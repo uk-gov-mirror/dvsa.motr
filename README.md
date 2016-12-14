@@ -1,2 +1,2 @@
 # motr-webapp
-Web application for subscribing to MOT Reminders
+Web application and tests for subscribing to MOT Reminders
