@@ -108,6 +108,7 @@
 $( document ).ready(function() {
     dvsaMotFrontendAuthentication.addNonAutocompleteFields();
 });
+
 /*
 
 DVSA Password module
@@ -273,78 +274,136 @@ DVSA Password module
 
 
 /*
-    show/hide toggle to deal with multiple toggled items labelled with a class and toggled on change form radio buttons
-    example and implementation: http://localhost:3008/examples/js/radio-button-toggle
-
-    The radio:
-    ----------------------
-    ...some radios
-    <label class="block-label" for="SelectReasons7" data-toggle-class="toggle-this-content">
-        <input type="radio" value="7" name="SelectReasons" id="SelectReasons7" aria-controls="cancellation-reasons">
-        Inspection maybe dangerous or cause damage
-    </label>
-    ...more radios
-
-    The toggled item(s):
-    ----------------------
-    <div class="js-hidden toggle-this-content">
-        ...etc
-
-
-    Bottom of HTML page:
-    ----------------------
-    <script type="application/javascript">
-        (function(){
-            var showerHiderRadioClasses = new DVSA.Modules.DVSAShowHideToggleRadioClasses.showerHiderRadioClasses({});
-            showerHiderRadioClasses.init();
-        }());
-    </script>
-
-    All otherwise hidden elements are displayed if javascript is off.
+    simpler show/hide toggle
+    example:
+    <a href="#" data-action="toggle" data-open-text="Hide RFR details" data-target="rfrList" id="toggleRFRList" class="js-only">Show added RFR details</a>
+    data-action="toggle" // define action applied to element
+    data-open-text="Hide RFR details" // text to swap out once clicked
+    data-target="rfrList" // ID of target
 */
 
 (function (globals) {
     'use strict';
     var init,
-        showerHiderRadioClasses,
-        ShowHideToggleRadioClasses,
+        showerHider,
+        ShowHideToggle,
         DVSA = globals.DVSA || {};
 
-    ShowHideToggleRadioClasses = function ShowHideToggleRadioClasses() {};
+    ShowHideToggle = function ShowHideToggle() {};
 
-    ShowHideToggleRadioClasses.prototype.init = function(){
+    function isHidden(el) {
+        // This does not work in older version of IE annoyingly
+        // return (el.offsetParent === null); 
+
+        // But this hideous monstrosity does
+        // TODO: Ditch this in favour of above or stop supporting <=IE9
+        var style = window.getComputedStyle(el);
+        return (style.display === 'none');
+    }
+
+    ShowHideToggle.prototype.init = function(){
 
         var self = this;
-        var triggerRadio = $('[data-toggle-class]');
-        var triggerRadioClass = $(triggerRadio).data('toggle-class');
-        var otherRadios = $('input[type=radio]:not([data-toggle-class])');
+        this.triggerElements = document.querySelectorAll('[data-action="showHideToggle"]');
 
-        $(triggerRadio).on('click', function(e) {
-            self.showToggle(triggerRadioClass);
-        });
-         $(otherRadios).on('click', function(e) {
-            self.hideToggle(triggerRadioClass);
+        for (var i=0; i < this.triggerElements.length; i++){
+            (function () {
+                var triggerElement = self.triggerElements[i],
+                    triggerElementStartText = triggerElement.text,
+                    triggerElementOpenText = triggerElement.getAttribute('data-open-text'),
+                    targetId = triggerElement.getAttribute('data-target'),
+                    toggleType = triggerElement.getAttribute('data-toggle-type'),
+                    targetElement = document.querySelector('#' + targetId),
+                    footerTriggerElement = self.triggerElements[1];
+                    // use the less particular jQuery to be a bit more flexible about what elements we can target, either one # or many .
+                    // targetElement = $(targetId);
+
+                triggerElement.setAttribute('data-closed-text', triggerElementStartText);
+
+                // add class to target element in case it doesn't have one
+                // a lapse into jQuery to save adding tons of extra code to check class list etc
+                // seeing as we're loading it anyway...
+                if(toggleType != 'responsive') {
+                    $(targetElement).addClass(' js-hidden');
+                }
+
+                if (window.addEventListener) {
+                    triggerElement.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        self.checkState(triggerElement, targetElement, triggerElementStartText, triggerElementOpenText, targetId);
+                    });
+
+                    footerTriggerElement.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        self.scrollToTable(targetId);
+                    });
+                }
+            }());
+        }
+    };
+
+    ShowHideToggle.prototype.checkState = function(triggerElement, targetElement, triggerElementStartText, triggerElementOpenText, toggleType){
+
+        if(isHidden(targetElement)) {
+            
+            this.showToggle(targetElement, triggerElementOpenText, toggleType);
+        } else {
+            
+            this.hideToggle(targetElement, triggerElementStartText, toggleType);
+        }
+    };
+
+    // OK, lapsing into more jQuery as time is of the essence...
+    ShowHideToggle.prototype.showToggle = function(targetElement, triggerElementOpenText, toggleType) {
+
+        if(toggleType == 'responsive') {
+
+            $(targetElement).removeClass('hide-small');
+
+        } else {
+
+            $(targetElement).removeClass('js-hidden');
+
+        }
+
+        $('[data-action="showHideToggle"]').each(function(){
+            $(this).text(triggerElementOpenText);
+            $(this).removeClass('toggle-switch').addClass('toggle-switch--open');
         });
     };
 
-    ShowHideToggleRadioClasses.prototype.showToggle = function(triggerRadioClass) {
-        $('.' + triggerRadioClass).removeClass('js-hidden');
+    ShowHideToggle.prototype.hideToggle = function(targetElement, triggerElementStartText, toggleType) {
+
+        if(toggleType == 'responsive') {
+
+            $(targetElement).addClass('hide-small');
+
+        } else {
+
+             $(targetElement).addClass('js-hidden');
+        }
+
+        $('[data-action="showHideToggle"]').each(function(){
+            $(this).text(triggerElementStartText);
+            $(this).removeClass('toggle-switch--open').addClass('toggle-switch');
+        });
     };
 
-    ShowHideToggleRadioClasses.prototype.hideToggle = function(triggerRadioClass) {
-        $('.' + triggerRadioClass).addClass('js-hidden');
+    ShowHideToggle.prototype.scrollToTable = function(targetId) {
+        // If the bottom link is changed, then pull the "header bar" of the active area back into focus at the top of the screen to prevent user from getting lost
+        $('#' + targetId + 'Parent')[0].scrollIntoView(true);
     };
 
     // use below to init on all pages
     // showerHider = new ShowHideToggle();
     // this has been left in, in case requirements change
     init = function () {
-        // showerHider.init();
+        //showerHider.init();
     };
 
-    globals.DVSAShowHideToggleRadioClasses = {
+    globals.DVSAShowHideToggle = {
         init: init,
-        showerHiderRadioClasses: ShowHideToggleRadioClasses
+        showerHider: ShowHideToggle
     };
 
 }(this));
@@ -478,149 +537,6 @@ DVSA Password module
     globals.DVSAShowHideToggleClasses = {
         init: init,
         showerHiderClasses: ShowHideToggleClasses
-    };
-
-}(this));
-
-/*
-    simpler show/hide toggle
-    example:
-    <span class="defect-summary__toggle">
-        <a href="#" data-action="showHideToggle" data-open-text="Hide defects" data-target="testToggleID" id="" class="">Show defects</a>
-    </span>
-    data-action="toggle" // define action applied to element
-    data-open-text="Hide RFR details" // text to swap out once clicked
-    data-target="rfrList" // ID of target
-
-    If JS is on, this is how the anchor part appears in the DOM:
-    <a href="#" data-action="showHideToggle" data-open-text="Hide defects" data-target="testToggleID" id="" class="" data-closed-text="Show defects">Show defects</a>
-    Note: the data-closed-text attr is added automatically from the existing text
-*/
-
-(function (globals) {
-    'use strict';
-    var init,
-        showerHider,
-        ShowHideToggle,
-        DVSA = globals.DVSA || {};
-
-    // Create empty function upon which to hang the prototypes below
-    ShowHideToggle = function ShowHideToggle() {};
-
-    function isHidden(el) {
-        // This does not work in older version of IE annoyingly
-        // return (el.offsetParent === null); 
-
-        // But this hideous monstrosity does
-        // TODO: Ditch this in favour of above or stop supporting <=IE9
-        var style = window.getComputedStyle(el);
-        return (style.display === 'none');
-    }
-
-    ShowHideToggle.prototype.init = function(){
-
-        var self = this;
-        this.triggerElements = document.querySelectorAll('[data-action="showHideToggle"]');
-
-        for (var i=0; i < this.triggerElements.length; i++){
-            (function () {
-                var triggerElement = self.triggerElements[i],
-                    triggerElementStartText = triggerElement.text,
-                    triggerElementOpenText = triggerElement.getAttribute('data-open-text'),
-                    targetId = triggerElement.getAttribute('data-target'),
-                    toggleType = triggerElement.getAttribute('data-toggle-type'),
-                    targetElement = document.querySelector('#' + targetId),
-                    footerTriggerElement = self.triggerElements[1];
-                    // use the less particular jQuery to be a bit more flexible about what elements we can target, either one # or many .
-                    // targetElement = $(targetId);
-
-                triggerElement.setAttribute('data-closed-text', triggerElementStartText);
-
-                // add class to target element in case it doesn't have one
-                // a lapse into jQuery to save adding tons of extra code to check class list etc
-                // seeing as we're loading it anyway...
-                if(toggleType != 'responsive') {
-                    $(targetElement).addClass(' js-hidden');
-                }
-
-                if (window.addEventListener) {
-                    triggerElement.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        self.checkState(triggerElement, targetElement, triggerElementStartText, triggerElementOpenText, toggleType);
-                    });
-
-                    if(footerTriggerElement) {
-                        footerTriggerElement.addEventListener('click', function (e) {
-                            e.preventDefault();
-                            self.scrollToTable(targetId);
-                        });
-                    }
-                }
-            }());
-        }
-    };
-
-    ShowHideToggle.prototype.checkState = function(triggerElement, targetElement, triggerElementStartText, triggerElementOpenText, toggleType){
-
-        if(isHidden(targetElement)) {
-            
-            this.showToggle(targetElement, triggerElementOpenText, toggleType);
-        } else {
-            
-            this.hideToggle(targetElement, triggerElementStartText, toggleType);
-        }
-    };
-
-    // OK, lapsing into more jQuery as time is of the essence...
-    ShowHideToggle.prototype.showToggle = function(targetElement, triggerElementOpenText, toggleType) {
-
-        if(toggleType == 'responsive') {
-
-            $(targetElement).removeClass('hide-small');
-
-        } else {
-
-            $(targetElement).removeClass('js-hidden');
-        }
-
-        $('[data-action="showHideToggle"]').each(function(){
-            $(this).text(triggerElementOpenText);
-            $(this).removeClass('toggle-switch').addClass('toggle-switch--open');
-        });
-    };
-
-    ShowHideToggle.prototype.hideToggle = function(targetElement, triggerElementStartText, toggleType) {
-
-        if(toggleType == 'responsive') {
-
-            $(targetElement).addClass('hide-small');
-
-        } else {
-
-             $(targetElement).addClass('js-hidden');
-        }
-
-        $('[data-action="showHideToggle"]').each(function(){
-            $(this).text(triggerElementStartText);
-            $(this).removeClass('toggle-switch--open').addClass('toggle-switch');
-        });
-    };
-
-    ShowHideToggle.prototype.scrollToTable = function(targetId) {
-        // If the bottom link is changed, then pull the "header bar" of the active area back into focus at the top of the screen to prevent user from getting lost
-        $('#' + targetId + 'Parent')[0].scrollIntoView(true);
-    };
-
-    // use below to init on all pages
-    // showerHider = new ShowHideToggle();
-    // this has been left in, in case requirements change
-    init = function () {
-        // showerHider.init();
-    };
-
-    globals.DVSAShowHideToggle = {
-        init: init,
-        showerHider: ShowHideToggle
     };
 
 }(this));
@@ -1092,11 +1008,9 @@ DVSA cookie feature test module
     globals.DVSA.Modules.DVSACookiesEnabled = DVSACookiesEnabled;
     globals.DVSA.Modules.DVSAShowHideToggle = DVSAShowHideToggle;
     globals.DVSA.Modules.DVSAShowHideToggleClasses = DVSAShowHideToggleClasses;
-    globals.DVSA.Modules.DVSAShowHideToggleRadioClasses = DVSAShowHideToggleRadioClasses;
     globals.DVSA.Modules.DVSAMarkRepairs = DVSAMarkRepairs;
     globals.DVSA.Modules.DoubleClickPrevention = DoubleClickPrevention;
 
     // Initialise
     globals.DVSA.init($({}));
 }(this));
- 
