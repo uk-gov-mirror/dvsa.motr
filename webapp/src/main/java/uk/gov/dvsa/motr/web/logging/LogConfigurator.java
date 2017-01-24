@@ -1,8 +1,4 @@
-package uk.gov.dvsa.motr.web.system;
-
-import com.amazonaws.services.lambda.runtime.Context;
-
-import org.slf4j.MDC;
+package uk.gov.dvsa.motr.web.logging;
 
 import uk.gov.dvsa.motr.web.config.Config;
 
@@ -22,9 +18,5 @@ public class LogConfigurator {
 
         String logLevel = config.getValue(LOG_LEVEL).orElse(DEFAULT_LOG_LEVEL);
         getRootLogger().setLevel(toLevel(logLevel));
-    }
-
-    public static void setRequestContext(Context context) {
-        MDC.put("lambdaFunctionName", context.getFunctionName());
     }
 }
