@@ -1,0 +1,71 @@
+import java.util.concurrent.TimeUnit
+
+group 'uk.gov.dvsa.motr.web'
+version null
+
+allprojects {
+    apply plugin: 'java'
+    apply plugin: 'maven'
+    apply plugin: 'maven-publish'
+    apply plugin: 'idea'
+    apply plugin: 'checkstyle'
+
+    checkstyle {
+        configFile = getRootProject().file("dvsa_java_checks.xml")
+        toolVersion = "6.15"
+    }
+
+    [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+}
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+
+    compile 'com.amazonaws:aws-lambda-java-core:1.1.0'
+    compile 'com.amazonaws:aws-lambda-java-events:1.1.0'
+    compile 'com.amazonaws:aws-lambda-java-log4j:1.0.0'
+    compile 'com.github.jknack:handlebars:4.0.6'
+    compile 'org.slf4j:slf4j-log4j12:1.7.21'
+    compile 'com.github.awslabs:aws-serverless-java-container:af1ec224af'
+    compile 'com.github.szhem:log4j-json-layout:b657ab3466'
+
+    testCompile group: 'com.tngtech.java', name: 'junit-dataprovider', version: '1.12.0'
+    testCompile 'com.github.stefanbirkner:system-rules:1.16.0'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+task buildZip(type: Zip) {
+    from compileJava
+    from processResources
+    into('lib') {
+        from configurations.runtime
+    }
+}
+
+task adjustArchiveBaseName {
+    doLast {
+        try {
+            def revision = 'git rev-list --max-count=1 --timestamp HEAD'.execute().text.trim()
+            def commitHash = revision.split(' ').last()
+            def timestamp = revision ? new Date(TimeUnit.SECONDS.toMillis(revision.split(' ').first() as long)).format("yyyyMMddHHmmss") : null
+
+            if (timestamp && commitHash) {
+                archivesBaseName = "${rootProject.name}-${timestamp}-${commitHash}"
+            } else {
+                throw new GradleException('Unable to parse revision from Git')
+            }
+        } catch (e) {
+            throw new GradleException('Unable to parse revision from Git',e)
+
+        }
+    }
+}
+
+jar.dependsOn('adjustArchiveBaseName')
+build.dependsOn buildZip
