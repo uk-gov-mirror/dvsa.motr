@@ -6,7 +6,6 @@ public enum SystemVariable implements ConfigKey {
 
     LOG_LEVEL("LOG_LEVEL"),
     REGION("REGION"),
-    DB_CONNECTION_STRING("DB_CONNECTION_STRING"),
     GOV_NOTIFY_URI("GOV_NOTIFY_URI"),
     // must be secret
     GOV_NOTIFY_API_TOKEN("GOV_NOTIFY_API_TOKEN"),
