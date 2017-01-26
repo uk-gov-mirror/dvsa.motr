@@ -7,10 +7,13 @@ import uk.gov.dvsa.motr.navigation.GotoUrl;
 import uk.gov.dvsa.motr.ui.base.Page;
 
 @GotoUrl("/")
-public class Homepage extends Page {
+public class HomePage extends Page {
 
     @FindBy(id = "startButton")
     private WebElement startNowBtn;
+
+    @FindBy(linkText = "Start now")
+    private WebElement startNowButton;
 
     @Override
     protected String getIdentity() {
@@ -18,7 +21,7 @@ public class Homepage extends Page {
     }
 
     public boolean isStartNowVisible() {
-        return startNowBtn.isDisplayed();
+        return startNowButton.isDisplayed();
     }
 
 }
