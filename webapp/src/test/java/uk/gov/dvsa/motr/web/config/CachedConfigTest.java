@@ -2,7 +2,6 @@ package uk.gov.dvsa.motr.web.config;
 
 import org.junit.Test;
 
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.assertEquals;
@@ -15,7 +14,7 @@ public class CachedConfigTest {
         final AtomicInteger noOfCalculations = new AtomicInteger(0);
         Config targetConfig = x -> {
             noOfCalculations.incrementAndGet();
-            return Optional.of("value");
+            return "value";
         };
         ConfigKey testKey = () -> "configKey";
 

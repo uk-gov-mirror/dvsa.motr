@@ -31,9 +31,8 @@ public class TemplateEngineBinder extends AbstractBinder {
         @Override
         public TemplateEngine provide() {
 
-            String hash = config.getValue(STATIC_ASSETS_HASH).orElse("");
-            String rootPath = config.getValue(STATIC_ASSETS_URL)
-                    .orElseThrow(() -> new RuntimeException("STATIC_ASSETS_URL system variable is not defined!"));
+            String hash = config.getValue(STATIC_ASSETS_HASH);
+            String rootPath = config.getValue(STATIC_ASSETS_URL);
 
             return new HandlebarsTemplateEngine(rootPath, hash);
         }

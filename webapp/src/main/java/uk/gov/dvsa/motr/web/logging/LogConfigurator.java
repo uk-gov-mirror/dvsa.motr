@@ -12,11 +12,9 @@ import static uk.gov.dvsa.motr.web.system.SystemVariable.LOG_LEVEL;
  */
 public class LogConfigurator {
 
-    private static final String DEFAULT_LOG_LEVEL = "INFO";
-
     public static void configureLogging(Config config) {
 
-        String logLevel = config.getValue(LOG_LEVEL).orElse(DEFAULT_LOG_LEVEL);
+        String logLevel = config.getValue(LOG_LEVEL);
         getRootLogger().setLevel(toLevel(logLevel));
     }
 }
