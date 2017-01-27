@@ -1,14 +1,17 @@
 package uk.gov.dvsa.motr.web.config;
 
-import java.util.Optional;
-
 /**
  * Config based on Environment Variables
  */
 public class EnvironmentVariableConfig implements Config {
 
     @Override
-    public Optional<String> getValue(ConfigKey key) {
-        return Optional.ofNullable(System.getenv(key.getName()));
+    public String getValue(ConfigKey key) {
+        String value = System.getenv(key.getName());
+        if (value == null || "".equals(value)) {
+            throw new RuntimeException(
+                    String.format("Config key: %s not specified!", key.getName()));
+        }
+        return value;
     }
 }

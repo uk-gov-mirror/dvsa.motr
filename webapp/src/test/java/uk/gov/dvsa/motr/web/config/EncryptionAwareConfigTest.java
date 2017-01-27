@@ -5,7 +5,6 @@ import org.junit.Test;
 import uk.gov.dvsa.motr.web.encryption.Decryptor;
 
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -15,9 +14,9 @@ public class EncryptionAwareConfigTest {
     private static final Config sourceConfig = key -> {
         switch (key.getName()) {
             case "plainKey":
-                return Optional.of("plainValue");
+                return "plainValue";
             case "secretKey":
-                return Optional.of("secretValue");
+                return "secretValue";
             default:
                 throw new UnsupportedOperationException();
         }
@@ -38,7 +37,7 @@ public class EncryptionAwareConfigTest {
         assertEquals(
                 "Secret not decrypted correctly",
                 "secretValueDecrypted",
-                encryptionAwareConfig.getValue(secretKey).orElse("fail"));
+                encryptionAwareConfig.getValue(secretKey));
     }
 
     @Test
@@ -47,7 +46,7 @@ public class EncryptionAwareConfigTest {
         assertEquals(
                 "Plain value decrypted despite it should not",
                 "plainValue",
-                encryptionAwareConfig.getValue(() -> "plainKey").orElse("fail"));
+                encryptionAwareConfig.getValue(() -> "plainKey"));
     }
 
     private static Set<ConfigKey> secretKeys() {

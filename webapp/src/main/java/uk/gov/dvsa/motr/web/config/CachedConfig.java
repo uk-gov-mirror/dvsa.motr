@@ -2,7 +2,6 @@ package uk.gov.dvsa.motr.web.config;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * In-memory cache for configuration.
@@ -12,14 +11,14 @@ public class CachedConfig implements Config {
 
     private final Config wrappedConfig;
 
-    private final Map<ConfigKey, Optional<String>> cache = new HashMap<>();
+    private final Map<ConfigKey, String> cache = new HashMap<>();
 
     public CachedConfig(Config wrappedConfig) {
         this.wrappedConfig = wrappedConfig;
     }
 
     @Override
-    public Optional<String> getValue(ConfigKey key) {
+    public String getValue(ConfigKey key) {
         return cache.computeIfAbsent(key, wrappedConfig::getValue);
     }
 }

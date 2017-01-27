@@ -2,10 +2,7 @@ package uk.gov.dvsa.motr.web.config;
 
 import uk.gov.dvsa.motr.web.encryption.Decryptor;
 
-import java.util.Optional;
 import java.util.Set;
-
-import static java.util.function.Function.identity;
 
 /**
  * Wraps a given instance of config and adds decryption layer on top of it.
@@ -25,16 +22,11 @@ public class EncryptionAwareConfig implements Config {
     }
 
     @Override
-    public Optional<String> getValue(ConfigKey key) {
+    public String getValue(ConfigKey key) {
 
-        return wrappedConfig.getValue(key)
-                .map(encryptedEntries.contains(key) ? this::decrypt : identity());
+        String value = wrappedConfig.getValue(key);
+        return encryptedEntries.contains(key) ? decryptor.decrypt(value) : value;
 
-    }
-
-    private String decrypt(String encryptedValue) {
-
-        return decryptor.decrypt(encryptedValue);
     }
 }
 

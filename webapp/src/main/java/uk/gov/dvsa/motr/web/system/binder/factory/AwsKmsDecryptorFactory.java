@@ -7,7 +7,6 @@ import uk.gov.dvsa.motr.web.encryption.Decryptor;
 import javax.inject.Inject;
 
 import static com.amazonaws.regions.Region.getRegion;
-import static com.amazonaws.regions.Regions.EU_WEST_1;
 import static com.amazonaws.regions.Regions.fromName;
 
 import static uk.gov.dvsa.motr.web.system.SystemVariable.REGION;
@@ -27,7 +26,7 @@ public class AwsKmsDecryptorFactory implements BaseFactory<Decryptor> {
         return new AwsKmsDecryptor(
                 getRegion(
                         fromName(
-                                config.getValue(REGION).orElse(EU_WEST_1.getName())
+                                config.getValue(REGION)
                         )
                 )
         );
