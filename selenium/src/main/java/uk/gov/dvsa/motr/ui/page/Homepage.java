@@ -9,12 +9,12 @@ import uk.gov.dvsa.motr.ui.base.Page;
 @GotoUrl("/")
 public class Homepage extends Page {
 
-    @FindBy(linkText = "Start now")
+    @FindBy(id = "startButton")
     private WebElement startNowBtn;
 
     @Override
     protected String getIdentity() {
-        return "Sign up for an MOT reminder";
+        return "Get reminders about your MOT";
     }
 
     public boolean isStartNowVisible() {
