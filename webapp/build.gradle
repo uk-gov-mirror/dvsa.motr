@@ -1,3 +1,6 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
+
 import java.util.concurrent.TimeUnit
 
 group 'uk.gov.dvsa.motr.web'
@@ -25,6 +28,22 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 
+sourceSets {
+    integrationTest {
+        java {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+            srcDir file('src/integration-test/java')
+        }
+        resources.srcDir file('src/integration-test/resources')
+    }
+}
+
+configurations {
+    integrationTestCompile.extendsFrom testCompile
+    integrationTestRuntime.extendsFrom testRuntime
+}
+
 dependencies {
 
     compile 'com.amazonaws:aws-lambda-java-core:1.1.0'
@@ -34,11 +53,13 @@ dependencies {
     compile 'org.slf4j:slf4j-log4j12:1.7.21'
     compile 'com.github.awslabs:aws-serverless-java-container:af1ec224af'
     compile 'com.github.szhem:log4j-json-layout:b657ab3466'
+    compile 'com.amazonaws:aws-java-sdk-dynamodb:1.11.84'
     compile 'javax.mail:mail:1.4.7'
 
-    testCompile group: 'com.tngtech.java', name: 'junit-dataprovider', version: '1.12.0'
+
+    testCompile 'com.tngtech.java:junit-dataprovider:1.12.0'
     testCompile 'com.github.stefanbirkner:system-rules:1.16.0'
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile 'junit:junit:4.12'
 }
 
 task buildZip(type: Zip) {
@@ -64,6 +85,39 @@ task adjustArchiveBaseName {
         } catch (e) {
             throw new GradleException('Unable to parse revision from Git',e)
 
+        }
+    }
+}
+
+
+task integrationTest(type: Test) {
+
+    testClassesDir = sourceSets.integrationTest.output.classesDir
+    classpath = sourceSets.integrationTest.runtimeClasspath
+
+    systemProperties = (Map<String, String>)System.getProperties().findAll {it.key.startsWith("test.")}
+}
+
+// enhanced logging for test phases
+tasks.withType(Test) {
+    testLogging {
+        events = [TestLogEvent.PASSED,
+                  TestLogEvent.SKIPPED,
+                  TestLogEvent.FAILED,
+                  TestLogEvent.STANDARD_OUT]
+        showStandardStreams = true
+        exceptionFormat = TestExceptionFormat.FULL
+        showExceptions = true
+        showStackTraces = true
+        showCauses = true
+
+        afterSuite { desc, result ->
+            if (!desc.parent) { // will match the outermost suite
+                def output = "Results: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} successes, ${result.failedTestCount} failures, ${result.skippedTestCount} skipped)"
+                def startItem = '|  ', endItem = '  |'
+                def repeatLength = startItem.length() + output.length() + endItem.length()
+                println('\n' + ('-' * repeatLength) + '\n' + startItem + output + endItem + '\n' + ('-' * repeatLength))
+            }
         }
     }
 }
