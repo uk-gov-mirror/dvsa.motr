@@ -6,11 +6,14 @@ import com.github.jknack.handlebars.cache.ConcurrentMapTemplateCache;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
 
+import org.apache.log4j.MDC;
+
 import java.io.IOException;
 
 public class HandlebarsTemplateEngine implements TemplateEngine {
 
     private static final String ASSETS_HELPER_NAME = "asset";
+    private static final String REQUEST_ID_HELPER_NAME = "requestId";
 
     private final Handlebars handlebars;
 
@@ -23,6 +26,7 @@ public class HandlebarsTemplateEngine implements TemplateEngine {
         String assetsPathFormat = (assetsRootPath + "/%s?v=%s").replaceAll("(?<!(http:|https:))[//]+", "/");
         handlebars = new Handlebars(loader)
                 .registerHelper(ASSETS_HELPER_NAME, assetsHelper(assetsPathFormat, assetsHash))
+                .registerHelper(REQUEST_ID_HELPER_NAME, (context, options) -> MDC.get("AWSRequestId"))
                 .with(new ConcurrentMapTemplateCache());
     }
 
