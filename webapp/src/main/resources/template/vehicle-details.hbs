@@ -1,0 +1,40 @@
+{{#partial "content" }}
+    <header class="content-header">
+        <h1>
+            <span class="content-header__type"></span>
+            <span class="content-header__title">
+                What is your vehicle's registration (number plate)?
+            </span>
+        </h1>
+    </header>
+
+    {{#message}}
+        {{> partial/error-message }}
+    {{/message}}
+
+    <form method="POST" autocomplete="off" novalidate="">
+        <fieldset>
+            <div class="form-group {{#message}}has-error{{/message}}">
+                <label for="textStandard" class="form-label">
+                    Registration (number plate)
+                </label>
+                {{#showInLine}}
+                    <span class="validation-message">{{message}}</span>
+                {{/showInLine}}
+                <input class="form-control" id="regNumber" name="regNumber" type="text" style="text-transform: uppercase;"
+                       value="{{vehicleDetails}}">
+            </div>
+        </fieldset>
+
+        <nav class="content-navigation">
+            <input type="submit" value="Continue" id="continue" class="button">
+            <ul class="content-navigation__secondary">
+                <li>
+                    <a href="">Back</a>
+                </li>
+            </ul>
+        </nav>
+    </form>
+
+{{/partial}}
+{{> master}}

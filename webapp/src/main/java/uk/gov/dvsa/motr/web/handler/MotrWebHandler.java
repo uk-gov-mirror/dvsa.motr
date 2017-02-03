@@ -12,7 +12,6 @@ import uk.gov.dvsa.motr.web.system.MotrWebApplication;
 import static uk.gov.dvsa.motr.web.logging.LambdaInvocationLogging.invokeWithLogging;
 import static uk.gov.dvsa.motr.web.logging.LogConfigurator.configureLogging;
 
-
 /**
  * Entry point for Lambda
  */
