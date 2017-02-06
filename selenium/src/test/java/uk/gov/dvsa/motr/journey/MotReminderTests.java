@@ -7,7 +7,7 @@ import uk.gov.dvsa.motr.navigation.PageNavigator;
 import uk.gov.dvsa.motr.ui.page.EmailPage;
 import uk.gov.dvsa.motr.ui.page.HomePage;
 import uk.gov.dvsa.motr.ui.page.ReviewPage;
-import uk.gov.dvsa.motr.ui.page.VehicleDetailsPage;
+import uk.gov.dvsa.motr.ui.page.VrmPage;
 
 import java.io.IOException;
 
@@ -40,7 +40,7 @@ public class MotReminderTests extends BaseTest {
     @Test
     public void enteringVrmUrlWillDisplayEmailPage() throws IOException {
 
-        VehicleDetailsPage page = PageNavigator.goTo(VehicleDetailsPage.class);
+        VrmPage page = PageNavigator.goTo(VrmPage.class);
         assertTrue(page.isVrmContinueButtonDisplayed());
     }
 }

@@ -3,7 +3,7 @@ package uk.gov.dvsa.motr.web.validator;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
-public class EmailValidator implements Validator {
+public class EmailValidator {
 
     public static final String EMAIL_EMPTY_MESSAGE = "Enter your email address";
     public static final String EMAIL_INVALID_MESSAGE = "Enter a valid email address";

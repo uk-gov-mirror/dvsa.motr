@@ -56,11 +56,15 @@ dependencies {
     compile 'com.amazonaws:aws-java-sdk-dynamodb:1.11.84'
     compile 'javax.mail:mail:1.4.7'
     compile 'org.glassfish.jersey.media:jersey-media-json-jackson:2.25'
-
+    compile 'org.glassfish.jersey.connectors:jersey-apache-connector:2.20'
+    
     testCompile 'com.tngtech.java:junit-dataprovider:1.12.0'
+    testCompile 'com.github.tomakehurst:wiremock:2.5.1'
+
     testCompile 'com.github.stefanbirkner:system-rules:1.16.0'
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-all:1.9.5'
+    testCompile 'commons-io:commons-io:2.5'
 }
 
 task buildZip(type: Zip) {

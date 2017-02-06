@@ -7,17 +7,12 @@ import com.tngtech.java.junit.dataprovider.UseDataProvider;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import uk.gov.dvsa.motr.web.remote.client.VehicleDetailsClient;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 
 @RunWith(DataProviderRunner.class)
 public class VrmValidatorTest {
-
-    private static final VehicleDetailsClient VEHICLE_DETAILS_CLIENT = mock(VehicleDetailsClient.class);
 
     @Test
     public void isValidThrowsErrorMessageWhenNoRegistrationProvided() {
@@ -36,7 +31,6 @@ public class VrmValidatorTest {
 
         assertFalse(vrmValidator.isValid(invalidRegistration));
         assertEquals("Registration can only contain letters, numbers and hyphens", vrmValidator.getMessage());
-        assertTrue(vrmValidator.shouldShowInLineMessage());
     }
 
     @Test
@@ -46,7 +40,6 @@ public class VrmValidatorTest {
 
         assertFalse(vrmValidator.isValid("123456789ABCDE"));
         assertEquals("Registration must be shorter than 14 characters", vrmValidator.getMessage());
-        assertTrue(vrmValidator.shouldShowInLineMessage());
     }
 
     @Test

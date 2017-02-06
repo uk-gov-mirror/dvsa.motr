@@ -29,7 +29,7 @@ public class LocalDateDeserialiserTest {
     @Test
     public void testValidStringDate_returnsLocalDate() throws IOException {
 
-        when(PARSER.getText()).thenReturn("2015/10/13");
+        when(PARSER.getText()).thenReturn("2015-10-13");
         LocalDate actual = deserialiser.deserialize(PARSER, CONTEXT);
         assertEquals(13, actual.getDayOfMonth());
         assertEquals(10, actual.getMonthValue());
@@ -39,7 +39,7 @@ public class LocalDateDeserialiserTest {
     @Test(expected = DateTimeParseException.class)
     public void testInvalidStringDate_throwsJsonProcessingException() throws IOException {
 
-        when(PARSER.getText()).thenReturn("2015/13/10");
+        when(PARSER.getText()).thenReturn("2015-13-10");
         deserialiser.deserialize(PARSER, CONTEXT);
     }
 }

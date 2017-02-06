@@ -6,8 +6,8 @@ import org.openqa.selenium.support.FindBy;
 import uk.gov.dvsa.motr.navigation.GotoUrl;
 import uk.gov.dvsa.motr.ui.base.Page;
 
-@GotoUrl("/vehicle-details")
-public class VehicleDetailsPage extends Page {
+@GotoUrl("/vrm")
+public class VrmPage extends Page {
 
     @FindBy(id = "regNumber")
     private WebElement vrmField;

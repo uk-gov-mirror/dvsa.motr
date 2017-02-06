@@ -1,4 +1,4 @@
-package uk.gov.dvsa.motr.web.remote.client;
+package uk.gov.dvsa.motr.remote.vehicledetails;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -7,20 +7,27 @@ import uk.gov.dvsa.motr.web.serialisation.LocalDateDeserialiser;
 
 import java.time.LocalDate;
 
-public class Vehicle {
+
+public class VehicleDetails {
 
     @JsonProperty("make")
     private String make;
+
     @JsonProperty("model")
     private String model;
+
     @JsonProperty("primaryColour")
     private String primaryColour;
+
     @JsonProperty("secondaryColour")
     private String secondaryColour;
+
     @JsonProperty("regNumber")
     private String regNumber;
+
     @JsonProperty("yearOfManufacture")
     private Integer yearOfManufacture;
+
     @JsonDeserialize(using = LocalDateDeserialiser.class)
     @JsonProperty("motExpiryDate")
     private LocalDate motExpiryDate;
@@ -98,7 +105,7 @@ public class Vehicle {
     @Override
     public String toString() {
 
-        return "Vehicle{" +
+        return "VehicleDetails{" +
                 "make='" + make + '\'' +
                 ", model='" + model + '\'' +
                 ", primaryColour='" + primaryColour + '\'' +
