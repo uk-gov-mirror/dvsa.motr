@@ -28,6 +28,7 @@ public class VrmResourceTest {
 
     @Before
     public void setUp() {
+
         templateEngine = new TemplateEngineStub();
         client = mock(VehicleDetailsClient.class);
         resource = new VrmResource(templateEngine, client);

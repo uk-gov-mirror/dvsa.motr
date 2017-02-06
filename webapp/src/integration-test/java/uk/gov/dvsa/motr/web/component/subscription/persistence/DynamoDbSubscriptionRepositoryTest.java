@@ -42,6 +42,45 @@ public class DynamoDbSubscriptionRepositoryTest {
     }
 
     @Test
+    public void saveSubscriptionCorrectlySavesToDb() {
+
+        SubscriptionItem subscriptionItem = new SubscriptionItem();
+
+        Subscription subscription = new Subscription(subscriptionItem.getId())
+                .setEmail(subscriptionItem.getEmail())
+                .setVrm(subscriptionItem.getVrm())
+                .setMotDueDate(subscriptionItem.getMotDueDate());
+
+        repo.save(subscription);
+
+        Subscription actualSubscription = repo.findById(subscription.getId()).get();
+
+        assertEquals(subscriptionItem.getEmail(), actualSubscription.getEmail());
+        assertEquals(subscriptionItem.getVrm(), actualSubscription.getVrm());
+        assertEquals(subscriptionItem.getMotDueDate(), actualSubscription.getMotDueDate());
+    }
+
+    @Test
+    public void findByVrmAndEmailReturnsSubscriptionIfItExists() {
+
+        SubscriptionItem expectedSubscription = new SubscriptionItem();
+
+        fixture.table(new SubscriptionTable().item(expectedSubscription)).run();
+
+        Subscription actualSubscription = repo.findByVrmAndEmail(expectedSubscription.getVrm(), expectedSubscription.getEmail()).get();
+
+        assertEquals(actualSubscription.getEmail(), expectedSubscription.getEmail());
+        assertEquals(actualSubscription.getVrm(), expectedSubscription.getVrm());
+        assertEquals(actualSubscription.getMotDueDate(), expectedSubscription.getMotDueDate());
+    }
+
+    @Test
+    public void findByVrmAndEmailReturnsEmptyIfSubscriptionDoesNotExist() {
+
+        assertFalse(repo.findByVrmAndEmail("VRM_THAT_DOES_NOT_EXIST", "EMAIL_THAT_DOES_NOT_EXIST").isPresent());
+    }
+
+    @Test
     public void getByIdReturnsEmptyIfSubscriptionDoesNotExist() {
         
         assertFalse(repo.findById("ID_THAT_DOES_NOT_EXIST").isPresent());
