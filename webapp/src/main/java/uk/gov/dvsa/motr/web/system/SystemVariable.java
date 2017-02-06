@@ -6,8 +6,6 @@ public enum SystemVariable implements ConfigKey {
 
     LOG_LEVEL("LOG_LEVEL"),
     REGION("REGION"),
-    ENV_ID("ENV_ID"),
-
     GOV_NOTIFY_URI("GOV_NOTIFY_URI"),
     // must be secret
     GOV_NOTIFY_API_TOKEN("GOV_NOTIFY_API_TOKEN"),
@@ -15,7 +13,9 @@ public enum SystemVariable implements ConfigKey {
     // must be secret
     MOT_TEST_REMINDER_INFO_API_TOKEN("MOT_TEST_REMINDER_INFO_API_TOKEN"),
     STATIC_ASSETS_HASH("STATIC_ASSETS_HASH"),
-    STATIC_ASSETS_URL("STATIC_ASSETS_URL");
+    STATIC_ASSETS_URL("STATIC_ASSETS_URL"),
+    DB_TABLE_PENDING_SUBSCRIPTION("DB_TABLE_PENDING_SUBSCRIPTION"),
+    DB_TABLE_SUBSCRIPTION("DB_TABLE_SUBSCRIPTION");
 
     final String name;
 

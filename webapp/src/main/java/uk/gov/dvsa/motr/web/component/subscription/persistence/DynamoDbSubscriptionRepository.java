@@ -15,20 +15,16 @@ import java.time.LocalDate;
 import java.util.Iterator;
 import java.util.Optional;
 
-import static uk.gov.dvsa.motr.web.component.subscription.persistence.MotrTableName.tableName;
-
 
 public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
-
-    public static final String CORE_NAME = "subscription";
-
+    
     private DynamoDB dynamoDb;
 
     private String tableName;
 
-    public DynamoDbSubscriptionRepository(AmazonDynamoDB dynamoDb, String envId) {
+    public DynamoDbSubscriptionRepository(AmazonDynamoDB dynamoDb, String tableName) {
         this.dynamoDb = new DynamoDB(dynamoDb);
-        this.tableName = tableName(envId, CORE_NAME);
+        this.tableName = tableName;
     }
 
     public Optional<Subscription> findById(String subscriptionId) {

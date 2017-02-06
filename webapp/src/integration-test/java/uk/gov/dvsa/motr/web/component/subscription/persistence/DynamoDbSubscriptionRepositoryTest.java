@@ -12,7 +12,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 import static uk.gov.dvsa.motr.test.integration.dynamodb.DynamoDbIntegrationHelper.client;
-import static uk.gov.dvsa.motr.test.integration.dynamodb.DynamoDbIntegrationHelper.envId;
+import static uk.gov.dvsa.motr.test.integration.dynamodb.DynamoDbIntegrationHelper.subscriptionTableName;
 
 public class DynamoDbSubscriptionRepositoryTest {
 
@@ -22,7 +22,7 @@ public class DynamoDbSubscriptionRepositoryTest {
 
     @Before
     public void setUp() {
-        repo = new DynamoDbSubscriptionRepository(client(), envId());
+        repo = new DynamoDbSubscriptionRepository(client(), subscriptionTableName());
         fixture = new DynamoDbFixture(client());
     }
 

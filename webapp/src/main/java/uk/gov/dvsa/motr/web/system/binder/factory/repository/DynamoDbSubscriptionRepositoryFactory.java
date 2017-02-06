@@ -10,7 +10,7 @@ import uk.gov.dvsa.motr.web.system.binder.factory.BaseFactory;
 
 import javax.inject.Inject;
 
-import static uk.gov.dvsa.motr.web.system.SystemVariable.ENV_ID;
+import static uk.gov.dvsa.motr.web.system.SystemVariable.DB_TABLE_SUBSCRIPTION;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.REGION;
 
 public class DynamoDbSubscriptionRepositoryFactory implements BaseFactory<SubscriptionRepository> {
@@ -26,9 +26,9 @@ public class DynamoDbSubscriptionRepositoryFactory implements BaseFactory<Subscr
     public SubscriptionRepository provide() {
 
         String region = config.getValue(REGION);
-        String envId = config.getValue(ENV_ID);
+        String tableName = config.getValue(DB_TABLE_SUBSCRIPTION);
         AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard().withRegion(region).build();
 
-        return new DynamoDbSubscriptionRepository(client, envId);
+        return new DynamoDbSubscriptionRepository(client, tableName);
     }
 }

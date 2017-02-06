@@ -8,14 +8,14 @@ import java.util.Optional;
 
 public class DynamoDbIntegrationHelper {
 
-    /**
-     * Returns environment id for testing
-     *
-     * @return environment id
-     */
-    public static String envId() {
+    public static String subscriptionTableName() {
 
-        return lookupProperty("test.dynamoDB.integration.envId");
+        return lookupProperty("test.dynamoDB.integration.table.subscription");
+    }
+
+    public static String pendingSubscriptionTableName() {
+
+        return lookupProperty("test.dynamoDB.integration.table.pending_subscription");
     }
 
     /**
@@ -39,9 +39,4 @@ public class DynamoDbIntegrationHelper {
         return AmazonDynamoDBClientBuilder.standard().withRegion(region())
                 .withCredentials(new DefaultAWSCredentialsProviderChain()).build();
     }
-
-    public static String tableName(String coreName) {
-        return String.format("motr-%s-%s", envId(), coreName);
-    }
-
 }
