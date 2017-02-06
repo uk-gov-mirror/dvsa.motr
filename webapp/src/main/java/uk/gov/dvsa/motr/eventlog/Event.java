@@ -1,10 +1,15 @@
 package uk.gov.dvsa.motr.eventlog;
 
+import java.util.HashMap;
 import java.util.Map;
 
-public interface Event {
+public abstract class Event {
 
-    Map<String, String> toMap();
+    protected Map<String, String> params = new HashMap<>();
 
-    String getCode();
+    Map<String, String> toMap() {
+        return params;
+    }
+
+    public abstract String getCode();
 }

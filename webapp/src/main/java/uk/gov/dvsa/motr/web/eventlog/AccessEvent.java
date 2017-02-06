@@ -2,20 +2,7 @@ package uk.gov.dvsa.motr.web.eventlog;
 
 import uk.gov.dvsa.motr.eventlog.Event;
 
-import java.util.HashMap;
-import java.util.Map;
-
-/**
- * Container for ACCESS event data
- */
-public class AccessEvent implements Event {
-
-    private Map<String, String> params = new HashMap<>();
-
-    @Override
-    public Map<String, String> toMap() {
-        return params;
-    }
+public class AccessEvent extends Event {
 
     @Override
     public String getCode() {
