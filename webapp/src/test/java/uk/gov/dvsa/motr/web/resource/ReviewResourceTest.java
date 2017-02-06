@@ -2,6 +2,7 @@ package uk.gov.dvsa.motr.web.resource;
 
 import org.junit.Test;
 
+import uk.gov.dvsa.motr.notifications.service.NotifyService;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.web.component.subscription.service.SubscriptionService;
@@ -30,12 +31,13 @@ public class ReviewResourceTest {
     private static final VrmValidator VRM_VALIDATOR = mock(VrmValidator.class);
     private static final EmailValidator EMAIL_VALIDATOR = mock(EmailValidator.class);
     private static final TemplateEngineStub TEMPLATE_ENGINE_STUB = new TemplateEngineStub();
+    private static final NotifyService NOTIFY_SERVICE = mock(NotifyService.class);
+    private static final String BASE_URL = "https://testUrl";
 
     @Test
     public void reviewTemplateIsRenderedOnGetWithViewModel() throws Exception {
 
-        ReviewResource resource = new ReviewResource(TEMPLATE_ENGINE_STUB, SUBSCRIPTION_SERVICE, VEHICLE_DETAILS_CLIENT,
-                "https://testUrl");
+        ReviewResource resource = new ReviewResource(TEMPLATE_ENGINE_STUB, SUBSCRIPTION_SERVICE, VEHICLE_DETAILS_CLIENT, BASE_URL);
 
         when(VEHICLE_DETAILS_CLIENT.fetch("YN13NTX")).thenReturn(vehicleDetailsResponse());
 
@@ -48,13 +50,13 @@ public class ReviewResourceTest {
     public void redirectsToSubscriptionScreenWhenReviewDetailsValid() throws Exception {
 
         ReviewResource resource = new ReviewResource(TEMPLATE_ENGINE_STUB, SUBSCRIPTION_SERVICE, VEHICLE_DETAILS_CLIENT,
-                "https://testUrl");
+                BASE_URL);
 
         when(VRM_VALIDATOR.isValid("test-reg")).thenReturn(true);
         when(EMAIL_VALIDATOR.isValid()).thenReturn(true);
         when(VEHICLE_DETAILS_CLIENT.fetch("test-reg")).thenReturn(Optional.of(mockVehicleDetails()));
         Response actual = resource.reviewPagePost();
-        assertEquals(303, actual.getStatus());
+        assertEquals(302, actual.getStatus());
     }
 
     private VehicleDetails mockVehicleDetails() {
@@ -76,7 +78,7 @@ public class ReviewResourceTest {
     public void whenNoVehicleReturnedFromApiNotFoundThrown() throws Exception {
         TemplateEngineStub engine = new TemplateEngineStub();
         ReviewResource resource = new ReviewResource(TEMPLATE_ENGINE_STUB, SUBSCRIPTION_SERVICE, VEHICLE_DETAILS_CLIENT,
-                "https://testUrl");
+                BASE_URL);
         when(VEHICLE_DETAILS_CLIENT.fetch("YN13NTX")).thenReturn(Optional.empty());
         resource.reviewPage();
     }

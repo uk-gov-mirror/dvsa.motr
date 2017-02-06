@@ -10,8 +10,8 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.safari.SafariDriver;
 import org.testng.Assert;
 
-import uk.gov.dvsa.motr.logging.Logger;
 import uk.gov.dvsa.motr.config.Configurator;
+import uk.gov.dvsa.motr.logging.Logger;
 
 import java.net.MalformedURLException;
 import java.net.URL;

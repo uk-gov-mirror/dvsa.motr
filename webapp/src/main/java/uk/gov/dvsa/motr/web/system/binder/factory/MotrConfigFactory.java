@@ -13,7 +13,6 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import static uk.gov.dvsa.motr.web.system.SystemVariable.GOV_NOTIFY_API_TOKEN;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.MOT_TEST_REMINDER_INFO_API_TOKEN;
 
 import static java.util.Arrays.asList;
@@ -43,7 +42,7 @@ public class MotrConfigFactory implements BaseFactory<Config> {
 
         Set<ConfigKey> secretVariables = new HashSet<>();
         secretVariables.addAll(asList(
-                GOV_NOTIFY_API_TOKEN,
+                //GOV_NOTIFY_API_TOKEN,
                 MOT_TEST_REMINDER_INFO_API_TOKEN
         ));
 

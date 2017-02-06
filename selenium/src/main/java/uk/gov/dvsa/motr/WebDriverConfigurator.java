@@ -1,8 +1,8 @@
 package uk.gov.dvsa.motr;
 
 import uk.gov.dvsa.motr.config.Configurator;
-import uk.gov.dvsa.motr.config.webdriver.DriverFactory;
 import uk.gov.dvsa.motr.config.webdriver.BaseAppDriver;
+import uk.gov.dvsa.motr.config.webdriver.DriverFactory;
 
 import java.util.concurrent.TimeUnit;
 

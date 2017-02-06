@@ -7,6 +7,7 @@ import uk.gov.dvsa.motr.navigation.PageNavigator;
 import uk.gov.dvsa.motr.ui.page.EmailPage;
 import uk.gov.dvsa.motr.ui.page.HomePage;
 import uk.gov.dvsa.motr.ui.page.ReviewPage;
+import uk.gov.dvsa.motr.ui.page.SubscriptionConfirmationPage;
 import uk.gov.dvsa.motr.ui.page.VrmPage;
 
 import java.io.IOException;
@@ -31,16 +32,22 @@ public class MotReminderTests extends BaseTest {
     }
 
     @Test
-    public void enteringReviewUrlWillDisplayEmailPage() throws IOException {
+    public void enteringReviewUrlWillDisplayReviewPage() throws IOException {
 
         ReviewPage page = PageNavigator.goTo(ReviewPage.class);
         assertTrue(page.isContinueButtonDisplayed());
     }
 
     @Test
-    public void enteringVrmUrlWillDisplayEmailPage() throws IOException {
+    public void enteringVrmUrlWillDisplayVrmPage() throws IOException {
 
         VrmPage page = PageNavigator.goTo(VrmPage.class);
         assertTrue(page.isVrmContinueButtonDisplayed());
+    }
+
+    @Test
+    public void enteringSubscriptionConfirmedUrlWillDisplaySubscriptionConfirmationPage() throws IOException {
+
+        PageNavigator.goTo(SubscriptionConfirmationPage.class);
     }
 }

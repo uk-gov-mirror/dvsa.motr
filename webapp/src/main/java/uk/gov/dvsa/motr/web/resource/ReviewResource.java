@@ -5,7 +5,7 @@ import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClientException;
 import uk.gov.dvsa.motr.web.component.subscription.exception.SubscriptionAlreadyExistsException;
 import uk.gov.dvsa.motr.web.component.subscription.service.SubscriptionService;
-import uk.gov.dvsa.motr.web.helper.ConfigValue;
+import uk.gov.dvsa.motr.web.helper.SystemVariableParam;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 import uk.gov.dvsa.motr.web.validator.EmailValidator;
 import uk.gov.dvsa.motr.web.validator.VrmValidator;
@@ -27,6 +27,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
+import static uk.gov.dvsa.motr.web.system.SystemVariable.BASE_URL;
+
+import static javax.ws.rs.core.Response.Status.FOUND;
+
 @Singleton
 @Path("/review")
 @Produces("text/html")
@@ -38,8 +42,12 @@ public class ReviewResource {
     private final String baseUrl;
 
     @Inject
-    public ReviewResource(TemplateEngine renderer, SubscriptionService subscriptionService, VehicleDetailsClient vehicleDetailsClient,
-            @ConfigValue("BASE_URL") String baseUrl) {
+    public ReviewResource(
+            TemplateEngine renderer,
+            SubscriptionService subscriptionService,
+            VehicleDetailsClient vehicleDetailsClient,
+            @SystemVariableParam(BASE_URL) String baseUrl
+    ) {
 
         this.renderer = renderer;
         this.subscriptionService = subscriptionService;
@@ -76,7 +84,6 @@ public class ReviewResource {
     @POST
     public Response reviewPagePost() throws Exception {
 
-        //TODO here for the time being - will be refactored when we have session integration
         Map<String, Object> map = new HashMap<>();
         ReviewViewModel viewModel = new ReviewViewModel();
 
@@ -106,16 +113,16 @@ public class ReviewResource {
 
             try {
                 // TODO replace hard coded values with vehicle data
-                this.subscriptionService.saveSubscription("new-fake-reg", "thisNewEmailHere@test.com", LocalDate.of(2017, 2, 2));
-                return Response.seeOther(UriBuilder.fromUri(new URI(this.baseUrl)).path("subscription-confirmation").build()).build();
+                this.subscriptionService.createSubscription("new-fake-reg", "thisNewEmailHere@test.com", LocalDate.of(2017, 2, 2));
+                return Response.status(FOUND).location(UriBuilder.fromUri(new URI(this.baseUrl)).path("subscription-confirmation").build())
+                        .build();
             } catch (SubscriptionAlreadyExistsException e) {
-                //TODO add error for when a subscription already exists
+                throw new NotFoundException();
             }
         }
 
         map.put("viewModel", viewModel);
 
-        //TODO Add in call to gov notify to set up the subscription.
         return Response.ok().entity(renderer.render("review", map)).build();
     }
 }

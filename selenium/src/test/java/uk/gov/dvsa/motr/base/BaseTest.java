@@ -5,12 +5,12 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
 
-import uk.gov.dvsa.motr.logging.Logger;
 import uk.gov.dvsa.motr.WebDriverConfigurator;
 import uk.gov.dvsa.motr.WebDriverConfiguratorRegistry;
 import uk.gov.dvsa.motr.config.Configurator;
 import uk.gov.dvsa.motr.config.TestExecutionListener;
 import uk.gov.dvsa.motr.config.webdriver.BaseAppDriver;
+import uk.gov.dvsa.motr.logging.Logger;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

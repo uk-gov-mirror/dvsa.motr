@@ -1,8 +1,10 @@
 package uk.gov.dvsa.motr.web.component.subscription.service;
 
+import uk.gov.dvsa.motr.notifications.service.NotifyService;
 import uk.gov.dvsa.motr.web.component.subscription.exception.SubscriptionAlreadyExistsException;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.persistence.SubscriptionRepository;
+import uk.gov.service.notify.NotificationClientException;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -14,14 +16,17 @@ import static java.lang.String.format;
 public class SubscriptionService {
 
     private SubscriptionRepository subscriptionRepository;
+    private final NotifyService notifyService;
 
     @Inject
-    public SubscriptionService(SubscriptionRepository subscriptionRepository) {
+    public SubscriptionService(SubscriptionRepository subscriptionRepository, NotifyService notifyService) {
 
         this.subscriptionRepository = subscriptionRepository;
+        this.notifyService = notifyService;
     }
 
-    public void saveSubscription(String vrm, String email, LocalDate motDueDate) throws SubscriptionAlreadyExistsException {
+    public void createSubscription(String vrm, String email, LocalDate motDueDate) throws SubscriptionAlreadyExistsException,
+            NotificationClientException {
 
         if (!doesSubscriptionAlreadyExist(vrm, email)) {
             Subscription subscription = new Subscription(UUID.randomUUID().toString())
@@ -29,6 +34,7 @@ public class SubscriptionService {
                     .setVrm(vrm)
                     .setMotDueDate(motDueDate);
             this.subscriptionRepository.save(subscription);
+            this.notifyService.sendConfirmationEmail("a.long@kainos.com", "ABCDEFG", LocalDate.now(), "link");
         } else {
             throw new SubscriptionAlreadyExistsException(format("A subscription exists for vehicle: %s with an email of: %s", vrm, email));
         }
