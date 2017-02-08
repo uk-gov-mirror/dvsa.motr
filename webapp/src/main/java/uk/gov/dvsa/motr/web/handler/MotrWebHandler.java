@@ -9,7 +9,6 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import uk.gov.dvsa.motr.web.config.Config;
 import uk.gov.dvsa.motr.web.system.MotrWebApplication;
 
-import static uk.gov.dvsa.motr.web.logging.LambdaInvocationLogging.invokeWithLogging;
 import static uk.gov.dvsa.motr.web.logging.LogConfigurator.configureLogging;
 
 /**
@@ -32,6 +31,6 @@ public class MotrWebHandler implements RequestHandler<AwsProxyRequest, AwsProxyR
 
     public AwsProxyResponse handleRequest(AwsProxyRequest request, Context context) {
 
-        return invokeWithLogging(request, context, handler::proxy);
+        return handler.proxy(request, context);
     }
 }

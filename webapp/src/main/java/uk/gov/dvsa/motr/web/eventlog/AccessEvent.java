@@ -27,13 +27,7 @@ public class AccessEvent extends Event {
         return this;
     }
 
-    public AccessEvent setRequestBodyLength(int val) {
-
-        params.put("request-body-length", String.valueOf(val));
-        return this;
-    }
-
-    public AccessEvent statusCode(int val) {
+    public AccessEvent setStatusCode(int val) {
 
         params.put("response-status-code", String.valueOf(val));
         return this;
