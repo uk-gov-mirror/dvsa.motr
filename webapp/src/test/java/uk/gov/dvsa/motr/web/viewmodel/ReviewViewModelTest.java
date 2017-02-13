@@ -12,7 +12,7 @@ public class ReviewViewModelTest {
     public void whenColourIsNullItIsSetToUnknown() {
 
         ReviewViewModel viewModel = new ReviewViewModel();
-        viewModel.setColour(null);
+        viewModel.setColour(null, null);
         assertTrue(viewModel.getColour().equals("Unknown"));
     }
 
@@ -20,7 +20,7 @@ public class ReviewViewModelTest {
     public void whenColourIsEmptyItIsSetToUnknown() {
 
         ReviewViewModel viewModel = new ReviewViewModel();
-        viewModel.setColour("");
+        viewModel.setColour("", null);
         assertTrue(viewModel.getColour().equals("Unknown"));
     }
 
@@ -28,8 +28,16 @@ public class ReviewViewModelTest {
     public void colourIsUpperCasedWhenSet() {
 
         ReviewViewModel viewModel = new ReviewViewModel();
-        viewModel.setColour("black");
+        viewModel.setColour("black", "");
         assertTrue(viewModel.getColour().equals("BLACK"));
+    }
+
+    @Test
+    public void colourAndSecondaryColourIsUpperCasedWhenSet() {
+
+        ReviewViewModel viewModel = new ReviewViewModel();
+        viewModel.setColour("black", "blue");
+        assertTrue(viewModel.getColour().equals("BLACK, BLUE"));
     }
 
     @Test
@@ -86,7 +94,7 @@ public class ReviewViewModelTest {
     public void makeModelIsUpperCasedWhenSet() {
 
         ReviewViewModel viewModel = new ReviewViewModel();
-        viewModel.setMakeModel("Honda Civic");
+        viewModel.setMakeModel("Honda", "CIVIC");
         assertTrue(viewModel.getMakeModel().equals("HONDA CIVIC"));
     }
 }

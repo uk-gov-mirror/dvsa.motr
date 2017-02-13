@@ -41,9 +41,14 @@ public class ReviewViewModel {
         return makeModel;
     }
 
-    public ReviewViewModel setMakeModel(String makeModel) {
+    public ReviewViewModel setMakeModel(String make, String model) {
 
-        this.makeModel = makeModel.toUpperCase();
+        if (model == null || "".equals(model)) {
+            this.makeModel = make.toUpperCase();
+        } else {
+            String makeModel = make + " " + model;
+            this.makeModel = makeModel.toUpperCase();
+        }
         return this;
     }
 
@@ -52,13 +57,20 @@ public class ReviewViewModel {
         return colour;
     }
 
-    public ReviewViewModel setColour(String colour) {
+    public ReviewViewModel setColour(String colour, String colourSecondary) {
 
         if (colour == null || "".equals(colour)) {
             this.colour = UNKNOWN_STRING;
             return this;
         }
-        this.colour = colour.toUpperCase();
+
+        if (colourSecondary == null || "".equals(colourSecondary)) {
+            this.colour = colour.toUpperCase();
+        } else {
+            String colours = colour + ", " + colourSecondary;
+            this.colour = colours.toUpperCase();
+        }
+
         return this;
     }
 

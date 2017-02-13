@@ -1,15 +1,18 @@
 package uk.gov.dvsa.motr.web.resource;
 
+import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
+import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 import uk.gov.dvsa.motr.web.viewmodel.ReviewViewModel;
 
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -22,10 +25,12 @@ import static java.util.Collections.emptyMap;
 public class ReviewResource {
 
     private final TemplateEngine renderer;
+    private VehicleDetailsClient vehicleDetailsClient;
 
     @Inject
-    public ReviewResource(TemplateEngine renderer) {
+    public ReviewResource(TemplateEngine renderer, VehicleDetailsClient vehicleDetailsClient) {
         this.renderer = renderer;
+        this.vehicleDetailsClient = vehicleDetailsClient;
     }
 
     @GET
@@ -34,15 +39,20 @@ public class ReviewResource {
         Map<String, Object> map = new HashMap<>();
         ReviewViewModel viewModel = new ReviewViewModel();
 
-        //TODO add in call to get the vehicle from MOTH
+        //TODO Should be the vrn from the cookie when it's ready
+        Optional<VehicleDetails> vehicleOptional = this.vehicleDetailsClient.fetch("YN13NTX");
 
-        //TODO replace this dummy data with the information from MOTH and info from cookie
-        viewModel.setColour("Black")
-                .setEmail("test@test.com")
-                .setExpiryDate(LocalDate.of(2017, 2, 2))
-                .setMakeModel("Ford Fiesta")
-                .setRegistration("test-reg")
-                .setYearOfManufacture("2007");
+        if (vehicleOptional.isPresent()) {
+            VehicleDetails vehicle = vehicleOptional.get();
+            viewModel.setColour(vehicle.getPrimaryColour(), vehicle.getSecondaryColour())
+                    .setEmail("test@test.com")
+                    .setExpiryDate(vehicle.getMotExpiryDate())
+                    .setMakeModel(vehicle.getMake(), vehicle.getModel())
+                    .setRegistration("test-reg")
+                    .setYearOfManufacture(vehicle.getYearOfManufacture().toString());
+        } else {
+            throw new NotFoundException();
+        }
 
         map.put("viewModel", viewModel);
 
