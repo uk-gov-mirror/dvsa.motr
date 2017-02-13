@@ -6,13 +6,30 @@ import java.util.concurrent.TimeUnit
 group 'uk.gov.dvsa.motr.web'
 version null
 
+buildscript {
+    repositories {
+        maven {
+            url "https://maven.eveoh.nl/content/repositories/releases"
+        }
+    }
 
+    dependencies {
+        classpath "nl.eveoh:gradle-aspectj:1.6"
+    }
+}
+
+project.ext {
+    aspectjVersion = '1.8.10'
+}
+
+apply plugin: 'aspectj'
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
 apply plugin: 'idea'
 apply plugin: 'checkstyle'
 apply plugin: 'eclipse'
+
 
 checkstyle {
     configFile = getRootProject().file("dvsa_java_checks.xml")
