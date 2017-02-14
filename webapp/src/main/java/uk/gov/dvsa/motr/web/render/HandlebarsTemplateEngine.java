@@ -8,7 +8,12 @@ import com.github.jknack.handlebars.io.TemplateLoader;
 
 import org.apache.log4j.MDC;
 
+import uk.gov.dvsa.motr.web.helper.SystemVariableParam;
+
 import java.io.IOException;
+
+import static uk.gov.dvsa.motr.web.system.SystemVariable.STATIC_ASSETS_HASH;
+import static uk.gov.dvsa.motr.web.system.SystemVariable.STATIC_ASSETS_URL;
 
 public class HandlebarsTemplateEngine implements TemplateEngine {
 
@@ -17,7 +22,10 @@ public class HandlebarsTemplateEngine implements TemplateEngine {
 
     private final Handlebars handlebars;
 
-    public HandlebarsTemplateEngine(String assetsRootPath, String assetsHash) {
+    public HandlebarsTemplateEngine(
+            @SystemVariableParam(STATIC_ASSETS_HASH) String assetsRootPath,
+            @SystemVariableParam(STATIC_ASSETS_URL) String assetsHash
+    ) {
 
         TemplateLoader loader = new ClassPathTemplateLoader();
         loader.setPrefix("/template");

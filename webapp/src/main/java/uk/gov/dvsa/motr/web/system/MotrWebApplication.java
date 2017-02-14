@@ -3,6 +3,7 @@ package uk.gov.dvsa.motr.web.system;
 import org.glassfish.jersey.server.ResourceConfig;
 
 import uk.gov.dvsa.motr.web.system.binder.ConfigBinder;
+import uk.gov.dvsa.motr.web.system.binder.SystemVariableBinder;
 import uk.gov.dvsa.motr.web.system.binder.TemplateEngineBinder;
 
 public class MotrWebApplication extends ResourceConfig {
@@ -13,5 +14,6 @@ public class MotrWebApplication extends ResourceConfig {
 
         register(new ConfigBinder());
         register(new TemplateEngineBinder());
+        register(new SystemVariableBinder());
     }
 }

@@ -1,6 +1,7 @@
 package uk.gov.dvsa.motr.web.component.subscription.persistence;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Index;
 import com.amazonaws.services.dynamodbv2.document.Item;
@@ -10,20 +11,32 @@ import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
 import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
+import uk.gov.dvsa.motr.web.helper.SystemVariableParam;
 
 import java.time.LocalDate;
 import java.util.Iterator;
 import java.util.Optional;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
+import static uk.gov.dvsa.motr.web.system.SystemVariable.DB_TABLE_SUBSCRIPTION;
+import static uk.gov.dvsa.motr.web.system.SystemVariable.REGION;
+
+@Singleton
 public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
-    
+
     private DynamoDB dynamoDb;
 
     private String tableName;
 
-    public DynamoDbSubscriptionRepository(AmazonDynamoDB dynamoDb, String tableName) {
-        this.dynamoDb = new DynamoDB(dynamoDb);
+    @Inject
+    public DynamoDbSubscriptionRepository(@SystemVariableParam(DB_TABLE_SUBSCRIPTION) String tableName, @SystemVariableParam(REGION)
+            String region) {
+
+        AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard().withRegion(region).build();
+
+        this.dynamoDb = new DynamoDB(client);
         this.tableName = tableName;
     }
 
