@@ -23,8 +23,8 @@ public class HandlebarsTemplateEngine implements TemplateEngine {
     private final Handlebars handlebars;
 
     public HandlebarsTemplateEngine(
-            @SystemVariableParam(STATIC_ASSETS_HASH) String assetsRootPath,
-            @SystemVariableParam(STATIC_ASSETS_URL) String assetsHash
+            @SystemVariableParam(STATIC_ASSETS_URL) String assetsRootPath,
+            @SystemVariableParam(STATIC_ASSETS_HASH) String assetsHash
     ) {
 
         TemplateLoader loader = new ClassPathTemplateLoader();
