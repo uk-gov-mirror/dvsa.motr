@@ -23,11 +23,15 @@ public class PerfAspect {
     public void vehicleDetailsClientCall() {
     }
 
+    @Pointcut("execution(* uk.gov.dvsa.motr.notifications.service.NotifyService.*(..))")
+    public void notifyServiceCall() {
+    }
+
     @Pointcut("execution(* uk.gov.dvsa.motr.web.component.subscription.persistence.DynamoDbSubscriptionRepository.*(..))")
     public void repositoryCall() {
     }
 
-    @Pointcut("vehicleDetailsClientCall() || repositoryCall()")
+    @Pointcut("vehicleDetailsClientCall() || repositoryCall() || notifyServiceCall()")
     public void remoteCall() {
     }
 

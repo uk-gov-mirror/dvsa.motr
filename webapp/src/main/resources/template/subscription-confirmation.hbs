@@ -1,0 +1,28 @@
+{{#partial "content" }}
+
+    <div class="transaction-header">
+        <h1 class="transaction-header__title">You've signed up for MOT reminders</h1>
+        <p class="transaction-header__next-step">Your MOT for {{viewModel.vrm}} expires on {{viewModel.expiryDate}}</p>
+    </div>
+
+    <div class="text">
+        <h2 class="heading-medium">What happens next?</h2>
+
+        <p>DVSA will send you an email reminder at {{viewModel.email}} a month before your vehicle’s MOT expiry date and again 2 weeks later.</p>
+
+        <p>You can unsubscribe at any time from the reminder emails.</p>
+
+    </div>
+
+    <nav class="content-navigation">
+
+        <ul class="content-navigation__secondary">
+            <li>
+                <a href="https://www.gov.uk/" id="continue-to-gov-uk">Continue to GOV.UK</a>
+            </li>
+        </ul>
+
+    </nav>
+
+{{/partial}}
+{{> master}}

@@ -27,10 +27,12 @@ public abstract class Page {
     }
 
     public final String getTitle() {
+
         return title.getText();
     }
 
-    private void selfVerify() {
+    protected void selfVerify() {
+
         if (!getTitle().contains(getIdentity())) {
 
             throw new PageIdentityVerificationException("Page identity verification failed: "
