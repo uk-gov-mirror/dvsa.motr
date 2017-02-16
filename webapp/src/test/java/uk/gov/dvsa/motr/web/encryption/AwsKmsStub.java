@@ -52,6 +52,8 @@ import com.amazonaws.services.kms.model.ListKeyPoliciesRequest;
 import com.amazonaws.services.kms.model.ListKeyPoliciesResult;
 import com.amazonaws.services.kms.model.ListKeysRequest;
 import com.amazonaws.services.kms.model.ListKeysResult;
+import com.amazonaws.services.kms.model.ListResourceTagsRequest;
+import com.amazonaws.services.kms.model.ListResourceTagsResult;
 import com.amazonaws.services.kms.model.ListRetirableGrantsRequest;
 import com.amazonaws.services.kms.model.ListRetirableGrantsResult;
 import com.amazonaws.services.kms.model.PutKeyPolicyRequest;
@@ -64,6 +66,10 @@ import com.amazonaws.services.kms.model.RevokeGrantRequest;
 import com.amazonaws.services.kms.model.RevokeGrantResult;
 import com.amazonaws.services.kms.model.ScheduleKeyDeletionRequest;
 import com.amazonaws.services.kms.model.ScheduleKeyDeletionResult;
+import com.amazonaws.services.kms.model.TagResourceRequest;
+import com.amazonaws.services.kms.model.TagResourceResult;
+import com.amazonaws.services.kms.model.UntagResourceRequest;
+import com.amazonaws.services.kms.model.UntagResourceResult;
 import com.amazonaws.services.kms.model.UpdateAliasRequest;
 import com.amazonaws.services.kms.model.UpdateAliasResult;
 import com.amazonaws.services.kms.model.UpdateKeyDescriptionRequest;
@@ -231,6 +237,11 @@ public class AwsKmsStub implements AWSKMS {
     }
 
     @Override
+    public ListResourceTagsResult listResourceTags(ListResourceTagsRequest listResourceTagsRequest) {
+        return null;
+    }
+
+    @Override
     public ListRetirableGrantsResult listRetirableGrants(ListRetirableGrantsRequest listRetirableGrantsRequest) {
         throw new UnsupportedOperationException();
     }
@@ -263,6 +274,16 @@ public class AwsKmsStub implements AWSKMS {
     @Override
     public ScheduleKeyDeletionResult scheduleKeyDeletion(ScheduleKeyDeletionRequest scheduleKeyDeletionRequest) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public TagResourceResult tagResource(TagResourceRequest tagResourceRequest) {
+        return null;
+    }
+
+    @Override
+    public UntagResourceResult untagResource(UntagResourceRequest untagResourceRequest) {
+        return null;
     }
 
     @Override
