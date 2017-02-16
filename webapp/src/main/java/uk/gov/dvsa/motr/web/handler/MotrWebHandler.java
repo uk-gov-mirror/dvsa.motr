@@ -7,6 +7,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 
 import uk.gov.dvsa.motr.web.config.Config;
+import uk.gov.dvsa.motr.web.performance.ColdStartMarker;
 import uk.gov.dvsa.motr.web.system.MotrWebApplication;
 
 import static uk.gov.dvsa.motr.web.logging.LogConfigurator.configureLogging;
@@ -17,7 +18,7 @@ import static uk.gov.dvsa.motr.web.logging.LogConfigurator.configureLogging;
 public class MotrWebHandler implements RequestHandler<AwsProxyRequest, AwsProxyResponse> {
 
     private final JerseyLambdaContainerHandler<AwsProxyRequest, AwsProxyResponse> handler;
-
+    
     /**
      * Executes once per container instance
      */
@@ -31,6 +32,8 @@ public class MotrWebHandler implements RequestHandler<AwsProxyRequest, AwsProxyR
 
     public AwsProxyResponse handleRequest(AwsProxyRequest request, Context context) {
 
-        return handler.proxy(request, context);
+        AwsProxyResponse response = handler.proxy(request, context);
+        ColdStartMarker.unmark();
+        return response;
     }
 }

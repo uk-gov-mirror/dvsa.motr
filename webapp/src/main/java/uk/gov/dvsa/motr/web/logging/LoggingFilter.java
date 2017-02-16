@@ -6,6 +6,7 @@ import org.slf4j.MDC;
 
 import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.web.eventlog.AccessEvent;
+import uk.gov.dvsa.motr.web.performance.ColdStartMarker;
 
 import java.io.IOException;
 
@@ -22,6 +23,7 @@ import javax.ws.rs.ext.Provider;
 @Provider
 public class LoggingFilter implements ContainerRequestFilter, ContainerResponseFilter {
 
+
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
 
@@ -35,7 +37,8 @@ public class LoggingFilter implements ContainerRequestFilter, ContainerResponseF
                 .setRequestPath(requestContext.getUriInfo().getPath())
                 .setQueryString(queryString != null ? queryString : "")
                 .setStatusCode(responseContext.getStatus())
-                .setResponseBodyLength(responseLength);
+                .setResponseBodyLength(responseLength)
+                .setColdStart(ColdStartMarker.isSet());
 
         EventLogger.logEvent(accessEvent);
     }

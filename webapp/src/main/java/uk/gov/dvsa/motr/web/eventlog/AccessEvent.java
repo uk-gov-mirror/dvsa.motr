@@ -38,4 +38,9 @@ public class AccessEvent extends Event {
         params.put("response-body-length", String.valueOf(val));
         return this;
     }
+
+    public AccessEvent setColdStart(boolean isColdStart) {
+        params.put("cold-start", String.valueOf(isColdStart));
+        return this;
+    }
 }
