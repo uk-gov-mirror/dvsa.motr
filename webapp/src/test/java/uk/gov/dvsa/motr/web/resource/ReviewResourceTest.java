@@ -19,6 +19,7 @@ import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -53,7 +54,7 @@ public class ReviewResourceTest {
                 BASE_URL);
 
         when(VRM_VALIDATOR.isValid("test-reg")).thenReturn(true);
-        when(EMAIL_VALIDATOR.isValid()).thenReturn(true);
+        when(EMAIL_VALIDATOR.isValid(any())).thenReturn(true);
         when(VEHICLE_DETAILS_CLIENT.fetch("test-reg")).thenReturn(Optional.of(mockVehicleDetails()));
         Response actual = resource.reviewPagePost();
         assertEquals(302, actual.getStatus());

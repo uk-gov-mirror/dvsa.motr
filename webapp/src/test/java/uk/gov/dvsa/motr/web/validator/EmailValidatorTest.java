@@ -4,6 +4,7 @@ import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.DataProviderRunner;
 import com.tngtech.java.junit.dataprovider.UseDataProvider;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -13,6 +14,8 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(DataProviderRunner.class)
 public class EmailValidatorTest {
+
+    private EmailValidator emailValidator;
 
     @DataProvider
     public static Object[][] invalidEmails() {
@@ -38,19 +41,23 @@ public class EmailValidatorTest {
         };
     }
 
+    @Before
+    public void setUp() {
+
+        this.emailValidator = new EmailValidator();
+    }
+
     @Test
     public void emptyEmailIsInvalid() {
 
-        EmailValidator emailValidator = new EmailValidator("");
-        assertFalse(emailValidator.isValid());
+        assertFalse(emailValidator.isValid(""));
         assertSame(EmailValidator.EMAIL_EMPTY_MESSAGE, emailValidator.getMessage());
     }
 
     @Test
     public void nullEmailIsInvalid() {
 
-        EmailValidator emailValidator = new EmailValidator(null);
-        assertFalse(emailValidator.isValid());
+        assertFalse(emailValidator.isValid(null));
         assertSame(EmailValidator.EMAIL_EMPTY_MESSAGE, emailValidator.getMessage());
     }
 
@@ -58,8 +65,7 @@ public class EmailValidatorTest {
     @Test
     public void invalidEmailFormatIsInvalid(String email) {
 
-        EmailValidator emailValidator = new EmailValidator(email);
-        assertFalse(emailValidator.isValid());
+        assertFalse(emailValidator.isValid(email));
         assertSame(EmailValidator.EMAIL_INVALID_MESSAGE, emailValidator.getMessage());
     }
 
@@ -67,8 +73,7 @@ public class EmailValidatorTest {
     @Test
     public void validEmailFormatIsValid(String email) {
 
-        EmailValidator emailValidator = new EmailValidator(email);
-        assertTrue(emailValidator.isValid());
+        assertTrue(emailValidator.isValid(email));
         assertSame(null, emailValidator.getMessage());
     }
 }

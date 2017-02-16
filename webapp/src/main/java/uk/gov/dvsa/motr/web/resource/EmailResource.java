@@ -37,9 +37,9 @@ public class EmailResource {
     @POST
     public String emailPagePost(@FormParam("emailAddress") String email) throws Exception {
 
-        EmailValidator emailValidator = new EmailValidator(email);
+        EmailValidator emailValidator = new EmailValidator();
 
-        if (emailValidator.isValid()) {
+        if (emailValidator.isValid(email)) {
             //TODO Dynamo DB check and redirection to review page when it's ready
             return renderer.render("email", emptyMap());
         }

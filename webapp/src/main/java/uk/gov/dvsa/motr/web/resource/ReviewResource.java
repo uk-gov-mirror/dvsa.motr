@@ -89,9 +89,9 @@ public class ReviewResource {
 
         // TODO replace hard coded values with session information
         VrmValidator vrmValidator = new VrmValidator();
-        EmailValidator emailValidator = new EmailValidator("test@test.com");
+        EmailValidator emailValidator = new EmailValidator();
 
-        if (vrmValidator.isValid("test-reg") && emailValidator.isValid()) {
+        if (vrmValidator.isValid("test-reg") && emailValidator.isValid("test@test.com")) {
 
             try {
                 Optional<VehicleDetails> vehicle = this.vehicleDetailsClient.fetch("test-reg");

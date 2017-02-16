@@ -9,15 +9,10 @@ public class EmailValidator {
     public static final String EMAIL_INVALID_MESSAGE = "Enter a valid email address";
 
     private String message;
-    private String email;
 
-    public EmailValidator(String email) {
-        this.email = email;
-    }
+    public boolean isValid(String email) {
 
-    public boolean isValid() {
-
-        if (this.email == null || this.email.isEmpty()) {
+        if (email == null || email.isEmpty()) {
             this.message = EMAIL_EMPTY_MESSAGE;
             return false;
         }
