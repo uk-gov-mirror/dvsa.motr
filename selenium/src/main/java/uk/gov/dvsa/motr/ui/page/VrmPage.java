@@ -19,6 +19,19 @@ public class VrmPage extends Page {
         return "What is your vehicle's registration (number plate)?";
     }
 
+    public EmailPage enterVrm(String vrm){
+        vrmField.sendKeys(vrm);
+        continueButton.click();
+        return new EmailPage();
+    }
+
+    public ReviewPage enterVrmExpectingReturnToReview(String vrm) {
+        vrmField.clear();
+        vrmField.sendKeys(vrm);
+        continueButton.click();
+        return new ReviewPage();
+    }
+
     public boolean isVrmContinueButtonDisplayed() {
         return continueButton.isDisplayed();
     }

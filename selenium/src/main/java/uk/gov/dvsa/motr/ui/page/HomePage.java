@@ -10,9 +10,6 @@ import uk.gov.dvsa.motr.ui.base.Page;
 public class HomePage extends Page {
 
     @FindBy(id = "startButton")
-    private WebElement startNowBtn;
-
-    @FindBy(linkText = "Start now")
     private WebElement startNowButton;
 
     @Override
@@ -20,8 +17,8 @@ public class HomePage extends Page {
         return "Get reminders about your MOT";
     }
 
-    public boolean isStartNowVisible() {
-        return startNowButton.isDisplayed();
+    public VrmPage clickStartNow() {
+        startNowButton.click();
+        return new VrmPage();
     }
-
 }

@@ -11,6 +11,7 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
         assetsUrl("http://url");
         assetsHash("981347823940237907edfdfdfdf");
         logLevel("INFO");
+        baseUrl("http://url");
     }
 
     public TestEnvironmentVariables assetsUrl(String value) {
@@ -23,6 +24,10 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
 
     public TestEnvironmentVariables logLevel(String value) {
         return set(SystemVariable.LOG_LEVEL, value);
+    }
+
+    public TestEnvironmentVariables baseUrl(String value) {
+        return set(SystemVariable.BASE_URL, value);
     }
 
     private TestEnvironmentVariables set(SystemVariable var, String value) {

@@ -30,7 +30,7 @@ public class SubscriptionConfirmationPage extends Page {
         return "You've signed up for MOT reminders";
     }
 
-    private String getHeaderTitle() {
+    public String getHeaderTitle() {
 
         return headerTitle.getText();
     }

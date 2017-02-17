@@ -1,10 +1,14 @@
 package uk.gov.dvsa.motr.web.resource;
 
+import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClientException;
 import uk.gov.dvsa.motr.web.component.subscription.exception.SubscriptionAlreadyExistsException;
 import uk.gov.dvsa.motr.web.component.subscription.service.SubscriptionService;
+import uk.gov.dvsa.motr.web.cookie.MotrSession;
+import uk.gov.dvsa.motr.web.eventlog.subscription.SubscriptionConfirmationFailureEvent;
+import uk.gov.dvsa.motr.web.eventlog.subscription.SubscriptionConfirmationSuccessfulEvent;
 import uk.gov.dvsa.motr.web.helper.SystemVariableParam;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 import uk.gov.dvsa.motr.web.validator.EmailValidator;
@@ -12,7 +16,7 @@ import uk.gov.dvsa.motr.web.validator.VrmValidator;
 import uk.gov.dvsa.motr.web.viewmodel.ReviewViewModel;
 
 import java.net.URI;
-import java.time.LocalDate;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -40,45 +44,55 @@ public class ReviewResource {
     private final SubscriptionService subscriptionService;
     private final VehicleDetailsClient vehicleDetailsClient;
     private final String baseUrl;
+    private final MotrSession motrSession;
 
     @Inject
     public ReviewResource(
+            @SystemVariableParam(BASE_URL) String baseUrl,
+            MotrSession motrSession,
             TemplateEngine renderer,
             SubscriptionService subscriptionService,
-            VehicleDetailsClient vehicleDetailsClient,
-            @SystemVariableParam(BASE_URL) String baseUrl
+            VehicleDetailsClient vehicleDetailsClient
     ) {
 
         this.renderer = renderer;
         this.subscriptionService = subscriptionService;
         this.vehicleDetailsClient = vehicleDetailsClient;
         this.baseUrl = baseUrl;
+        this.motrSession = motrSession;
     }
 
     @GET
-    public String reviewPage() throws Exception {
+    public Response reviewPage() throws Exception {
+
+        if (!this.motrSession.isAllowedOnPage()) {
+            return Response.status(Response.Status.FOUND).location(getFullUriForPage("/")).build();
+        }
 
         Map<String, Object> map = new HashMap<>();
         ReviewViewModel viewModel = new ReviewViewModel();
 
-        //TODO Should be the vrn from the cookie when it's ready
-        Optional<VehicleDetails> vehicleOptional = this.vehicleDetailsClient.fetch("YN13NTX");
+        String regNumberFromSession = this.motrSession.getRegNumberFromSession();
+        String emailFromSession = this.motrSession.getEmailFromSession();
+
+        Optional<VehicleDetails> vehicleOptional = this.vehicleDetailsClient.fetch(regNumberFromSession);
 
         if (vehicleOptional.isPresent()) {
             VehicleDetails vehicle = vehicleOptional.get();
             viewModel.setColour(vehicle.getPrimaryColour(), vehicle.getSecondaryColour())
-                    .setEmail("test@test.com")
+                    .setEmail(emailFromSession)
                     .setExpiryDate(vehicle.getMotExpiryDate())
                     .setMakeModel(vehicle.getMake(), vehicle.getModel())
-                    .setRegistration("test-reg")
+                    .setRegistration(regNumberFromSession)
                     .setYearOfManufacture(vehicle.getYearOfManufacture().toString());
         } else {
             throw new NotFoundException();
         }
 
-        map.put("viewModel", viewModel);
+        this.motrSession.setVisitingFromReview(true);
 
-        return renderer.render("review", map);
+        map.put("viewModel", viewModel);
+        return Response.ok().entity(renderer.render("review", map)).build();
     }
 
     @POST
@@ -87,42 +101,52 @@ public class ReviewResource {
         Map<String, Object> map = new HashMap<>();
         ReviewViewModel viewModel = new ReviewViewModel();
 
-        // TODO replace hard coded values with session information
+        String regNumberFromSession = this.motrSession.getRegNumberFromSession();
+        String emailFromSession = this.motrSession.getEmailFromSession();
+
         VrmValidator vrmValidator = new VrmValidator();
         EmailValidator emailValidator = new EmailValidator();
 
         if (vrmValidator.isValid("test-reg") && emailValidator.isValid("test@test.com")) {
 
             try {
-                Optional<VehicleDetails> vehicle = this.vehicleDetailsClient.fetch("test-reg");
+                Optional<VehicleDetails> vehicle = this.vehicleDetailsClient.fetch(regNumberFromSession);
 
                 if (vehicle.isPresent()) {
                     VehicleDetails vehicleDetails = vehicle.get();
                     viewModel.setColour(vehicleDetails.getPrimaryColour(), vehicleDetails.getSecondaryColour())
-                            .setEmail("test@test.com")
+                            .setEmail(emailFromSession)
                             .setExpiryDate(vehicleDetails.getMotExpiryDate())
                             .setMakeModel(vehicleDetails.getMake(), vehicleDetails.getModel())
-                            .setRegistration("test-reg")
+                            .setRegistration(regNumberFromSession)
                             .setYearOfManufacture(vehicleDetails.getYearOfManufacture().toString());
+
+                    try {
+                        this.subscriptionService.createSubscription(vehicleDetails.getRegNumber(), emailFromSession,
+                                vehicleDetails.getMotExpiryDate());
+                        EventLogger.logEvent(new SubscriptionConfirmationSuccessfulEvent().setVrm(regNumberFromSession)
+                                .setEmail(emailFromSession).setExpiryDate(vehicleDetails.getMotExpiryDate()));
+                        return Response.status(FOUND).location(getFullUriForPage("subscription-confirmation")).build();
+                    } catch (SubscriptionAlreadyExistsException e) {
+                        EventLogger.logErrorEvent(new SubscriptionConfirmationFailureEvent().setVrm(regNumberFromSession)
+                                .setEmail(emailFromSession).setExpiryDate(vehicleDetails.getMotExpiryDate()), e);
+                        throw new NotFoundException();
+                    }
                 }
             } catch (VehicleDetailsClientException exception) {
                 //TODO this is to be covered in BL-4200
                 //we will show a something went wrong banner message, so we will thread that
                 //through from here
             }
-
-            try {
-                // TODO replace hard coded values with vehicle data
-                this.subscriptionService.createSubscription("new-fake-reg", "thisNewEmailHere@test.com", LocalDate.of(2017, 2, 2));
-                return Response.status(FOUND).location(UriBuilder.fromUri(new URI(this.baseUrl)).path("subscription-confirmation").build())
-                        .build();
-            } catch (SubscriptionAlreadyExistsException e) {
-                throw new NotFoundException();
-            }
         }
 
         map.put("viewModel", viewModel);
 
         return Response.ok().entity(renderer.render("review", map)).build();
+    }
+
+    private URI getFullUriForPage(String page) throws URISyntaxException {
+
+        return UriBuilder.fromUri(new URI(this.baseUrl)).path(page).build();
     }
 }

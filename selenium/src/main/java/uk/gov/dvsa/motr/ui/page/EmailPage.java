@@ -19,6 +19,13 @@ public class EmailPage extends Page {
         return "What is your email address?";
     }
 
+    public ReviewPage enterEmailAddress(String email) {
+        emailAddressField.clear();
+        emailAddressField.sendKeys(email);
+        continueButton.click();
+        return new ReviewPage();
+    }
+
     public boolean isEmailContinueButtonDisplayed() {
         return continueButton.isDisplayed();
     }

@@ -14,6 +14,5 @@ public class ServiceBinder extends AbstractBinder {
 
         bindFactory(NotifyServiceFactory.class).to(NotifyService.class);
         bindFactory(SubscriptionServiceFactory.class).to(SubscriptionService.class);
-        bindFactory(NotifyServiceFactory.class).to(NotifyService.class);
     }
 }

@@ -2,6 +2,7 @@ package uk.gov.dvsa.motr.web.resource;
 
 import org.junit.Test;
 
+import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.test.render.TemplateEngineStub;
 
 import java.util.HashMap;
@@ -17,10 +18,12 @@ public class HomepageResourceTest {
     public void homepageTemplateIsRenderedWhenRootPathAccessed() throws Exception {
 
         TemplateEngineStub engine = new TemplateEngineStub();
-        HomepageResource resource = new HomepageResource(engine);
+        HomepageResource resource = new HomepageResource("testUrl/", new MotrSession(), engine);
 
+        Map<String, Object> expectedMap = new HashMap<>();
+        expectedMap.put("vrm_url", "testUrl/vrm");
         assertEquals(RESPONSE, resource.homePage());
         assertEquals("home", engine.getTemplate());
-        assertEquals(new HashMap<>(), engine.getContext(Map.class));
+        assertEquals(expectedMap.toString(), engine.getContext(Map.class).toString());
     }
 }

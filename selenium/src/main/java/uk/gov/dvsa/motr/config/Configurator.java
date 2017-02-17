@@ -19,7 +19,7 @@ public abstract class Configurator {
 
     private static Properties props;
 
-    private static final int defaultDriverTimeout = 10;
+    private static final int defaultDriverTimeout = 20;
 
     public static SimpleDateFormat screenshotDateFormat =
             new SimpleDateFormat("yyyyMMdd-HHmmss");

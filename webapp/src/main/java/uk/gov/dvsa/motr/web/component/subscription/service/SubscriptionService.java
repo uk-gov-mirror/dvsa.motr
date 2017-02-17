@@ -19,7 +19,10 @@ public class SubscriptionService {
     private final NotifyService notifyService;
 
     @Inject
-    public SubscriptionService(SubscriptionRepository subscriptionRepository, NotifyService notifyService) {
+    public SubscriptionService(
+            SubscriptionRepository subscriptionRepository,
+            NotifyService notifyService
+    ) {
 
         this.subscriptionRepository = subscriptionRepository;
         this.notifyService = notifyService;
@@ -34,7 +37,7 @@ public class SubscriptionService {
                     .setVrm(vrm)
                     .setMotDueDate(motDueDate);
             this.subscriptionRepository.save(subscription);
-            this.notifyService.sendConfirmationEmail("a.long@kainos.com", "ABCDEFG", LocalDate.now(), "link");
+            this.notifyService.sendConfirmationEmail(email, vrm, motDueDate, "link");
         } else {
             throw new SubscriptionAlreadyExistsException(format("A subscription exists for vehicle: %s with an email of: %s", vrm, email));
         }

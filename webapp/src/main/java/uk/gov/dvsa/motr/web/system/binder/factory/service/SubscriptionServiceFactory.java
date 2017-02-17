@@ -13,7 +13,10 @@ public class SubscriptionServiceFactory implements BaseFactory<SubscriptionServi
     private final NotifyService notifyService;
 
     @Inject
-    public SubscriptionServiceFactory(SubscriptionRepository subscriptionRepository, NotifyService notifyService) {
+    public SubscriptionServiceFactory(
+            NotifyService notifyService,
+            SubscriptionRepository subscriptionRepository
+    ) {
 
         this.subscriptionRepository = subscriptionRepository;
         this.notifyService = notifyService;
