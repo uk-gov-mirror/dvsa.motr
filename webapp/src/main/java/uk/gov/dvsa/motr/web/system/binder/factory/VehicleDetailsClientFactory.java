@@ -1,6 +1,5 @@
 package uk.gov.dvsa.motr.web.system.binder.factory;
 
-import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
 import org.glassfish.jersey.client.ClientConfig;
 
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
@@ -24,9 +23,7 @@ public class VehicleDetailsClientFactory implements BaseFactory<VehicleDetailsCl
     public VehicleDetailsClient provide() {
 
         String apiKey = ""; // TODO this.config.getValue(MOT_TEST_REMINDER_INFO_API_TOKEN);
-        ClientConfig config = new ClientConfig()
-                .connectorProvider(new ApacheConnectorProvider());
 
-        return new VehicleDetailsClient(config, this.uri, apiKey);
+        return new VehicleDetailsClient(new ClientConfig(), this.uri, apiKey);
     }
 }

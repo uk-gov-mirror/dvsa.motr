@@ -9,6 +9,9 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.Response;
 
+/**
+ * HTTP client to retrieve vehicle and test data
+ */
 public class VehicleDetailsClient {
 
     private static final String REG_NUMBER_QUERY_PARAM = "vrm";
@@ -27,7 +30,25 @@ public class VehicleDetailsClient {
         this.client = ClientBuilder.newClient(clientConfig);
     }
 
+    /**
+     * Method to fetch vehicle information
+     * @param vrm vehicle registration mark
+     * @return vehicle data {@link VehicleDetailsClient}
+     * @throws VehicleDetailsClientException thrown when unexpected response (5XX, garbled response, timeout, etc)
+     */
     public Optional<VehicleDetails> fetch(String vrm) throws VehicleDetailsClientException {
+
+        return fetch(vrm, this.apiKey);
+    }
+
+    /**
+     * Method to fetch vehicle information with custom api key
+     * @param vrm vehicle registration mark
+     * @param apiKey custom api key
+     * @return vehicle data {@link VehicleDetailsClient}
+     * @throws VehicleDetailsClientException thrown when unexpected response (5XX, garbled response, timeout, etc)
+     */
+    public Optional<VehicleDetails> fetch(String vrm, String apiKey) throws VehicleDetailsClientException {
 
         Response response;
 

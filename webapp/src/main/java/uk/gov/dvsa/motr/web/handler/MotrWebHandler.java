@@ -6,8 +6,11 @@ import com.amazonaws.serverless.proxy.jersey.JerseyLambdaContainerHandler;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 
+import org.glassfish.hk2.api.ServiceLocator;
+
 import uk.gov.dvsa.motr.web.config.Config;
 import uk.gov.dvsa.motr.web.performance.ColdStartMarker;
+import uk.gov.dvsa.motr.web.performance.warmup.LambdaWarmUp;
 import uk.gov.dvsa.motr.web.system.MotrWebApplication;
 
 import static uk.gov.dvsa.motr.web.logging.LogConfigurator.configureLogging;
@@ -18,7 +21,7 @@ import static uk.gov.dvsa.motr.web.logging.LogConfigurator.configureLogging;
 public class MotrWebHandler implements RequestHandler<AwsProxyRequest, AwsProxyResponse> {
 
     private final JerseyLambdaContainerHandler<AwsProxyRequest, AwsProxyResponse> handler;
-    
+
     /**
      * Executes once per container instance
      */
@@ -26,8 +29,10 @@ public class MotrWebHandler implements RequestHandler<AwsProxyRequest, AwsProxyR
 
         MotrWebApplication application = new MotrWebApplication();
         handler = JerseyLambdaContainerHandler.getAwsProxyHandler(application);
-        Config config = handler.getApplicationHandler().getServiceLocator().getService(Config.class);
+        ServiceLocator locator = handler.getApplicationHandler().getServiceLocator();
+        Config config = locator.getService(Config.class);
         configureLogging(config);
+        locator.getService(LambdaWarmUp.class).warmUp();
     }
 
     public AwsProxyResponse handleRequest(AwsProxyRequest request, Context context) {

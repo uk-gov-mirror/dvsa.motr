@@ -38,11 +38,22 @@ public class HandlebarsTemplateEngine implements TemplateEngine {
                 .with(new ConcurrentMapTemplateCache());
     }
 
+
     @Override
     public String render(String templateName, Object context) {
 
         try {
             return handlebars.compile(templateName).apply(context);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void precompile(String templateName) {
+
+        try {
+            handlebars.compile(templateName);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

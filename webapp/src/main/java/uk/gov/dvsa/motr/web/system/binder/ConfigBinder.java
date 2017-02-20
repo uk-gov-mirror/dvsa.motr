@@ -13,7 +13,6 @@ public class ConfigBinder extends AbstractBinder {
 
     @Override
     protected void configure() {
-
         bindFactory(MotrConfigFactory.class).to(Config.class);
         bindFactory(AwsKmsDecryptorFactory.class).to(Decryptor.class);
         bindFactory(VehicleDetailsClientFactory.class).to(VehicleDetailsClient.class);

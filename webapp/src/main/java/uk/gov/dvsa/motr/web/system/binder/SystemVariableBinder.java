@@ -26,7 +26,8 @@ public class SystemVariableBinder extends AbstractBinder {
     protected void configure() {
 
         bind(ConfigValueResolverFactory.class).to(ValueFactoryProvider.class).in(Singleton.class);
-        bind(ConfigValueResolver.class).to(new TypeLiteral<InjectionResolver<SystemVariableParam>>() {}).in(Singleton.class);
+        bind(ConfigValueResolver.class).to(new TypeLiteral<InjectionResolver<SystemVariableParam>>() {
+        }).in(Singleton.class);
     }
 
     @Singleton
@@ -54,7 +55,7 @@ public class SystemVariableBinder extends AbstractBinder {
 
             final Class<?> classType = parameter.getRawType();
 
-            if (classType == null || (!classType.equals(String.class))) {
+            if (classType == null) {
                 return null;
             }
 
@@ -62,12 +63,23 @@ public class SystemVariableBinder extends AbstractBinder {
                 return null;
             }
 
-            return new AbstractContainerRequestValueFactory<String>() {
+            return new AbstractContainerRequestValueFactory<Object>() {
 
                 @Override
-                public String provide() {
+                public Object provide() {
 
-                    return getLocator().getService(Config.class).getValue(parameter.getAnnotation(SystemVariableParam.class).value());
+                    Config config = getLocator().getService(Config.class);
+                    String value = config.getValue(parameter.getAnnotation(SystemVariableParam.class).value());
+
+                    if (classType.equals(Integer.class)) {
+                        return Integer.valueOf(value);
+                    }
+
+                    if (classType.equals(Boolean.class)) {
+                        return Boolean.parseBoolean(value);
+                    }
+
+                    return value;
                 }
             };
         }
