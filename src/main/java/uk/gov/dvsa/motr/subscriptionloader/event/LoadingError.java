@@ -6,6 +6,7 @@ public class LoadingError extends Event {
 
     @Override
     public String getCode() {
+
         return "LOADING_ERROR";
     }
 }

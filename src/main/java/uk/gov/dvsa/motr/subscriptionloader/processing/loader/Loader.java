@@ -1,8 +1,10 @@
 package uk.gov.dvsa.motr.subscriptionloader.processing.loader;
 
+import com.amazonaws.services.lambda.runtime.Context;
+
 import java.time.LocalDate;
 
 public interface Loader {
 
-    void run(LocalDate today) throws Exception;
+    LoadReport run(LocalDate today, Context context) throws Exception;
 }

@@ -7,11 +7,11 @@ public class EnvironmentVariableConfig implements Config {
 
     @Override
     public String getValue(ConfigKey key) {
-        String value = System.getenv(key.getName());
-        if (value == null || "".equals(value)) {
 
+        String value = System.getenv(key.getName());
+        if (value == null || value.isEmpty()) {
             throw new RuntimeException(
-                 String.format("Config key: %s not specified!", key.getName()));
+                    String.format("Config key: %s not specified!", key.getName()));
         }
         return value;
     }

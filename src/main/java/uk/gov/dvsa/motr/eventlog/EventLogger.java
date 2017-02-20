@@ -5,8 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 /**
- * Event log is responsible for recording and formatting strictly defined set of log events.
- * Each log event will have a set of parameters associated with it so metrics and alarms can base off it.
+ * Event log is responsible for recording and formatting strictly defined set of log events. Each log event will have a set of parameters
+ * associated with it so metrics and alarms can base off it.
  */
 public class EventLogger {
 

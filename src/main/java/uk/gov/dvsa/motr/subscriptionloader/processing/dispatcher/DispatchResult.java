@@ -1,56 +1,52 @@
 package uk.gov.dvsa.motr.subscriptionloader.processing.dispatcher;
 
-import com.amazonaws.handlers.AsyncHandler;
-import com.amazonaws.services.sqs.model.SendMessageRequest;
 import com.amazonaws.services.sqs.model.SendMessageResult;
 
 import uk.gov.dvsa.motr.subscriptionloader.processing.model.Subscription;
 
+import java.util.concurrent.Future;
+
 /**
  * Wrapper for future message result to abstract from it and expose only data that are necessary
  */
-public class DispatchResult implements AsyncHandler<SendMessageRequest, SendMessageResult> {
+public class DispatchResult {
 
-    private volatile Exception error;
-
-    private volatile boolean isDone = false;
 
     private Subscription originalPayload;
+    private Future<SendMessageResult> result;
+    private Exception exception;
 
-    DispatchResult(Subscription originalPayload) {
+    public DispatchResult(Subscription originalPayload, Future<SendMessageResult> futureResult) {
 
         this.originalPayload = originalPayload;
+        this.result = futureResult;
     }
 
     public boolean isDone() {
 
-        return isDone;
+        return result.isDone();
     }
 
     public boolean isFailed() {
 
-        return this.error != null;
+        if (result.isDone()) {
+            try {
+                result.get();
+            } catch (Exception execException) {
+                this.exception = execException;
+            }
+        }
+        return exception != null;
     }
 
     public Exception getError() {
 
-        return this.error;
+        isFailed();
+        return exception;
     }
 
     public Subscription getSubscription() {
+
         return originalPayload;
-    }
-
-    @Override
-    public void onError(Exception exception) {
-
-        isDone = true;
-        this.error = exception;
-    }
-
-    @Override
-    public void onSuccess(SendMessageRequest request, SendMessageResult sendMessageResult) {
-
-        isDone = true;
     }
 }

@@ -2,6 +2,7 @@ package uk.gov.dvsa.motr.subscriptionloader.module;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
+import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.sqs.AmazonSQSAsync;
 import com.amazonaws.services.sqs.AmazonSQSAsyncClientBuilder;
@@ -26,10 +27,10 @@ import static org.apache.log4j.Level.toLevel;
 
 import static uk.gov.dvsa.motr.subscriptionloader.SystemVariable.INFLIGHT_BATCHES;
 import static uk.gov.dvsa.motr.subscriptionloader.SystemVariable.LOG_LEVEL;
+import static uk.gov.dvsa.motr.subscriptionloader.SystemVariable.POST_PURGE_DELAY;
 import static uk.gov.dvsa.motr.subscriptionloader.SystemVariable.QUEUE_URL;
 import static uk.gov.dvsa.motr.subscriptionloader.SystemVariable.REGION;
 import static uk.gov.dvsa.motr.subscriptionloader.SystemVariable.TABLE_NAME;
-
 
 public class ConfigModule extends AbstractModule {
 
@@ -40,7 +41,6 @@ public class ConfigModule extends AbstractModule {
         bind(Config.class).toInstance(config);
         Logger.getRootLogger().setLevel(toLevel(config.getValue(LOG_LEVEL)));
     }
-
 
     @Provides
     public Dispatcher provideDispatcher(Config config, AmazonSQSAsync sqsClient, Context context) {
@@ -67,12 +67,13 @@ public class ConfigModule extends AbstractModule {
         String table = config.getValue(TABLE_NAME);
         String region = config.getValue(REGION);
         AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard().withRegion(region).build();
-        return new DynamoDbProducer(client, table);
+        return new DynamoDbProducer(new DynamoDB(client), table);
     }
 
     @Provides
     public Loader provideLoader(Config config, AmazonSQSAsync client, SubscriptionProducer producer, Dispatcher dispatcher) {
 
-        return new PurgingLoader(new DefaultLoader(producer, dispatcher), client, config.getValue(QUEUE_URL));
+        return new PurgingLoader(new DefaultLoader(producer, dispatcher), client, config.getValue(QUEUE_URL), Integer.parseInt(config
+                .getValue(POST_PURGE_DELAY)), 10_000);
     }
 }

@@ -1,5 +1,6 @@
 package uk.gov.dvsa.motr.subscriptionloader.processing.loader;
 
+import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.model.PurgeQueueInProgressException;
 import com.amazonaws.services.sqs.model.PurgeQueueRequest;
@@ -12,47 +13,47 @@ import java.time.LocalDate;
 public class PurgingLoader implements Loader {
 
     private static final Logger logger = LoggerFactory.getLogger(PurgingLoader.class);
+
     private Loader wrappedLoader;
-
     private AmazonSQS awsSqs;
-
     private String queueUrl;
+    private int postPurgeDelayMs;
+    private int purgeInProgressDelayMs;
 
-    public PurgingLoader(Loader wrappedLoader, AmazonSQS awsSqs, String queueUrl) {
+    public PurgingLoader(Loader wrappedLoader, AmazonSQS awsSqs, String queueUrl, int postPurgeDelayMs, int purgeInProgressDelayMs) {
+
         this.wrappedLoader = wrappedLoader;
         this.awsSqs = awsSqs;
         this.queueUrl = queueUrl;
+        this.postPurgeDelayMs = postPurgeDelayMs;
+        this.purgeInProgressDelayMs = purgeInProgressDelayMs;
     }
 
     @Override
-    public void run(LocalDate today) throws Exception {
-
-        final int postPurgeDelayMs = 60_000;
+    public LoadReport run(LocalDate today, Context context) throws Exception {
 
         long purgingStartedAt = System.currentTimeMillis();
 
         while (true) {
-
             try {
                 logger.info("Requesting queue purge");
 
                 awsSqs.purgeQueue(new PurgeQueueRequest().withQueueUrl(queueUrl));
 
-                logger.info("Wait after purge operation to finish: {} ms", postPurgeDelayMs);
+                logger.info("Wait after purge operation to finish: {} ms", this.postPurgeDelayMs);
 
-                Thread.sleep(postPurgeDelayMs);
+                Thread.sleep(this.postPurgeDelayMs);
 
                 break;
             } catch (PurgeQueueInProgressException pqinpe) {
                 // retry
                 logger.info("Purging already in progress");
-                Thread.sleep(10_000);
+                Thread.sleep(this.purgeInProgressDelayMs);
             }
-
         }
 
         logger.info("Purging completed in: {} ms", System.currentTimeMillis() - purgingStartedAt);
 
-        wrappedLoader.run(today);
+        return wrappedLoader.run(today, context);
     }
 }

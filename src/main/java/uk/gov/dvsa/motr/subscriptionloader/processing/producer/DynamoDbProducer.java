@@ -8,86 +8,73 @@ import com.amazonaws.services.dynamodbv2.document.ItemCollection;
 import com.amazonaws.services.dynamodbv2.document.ScanFilter;
 import com.amazonaws.services.dynamodbv2.document.ScanOutcome;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import uk.gov.dvsa.motr.subscriptionloader.processing.model.Subscription;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Produces
  */
 public class DynamoDbProducer implements SubscriptionProducer {
 
+    private static final Logger logger = LoggerFactory.getLogger(DynamoDbProducer.class);
     private static final String INDEX_NAME = "due-date-md-gsi";
-    private DynamoDB dynamoDB;
 
     private String subscriptionTableName;
+    private DynamoDB dynamoDb;
 
-    public DynamoDbProducer(AmazonDynamoDB dynamoDB, String subscriptionTableName) {
+    public DynamoDbProducer(DynamoDB dynamoDb, String subscriptionTableName) {
 
-        this.dynamoDB = new DynamoDB(dynamoDB);
+        this.dynamoDb = dynamoDb;
         this.subscriptionTableName = subscriptionTableName;
     }
 
+    public Iterator<Subscription> getIterator(LocalDate firstNotificationDate, LocalDate secondNotificationDate) {
 
-    public Iterator<Subscription> getIterator(List<LocalDate> dates) {
+        Index dueDateIndex = dynamoDb.getTable(subscriptionTableName).getIndex(INDEX_NAME);
 
-        Index dueDateIndex = dynamoDB.getTable(subscriptionTableName).getIndex(INDEX_NAME);
+        ScanFilter firstDateScanFilter = new ScanFilter("mot_due_date_md")
+                .eq(firstNotificationDate.format(DateTimeFormatter.ofPattern("MM-dd")));
+        ScanFilter secondDateScanFilter = new ScanFilter("mot_due_date_md")
+                .eq(secondNotificationDate.format(DateTimeFormatter.ofPattern("MM-dd")));
 
-        ItemCollection<ScanOutcome> collection = dueDateIndex.scan(new ScanFilter("mot_due_date_md").eq("02-10"));
-        Iterator<Item> resultIterator = collection.iterator();
+        ItemCollection<ScanOutcome> firstNotificationCollection = dueDateIndex.scan(firstDateScanFilter);
+        ItemCollection<ScanOutcome> secondNotificationCollection = dueDateIndex.scan(secondDateScanFilter);
 
-        AtomicInteger ai = new AtomicInteger(0);
+        Iterator<Item> firstNotificationsIterator = firstNotificationCollection.iterator();
+        Iterator<Item> secondNotificationsIterator = secondNotificationCollection.iterator();
+
         return new Iterator<Subscription>() {
+
             @Override
             public boolean hasNext() {
-                return ai.get() < 1000 && resultIterator.hasNext();
+
+                return firstNotificationsIterator.hasNext() || secondNotificationsIterator.hasNext();
             }
 
             @Override
             public Subscription next() {
 
-                ai.incrementAndGet();
-                Item item = resultIterator.next();
-                String id = item.getString("id");
-                String vrm = item.getString("vrm");
-                String email = item.getString("email");
+                Item item;
+                if (firstNotificationsIterator.hasNext()) {
+                    item = firstNotificationsIterator.next();
+                } else {
+                    item = secondNotificationsIterator.next();
+                }
+                logger.debug("item is {}", item);
+                LocalDate motDueDate = LocalDate.parse(item.getString("mot_due_date"), DateTimeFormatter.ISO_DATE);
+                return new Subscription()
+                        .setId(item.getString("id"))
+                        .setVrm(item.getString("vrm"))
+                        .setEmail(item.getString("email"))
+                        .setMotDueDate(motDueDate);
 
-                return new Subscription().setId(id).setVrm(vrm).setEmail(email).setMotDueDate(LocalDate.now());
             }
         };
     }
-
-
-   /* public static class Aaaa implements Runnable{
-        private static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM-dd");
-        int i;
-        Table table;
-        LocalDate ld;
-        public Aaaa(int i, Table table, LocalDate ld) {
-            this.i = i;
-            this.table = table;
-            this.ld = ld;
-        }
-
-
-        @Override
-        public void run() {
-
-            if(i % 100 == 0) {
-                System.out.println(i);
-            }
-            table.putItem(new PutItemSpec().withItem(
-                    new Item().withString("id", UUID.randomUUID().toString())
-                            .withString("mot_due_date", ld.format(DateTimeFormatter.ISO_DATE))
-                            .withString("mot_due_date_md", ld.format(dtf))
-                            .withString("vrm", UUID.randomUUID().toString())
-                            .withString("email", UUID.randomUUID().toString() + i + "@gmail.com")
-                    )
-
-            );
-        }
-    }*/
 }

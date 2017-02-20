@@ -8,6 +8,7 @@ public abstract class Event {
     protected Map<String, String> params = new HashMap<>();
 
     Map<String, String> toMap() {
+
         return params;
     }
 

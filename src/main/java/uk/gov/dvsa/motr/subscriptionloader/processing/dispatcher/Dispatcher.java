@@ -15,15 +15,13 @@ import javax.inject.Inject;
 public class Dispatcher {
 
     private AmazonSQSAsync sqsClient;
-
     private String queueUrl;
-
     private ObjectMapper jsonMapper;
-
     private Map<String, MessageAttributeValue> attributes = new HashMap<>();
 
     @Inject
     public Dispatcher(AmazonSQSAsync client, String queueUrl, String correlationId) {
+
         this.sqsClient = client;
         this.queueUrl = queueUrl;
         this.jsonMapper = new ObjectMapper();
@@ -37,7 +35,6 @@ public class Dispatcher {
         String messageBody;
 
         try {
-
             messageBody = jsonMapper.writeValueAsString(subscription);
         } catch (Exception e) {
             throw new RuntimeException("Serialization error of subscription");
@@ -48,9 +45,6 @@ public class Dispatcher {
                 .withMessageAttributes(attributes)
                 .withMessageBody(messageBody);
 
-        DispatchResult result = new DispatchResult(subscription);
-        sqsClient.sendMessageAsync(request, result);
-
-        return result;
+        return new DispatchResult(subscription, sqsClient.sendMessageAsync(request));
     }
 }
