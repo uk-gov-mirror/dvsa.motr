@@ -4,6 +4,7 @@ import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.DataProviderRunner;
 import com.tngtech.java.junit.dataprovider.UseDataProvider;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -75,5 +76,13 @@ public class EmailValidatorTest {
 
         assertTrue(emailValidator.isValid(email));
         assertSame(null, emailValidator.getMessage());
+    }
+
+    @Test
+    public void tooLongEmailIsInvalid() {
+
+        String email = RandomStringUtils.random(266);
+        assertFalse(emailValidator.isValid(email));
+        assertSame(EmailValidator.EMAIL_INVALID_MESSAGE, emailValidator.getMessage());
     }
 }

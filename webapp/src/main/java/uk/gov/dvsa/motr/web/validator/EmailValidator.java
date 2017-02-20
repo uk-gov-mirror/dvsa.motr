@@ -7,6 +7,7 @@ public class EmailValidator {
 
     public static final String EMAIL_EMPTY_MESSAGE = "Enter your email address";
     public static final String EMAIL_INVALID_MESSAGE = "Enter a valid email address";
+    public static final int MAX_LENGTH = 255;
 
     private String message;
 
@@ -14,6 +15,11 @@ public class EmailValidator {
 
         if (email == null || email.isEmpty()) {
             this.message = EMAIL_EMPTY_MESSAGE;
+            return false;
+        }
+
+        if (email.length() > MAX_LENGTH) {
+            this.message = EMAIL_INVALID_MESSAGE;
             return false;
         }
 
