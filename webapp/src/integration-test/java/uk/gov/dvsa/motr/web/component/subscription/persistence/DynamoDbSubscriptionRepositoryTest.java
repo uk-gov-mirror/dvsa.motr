@@ -1,5 +1,10 @@
 package uk.gov.dvsa.motr.web.component.subscription.persistence;
 
+import com.amazonaws.services.dynamodbv2.document.DynamoDB;
+import com.amazonaws.services.dynamodbv2.document.Item;
+import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
+import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -10,10 +15,13 @@ import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 import static uk.gov.dvsa.motr.test.integration.dynamodb.DynamoDbIntegrationHelper.client;
 import static uk.gov.dvsa.motr.test.integration.dynamodb.DynamoDbIntegrationHelper.region;
 import static uk.gov.dvsa.motr.test.integration.dynamodb.DynamoDbIntegrationHelper.subscriptionTableName;
+
+import static java.time.format.DateTimeFormatter.ofPattern;
 
 public class DynamoDbSubscriptionRepositoryTest {
 
@@ -60,6 +68,35 @@ public class DynamoDbSubscriptionRepositoryTest {
         assertEquals(subscriptionItem.getMotDueDate(), actualSubscription.getMotDueDate());
     }
 
+
+    @Test
+    public void saveSubscriptionCorrectlySavesNonModelAttributesToDb() {
+
+        SubscriptionItem subscriptionItem = new SubscriptionItem();
+
+        Subscription subscription = new Subscription(subscriptionItem.getId())
+                .setEmail(subscriptionItem.getEmail())
+                .setVrm(subscriptionItem.getVrm())
+                .setMotDueDate(subscriptionItem.getMotDueDate());
+
+        repo.save(subscription);
+
+        Item savedItem = new DynamoDB(client()).getTable(subscriptionTableName()).query(
+                new QuerySpec()
+                        .withKeyConditionExpression("vrm = :vrm AND email = :email")
+                        .withValueMap(new ValueMap()
+                                .withString(":vrm", subscription.getVrm())
+                                .withString(":email", subscription.getEmail())
+                        )
+        ).iterator().next();
+
+        assertNotNull("created_at cannot be null when saving db", savedItem.getString("created_at"));
+
+        String dueDateMd = savedItem.getString("mot_due_date_md");
+        assertEquals("due date md fragment is incorrect", dueDateMd, subscription.getMotDueDate().format(ofPattern("MM-dd")));
+    }
+
+
     @Test
     public void findByVrmAndEmailReturnsSubscriptionIfItExists() {
 
@@ -82,7 +119,7 @@ public class DynamoDbSubscriptionRepositoryTest {
 
     @Test
     public void getByIdReturnsEmptyIfSubscriptionDoesNotExist() {
-        
+
         assertFalse(repo.findById("ID_THAT_DOES_NOT_EXIST").isPresent());
     }
 }
