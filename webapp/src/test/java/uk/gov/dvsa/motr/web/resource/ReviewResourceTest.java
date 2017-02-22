@@ -36,7 +36,6 @@ public class ReviewResourceTest {
     private static final EmailValidator EMAIL_VALIDATOR = mock(EmailValidator.class);
     private static final TemplateEngineStub TEMPLATE_ENGINE_STUB = new TemplateEngineStub();
     private static final MotrSession MOTR_SESSION = mock(MotrSession.class);
-    private static final String BASE_URL = "https://testUrl";
     private static final String VRM = "YN13NTX";
     private static final String EMAIL = "test@test.com";
 
@@ -46,7 +45,6 @@ public class ReviewResourceTest {
     public void setUp() {
 
         this.resource = new ReviewResource(
-                BASE_URL,
                 MOTR_SESSION,
                 TEMPLATE_ENGINE_STUB,
                 SUBSCRIPTION_SERVICE,

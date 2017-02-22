@@ -31,7 +31,7 @@ public class SubscriptionConfirmationResourceTest {
     public void setUp() {
 
         templateEngineStub = new TemplateEngineStub();
-        resource = new SubscriptionConfirmationResource("", VEHICLE_DETAILS_CLIENT, templateEngineStub, MOTR_SESSION);
+        resource = new SubscriptionConfirmationResource(VEHICLE_DETAILS_CLIENT, templateEngineStub, MOTR_SESSION);
     }
 
     @Test

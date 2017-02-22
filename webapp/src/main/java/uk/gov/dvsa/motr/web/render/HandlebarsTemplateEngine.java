@@ -12,6 +12,7 @@ import uk.gov.dvsa.motr.web.helper.SystemVariableParam;
 
 import java.io.IOException;
 
+import static uk.gov.dvsa.motr.web.system.SystemVariable.BASE_URL;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.STATIC_ASSETS_HASH;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.STATIC_ASSETS_URL;
 
@@ -19,22 +20,25 @@ public class HandlebarsTemplateEngine implements TemplateEngine {
 
     private static final String ASSETS_HELPER_NAME = "asset";
     private static final String REQUEST_ID_HELPER_NAME = "requestId";
+    private static final String URL_HELPER = "url";
 
     private final Handlebars handlebars;
 
     public HandlebarsTemplateEngine(
             @SystemVariableParam(STATIC_ASSETS_URL) String assetsRootPath,
-            @SystemVariableParam(STATIC_ASSETS_HASH) String assetsHash
+            @SystemVariableParam(STATIC_ASSETS_HASH) String assetsHash,
+            @SystemVariableParam(BASE_URL) String baseUrl
     ) {
 
         TemplateLoader loader = new ClassPathTemplateLoader();
         loader.setPrefix("/template");
         loader.setSuffix(".hbs");
         // (1) - resource, (2) - version
-        String assetsPathFormat = (assetsRootPath + "/%s?v=%s").replaceAll("(?<!(http:|https:))[//]+", "/");
+        String assetsPathFormat = assetsRootPath + "/%s?v=%s";
         handlebars = new Handlebars(loader)
                 .registerHelper(ASSETS_HELPER_NAME, assetsHelper(assetsPathFormat, assetsHash))
                 .registerHelper(REQUEST_ID_HELPER_NAME, (context, options) -> MDC.get("AWSRequestId"))
+                .registerHelper(URL_HELPER, urlHelper(baseUrl))
                 .with(new ConcurrentMapTemplateCache());
     }
 
@@ -62,6 +66,17 @@ public class HandlebarsTemplateEngine implements TemplateEngine {
     private static Helper<Object> assetsHelper(String assetsPathFormat, String assetsHash) {
 
         return (context, options) ->
-                String.format(assetsPathFormat, options.param(0), assetsHash);
+                normalizeSlashes(String.format(assetsPathFormat, options.param(0), assetsHash));
+    }
+
+    private static Helper<Object> urlHelper(String baseUrl) {
+
+        return (context, options) ->
+                normalizeSlashes(String.format("%s/%s", baseUrl, options.param(0)));
+    }
+
+    private static String normalizeSlashes(String input) {
+
+        return input.replaceAll("(?<!(http:|https:))[//]+", "/");
     }
 }

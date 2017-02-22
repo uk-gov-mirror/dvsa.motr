@@ -9,14 +9,11 @@ import uk.gov.dvsa.motr.web.component.subscription.service.SubscriptionService;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.eventlog.subscription.SubscriptionConfirmationFailureEvent;
 import uk.gov.dvsa.motr.web.eventlog.subscription.SubscriptionConfirmationSuccessfulEvent;
-import uk.gov.dvsa.motr.web.helper.SystemVariableParam;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 import uk.gov.dvsa.motr.web.validator.EmailValidator;
 import uk.gov.dvsa.motr.web.validator.VrmValidator;
 import uk.gov.dvsa.motr.web.viewmodel.ReviewViewModel;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -29,11 +26,8 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 
-import static uk.gov.dvsa.motr.web.system.SystemVariable.BASE_URL;
-
-import static javax.ws.rs.core.Response.Status.FOUND;
+import static uk.gov.dvsa.motr.web.resource.RedirectResponseBuilder.redirect;
 
 @Singleton
 @Path("/review")
@@ -43,12 +37,10 @@ public class ReviewResource {
     private final TemplateEngine renderer;
     private final SubscriptionService subscriptionService;
     private final VehicleDetailsClient vehicleDetailsClient;
-    private final String baseUrl;
     private final MotrSession motrSession;
 
     @Inject
     public ReviewResource(
-            @SystemVariableParam(BASE_URL) String baseUrl,
             MotrSession motrSession,
             TemplateEngine renderer,
             SubscriptionService subscriptionService,
@@ -58,7 +50,6 @@ public class ReviewResource {
         this.renderer = renderer;
         this.subscriptionService = subscriptionService;
         this.vehicleDetailsClient = vehicleDetailsClient;
-        this.baseUrl = baseUrl;
         this.motrSession = motrSession;
     }
 
@@ -66,7 +57,7 @@ public class ReviewResource {
     public Response reviewPage() throws Exception {
 
         if (!this.motrSession.isAllowedOnPage()) {
-            return Response.status(Response.Status.FOUND).location(getFullUriForPage("/")).build();
+            return redirect("/");
         }
 
         Map<String, Object> map = new HashMap<>();
@@ -92,7 +83,7 @@ public class ReviewResource {
         this.motrSession.setVisitingFromReview(true);
 
         map.put("viewModel", viewModel);
-        return Response.ok().entity(renderer.render("review", map)).build();
+        return Response.ok(renderer.render("review", map)).build();
     }
 
     @POST
@@ -126,7 +117,9 @@ public class ReviewResource {
                                 vehicleDetails.getMotExpiryDate());
                         EventLogger.logEvent(new SubscriptionConfirmationSuccessfulEvent().setVrm(regNumberFromSession)
                                 .setEmail(emailFromSession).setExpiryDate(vehicleDetails.getMotExpiryDate()));
-                        return Response.status(FOUND).location(getFullUriForPage("subscription-confirmation")).build();
+
+                        return redirect("subscription-confirmation");
+
                     } catch (SubscriptionAlreadyExistsException e) {
                         EventLogger.logErrorEvent(new SubscriptionConfirmationFailureEvent().setVrm(regNumberFromSession)
                                 .setEmail(emailFromSession).setExpiryDate(vehicleDetails.getMotExpiryDate()), e);
@@ -142,11 +135,6 @@ public class ReviewResource {
 
         map.put("viewModel", viewModel);
 
-        return Response.ok().entity(renderer.render("review", map)).build();
-    }
-
-    private URI getFullUriForPage(String page) throws URISyntaxException {
-
-        return UriBuilder.fromUri(new URI(this.baseUrl)).path(page).build();
+        return Response.ok(renderer.render("review", map)).build();
     }
 }

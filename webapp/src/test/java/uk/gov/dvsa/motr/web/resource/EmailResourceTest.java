@@ -27,7 +27,7 @@ public class EmailResourceTest {
 
         motrSession = mock(MotrSession.class);
         engine = new TemplateEngineStub();
-        resource = new EmailResource("", motrSession, engine);
+        resource = new EmailResource(motrSession, engine);
         when(motrSession.getEmailFromSession()).thenReturn("test@test.com");
     }
 
@@ -38,7 +38,7 @@ public class EmailResourceTest {
         assertEquals(200, resource.emailPage().getStatus());
         assertEquals("email", engine.getTemplate());
 
-        Map<String, String>  expectedMap = new HashMap<>();
+        Map<String, String> expectedMap = new HashMap<>();
         expectedMap.put("back_url", "vrm");
         expectedMap.put("continue_button_text", "Continue");
         expectedMap.put("back_button_text", "Back");
@@ -50,7 +50,7 @@ public class EmailResourceTest {
     public void onPostWithValid_ThenRedirectedToReviewPage() throws Exception {
 
         Response response = resource.emailPagePost("test@test.com");
-        assertEquals(303, response.getStatus());
+        assertEquals(302, response.getStatus());
     }
 
     @Test

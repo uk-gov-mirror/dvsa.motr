@@ -16,29 +16,59 @@ import static org.junit.Assert.assertEquals;
 public class HandlebarsTemplateEngineTest {
 
     @DataProvider
-    public static Object[][] rootPaths() {
+    public static Object[][] baseUrl() {
         // @formatter:off
         return new Object[][]{
-                {"http://assets/"},
-                {"http://assets//"},
-                {"http://assets"}
+                {"https://assets/", "/vrm", "https://assets/vrm"},
+                {"http://assets//", "/vrm", "http://assets/vrm"},
+                {"http://assets//", "vrm", "http://assets/vrm"},
+                {"/", "/sub/vrm", "/sub/vrm"},
+                {"http://assets", "/sub/vrm", "http://assets/sub/vrm"},
         };
     }
     // @formatter:on
 
-    @UseDataProvider("rootPaths")
+    @UseDataProvider("baseUrl")
     @Test
-    public void testEngineCorrectlyFillsTemplate(String rootPath) {
+    public void assetHelperBuildsPathsCorrectly(String assetsPath, String path, String result) {
 
         HandlebarsTemplateEngine instance =
-                new HandlebarsTemplateEngine(rootPath, "12345");
+                new HandlebarsTemplateEngine(assetsPath, "12345", "baseUrl");
 
         Map<String, String> context = new HashMap<String, String>();
-        context.put("key", "testValue");
+        context.put("path", path);
 
-        String actualOutput = instance.render("test", context);
-        String expectedOutput = "http://assets/somepath/my.css?v=12345\n" +
-                "testValue";
+        String actualOutput = instance.render("test-assetshelper", context);
+        String expectedOutput = result + "?v=12345";
+
+        assertEquals("Received output is wrong", expectedOutput, actualOutput);
+    }
+
+    @Test
+    public void testEngineCorrectlyFillsContextKey() {
+
+        HandlebarsTemplateEngine instance =
+                new HandlebarsTemplateEngine("/", "12345", "baseUrl");
+
+        Map<String, String> context = new HashMap<String, String>();
+        context.put("key", "SomeValueOfTheKey");
+
+        String actualOutput = instance.render("test-contextkey", context);
+
+        assertEquals("Received output is wrong", "SomeValueOfTheKey", actualOutput);
+    }
+
+    @UseDataProvider("baseUrl")
+    @Test
+    public void urlHelperCorrectlyBuildsPathsCorrectly(String basePath, String path, String expectedOutput) {
+
+        HandlebarsTemplateEngine instance =
+                new HandlebarsTemplateEngine("someassetPath", "12345", basePath);
+
+        Map<String, String> context = new HashMap<String, String>();
+        context.put("path", path);
+
+        String actualOutput = instance.render("test-urlhelper", context);
 
         assertEquals("Received output is wrong", expectedOutput, actualOutput);
     }

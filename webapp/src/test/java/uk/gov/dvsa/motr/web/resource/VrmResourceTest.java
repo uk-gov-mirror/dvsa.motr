@@ -26,7 +26,6 @@ public class VrmResourceTest {
 
     private static final String INVALID_REG_NUMBER = "________";
     private static final String VALID_REG_NUMBER = "FP12345";
-    private static final String TEST_BASE_URL = "http://some-test/url";
 
     private VehicleDetailsClient client;
     private TemplateEngineStub templateEngine;
@@ -39,7 +38,7 @@ public class VrmResourceTest {
         templateEngine = new TemplateEngineStub();
         client = mock(VehicleDetailsClient.class);
         motrSession = mock(MotrSession.class);
-        resource = new VrmResource("", motrSession, templateEngine, client);
+        resource = new VrmResource(motrSession, templateEngine, client);
         when(motrSession.getRegNumberFromSession()).thenReturn("VRZ");
     }
 
@@ -57,7 +56,7 @@ public class VrmResourceTest {
 
         when(client.fetch(eq(VALID_REG_NUMBER))).thenReturn(Optional.of(new VehicleDetails()));
         Response response = resource.vrmPagePost(VALID_REG_NUMBER);
-        assertEquals(303, response.getStatus());
+        assertEquals(302, response.getStatus());
     }
 
     @Test
@@ -90,11 +89,11 @@ public class VrmResourceTest {
         when(motrSession.visitingFromReviewPage()).thenReturn(true);
         when(client.fetch(eq(VALID_REG_NUMBER))).thenReturn(Optional.of(new VehicleDetails()));
 
-        resource = new VrmResource(TEST_BASE_URL, motrSession, templateEngine, client);
+        resource = new VrmResource(motrSession, templateEngine, client);
         Response response = resource.vrmPagePost(VALID_REG_NUMBER);
 
-        assertEquals(TEST_BASE_URL + "/review", response.getHeaders().get("Location").get(0).toString());
-        assertEquals(303, response.getStatus());
+        assertEquals("review", response.getHeaders().get("Location").get(0).toString());
+        assertEquals(302, response.getStatus());
         assertNull(response.getEntity());
     }
 
