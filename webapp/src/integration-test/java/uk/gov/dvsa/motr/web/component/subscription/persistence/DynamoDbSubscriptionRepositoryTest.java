@@ -81,14 +81,11 @@ public class DynamoDbSubscriptionRepositoryTest {
 
         repo.save(subscription);
 
-        Item savedItem = new DynamoDB(client()).getTable(subscriptionTableName()).query(
-                new QuerySpec()
-                        .withKeyConditionExpression("vrm = :vrm AND email = :email")
-                        .withValueMap(new ValueMap()
-                                .withString(":vrm", subscription.getVrm())
-                                .withString(":email", subscription.getEmail())
-                        )
-        ).iterator().next();
+        QuerySpec spec = new QuerySpec()
+                .withKeyConditionExpression("vrm = :vrm AND email = :email")
+                .withValueMap(new ValueMap().withString(":vrm", subscription.getVrm()).withString(":email", subscription.getEmail()));
+
+        Item savedItem = new DynamoDB(client()).getTable(subscriptionTableName()).query(spec).iterator().next();
 
         assertNotNull("created_at cannot be null when saving db", savedItem.getString("created_at"));
 
