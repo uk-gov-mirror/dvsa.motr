@@ -100,7 +100,7 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
                 .withString("vrm", subscription.getVrm())
                 .withString("email", subscription.getEmail())
                 .withString("mot_due_date", subscription.getMotDueDate().format(DateTimeFormatter.ISO_LOCAL_DATE))
-                .withString("mot_due_date_md", subscription.getMotDueDate().format(DateTimeFormatter.ofPattern("MMdd")))
+                .withString("mot_due_date_md", subscription.getMotDueDate().format(DateTimeFormatter.ofPattern("MM-dd")))
                 .withString("created_at", ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT));
 
         dynamoDb.getTable(tableName).putItem(item);
