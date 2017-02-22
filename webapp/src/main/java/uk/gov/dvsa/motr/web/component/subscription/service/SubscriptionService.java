@@ -36,8 +36,8 @@ public class SubscriptionService {
                     .setEmail(email)
                     .setVrm(vrm)
                     .setMotDueDate(motDueDate);
-            this.subscriptionRepository.save(subscription);
             this.notifyService.sendConfirmationEmail(email, vrm, motDueDate, "link");
+            this.subscriptionRepository.save(subscription);
         } else {
             throw new SubscriptionAlreadyExistsException(format("A subscription exists for vehicle: %s with an email of: %s", vrm, email));
         }

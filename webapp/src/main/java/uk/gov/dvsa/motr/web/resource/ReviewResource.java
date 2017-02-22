@@ -107,7 +107,7 @@ public class ReviewResource {
         VrmValidator vrmValidator = new VrmValidator();
         EmailValidator emailValidator = new EmailValidator();
 
-        if (vrmValidator.isValid("test-reg") && emailValidator.isValid("test@test.com")) {
+        if (vrmValidator.isValid(regNumberFromSession) && emailValidator.isValid(emailFromSession)) {
 
             try {
                 Optional<VehicleDetails> vehicle = this.vehicleDetailsClient.fetch(regNumberFromSession);
