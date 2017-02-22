@@ -93,16 +93,13 @@ public class VrmResource {
 
         VrmValidator validator = new VrmValidator();
         if (validator.isValid(vrm)) {
-
-            this.motrSession.setVrm(vrm);
-
             try {
                 Optional<VehicleDetails> vehicle = this.client.fetch(vrm);
                 if (!vehicle.isPresent()) {
                     modelMap.put(MESSAGE_KEY, VEHICLE_NOT_FOUND_MESSAGE);
                     modelMap.put(SHOW_INLINE_KEY, false);
                 } else {
-
+                    this.motrSession.setVrm(vrm);
                     if (this.motrSession.visitingFromReviewPage()) {
                         return Response.seeOther(getFullUriForPage("review")).build();
                     }

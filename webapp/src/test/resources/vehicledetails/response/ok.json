@@ -3,7 +3,8 @@
   "model": "C220 ELEGANCE ED125 CDI BLU-CY",
   "primaryColour": "Silver",
   "secondaryColour": "",
-  "regNumber": "VRM12345",
-  "yearOfManufacture": "2006",
-  "motExpiryDate": "2016-11-26"
+  "registration": "VRM12345",
+  "manufactureYear": "2006",
+  "motTestExpiryDate": "2016-11-26",
+  "motTestNumber": "11111111111"
 }

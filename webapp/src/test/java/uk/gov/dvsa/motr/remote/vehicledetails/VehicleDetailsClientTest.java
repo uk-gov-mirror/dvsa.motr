@@ -78,7 +78,7 @@ public class VehicleDetailsClientTest {
         Optional<VehicleDetails> response = withDefaultClient().fetch("VRM12345");
 
         assertFalse(response.isPresent());
-        verify(getRequestedFor(urlEqualTo("/vehicle-details-endpoint?vrm=VRM12345")));
+        verify(getRequestedFor(urlEqualTo("/vehicle-details-endpoint/VRM12345")));
     }
 
     @DataProvider
@@ -128,13 +128,13 @@ public class VehicleDetailsClientTest {
 
     private MappingBuilder onRequest() {
 
-        return get(urlEqualTo("/vehicle-details-endpoint?vrm=VRM12345"))
+        return get(urlEqualTo("/vehicle-details-endpoint/VRM12345"))
                 .withHeader("x-api-key", equalTo("api-key"));
     }
 
     private VehicleDetailsClient withDefaultClient() {
 
-        final String endpointUri = "http://localhost:8098/vehicle-details-endpoint";
+        final String endpointUri = "http://localhost:8098/vehicle-details-endpoint/{registration}";
         return new VehicleDetailsClient(new ClientConfig(), endpointUri, "api-key");
     }
 

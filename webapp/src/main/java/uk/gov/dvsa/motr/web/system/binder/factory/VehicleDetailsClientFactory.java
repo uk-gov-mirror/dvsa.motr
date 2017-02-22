@@ -8,21 +8,25 @@ import uk.gov.dvsa.motr.web.helper.SystemVariableParam;
 import javax.inject.Inject;
 
 import static uk.gov.dvsa.motr.web.system.SystemVariable.MOT_TEST_REMINDER_INFO_API_URI;
+import static uk.gov.dvsa.motr.web.system.SystemVariable.TRADE_API_TOKEN;
 
 public class VehicleDetailsClientFactory implements BaseFactory<VehicleDetailsClient> {
 
     private String uri;
+    private String apiKey;
 
     @Inject
-    public VehicleDetailsClientFactory(@SystemVariableParam(MOT_TEST_REMINDER_INFO_API_URI) String uri) {
+    public VehicleDetailsClientFactory(
+            @SystemVariableParam(MOT_TEST_REMINDER_INFO_API_URI) String uri,
+            @SystemVariableParam(TRADE_API_TOKEN) String apiKey
+    ) {
 
         this.uri = uri;
+        this.apiKey = apiKey;
     }
 
     @Override
     public VehicleDetailsClient provide() {
-
-        String apiKey = ""; // TODO this.config.getValue(MOT_TEST_REMINDER_INFO_API_TOKEN);
 
         return new VehicleDetailsClient(new ClientConfig(), this.uri, apiKey);
     }

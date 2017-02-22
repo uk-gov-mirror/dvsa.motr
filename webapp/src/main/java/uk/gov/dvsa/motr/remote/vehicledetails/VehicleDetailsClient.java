@@ -7,6 +7,7 @@ import java.util.Optional;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 
 /**
@@ -14,7 +15,7 @@ import javax.ws.rs.core.Response;
  */
 public class VehicleDetailsClient {
 
-    private static final String REG_NUMBER_QUERY_PARAM = "vrm";
+    private static final String REG_NUMBER_PATH_PARAM = "registration";
     private static final String API_KEY_HEADER = "x-api-key";
 
     private Client client;
@@ -53,8 +54,11 @@ public class VehicleDetailsClient {
         Response response;
 
         try {
-            response = this.client.target(uri)
-                    .queryParam(REG_NUMBER_QUERY_PARAM, vrm)
+
+            WebTarget target = this.client.target(uri)
+                    .resolveTemplate(REG_NUMBER_PATH_PARAM, vrm);
+
+            response = this.client.target(target.getUri())
                     .request()
                     .header(API_KEY_HEADER, apiKey)
                     .get();

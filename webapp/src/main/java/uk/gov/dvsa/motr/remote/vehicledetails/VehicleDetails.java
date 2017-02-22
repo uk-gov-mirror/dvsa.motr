@@ -1,12 +1,12 @@
 package uk.gov.dvsa.motr.remote.vehicledetails;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import uk.gov.dvsa.motr.web.serialisation.LocalDateDeserialiser;
 
 import java.time.LocalDate;
-
 
 public class VehicleDetails {
 
@@ -20,17 +20,21 @@ public class VehicleDetails {
     private String primaryColour;
 
     @JsonProperty("secondaryColour")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String secondaryColour;
 
-    @JsonProperty("regNumber")
+    @JsonProperty("registration")
     private String regNumber;
 
-    @JsonProperty("yearOfManufacture")
+    @JsonProperty("manufactureYear")
     private Integer yearOfManufacture;
 
     @JsonDeserialize(using = LocalDateDeserialiser.class)
-    @JsonProperty("motExpiryDate")
+    @JsonProperty("motTestExpiryDate")
     private LocalDate motExpiryDate;
+
+    @JsonProperty("motTestNumber")
+    private String motTestNumber;
 
     public String getMake() {
 
@@ -102,6 +106,16 @@ public class VehicleDetails {
         this.motExpiryDate = motExpiryDate;
     }
 
+    public String getMotTestNumber() {
+
+        return motTestNumber;
+    }
+
+    public void setMotTestNumber(String motTestNumber) {
+
+        this.motTestNumber = motTestNumber;
+    }
+
     @Override
     public String toString() {
 
@@ -111,8 +125,9 @@ public class VehicleDetails {
                 ", primaryColour='" + primaryColour + '\'' +
                 ", secondaryColour='" + secondaryColour + '\'' +
                 ", regNumber='" + regNumber + '\'' +
-                ", yearOfManufacture='" + yearOfManufacture + '\'' +
+                ", yearOfManufacture=" + yearOfManufacture +
                 ", motExpiryDate=" + motExpiryDate +
+                ", motTestNumber='" + motTestNumber + '\'' +
                 '}';
     }
 }
