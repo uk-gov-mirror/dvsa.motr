@@ -26,7 +26,7 @@ public class MotrConfigFactory implements BaseFactory<Config> {
 
         Set<ConfigKey> secretVariables = new HashSet<>();
 
-        //TODO GOV_NOTIFY_API_TOKEN and TRADE_API_TOKEN secretVariables
+        //TODO GOV_NOTIFY_API_TOKEN and MOT_TEST_REMINDER_INFO_TOKEN secretVariables
 
         return secretVariables;
     }

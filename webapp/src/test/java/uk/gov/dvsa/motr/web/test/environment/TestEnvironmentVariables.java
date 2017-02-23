@@ -8,9 +8,9 @@ import static uk.gov.dvsa.motr.web.system.SystemVariable.BASE_URL;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.DO_WARM_UP;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.LOG_LEVEL;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.MOT_TEST_REMINDER_INFO_API_URI;
+import static uk.gov.dvsa.motr.web.system.SystemVariable.MOT_TEST_REMINDER_INFO_TOKEN;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.STATIC_ASSETS_HASH;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.STATIC_ASSETS_URL;
-import static uk.gov.dvsa.motr.web.system.SystemVariable.TRADE_API_TOKEN;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.WARM_UP_TIMEOUT_SEC;
 
 public class TestEnvironmentVariables extends EnvironmentVariables {
@@ -24,7 +24,7 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
         motTestReminderInfoApiUri("some_uri");
         doWarmUp(false);
         warmUpTimeoutSec(10);
-        tradeApiToken("test-token");
+        motTestReminderInfoToken("test-token");
     }
 
     public TestEnvironmentVariables assetsUrl(String value) {
@@ -55,8 +55,8 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
         return set(MOT_TEST_REMINDER_INFO_API_URI, value);
     }
 
-    public TestEnvironmentVariables tradeApiToken(String value) {
-        return set(TRADE_API_TOKEN, value);
+    public TestEnvironmentVariables motTestReminderInfoToken(String value) {
+        return set(MOT_TEST_REMINDER_INFO_TOKEN, value);
     }
 
     private TestEnvironmentVariables set(SystemVariable var, String value) {
