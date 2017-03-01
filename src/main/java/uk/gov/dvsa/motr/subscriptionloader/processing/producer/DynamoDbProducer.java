@@ -4,8 +4,9 @@ import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Index;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.ItemCollection;
-import com.amazonaws.services.dynamodbv2.document.ScanFilter;
-import com.amazonaws.services.dynamodbv2.document.ScanOutcome;
+import com.amazonaws.services.dynamodbv2.document.QueryOutcome;
+import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
+import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,31 +38,32 @@ public class DynamoDbProducer implements SubscriptionProducer {
 
         Index dueDateIndex = dynamoDb.getTable(subscriptionTableName).getIndex(INDEX_NAME);
 
-        String first = firstNotificationDate.format(DateTimeFormatter.ofPattern("MM-dd"));
-        String second = secondNotificationDate.format(DateTimeFormatter.ofPattern("MM-dd"));
-        logger.debug("first scan date is {} and second scan is {}", first, second);
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MM-dd");
 
-        ScanFilter firstDateScanFilter = new ScanFilter("mot_due_date_md")
-                .eq(firstNotificationDate.format(DateTimeFormatter.ofPattern("MM-dd")));
+        ValueMap valueMap = new ValueMap()
+                .withString(":due_date1", firstNotificationDate.format(dateFormatter))
+                .withString(":due_date2", secondNotificationDate.format(dateFormatter));
 
-        ItemCollection<ScanOutcome> firstNotificationCollection = dueDateIndex.scan(firstDateScanFilter);
+        QuerySpec querySpec = new QuerySpec()
+                .withKeyConditionExpression("mot_due_date_md = :due_date1 OR mot_due_date_md = :due_date2")
+                .withValueMap(valueMap);
 
-        Iterator<Item> firstNotificationsIterator = firstNotificationCollection.iterator();
+        ItemCollection<QueryOutcome> resultCollection = dueDateIndex.query(querySpec);
+
+        Iterator<Item> iterator = resultCollection.iterator();
 
         return new Iterator<Subscription>() {
 
             @Override
             public boolean hasNext() {
 
-                return firstNotificationsIterator.hasNext();
+                return iterator.hasNext();
             }
 
             @Override
             public Subscription next() {
 
-                Item item;
-                item = firstNotificationsIterator.next();
-
+                Item item = iterator.next();
                 logger.debug("item is {}", item);
                 LocalDate motDueDate = LocalDate.parse(item.getString("mot_due_date"), DateTimeFormatter.ISO_DATE);
                 return new Subscription()
