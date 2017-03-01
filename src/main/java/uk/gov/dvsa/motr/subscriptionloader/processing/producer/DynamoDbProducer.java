@@ -34,25 +34,27 @@ public class DynamoDbProducer implements SubscriptionProducer {
         this.subscriptionTableName = subscriptionTableName;
     }
 
-    public Iterator<Subscription> getIterator(LocalDate firstNotificationDate, LocalDate secondNotificationDate) {
+    public Iterator<Subscription> getIterator(LocalDate date1MonthAheadDueDate, LocalDate date2WeeksAheadDueDate) {
 
         Index dueDateIndex = dynamoDb.getTable(subscriptionTableName).getIndex(INDEX_NAME);
 
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MM-dd");
 
+        String keyCondExpr = "mot_due_date_md = :due_date";
+
         QuerySpec querySpec1MonthAhead = new QuerySpec()
-                .withKeyConditionExpression("mot_due_date_md = :due_date")
-                .withValueMap(new ValueMap().withString(":due_date", firstNotificationDate.format(dateFormatter)));
+                .withKeyConditionExpression(keyCondExpr)
+                .withValueMap(new ValueMap().withString(":due_date", date1MonthAheadDueDate.format(dateFormatter)));
 
         QuerySpec querySpec2WeeksAhead = new QuerySpec()
-                .withKeyConditionExpression("mot_due_date_md = :due_date")
-                .withValueMap(new ValueMap().withString(":due_date", secondNotificationDate.format(dateFormatter)));
+                .withKeyConditionExpression(keyCondExpr)
+                .withValueMap(new ValueMap().withString(":due_date", date2WeeksAheadDueDate.format(dateFormatter)));
 
 
-        ItemCollection<QueryOutcome> result2weeksAhead = dueDateIndex.query(querySpec2WeeksAhead);
+        ItemCollection<QueryOutcome> result2WeeksAhead = dueDateIndex.query(querySpec2WeeksAhead);
         ItemCollection<QueryOutcome> result1MonthAhead = dueDateIndex.query(querySpec1MonthAhead);
 
-        Iterator<Item> iterator2WeeksAhead = result2weeksAhead.iterator();
+        Iterator<Item> iterator2WeeksAhead = result2WeeksAhead.iterator();
         Iterator<Item> iterator1MonthAhead = result1MonthAhead.iterator();
 
         return new Iterator<Subscription>() {
@@ -73,7 +75,6 @@ public class DynamoDbProducer implements SubscriptionProducer {
                     item = iterator1MonthAhead.next();
                 }
 
-                logger.debug("item is {}", item);
                 LocalDate motDueDate = LocalDate.parse(item.getString("mot_due_date"), DateTimeFormatter.ISO_DATE);
                 return new Subscription()
                         .setId(item.getString("id"))

@@ -14,7 +14,15 @@ import uk.gov.dvsa.motr.subscriptionloader.processing.producer.SubscriptionProdu
 import static uk.gov.dvsa.motr.subscriptionloader.SystemVariable.POST_PURGE_DELAY;
 import static uk.gov.dvsa.motr.subscriptionloader.SystemVariable.QUEUE_URL;
 
+import static java.lang.Integer.parseInt;
+
 public class LoaderModule extends AbstractModule {
+
+    private boolean isPurge = false;
+
+    public LoaderModule(boolean isPurge) {
+        this.isPurge = isPurge;
+    }
 
     @Override
     protected void configure() {
@@ -24,7 +32,12 @@ public class LoaderModule extends AbstractModule {
     @Provides
     public Loader provideLoader(Config config, AmazonSQSAsync client, SubscriptionProducer producer, Dispatcher dispatcher) {
 
-        return new PurgingLoader(new DefaultLoader(producer, dispatcher), client, config.getValue(QUEUE_URL), Integer.parseInt(config
-                .getValue(POST_PURGE_DELAY)), 10_000);
+        Loader loader = new DefaultLoader(producer, dispatcher);
+
+        String queueUrl = config.getValue(QUEUE_URL);
+        int postPurgeDelayMs = parseInt(config.getValue(POST_PURGE_DELAY));
+        int purgeInProgressDelayMs = 10_000;
+
+        return isPurge ? new PurgingLoader(loader, client, queueUrl, postPurgeDelayMs, purgeInProgressDelayMs) : loader;
     }
 }

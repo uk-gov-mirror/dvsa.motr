@@ -11,7 +11,6 @@ import java.util.concurrent.Future;
  */
 public class DispatchResult {
 
-
     private Subscription originalPayload;
     private Future<SendMessageResult> result;
     private Exception exception;

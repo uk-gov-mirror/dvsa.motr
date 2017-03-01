@@ -12,7 +12,7 @@ import java.time.LocalDate;
 
 public class PurgingLoader implements Loader {
 
-    private static final Logger logger = LoggerFactory.getLogger(PurgingLoader.class);
+    private static final Logger logger = LoggerFactory.getLogger(PurgingLoader.class.getSimpleName());
 
     private Loader wrappedLoader;
     private AmazonSQS awsSqs;
@@ -40,7 +40,7 @@ public class PurgingLoader implements Loader {
 
                 awsSqs.purgeQueue(new PurgeQueueRequest().withQueueUrl(queueUrl));
 
-                logger.info("Wait after purge operation to finish: {} ms", this.postPurgeDelayMs);
+                logger.info("Wait for purge operation to finish: {} ms", this.postPurgeDelayMs);
 
                 Thread.sleep(this.postPurgeDelayMs);
 

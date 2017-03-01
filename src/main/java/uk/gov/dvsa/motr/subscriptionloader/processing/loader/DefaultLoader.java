@@ -23,9 +23,13 @@ import javax.inject.Inject;
 
 public class DefaultLoader implements Loader {
 
-    private static final Logger logger = LoggerFactory.getLogger(DefaultLoader.class);
+    private static final Logger logger = LoggerFactory.getLogger(DefaultLoader.class.getSimpleName());
     private static final int FIRST_NOTIFICATION_TIME_MONTHS = 1;
     private static final int SECOND_NOTIFICATION_TIME_DAYS = 14;
+    /**
+     * Time in milliseconds used define a threshold beyond which execution has timed out.
+     */
+    private static final int LOADING_CUTOFF_DELTA_MS = 2000;
 
     private SubscriptionProducer producer;
     private Dispatcher dispatcher;
@@ -37,13 +41,13 @@ public class DefaultLoader implements Loader {
         this.dispatcher = dispatcher;
     }
 
-    public LoadReport run(LocalDate today, Context context) throws Exception {
+    public LoadReport run(LocalDate referenceDate, Context context) throws Exception {
 
         LoadReport report = new LoadReport();
-        LocalDate secondDate = today.plusDays(SECOND_NOTIFICATION_TIME_DAYS);
-        LocalDate firstDate = today.plusMonths(FIRST_NOTIFICATION_TIME_MONTHS);
+        LocalDate firstDate = referenceDate.plusMonths(FIRST_NOTIFICATION_TIME_MONTHS);
+        LocalDate secondDate = referenceDate.plusDays(SECOND_NOTIFICATION_TIME_DAYS);
 
-        logger.debug("Localdate (+14 days) is {} and LocalDate (+1 month) is {}", secondDate, firstDate);
+        logger.info("Reference date: {}, +14 days is {}, +1 month is {}", referenceDate, secondDate, firstDate);
         Iterator<Subscription> subscriptionIterator = producer.getIterator(firstDate, secondDate);
         List<DispatchResult> inFlightOps = new ArrayList<>();
 
@@ -66,7 +70,6 @@ public class DefaultLoader implements Loader {
 
             EventLogger.logEvent(new LoadingSuccess()
                     .setProcessed(report.getProcessed())
-                    .setSubmittedForProcessing(report.getSubmittedForProcessing())
                     .setDuration(report.getDuration())
             );
 
@@ -86,7 +89,7 @@ public class DefaultLoader implements Loader {
 
     private void reportRemaining(List<DispatchResult> result, LoadReport report, Context context) throws Exception {
 
-        logger.debug("reporting remaining with result.size of {}", result.size());
+        logger.debug("reporting remaining count: {}", result.size());
         while (result.size() > 0) {
             checkRemainingTime(report, context);
             Iterator<DispatchResult> iterator = result.iterator();
@@ -103,6 +106,8 @@ public class DefaultLoader implements Loader {
                 if (!dispatchResult.isFailed()) {
                     report.incrementProcessed();
                     dispatchResultIterator.remove();
+                    Subscription subscription = dispatchResult.getSubscription();
+                    logger.debug("Success vrm: {}, email: {}", subscription.getVrm(), subscription.getEmail());
                 } else {
                     throw new LoadingException(dispatchResult.getError());
                 }
@@ -112,7 +117,7 @@ public class DefaultLoader implements Loader {
 
     private void checkRemainingTime(LoadReport report, Context context) throws LoadingException {
 
-        if (context.getRemainingTimeInMillis() < 2000) {
+        if (context.getRemainingTimeInMillis() < LOADING_CUTOFF_DELTA_MS) {
             EventLogger.logEvent(new LoadingTimeout()
                     .setProcessed(report.getProcessed())
                     .setSubmittedForProcessing(report.getSubmittedForProcessing())

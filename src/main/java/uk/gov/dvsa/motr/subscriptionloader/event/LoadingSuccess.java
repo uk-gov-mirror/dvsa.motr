@@ -10,12 +10,6 @@ public class LoadingSuccess extends Event {
         return "LOADING_SUCCESS";
     }
 
-    public LoadingSuccess setSubmittedForProcessing(int submittedForProcessing) {
-
-        params.put("submitted-for-processing", String.valueOf(submittedForProcessing));
-        return this;
-    }
-
     public LoadingSuccess setProcessed(int processed) {
 
         params.put("processed", String.valueOf(processed));
@@ -24,7 +18,7 @@ public class LoadingSuccess extends Event {
 
     public LoadingSuccess setDuration(long duration) {
 
-        params.put("duration", String.valueOf(duration));
+        params.put("duration-ms", String.valueOf(duration));
         return this;
     }
 }
