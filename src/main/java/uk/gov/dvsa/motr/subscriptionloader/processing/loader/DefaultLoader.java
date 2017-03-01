@@ -40,8 +40,12 @@ public class DefaultLoader implements Loader {
     public LoadReport run(LocalDate today, Context context) throws Exception {
 
         LoadReport report = new LoadReport();
-        Iterator<Subscription> subscriptionIterator = producer.getIterator(today.plusMonths(FIRST_NOTIFICATION_TIME_MONTHS),
-                today.plusDays(SECOND_NOTIFICATION_TIME_DAYS));
+        LocalDate secondDate = today.plusDays(SECOND_NOTIFICATION_TIME_DAYS);
+        LocalDate firstDate = today.plusMonths(FIRST_NOTIFICATION_TIME_MONTHS);
+
+
+        logger.debug("Localdate (+14 days) is {} and LocalDate (+1 month) is {}", secondDate, firstDate);
+        Iterator<Subscription> subscriptionIterator = producer.getIterator(secondDate, firstDate);
         List<DispatchResult> inFlightOps = new ArrayList<>();
 
         try {

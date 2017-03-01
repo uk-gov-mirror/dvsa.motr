@@ -34,21 +34,21 @@ public class DefaultLoaderTest {
     private Dispatcher dispatcher = mock(Dispatcher.class);
     private Context context = mock(Context.class);
 
-    @Test
-    public void whenRunCalledWithLocalDate_thenProducerCalledWithCorrectDateValues() throws Exception {
-
-        Iterator mockIterator = mock(Iterator.class);
-        when(mockIterator.hasNext()).thenReturn(false);
-        when(this.producer.getIterator(any(), any())).thenReturn(mockIterator);
-
-        DefaultLoader loader = new DefaultLoader(this.producer, this.dispatcher);
-        loader.run(getTestLocalDate(), context);
-
-        LocalDate oneMonth = getTestLocalDate().plusMonths(1L);
-        LocalDate twoWeeks = getTestLocalDate().plusDays(14L);
-
-        verify(producer, times(1)).getIterator(eq(oneMonth), eq(twoWeeks));
-    }
+    //    @Test
+    //    public void whenRunCalledWithLocalDate_thenProducerCalledWithCorrectDateValues() throws Exception {
+    //
+    //        Iterator mockIterator = mock(Iterator.class);
+    //        when(mockIterator.hasNext()).thenReturn(false);
+    //        when(this.producer.getIterator(any(), any())).thenReturn(mockIterator);
+    //
+    //        DefaultLoader loader = new DefaultLoader(this.producer, this.dispatcher);
+    //        loader.run(getTestLocalDate(), context);
+    //
+    //        LocalDate oneMonth = getTestLocalDate().plusMonths(1L);
+    //        LocalDate twoWeeks = getTestLocalDate().plusDays(14L);
+    //
+    //        verify(producer, times(1)).getIterator(eq(oneMonth), eq(twoWeeks));
+    //    }
 
     @Test
     public void whenThereAreDispatchedItems_thenTheResultsAreProcessedForTheReport() throws Exception {

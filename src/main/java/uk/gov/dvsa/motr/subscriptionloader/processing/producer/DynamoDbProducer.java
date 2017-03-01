@@ -40,35 +40,28 @@ public class DynamoDbProducer implements SubscriptionProducer {
         String first = firstNotificationDate.format(DateTimeFormatter.ofPattern("MM-dd"));
         String second = secondNotificationDate.format(DateTimeFormatter.ofPattern("MM-dd"));
         logger.debug("first scan date is {} and second scan is {}", first, second);
-        
+
         ScanFilter firstDateScanFilter = new ScanFilter("mot_due_date_md")
                 .eq(firstNotificationDate.format(DateTimeFormatter.ofPattern("MM-dd")));
-        ScanFilter secondDateScanFilter = new ScanFilter("mot_due_date_md")
-                .eq(secondNotificationDate.format(DateTimeFormatter.ofPattern("MM-dd")));
 
         ItemCollection<ScanOutcome> firstNotificationCollection = dueDateIndex.scan(firstDateScanFilter);
-        ItemCollection<ScanOutcome> secondNotificationCollection = dueDateIndex.scan(secondDateScanFilter);
 
         Iterator<Item> firstNotificationsIterator = firstNotificationCollection.iterator();
-        Iterator<Item> secondNotificationsIterator = secondNotificationCollection.iterator();
 
         return new Iterator<Subscription>() {
 
             @Override
             public boolean hasNext() {
 
-                return firstNotificationsIterator.hasNext() || secondNotificationsIterator.hasNext();
+                return firstNotificationsIterator.hasNext();
             }
 
             @Override
             public Subscription next() {
 
                 Item item;
-                if (firstNotificationsIterator.hasNext()) {
-                    item = firstNotificationsIterator.next();
-                } else {
-                    item = secondNotificationsIterator.next();
-                }
+                item = firstNotificationsIterator.next();
+
                 logger.debug("item is {}", item);
                 LocalDate motDueDate = LocalDate.parse(item.getString("mot_due_date"), DateTimeFormatter.ISO_DATE);
                 return new Subscription()
