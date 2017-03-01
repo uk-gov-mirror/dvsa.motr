@@ -23,8 +23,10 @@ public class EventHandler {
     public EventHandler() {
 
     }
+
     public EventHandler(Module loaderModule) {
-        this.loaderModule = this.loaderModule;
+
+        this.loaderModule = loaderModule;
     }
 
     public LoadReport handle(AwsCloudwatchEvent request, Context context) throws Exception {

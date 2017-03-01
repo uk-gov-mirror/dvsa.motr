@@ -4,18 +4,27 @@ import com.amazonaws.services.lambda.runtime.ClientContext;
 import com.amazonaws.services.lambda.runtime.CognitoIdentity;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
+import com.amazonaws.services.sqs.AmazonSQSAsync;
 import com.amazonaws.services.sqs.model.Message;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 
+import uk.gov.dvsa.motr.config.Config;
 import uk.gov.dvsa.motr.subscriptionloader.handler.AwsCloudwatchEvent;
 import uk.gov.dvsa.motr.subscriptionloader.handler.EventHandler;
+import uk.gov.dvsa.motr.subscriptionloader.processing.dispatcher.Dispatcher;
+import uk.gov.dvsa.motr.subscriptionloader.processing.loader.DefaultLoader;
 import uk.gov.dvsa.motr.subscriptionloader.processing.loader.LoadReport;
+import uk.gov.dvsa.motr.subscriptionloader.processing.loader.Loader;
+import uk.gov.dvsa.motr.subscriptionloader.processing.loader.PurgingLoader;
 import uk.gov.dvsa.motr.subscriptionloader.processing.model.Subscription;
+import uk.gov.dvsa.motr.subscriptionloader.processing.producer.SubscriptionProducer;
 import uk.gov.dvsa.motr.test.environment.variables.TestEnvironmentVariables;
 import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.core.DynamoDbFixture;
 import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.model.SubscriptionItem;
@@ -27,6 +36,8 @@ import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 
+import static uk.gov.dvsa.motr.subscriptionloader.SystemVariable.POST_PURGE_DELAY;
+import static uk.gov.dvsa.motr.subscriptionloader.SystemVariable.QUEUE_URL;
 import static uk.gov.dvsa.motr.test.integration.dynamodb.DynamoDbIntegrationHelper.dynamoDbClient;
 
 
@@ -44,7 +55,7 @@ public class SubscriptionLoaderTests {
     public void setUp() {
 
         queueHelper = new SqsHelper();
-        eventHandler = new EventHandler();
+        eventHandler = new EventHandler(new IntegrationTestModule());
         subscriptionItem = new SubscriptionItem();
         DynamoDbFixture fixture = new DynamoDbFixture(dynamoDbClient());
         fixture.table(new SubscriptionTable().item(subscriptionItem)).run();
@@ -148,5 +159,18 @@ public class SubscriptionLoaderTests {
         };
     }
 
+    private class IntegrationTestModule extends AbstractModule {
+
+        @Override
+        protected void configure() {
+
+        }
+
+        @Provides
+        public Loader provideLoader(Config config, AmazonSQSAsync client, SubscriptionProducer producer, Dispatcher dispatcher) {
+
+            return new DefaultLoader(producer, dispatcher);
+        }
+    }
 
 }
