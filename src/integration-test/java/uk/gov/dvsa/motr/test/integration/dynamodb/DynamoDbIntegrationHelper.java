@@ -23,36 +23,6 @@ public class DynamoDbIntegrationHelper {
         return lookupProperty("test.dynamoDB.integration.region");
     }
 
-    /**
-     * Returns the amount of inflight batches for the sqs queue
-     *`
-     * @return inflight batches
-     */
-    public static String inflightBatches() {
-
-        return lookupProperty("test.dynamoDB.integration.inflight.batches");
-    }
-
-    /**
-     * Returns the amount of delay while purging the amazon sqs queue
-     *`
-     * @return purge delay
-     */
-    public static String postPurgeDelay() {
-
-        return lookupProperty("test.dynamoDB.integration.post.purge");
-    }
-
-    /**
-     * Returns the url the sqs queue
-     *`
-     * @return amazon sqs queue
-     */
-    public static String subscriptionQueue() {
-
-        return lookupProperty("test.dynamoDB.integration.subscription.queue");
-    }
-
     private static String lookupProperty(String property) {
 
         return Optional.ofNullable(System.getProperty(property)).orElseThrow(

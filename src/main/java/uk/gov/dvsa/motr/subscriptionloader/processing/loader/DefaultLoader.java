@@ -86,9 +86,6 @@ public class DefaultLoader implements Loader {
         logger.debug("reporting remaining with result.size of {}", result.size());
         while (result.size() > 0) {
             checkRemainingTime(report, context);
-            for (DispatchResult r : result) {
-                logger.info("{} {} {}", r.getSubscription(), r.getError(), r.isDone());
-            }
             Iterator<DispatchResult> iterator = result.iterator();
             processResults(iterator, report);
             Thread.sleep(100);

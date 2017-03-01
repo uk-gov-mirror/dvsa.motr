@@ -1,7 +1,5 @@
 package uk.gov.dvsa.motr.test.data;
 
-import org.apache.commons.lang3.RandomStringUtils;
-
 import java.time.LocalDate;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;

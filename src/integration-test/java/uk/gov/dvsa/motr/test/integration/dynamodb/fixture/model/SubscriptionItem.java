@@ -56,6 +56,7 @@ public class SubscriptionItem implements DynamoDbFixtureTableItem {
         return new Item().with("id", id)
                 .with("mot_due_date", motDueDate.format(DateTimeFormatter.ISO_DATE))
                 .with("vrm", vrm)
+                .with("mot_due_date_md", motDueDate.format(DateTimeFormatter.ofPattern("MM-dd")))
                 .with("email", email);
     }
 }
