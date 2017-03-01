@@ -37,6 +37,10 @@ public class DynamoDbProducer implements SubscriptionProducer {
 
         Index dueDateIndex = dynamoDb.getTable(subscriptionTableName).getIndex(INDEX_NAME);
 
+        String first = firstNotificationDate.format(DateTimeFormatter.ofPattern("MM-dd"));
+        String second = secondNotificationDate.format(DateTimeFormatter.ofPattern("MM-dd"));
+        logger.debug("first scan date is {} and second scan is {}", first, second);
+        
         ScanFilter firstDateScanFilter = new ScanFilter("mot_due_date_md")
                 .eq(firstNotificationDate.format(DateTimeFormatter.ofPattern("MM-dd")));
         ScanFilter secondDateScanFilter = new ScanFilter("mot_due_date_md")
