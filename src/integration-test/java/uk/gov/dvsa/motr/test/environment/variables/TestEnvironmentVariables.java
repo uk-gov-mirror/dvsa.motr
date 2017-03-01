@@ -22,7 +22,6 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
         subscriptionTable(DynamoDbIntegrationHelper.subscriptionTableName());
         inflightBatches(SqsHelper.inflightBatches());
         subscriptionQueue(SqsHelper.sqsEndpoint());
-        postPurgeDelay(SqsHelper.postPurgeDelay());
     }
 
     private TestEnvironmentVariables logLevel(String value) {
@@ -48,11 +47,6 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
     private TestEnvironmentVariables subscriptionQueue(String value) {
 
         return set(QUEUE_URL, value);
-    }
-
-    private TestEnvironmentVariables postPurgeDelay(String value) {
-
-        return set(POST_PURGE_DELAY, value);
     }
 
     private TestEnvironmentVariables set(SystemVariable var, String value) {
