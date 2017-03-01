@@ -44,7 +44,7 @@ public class DynamoDbProducer implements SubscriptionProducer {
                 .withKeyConditionExpression("mot_due_date_md = :due_date")
                 .withValueMap(new ValueMap().withString(":due_date", firstNotificationDate.format(dateFormatter)));
 
-        QuerySpec querySpec2WeeksAhead= new QuerySpec()
+        QuerySpec querySpec2WeeksAhead = new QuerySpec()
                 .withKeyConditionExpression("mot_due_date_md = :due_date")
                 .withValueMap(new ValueMap().withString(":due_date", secondNotificationDate.format(dateFormatter)));
 
