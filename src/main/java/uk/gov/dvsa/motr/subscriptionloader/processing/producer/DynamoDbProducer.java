@@ -40,37 +40,37 @@ public class DynamoDbProducer implements SubscriptionProducer {
 
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MM-dd");
 
-        QuerySpec querySpec2WeeksAgo = new QuerySpec()
+        QuerySpec querySpec1MonthAhead = new QuerySpec()
                 .withKeyConditionExpression("mot_due_date_md = :due_date")
                 .withValueMap(new ValueMap().withString(":due_date", firstNotificationDate.format(dateFormatter)));
 
-        QuerySpec querySpec1MonthAgo = new QuerySpec()
+        QuerySpec querySpec2WeeksAhead= new QuerySpec()
                 .withKeyConditionExpression("mot_due_date_md = :due_date")
                 .withValueMap(new ValueMap().withString(":due_date", secondNotificationDate.format(dateFormatter)));
 
 
-        ItemCollection<QueryOutcome> result2weeksAgo = dueDateIndex.query(querySpec2WeeksAgo);
-        ItemCollection<QueryOutcome> result1MonthAgo = dueDateIndex.query(querySpec1MonthAgo);
+        ItemCollection<QueryOutcome> result2weeksAhead = dueDateIndex.query(querySpec2WeeksAhead);
+        ItemCollection<QueryOutcome> result1MonthAhead = dueDateIndex.query(querySpec1MonthAhead);
 
-        Iterator<Item> iterator2WeeksAgo = result2weeksAgo.iterator();
-        Iterator<Item> iterator1MonthAgo = result1MonthAgo.iterator();
+        Iterator<Item> iterator2WeeksAhead = result2weeksAhead.iterator();
+        Iterator<Item> iterator1MonthAhead = result1MonthAhead.iterator();
 
         return new Iterator<Subscription>() {
 
             @Override
             public boolean hasNext() {
 
-                return iterator2WeeksAgo.hasNext() || iterator1MonthAgo.hasNext();
+                return iterator2WeeksAhead.hasNext() || iterator1MonthAhead.hasNext();
             }
 
             @Override
             public Subscription next() {
 
                 Item item;
-                if (iterator2WeeksAgo.hasNext()) {
-                    item = iterator2WeeksAgo.next();
+                if (iterator2WeeksAhead.hasNext()) {
+                    item = iterator2WeeksAhead.next();
                 } else {
-                    item = iterator1MonthAgo.next();
+                    item = iterator1MonthAhead.next();
                 }
 
                 logger.debug("item is {}", item);
