@@ -27,7 +27,6 @@ public class Dispatcher {
         this.jsonMapper = new ObjectMapper();
         this.attributes.put("correlation-id",
                 new MessageAttributeValue().withDataType("String").withStringValue(correlationId));
-
     }
 
     public DispatchResult dispatch(Subscription subscription) {

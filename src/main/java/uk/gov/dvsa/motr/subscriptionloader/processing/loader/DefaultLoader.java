@@ -91,7 +91,6 @@ public class DefaultLoader implements Loader {
             checkRemainingTime(report, context);
             Iterator<DispatchResult> iterator = result.iterator();
             processResults(iterator, report);
-            Thread.sleep(100);
         }
     }
 
