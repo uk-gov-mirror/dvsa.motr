@@ -2,6 +2,7 @@ package uk.gov.dvsa.motr.ui.page;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+
 import uk.gov.dvsa.motr.navigation.GotoUrl;
 import uk.gov.dvsa.motr.ui.base.Page;
 import uk.gov.dvsa.motr.ui.base.PageIdentityVerificationException;

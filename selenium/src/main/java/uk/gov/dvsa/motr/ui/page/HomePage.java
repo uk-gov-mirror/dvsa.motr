@@ -21,4 +21,9 @@ public class HomePage extends Page {
         startNowButton.click();
         return new VrmPage();
     }
+
+    public CookiesPage clickCookiesLink() {
+        cookiesLink.click();
+        return new CookiesPage();
+    }
 }
