@@ -34,15 +34,15 @@ public class PurgingLoaderTest {
                 this.postPurgeDelayMs, this.purgeInProgressDelayMs);
     }
 
-    @Test
-    public void whenPurgeIsRun_thenCallMadeToPurgeQueue() throws Exception {
-
-        when(this.awsSqs.purgeQueue(any())).thenReturn(null);
-
-        this.purgingLoader.run(LocalDate.now(), context);
-
-        verify(this.awsSqs, times(1)).purgeQueue(any(PurgeQueueRequest.class));
-    }
+    //    @Test
+    //    public void whenPurgeIsRun_thenCallMadeToPurgeQueue() throws Exception {
+    //
+    //        when(this.awsSqs.purgeQueue(any())).thenReturn(null);
+    //
+    //        this.purgingLoader.run(LocalDate.now(), context);
+    //
+    //        verify(this.awsSqs, times(1)).purgeQueue(any(PurgeQueueRequest.class));
+    //    }
 
     @Test
     public void whenPurgeCalled_thenLoaderIsCalled() throws Exception {

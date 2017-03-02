@@ -32,27 +32,27 @@ public class PurgingLoader implements Loader {
     @Override
     public LoadReport run(LocalDate today, Context context) throws Exception {
 
-        long purgingStartedAt = System.currentTimeMillis();
-
-        while (true) {
-            try {
-                logger.info("Requesting queue purge");
-
-                awsSqs.purgeQueue(new PurgeQueueRequest().withQueueUrl(queueUrl));
-
-                logger.info("Wait for purge operation to finish: {} ms", this.postPurgeDelayMs);
-
-                Thread.sleep(this.postPurgeDelayMs);
-
-                break;
-            } catch (PurgeQueueInProgressException pqinpe) {
-                // retry
-                logger.info("Purging already in progress");
-                Thread.sleep(this.purgeInProgressDelayMs);
-            }
-        }
-
-        logger.info("Purging completed in: {} ms", System.currentTimeMillis() - purgingStartedAt);
+        //        long purgingStartedAt = System.currentTimeMillis();
+        //
+        //        while (true) {
+        //            try {
+        //                logger.info("Requesting queue purge");
+        //
+        //                awsSqs.purgeQueue(new PurgeQueueRequest().withQueueUrl(queueUrl));
+        //
+        //                logger.info("Wait for purge operation to finish: {} ms", this.postPurgeDelayMs);
+        //
+        //                Thread.sleep(this.postPurgeDelayMs);
+        //
+        //                break;
+        //            } catch (PurgeQueueInProgressException pqinpe) {
+        //                // retry
+        //                logger.info("Purging already in progress");
+        //                Thread.sleep(this.purgeInProgressDelayMs);
+        //            }
+        //        }
+        //
+        //        logger.info("Purging completed in: {} ms", System.currentTimeMillis() - purgingStartedAt);
 
         return wrappedLoader.run(today, context);
     }
