@@ -48,7 +48,6 @@ dependencies {
     compile 'com.amazonaws:aws-lambda-java-log4j:1.0.0'
     compile 'com.amazonaws:aws-java-sdk-dynamodb:1.11.86'
     compile 'com.amazonaws:aws-java-sdk-sqs:1.11.86'
-    compile 'com.amazonaws:aws-java-sdk-cloudwatchmetrics:1.11.86'
     compile 'org.slf4j:slf4j-log4j12:1.7.21'
     compile 'com.google.inject:guice:4.1.0'
     compile 'com.github.szhem:log4j-json-layout:b657ab3466'
