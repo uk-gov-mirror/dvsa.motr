@@ -62,10 +62,6 @@ public class VrmResource {
 
         modelMap.put(VRM_MODEL_KEY, regNumber);
 
-        if (this.motrSession.visitingFromReviewPage()) {
-            modelMap.put("back_location", "review");
-        }
-
         return renderer.render("vrm", modelMap);
     }
 

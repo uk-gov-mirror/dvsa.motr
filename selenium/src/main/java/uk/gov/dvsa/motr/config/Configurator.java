@@ -123,6 +123,14 @@ public abstract class Configurator {
         return getProp("test.baseUrl");
     }
 
+    public static String dynamoDbRegion() {
+        return getProp("test.dynamoDb.region");
+    }
+
+    public static String dynamoDbTableName() {
+        return getProp("test.dynamoDb.table.name");
+    }
+
     public String getChromeDriverPath() {
         return getProp("test.chromeDriverPath");
     }

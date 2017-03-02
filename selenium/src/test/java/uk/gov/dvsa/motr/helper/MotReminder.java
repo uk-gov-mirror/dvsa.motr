@@ -4,6 +4,7 @@ import uk.gov.dvsa.motr.navigation.PageNavigator;
 import uk.gov.dvsa.motr.ui.page.EmailPage;
 import uk.gov.dvsa.motr.ui.page.HomePage;
 import uk.gov.dvsa.motr.ui.page.ReviewPage;
+import uk.gov.dvsa.motr.ui.page.UnsubscribePage;
 import uk.gov.dvsa.motr.ui.page.VrmPage;
 
 public class MotReminder {
@@ -13,5 +14,10 @@ public class MotReminder {
         VrmPage vrmPage = page.clickStartNow();
         EmailPage emailPage = vrmPage.enterVrm(vrm);
         return emailPage.enterEmailAddress(email);
+    }
+
+    public static UnsubscribePage navigateToUnsubscribe(String id) {
+
+        return PageNavigator.goTo(UnsubscribePage.class, id);
     }
 }

@@ -119,4 +119,19 @@ public class DynamoDbSubscriptionRepositoryTest {
 
         assertFalse(repo.findById("ID_THAT_DOES_NOT_EXIST").isPresent());
     }
+
+    @Test
+    public void subscriptionIsDeleted() {
+
+        SubscriptionItem sub = new SubscriptionItem();
+        fixture.table(new SubscriptionTable().item(sub)).run();
+
+        Subscription subscription = new Subscription(sub.getId())
+                .setEmail(sub.getEmail())
+                .setVrm(sub.getVrm());
+
+        repo.delete(subscription);
+
+        assertFalse(repo.findById(sub.getId()).isPresent());
+    }
 }

@@ -6,6 +6,7 @@ import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Index;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.ItemCollection;
+import com.amazonaws.services.dynamodbv2.document.PrimaryKey;
 import com.amazonaws.services.dynamodbv2.document.QueryOutcome;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
@@ -17,7 +18,9 @@ import uk.gov.dvsa.motr.web.helper.SystemVariableParam;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -104,5 +107,18 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
                 .withString("created_at", ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT));
 
         dynamoDb.getTable(tableName).putItem(item);
+    }
+
+    public void delete(Subscription subscription) {
+        PrimaryKey key = new PrimaryKey("vrm", subscription.getVrm(), "email", subscription.getEmail());
+        Map<String,Object> expressionAttributeValues = new HashMap<String,Object>();
+        expressionAttributeValues.put(":id", subscription.getId());
+
+        dynamoDb.getTable(tableName).deleteItem(
+                key,
+                "id = :id",
+                null,
+                expressionAttributeValues
+        );
     }
 }

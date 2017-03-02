@@ -3,12 +3,10 @@ package uk.gov.dvsa.motr.journey;
 import org.testng.annotations.Test;
 
 import uk.gov.dvsa.motr.base.BaseTest;
+import uk.gov.dvsa.motr.helper.DynamoDbSubscriptionHelper;
 import uk.gov.dvsa.motr.helper.MotReminder;
 import uk.gov.dvsa.motr.helper.RandomGenerator;
-import uk.gov.dvsa.motr.ui.page.EmailPage;
-import uk.gov.dvsa.motr.ui.page.ReviewPage;
-import uk.gov.dvsa.motr.ui.page.SubscriptionConfirmationPage;
-import uk.gov.dvsa.motr.ui.page.VrmPage;
+import uk.gov.dvsa.motr.ui.page.*;
 
 import java.io.IOException;
 
@@ -58,5 +56,21 @@ public class MotReminderTests extends BaseTest {
         //Then my mot reminder is set up successfully with the updated vehicle vrm
         SubscriptionConfirmationPage confirmPage = reviewPageSubmit.confirmSubscriptionDetails();
         assertEquals(confirmPage.getHeaderTitle(), "You've signed up for MOT reminders");
+    }
+
+    @Test(description = "Vehicle owner with an MOT reminder subscription can unsubscribe from the service")
+    public void unsubscribeFromMotReminders() {
+
+        //Given I have signed up for the MOT reminder service
+        String id = DynamoDbSubscriptionHelper.addSubscription("SELENIUM-VRM", "SELENIUM@EMAIL.COM");
+
+        //When I select to unsubscribe from an email reminder
+        UnsubscribePage unsubscribe = MotReminder.navigateToUnsubscribe(id);
+
+        //And confirm that I would like to unsubscribe
+        UnsubscribeConfirmationPage unsubscribeConfirmed = unsubscribe.clickUnsubscribe();
+
+        //Then my MOT reminder subscription has been cancelled
+        assertEquals(unsubscribeConfirmed.getBannerTitle(), "You’ve unsubscribed");
     }
 }

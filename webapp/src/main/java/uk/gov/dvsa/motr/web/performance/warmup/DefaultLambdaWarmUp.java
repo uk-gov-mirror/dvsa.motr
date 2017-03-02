@@ -53,6 +53,8 @@ public class DefaultLambdaWarmUp implements LambdaWarmUp {
             templateEngine.precompile("email");
             templateEngine.precompile("review");
             templateEngine.precompile("subscription-confirmation");
+            templateEngine.precompile("unsubscribe");
+            templateEngine.precompile("unsubscribe-confirmation");
 
             return null;
         });

@@ -29,7 +29,13 @@ test.javascript.enabled=yes
 Points to the **environment** config file that overrides default properties such as:
 ```
 # url of the environment
-test.baseUrl=https://testurl 
+test.baseUrl=https://testurl
+
+# AWS region of the dynamoDb
+test.dyanmoDb.region=
+
+# dynamoDb table name for subscriptions
+test.dynamoDb.table.name=
 
 # whether to store PNG snapshot in case of error
 test.screenshots.error.enabled=yes

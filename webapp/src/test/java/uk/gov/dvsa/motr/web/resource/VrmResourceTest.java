@@ -104,7 +104,6 @@ public class VrmResourceTest {
         resource.vrmPageGet();
 
         Map context = templateEngine.getContext(Map.class);
-        assertEquals("review", context.get("back_location"));
         assertEquals("VRZ", context.get("vrm"));
     }
 }
