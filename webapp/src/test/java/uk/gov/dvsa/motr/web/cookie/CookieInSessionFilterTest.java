@@ -29,7 +29,7 @@ public class CookieInSessionFilterTest {
     private final String attributeValue = "TEST-VRM";
     private final String cookieString = "session=rO0ABXNyACl1ay5nb3YuZHZzYS5tb3RyLndlYi5jb29raWUuQ29va2llU2Vzc2lvbsu1QnSCTN" +
             "+xAgABTAAKYXR0cmlidXRlc3QAD0xqYXZhL3V0aWwvTWFwO3hwc3IAEWphdmEudXRpbC5IYXNoTWFwBQfawcMWYNEDAAJGAApsb2FkRmFjdG9y" +
-            "SQAJdGhyZXNob2xkeHA/QAAAAAAADHcIAAAAEAAAAAF0AAN2cm10AAhURVNULVZSTXg=;Version=1;Path=/;Secure;HttpOnly";
+            "SQAJdGhyZXNob2xkeHA/QAAAAAAADHcIAAAAEAAAAAF0AAN2cm10AAhURVNULVZSTXg=;Version=1;Path=/;Max-Age=1200;Secure;HttpOnly";
 
     private MotrSession motrSession;
     private CookieInSessionFilter cookieInSessionFilter;

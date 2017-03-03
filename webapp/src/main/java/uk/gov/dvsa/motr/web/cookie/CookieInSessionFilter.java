@@ -13,7 +13,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Base64;
-import java.util.Date;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -30,6 +29,7 @@ import javax.ws.rs.ext.Provider;
 public class CookieInSessionFilter implements ContainerResponseFilter, ContainerRequestFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(CookieInSessionFilter.class);
+    public static final int MAX_COOKIE_AGE_IN_SECONDS = 60 * 20;
     private MotrSession motrSession;
 
     @Inject
@@ -81,7 +81,7 @@ public class CookieInSessionFilter implements ContainerResponseFilter, Container
 
         logger.debug("getSecureHttpOnlyCookieHeader has isShouldClearCookies value of {}",
                 this.motrSession.isShouldClearCookies());
-        int maxAge = this.motrSession.isShouldClearCookies() ? 0 : NewCookie.DEFAULT_MAX_AGE;
+        int maxAge = this.motrSession.isShouldClearCookies() ? 0 : MAX_COOKIE_AGE_IN_SECONDS;
 
         NewCookie newCookie = new NewCookie(key, value.toString(), "/", null, null, maxAge, true, true);
         logger.debug("NewCookie has value of {}", newCookie.toString());
