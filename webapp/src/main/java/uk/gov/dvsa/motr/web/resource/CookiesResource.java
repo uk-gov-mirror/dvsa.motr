@@ -26,7 +26,7 @@ public class CookiesResource {
     }
 
     @GET
-    public String cookiesPage() throws Exception {
+    public String cookiesPage() {
 
         return renderer.render(COOKIES_TEMPLATE_NAME, emptyMap());
     }
