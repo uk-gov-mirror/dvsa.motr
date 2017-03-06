@@ -11,6 +11,7 @@ public class MotrSession {
     private static final String VRM_COOKIE_ID = "regNumber";
     private static final String EMAIL_COOKIE_ID = "email";
     private static final String VISITING_FROM_REVIEW_COOKIE_ID = "visitingFromReview";
+    private static final String UNSUBSCRIBE_CONFIRMATION_PARAMS = "UNSUBSCRIBE_CONFIRMATION_PARAMS";
 
     private Map<String, Object> attributes;
 
@@ -36,6 +37,11 @@ public class MotrSession {
 
         Object emailFromSession = getAttribute(EMAIL_COOKIE_ID);
         return emailFromSession == null ? "" : emailFromSession.toString();
+    }
+
+    public UnsubscribeConfirmationParams getUnsubscribeConfirmationParams() {
+
+        return (UnsubscribeConfirmationParams) getAttribute(UNSUBSCRIBE_CONFIRMATION_PARAMS);
     }
 
     public boolean visitingFromReviewPage() {
@@ -67,6 +73,11 @@ public class MotrSession {
     public void setVrm(String vrmValue) {
 
         this.setAttribute(VRM_COOKIE_ID, vrmValue);
+    }
+
+    public void setUnsubscribeConfirmationParams(UnsubscribeConfirmationParams unsubscribeConfirmationParams) {
+
+        this.setAttribute(UNSUBSCRIBE_CONFIRMATION_PARAMS, unsubscribeConfirmationParams);
     }
 
     protected void setAttribute(String attributeKey, Object attributeValue) {

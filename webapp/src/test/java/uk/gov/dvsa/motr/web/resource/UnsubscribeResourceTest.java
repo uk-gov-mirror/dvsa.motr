@@ -5,6 +5,8 @@ import org.junit.Test;
 
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.persistence.SubscriptionRepository;
+import uk.gov.dvsa.motr.web.cookie.MotrSession;
+import uk.gov.dvsa.motr.web.cookie.UnsubscribeConfirmationParams;
 import uk.gov.dvsa.motr.web.test.render.TemplateEngineStub;
 import uk.gov.dvsa.motr.web.viewmodel.UnsubscribeViewModel;
 
@@ -33,8 +35,16 @@ public class UnsubscribeResourceTest {
     @Before
     public void setUp() {
 
+        MotrSession motrSession = new MotrSession();
+        UnsubscribeConfirmationParams params = new UnsubscribeConfirmationParams();
+
+        params.setExpiryDate(LocalDate.of(2015, 7, 10).toString());
+        params.setRegistration("TEST-VRM");
+        params.setEmail("test@this-is-a-test-123");
+        motrSession.setUnsubscribeConfirmationParams(params);
+
         this.subscriptionRepository = mock(SubscriptionRepository.class);
-        this.resource = new UnsubscribeResource(subscriptionRepository, TEMPLATE_ENGINE_STUB);
+        this.resource = new UnsubscribeResource(subscriptionRepository, TEMPLATE_ENGINE_STUB, motrSession);
     }
 
     @Test(expected = NotFoundException.class)
@@ -84,16 +94,24 @@ public class UnsubscribeResourceTest {
         verify(subscriptionRepository, times(1)).delete(subscription);
         assertEquals(302, actual.getStatus());
         assertEquals(
-                "unsubscribe/confirmed?expiryDate=2015-07-10&vrm=TEST-VRM&email=test%40this-is-a-test-123",
+                "unsubscribe/confirmed",
                 actual.getHeaderString("Location")
         );
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void unsubscribePostWillThrow404WhenSessionIsEmpty() throws Exception {
+
+        resource = new UnsubscribeResource(subscriptionRepository, TEMPLATE_ENGINE_STUB, new MotrSession());
+        resource.unsubscribeConfirmed();
     }
 
     @Test
     public void unsubscribeConfirmedDisplaysPage() throws Exception {
 
         when(subscriptionRepository.findById(any())).thenReturn(Optional.of(subscriptionStub()));
-        resource.unsubscribeConfrimed(LocalDate.of(2015, 7, 10).toString(), "TEST-VRM", "test@this-is-a-test-123");
+
+        resource.unsubscribeConfirmed();
 
         assertEquals(UnsubscribeViewModel.class, TEMPLATE_ENGINE_STUB.getContext(Map.class).get("viewModel").getClass());
         UnsubscribeViewModel viewModel = (UnsubscribeViewModel) TEMPLATE_ENGINE_STUB.getContext(Map.class).get("viewModel");
