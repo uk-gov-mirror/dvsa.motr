@@ -69,7 +69,8 @@ dependencies {
     compile 'com.amazonaws:aws-lambda-java-log4j:1.0.0'
     compile 'com.github.jknack:handlebars:4.0.6'
     compile 'org.slf4j:slf4j-log4j12:1.7.21'
-    compile 'com.github.awslabs:aws-serverless-java-container:af1ec224af'
+    compile 'com.amazonaws.serverless:aws-serverless-java-container-jersey:0.3'
+
     compile 'com.github.szhem:log4j-json-layout:b657ab3466'
     compile 'com.amazonaws:aws-java-sdk-dynamodb:1.11.84'
     compile 'javax.mail:mail:1.4.7'
