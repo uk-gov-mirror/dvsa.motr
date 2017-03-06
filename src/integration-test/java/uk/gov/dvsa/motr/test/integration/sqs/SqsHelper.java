@@ -20,7 +20,7 @@ public class SqsHelper {
 
     public List<Message> getMessagesFromQueue() {
 
-        ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(sqsEndpoint());
+        ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(sqsEndpoint()).withWaitTimeSeconds(5);
         return sqsClient.receiveMessage(receiveMessageRequest).getMessages();
     }
 
