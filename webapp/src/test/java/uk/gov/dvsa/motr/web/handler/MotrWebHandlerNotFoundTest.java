@@ -39,7 +39,7 @@ public class MotrWebHandlerNotFoundTest {
     @Test
     public void return404WhenResourceDoesNotExist(String resourcePath) throws Exception {
 
-        AwsProxyRequest req = new AwsProxyRequestBuilder().path(resourcePath).method("GET").build();
+        AwsProxyRequest req = buildRequest("GET", resourcePath);
 
         assertEquals(404, handle(req).getStatusCode());
     }
@@ -48,9 +48,16 @@ public class MotrWebHandlerNotFoundTest {
     @Test
     public void returnHtmlResponseWhenResourceDoesNotExist(String resourcePath) throws Exception {
 
-        AwsProxyRequest req = new AwsProxyRequestBuilder().path(resourcePath).method("GET").build();
+        AwsProxyRequest req = buildRequest("GET", resourcePath);
 
         assertEquals("text/html", handle(req).getHeaders().get("Content-type"));
+    }
+
+    private AwsProxyRequest buildRequest(String method, String path) {
+
+        AwsProxyRequest req = new AwsProxyRequestBuilder(path, method).build();
+        req.getRequestContext().getIdentity().setSourceIp("192.168.1.1");
+        return req;
     }
 
     private AwsProxyResponse handle(AwsProxyRequest req) {

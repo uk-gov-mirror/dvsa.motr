@@ -40,7 +40,14 @@ public class AccessEvent extends Event {
     }
 
     public AccessEvent setColdStart(boolean isColdStart) {
+
         params.put("cold-start", String.valueOf(isColdStart));
+        return this;
+    }
+
+    public AccessEvent setSourceIp(String sourceIp) {
+
+        params.put("source-ip", sourceIp);
         return this;
     }
 }

@@ -1,5 +1,6 @@
 package uk.gov.dvsa.motr.web.logging;
 
+import com.amazonaws.serverless.proxy.internal.model.ApiGatewayRequestContext;
 import com.amazonaws.services.lambda.runtime.Context;
 
 import org.slf4j.MDC;
@@ -27,18 +28,20 @@ public class LoggingFilter implements ContainerRequestFilter, ContainerResponseF
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
 
-        setLambdaContext(requestContext);
+        setExecutionContext(requestContext);
 
         String queryString = requestContext.getUriInfo().getRequestUri().getRawQuery();
         int responseLength = (responseContext.getEntity() instanceof String) ? ((String) responseContext.getEntity()).length() : -1;
-
+        String sourceIp = getLambdaRequest(requestContext).getIdentity().getSourceIp();
+        
         AccessEvent accessEvent = new AccessEvent()
                 .setRequestMethod(requestContext.getMethod())
                 .setRequestPath(requestContext.getUriInfo().getPath())
                 .setQueryString(queryString != null ? queryString : "")
                 .setStatusCode(responseContext.getStatus())
                 .setResponseBodyLength(responseLength)
-                .setColdStart(ColdStartMarker.isSet());
+                .setColdStart(ColdStartMarker.isSet())
+                .setSourceIp(sourceIp != null ? sourceIp : "");
 
         EventLogger.logEvent(accessEvent);
     }
@@ -46,12 +49,17 @@ public class LoggingFilter implements ContainerRequestFilter, ContainerResponseF
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
 
-        setLambdaContext(requestContext);
+        setExecutionContext(requestContext);
     }
 
-    private void setLambdaContext(ContainerRequestContext requestContext) {
+    private void setExecutionContext(ContainerRequestContext requestContext) {
 
-        Context ctx = (Context) requestContext.getProperty("com.amazonaws.lambda.context");
+        Context ctx =  (Context) requestContext.getProperty("com.amazonaws.lambda.context");
         MDC.put("lambdaFunction", ctx.getFunctionName() + ":" + ctx.getFunctionVersion());
+    }
+
+    private ApiGatewayRequestContext getLambdaRequest(ContainerRequestContext requestContext) {
+
+        return (ApiGatewayRequestContext) requestContext.getProperty("com.amazonaws.apigateway.request.context");
     }
 }
