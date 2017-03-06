@@ -12,7 +12,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.time.Clock;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Base64;
+import java.util.Date;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -25,18 +29,29 @@ import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.ext.Provider;
 
+import static java.time.temporal.ChronoUnit.SECONDS;
+import static java.util.Date.from;
+
+import static javax.ws.rs.core.Cookie.DEFAULT_VERSION;
+
 @Provider
 public class CookieInSessionFilter implements ContainerResponseFilter, ContainerRequestFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(CookieInSessionFilter.class);
     public static final int MAX_COOKIE_AGE_IN_SECONDS = 60 * 20;
     private MotrSession motrSession;
+    private Clock clockReference = Clock.system(ZoneId.of("Europe/London"));
 
     @Inject
     public CookieInSessionFilter(MotrSession motrSession) {
 
         this.motrSession = motrSession;
     }
+
+    public void setClock(Clock clock) {
+        this.clockReference = clock;
+    }
+
 
     @Override
     public void filter(ContainerRequestContext requestContext) {
@@ -83,7 +98,21 @@ public class CookieInSessionFilter implements ContainerResponseFilter, Container
                 this.motrSession.isShouldClearCookies());
         int maxAge = this.motrSession.isShouldClearCookies() ? 0 : MAX_COOKIE_AGE_IN_SECONDS;
 
-        NewCookie newCookie = new NewCookie(key, value.toString(), "/", null, null, maxAge, true, true);
+        Date expires = from(ZonedDateTime.now(clockReference).plus(MAX_COOKIE_AGE_IN_SECONDS, SECONDS)
+                .toInstant());
+        NewCookie newCookie = new NewCookie(
+                key,
+                value.toString(),
+                "/",
+                null,
+                DEFAULT_VERSION,
+                null,
+                maxAge,
+                expires,
+                true,
+                true
+        );
+
         logger.debug("NewCookie has value of {}", newCookie.toString());
 
         return newCookie.toString();
