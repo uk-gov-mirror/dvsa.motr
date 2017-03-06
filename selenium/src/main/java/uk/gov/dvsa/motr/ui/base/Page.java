@@ -18,6 +18,9 @@ public abstract class Page {
 
     @FindBy(className = "content-header__title")
     protected WebElement title;
+    
+    @FindBy(id = "cookiesLink")
+    protected WebElement cookiesLink;
 
     public Page() {
         this.driver = WebDriverConfiguratorRegistry.get().getDriver();

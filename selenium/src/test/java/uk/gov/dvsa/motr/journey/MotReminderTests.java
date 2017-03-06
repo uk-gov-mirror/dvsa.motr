@@ -6,7 +6,13 @@ import uk.gov.dvsa.motr.base.BaseTest;
 import uk.gov.dvsa.motr.helper.DynamoDbSubscriptionHelper;
 import uk.gov.dvsa.motr.helper.MotReminder;
 import uk.gov.dvsa.motr.helper.RandomGenerator;
-import uk.gov.dvsa.motr.ui.page.*;
+import uk.gov.dvsa.motr.ui.page.CookiesPage;
+import uk.gov.dvsa.motr.ui.page.EmailPage;
+import uk.gov.dvsa.motr.ui.page.ReviewPage;
+import uk.gov.dvsa.motr.ui.page.SubscriptionConfirmationPage;
+import uk.gov.dvsa.motr.ui.page.UnsubscribeConfirmationPage;
+import uk.gov.dvsa.motr.ui.page.UnsubscribePage;
+import uk.gov.dvsa.motr.ui.page.VrmPage;
 
 import java.io.IOException;
 
@@ -72,5 +78,16 @@ public class MotReminderTests extends BaseTest {
 
         //Then my MOT reminder subscription has been cancelled
         assertEquals(unsubscribeConfirmed.getBannerTitle(), "You’ve unsubscribed");
+    }
+
+    @Test(description = "As a user of the site with a vested interest in cookie policy, I can view them")
+    public void canViewCookiesPageWhenClickingLinkInFooter() {
+
+        //Given I am a user of the site
+        //When I click the cookies link in footer of the page
+        CookiesPage cookiesPage = MotReminder.clickCookiesLink();
+
+        //Then I am taken to the cookies page
+        assertEquals(cookiesPage.getTitle(), "Cookies", "Cookies page is not returned");
     }
 }
