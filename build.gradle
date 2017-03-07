@@ -72,9 +72,10 @@ task adjustArchiveBaseName {
             def revision = 'git rev-list --max-count=1 --timestamp HEAD'.execute().text.trim()
             def commitHash = revision.split(' ').last()
             def timestamp = revision ? new Date(TimeUnit.SECONDS.toMillis(revision.split(' ').first() as long)).format("yyyyMMddHHmmss") : null
+            def buildNumber = System.getenv("BUILD_NUMBER") ?: "LATEST"
 
             if (timestamp && commitHash) {
-                archivesBaseName = "${rootProject.name}-${timestamp}-${commitHash}"
+                archivesBaseName = "${rootProject.name}-${timestamp}-${commitHash}-${buildNumber}"
             } else {
                 throw new GradleException('Unable to parse revision from Git')
             }
