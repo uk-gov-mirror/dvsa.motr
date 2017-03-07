@@ -3,13 +3,11 @@ package uk.gov.dvsa.motr.web.performance.warmup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
-import uk.gov.dvsa.motr.web.render.TemplateEngine;
-import uk.gov.service.notify.NotificationClient;
-
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -21,65 +19,33 @@ public class DefaultLambdaWarmUp implements LambdaWarmUp {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultLambdaWarmUp.class);
 
-    private TemplateEngine templateEngine;
-
-    private VehicleDetailsClient vehicleDetailsClient;
-
-    private NotificationClient notificationClient;
+    private List<Callable> tasks = new ArrayList<>();
 
     private int warmUpTimeoutSeconds;
 
-    public DefaultLambdaWarmUp(
-            TemplateEngine templateEngine,
-            VehicleDetailsClient vehicleDetailsClient,
-            NotificationClient notificationClient,
-            int warmUpTimeoutSeconds) {
+    public DefaultLambdaWarmUp(List<Callable> tasks, int warmUpTimeoutSeconds) {
 
-        this.templateEngine = templateEngine;
-        this.vehicleDetailsClient = vehicleDetailsClient;
-        this.notificationClient = notificationClient;
+        this.tasks = tasks;
         this.warmUpTimeoutSeconds = warmUpTimeoutSeconds;
     }
 
     public void warmUp() {
 
-        ExecutorService warmUpExecutor = Executors.newCachedThreadPool();
-
-        FutureTask<Void> templatesWarmUp = new FutureTask<>(() -> {
-
-            templateEngine.precompile("master");
-            templateEngine.precompile("home");
-            templateEngine.precompile("vrm");
-            templateEngine.precompile("email");
-            templateEngine.precompile("review");
-            templateEngine.precompile("subscription-confirmation");
-            templateEngine.precompile("unsubscribe");
-            templateEngine.precompile("unsubscribe-confirmation");
-
-            return null;
-        });
-
-        FutureTask<Void> vehicleDetailsClientWarmUp = new FutureTask<>(() -> {
-
-            vehicleDetailsClient.fetch("__WARM_UP_VRM__", "__WARM_UP_KEY__");
-            return null;
-        });
-
-        FutureTask<Void> notifyClientWarmUp = new FutureTask<>(() -> {
-            notificationClient.getNotificationById("");
-            return null;
-        });
-
-        warmUpExecutor.submit(templatesWarmUp);
-        warmUpExecutor.submit(vehicleDetailsClientWarmUp);
-        warmUpExecutor.submit(notifyClientWarmUp);
-
-        warmUpExecutor.shutdown();
-
         try {
+
+            ExecutorService warmUpExecutor = Executors.newCachedThreadPool();
+            tasks.forEach(warmUpExecutor::submit);
+            warmUpExecutor.shutdown();
+
             warmUpExecutor.awaitTermination(warmUpTimeoutSeconds, SECONDS);
-        } catch (Exception interruptedException) {
-            logger.error("Executor interrupted exception", interruptedException);
+
+        } catch (InterruptedException exception) {
+
+            logger.info("Interrupted due to timeout");
+
+        } catch (Exception exception) {
+
+            logger.error("Error occurred", exception);
         }
     }
 }

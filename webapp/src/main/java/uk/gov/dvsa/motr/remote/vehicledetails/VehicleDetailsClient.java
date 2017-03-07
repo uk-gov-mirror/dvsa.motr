@@ -39,18 +39,6 @@ public class VehicleDetailsClient {
      */
     public Optional<VehicleDetails> fetch(String vrm) throws VehicleDetailsClientException {
 
-        return fetch(vrm, this.apiKey);
-    }
-
-    /**
-     * Method to fetch vehicle information with custom api key
-     * @param vrm vehicle registration mark
-     * @param apiKey custom api key
-     * @return vehicle data {@link VehicleDetailsClient}
-     * @throws VehicleDetailsClientException thrown when unexpected response (5XX, garbled response, timeout, etc)
-     */
-    public Optional<VehicleDetails> fetch(String vrm, String apiKey) throws VehicleDetailsClientException {
-
         Response response;
 
         try {

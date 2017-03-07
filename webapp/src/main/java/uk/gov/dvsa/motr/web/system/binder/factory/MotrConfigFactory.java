@@ -6,6 +6,7 @@ import uk.gov.dvsa.motr.web.config.ConfigKey;
 import uk.gov.dvsa.motr.web.config.EncryptionAwareConfig;
 import uk.gov.dvsa.motr.web.config.EnvironmentVariableConfig;
 import uk.gov.dvsa.motr.web.encryption.Decryptor;
+import uk.gov.dvsa.motr.web.system.SystemVariable;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -25,8 +26,8 @@ public class MotrConfigFactory implements BaseFactory<Config> {
     private static Set<ConfigKey> secretVariables() {
 
         Set<ConfigKey> secretVariables = new HashSet<>();
-
-        //TODO GOV_NOTIFY_API_TOKEN and MOT_TEST_REMINDER_INFO_TOKEN secretVariables
+        secretVariables.add(SystemVariable.GOV_NOTIFY_API_TOKEN);
+        secretVariables.add(SystemVariable.MOT_TEST_REMINDER_INFO_TOKEN);
 
         return secretVariables;
     }

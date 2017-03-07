@@ -27,11 +27,15 @@ public class PerfAspect {
     public void notifyServiceCall() {
     }
 
+    @Pointcut("execution(* uk.gov.dvsa.motr.web.encryption.AwsKmsDecryptor.*(..))")
+    public void decryptorCall() {
+    }
+
     @Pointcut("execution(* uk.gov.dvsa.motr.web.component.subscription.persistence.DynamoDbSubscriptionRepository.*(..))")
     public void repositoryCall() {
     }
 
-    @Pointcut("vehicleDetailsClientCall() || repositoryCall() || notifyServiceCall()")
+    @Pointcut("vehicleDetailsClientCall() || repositoryCall() || notifyServiceCall() || decryptorCall()")
     public void remoteCall() {
     }
 

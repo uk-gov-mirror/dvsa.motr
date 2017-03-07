@@ -7,6 +7,8 @@ import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
 
 import org.apache.log4j.MDC;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.gov.dvsa.motr.web.helper.SystemVariableParam;
 
@@ -17,6 +19,8 @@ import static uk.gov.dvsa.motr.web.system.SystemVariable.STATIC_ASSETS_HASH;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.STATIC_ASSETS_URL;
 
 public class HandlebarsTemplateEngine implements TemplateEngine {
+
+    private static final Logger logger = LoggerFactory.getLogger(HandlebarsTemplateEngine.class);
 
     private static final String ASSETS_HELPER_NAME = "asset";
     private static final String REQUEST_ID_HELPER_NAME = "requestId";
@@ -40,8 +44,15 @@ public class HandlebarsTemplateEngine implements TemplateEngine {
                 .registerHelper(REQUEST_ID_HELPER_NAME, (context, options) -> MDC.get("AWSRequestId"))
                 .registerHelper(URL_HELPER, urlHelper(baseUrl))
                 .with(new ConcurrentMapTemplateCache());
-    }
 
+
+        precompile("master");
+        precompile("home");
+        precompile("vrm");
+        precompile("email");
+        precompile("review");
+        precompile("subscription-confirmation");
+    }
 
     @Override
     public String render(String templateName, Object context) {
@@ -53,10 +64,10 @@ public class HandlebarsTemplateEngine implements TemplateEngine {
         }
     }
 
-    @Override
-    public void precompile(String templateName) {
+    private void precompile(String templateName) {
 
         try {
+            logger.debug("precompiling: {}", templateName);
             handlebars.compile(templateName);
         } catch (IOException e) {
             throw new RuntimeException(e);
