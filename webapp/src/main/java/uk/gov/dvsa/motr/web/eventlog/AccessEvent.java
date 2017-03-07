@@ -45,9 +45,9 @@ public class AccessEvent extends Event {
         return this;
     }
 
-    public AccessEvent setSourceIp(String sourceIp) {
+    public AccessEvent setIpChain(String ipChain) {
 
-        params.put("source-ip", sourceIp);
+        params.put("ip-chain", ipChain);
         return this;
     }
 }
