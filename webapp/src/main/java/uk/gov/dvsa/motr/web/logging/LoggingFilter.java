@@ -32,8 +32,7 @@ public class LoggingFilter implements ContainerRequestFilter, ContainerResponseF
 
         String queryString = requestContext.getUriInfo().getRequestUri().getRawQuery();
         int responseLength = (responseContext.getEntity() instanceof String) ? ((String) responseContext.getEntity()).length() : -1;
-        String sourceIp = getLambdaRequest(requestContext).getIdentity().getSourceIp();
-        
+        String ipChain = requestContext.getHeaderString("X-Forwarded-For");
         AccessEvent accessEvent = new AccessEvent()
                 .setRequestMethod(requestContext.getMethod())
                 .setRequestPath(requestContext.getUriInfo().getPath())
@@ -41,7 +40,7 @@ public class LoggingFilter implements ContainerRequestFilter, ContainerResponseF
                 .setStatusCode(responseContext.getStatus())
                 .setResponseBodyLength(responseLength)
                 .setColdStart(ColdStartMarker.isSet())
-                .setSourceIp(sourceIp != null ? sourceIp : "");
+                .setIpChain(ipChain != null ? ipChain : "");
 
         EventLogger.logEvent(accessEvent);
     }
