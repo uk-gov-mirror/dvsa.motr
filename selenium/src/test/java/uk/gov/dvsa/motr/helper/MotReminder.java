@@ -5,6 +5,7 @@ import uk.gov.dvsa.motr.ui.page.CookiesPage;
 import uk.gov.dvsa.motr.ui.page.EmailPage;
 import uk.gov.dvsa.motr.ui.page.HomePage;
 import uk.gov.dvsa.motr.ui.page.ReviewPage;
+import uk.gov.dvsa.motr.ui.page.TermsAndConditionsPage;
 import uk.gov.dvsa.motr.ui.page.UnsubscribePage;
 import uk.gov.dvsa.motr.ui.page.VrmPage;
 
@@ -20,6 +21,11 @@ public class MotReminder {
     public static CookiesPage clickCookiesLink() {
         HomePage page = PageNavigator.goTo(HomePage.class);
         return page.clickCookiesLink();
+    }
+
+    public static TermsAndConditionsPage clickTermsAndConditionsLink() {
+        HomePage page = PageNavigator.goTo(HomePage.class);
+        return page.clickTermsAndConditionsLink();
     }
 
     public static UnsubscribePage navigateToUnsubscribe(String id) {

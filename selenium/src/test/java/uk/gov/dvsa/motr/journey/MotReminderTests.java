@@ -10,6 +10,7 @@ import uk.gov.dvsa.motr.ui.page.CookiesPage;
 import uk.gov.dvsa.motr.ui.page.EmailPage;
 import uk.gov.dvsa.motr.ui.page.ReviewPage;
 import uk.gov.dvsa.motr.ui.page.SubscriptionConfirmationPage;
+import uk.gov.dvsa.motr.ui.page.TermsAndConditionsPage;
 import uk.gov.dvsa.motr.ui.page.UnsubscribeConfirmationPage;
 import uk.gov.dvsa.motr.ui.page.UnsubscribePage;
 import uk.gov.dvsa.motr.ui.page.VrmPage;
@@ -89,5 +90,16 @@ public class MotReminderTests extends BaseTest {
 
         //Then I am taken to the cookies page
         assertEquals(cookiesPage.getTitle(), "Cookies", "Cookies page is not returned");
+    }
+
+    @Test(description = "As a user of the site with a vested interest in terms and conditions of the service, I can view them")
+    public void canViewTermsAndConditionsPageWhenClickingLinkInFooter() {
+
+        //Given I am a user of the site
+        //When I click the terms and conditions link in footer of the page
+        TermsAndConditionsPage termsAndConditionsPage = MotReminder.clickTermsAndConditionsLink();
+
+        //Then I am taken to the terms and conditions page
+        assertEquals(termsAndConditionsPage.getTitle(), "Terms and conditions", "Terms and conditions page is not returned");
     }
 }

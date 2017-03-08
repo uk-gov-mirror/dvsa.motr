@@ -22,6 +22,9 @@ public abstract class Page {
     @FindBy(id = "cookiesLink")
     protected WebElement cookiesLink;
 
+    @FindBy(id = "terms-and-conditions-link")
+    protected WebElement termsAndConditionsLink;
+
     public Page() {
         this.driver = WebDriverConfiguratorRegistry.get().getDriver();
         DvsaElementLocatorFactory factory = new DvsaElementLocatorFactory(driver);

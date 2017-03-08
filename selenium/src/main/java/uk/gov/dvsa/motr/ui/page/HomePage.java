@@ -26,4 +26,9 @@ public class HomePage extends Page {
         cookiesLink.click();
         return new CookiesPage();
     }
+
+    public TermsAndConditionsPage clickTermsAndConditionsLink(){
+        termsAndConditionsLink.click();
+        return new TermsAndConditionsPage();
+    }
 }
