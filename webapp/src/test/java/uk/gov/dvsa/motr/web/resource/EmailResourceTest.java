@@ -62,11 +62,12 @@ public class EmailResourceTest {
         expectedContext.put("email", "invalidEmail");
         expectedContext.put("continue_button_text", "Continue");
         expectedContext.put("back_button_text", "Back");
+        expectedContext.put("dataLayer", "{\"error\":\"" + EmailValidator.EMAIL_INVALID_MESSAGE + "\"}");
 
         Response response = resource.emailPagePost("invalidEmail");
         assertEquals(200, response.getStatus());
         assertEquals("email", engine.getTemplate());
-        assertEquals(expectedContext.toString(), engine.getContext(Map.class).toString());
+        assertEquals(expectedContext, engine.getContext(Map.class));
     }
 
     @Test
@@ -78,10 +79,11 @@ public class EmailResourceTest {
         expectedContext.put("email", "");
         expectedContext.put("continue_button_text", "Continue");
         expectedContext.put("back_button_text", "Back");
+        expectedContext.put("dataLayer", "{\"error\":\"" + EmailValidator.EMAIL_EMPTY_MESSAGE + "\"}");
 
         Response response = resource.emailPagePost("");
         assertEquals(200, response.getStatus());
         assertEquals("email", engine.getTemplate());
-        assertEquals(expectedContext.toString(), engine.getContext(Map.class).toString());
+        assertEquals(expectedContext, engine.getContext(Map.class));
     }
 }

@@ -114,10 +114,12 @@ public class UnsubscribeResourceTest {
         resource.unsubscribeConfirmed();
 
         assertEquals(UnsubscribeViewModel.class, TEMPLATE_ENGINE_STUB.getContext(Map.class).get("viewModel").getClass());
+        String dataLayerString = (String) TEMPLATE_ENGINE_STUB.getContext(Map.class).get("dataLayer");
         UnsubscribeViewModel viewModel = (UnsubscribeViewModel) TEMPLATE_ENGINE_STUB.getContext(Map.class).get("viewModel");
         assertEquals("test@this-is-a-test-123", viewModel.getEmail());
         assertEquals("10 July 2015", viewModel.getExpiryDate());
         assertEquals("TEST-VRM", viewModel.getRegistration());
+        assertEquals("{\"vrm\":\"TEST-VRM\"}",dataLayerString);
     }
 
     private Subscription subscriptionStub() {

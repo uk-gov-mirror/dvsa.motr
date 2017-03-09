@@ -7,7 +7,9 @@ import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.test.render.TemplateEngineStub;
+import uk.gov.dvsa.motr.web.validator.VrmValidator;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -16,8 +18,6 @@ import javax.ws.rs.core.Response;
 import static junit.framework.TestCase.assertNull;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -39,13 +39,13 @@ public class VrmResourceTest {
         client = mock(VehicleDetailsClient.class);
         motrSession = mock(MotrSession.class);
         resource = new VrmResource(motrSession, templateEngine, client);
-        when(motrSession.getRegNumberFromSession()).thenReturn("VRZ");
+        when(motrSession.getVrmFromSession()).thenReturn("VRZ");
     }
 
     @Test
     public void getResultsInVrmTemplate() throws Exception {
 
-        when(motrSession.getRegNumberFromSession()).thenReturn("VRZ5555");
+        when(motrSession.getVrmFromSession()).thenReturn("VRZ5555");
 
         resource.vrmPageGet();
         assertEquals("vrm", templateEngine.getTemplate());
@@ -65,9 +65,18 @@ public class VrmResourceTest {
         resource.vrmPagePost(INVALID_REG_NUMBER);
 
         assertEquals("vrm", templateEngine.getTemplate());
-        Map context = templateEngine.getContext(Map.class);
-        assertNotNull(context.get("message"));
-        assertTrue((Boolean) context.get("showInLine"));
+
+        HashMap<String, Object> expectedContext = new HashMap<>();
+        expectedContext.put("message", VrmValidator.REGISTRATION_CAN_ONLY_CONTAIN_LETTERS_NUMBERS_AND_HYPHENS_MESSAGE);
+        expectedContext.put("back_url", "/");
+        expectedContext.put("vrm", INVALID_REG_NUMBER);
+        expectedContext.put("continue_button_text", "Continue");
+        expectedContext.put("showInLine", "true");
+        expectedContext.put("back_button_text", "Back");
+        expectedContext.put("dataLayer", "{\"vrm\":\"" + INVALID_REG_NUMBER + "\",\"error\":\"" +
+                VrmValidator.REGISTRATION_CAN_ONLY_CONTAIN_LETTERS_NUMBERS_AND_HYPHENS_MESSAGE + "\"}");
+
+        assertEquals(expectedContext.toString(), templateEngine.getContext(Map.class).toString());
     }
 
     @Test
@@ -77,10 +86,18 @@ public class VrmResourceTest {
 
         resource.vrmPagePost(VALID_REG_NUMBER);
 
+        HashMap<String, Object> expectedContext = new HashMap<>();
+        expectedContext.put("message", "Check that you’ve typed in the correct registration number.<br/>" +
+                "<br/>You can only sign up if your vehicle has had its first MOT.");
+        expectedContext.put("back_url", "/");
+        expectedContext.put("vrm", VALID_REG_NUMBER);
+        expectedContext.put("continue_button_text", "Continue");
+        expectedContext.put("showInLine", "false");
+        expectedContext.put("back_button_text", "Back");
+        expectedContext.put("dataLayer", "{\"vrm\":\"FP12345\",\"error\":\"Vehicle not found\"}");
+
+        assertEquals(expectedContext.toString(), templateEngine.getContext(Map.class).toString());
         assertEquals("vrm", templateEngine.getTemplate());
-        Map context = templateEngine.getContext(Map.class);
-        assertEquals("Check that you’ve typed in the correct registration number.<br/>" +
-                "<br/>You can only sign up if your vehicle has had its first MOT.", context.get("message"));
     }
 
     @Test

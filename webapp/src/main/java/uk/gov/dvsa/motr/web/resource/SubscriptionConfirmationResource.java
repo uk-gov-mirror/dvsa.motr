@@ -53,11 +53,11 @@ public class SubscriptionConfirmationResource {
         Map<String, Object> map = new HashMap<>();
         SubscriptionConfirmationViewModel subscriptionConfirmationViewModel = new SubscriptionConfirmationViewModel();
 
-        Optional<VehicleDetails> vehicleOptional = this.vehicleDetailsClient.fetch(this.motrSession.getRegNumberFromSession());
+        Optional<VehicleDetails> vehicleOptional = this.vehicleDetailsClient.fetch(this.motrSession.getVrmFromSession());
 
         if (vehicleOptional.isPresent()) {
             VehicleDetails vehicle = vehicleOptional.get();
-            subscriptionConfirmationViewModel.setVrm(this.motrSession.getRegNumberFromSession())
+            subscriptionConfirmationViewModel.setVrm(this.motrSession.getVrmFromSession())
                     .setExpiryDate(vehicle.getMotExpiryDate())
                     .setEmail(this.motrSession.getEmailFromSession());
         } else {

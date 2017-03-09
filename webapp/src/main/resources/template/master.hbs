@@ -6,7 +6,11 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
 
     <title>MOT reminders</title>
-
+    {{#dataLayer}}
+        <script>
+            dataLayer = [{{{dataLayer}}}];
+        </script>
+    {{/dataLayer}}
     <!-- Google Tag Manager -->
     <script>
         (function (w,d,s,l,i) {

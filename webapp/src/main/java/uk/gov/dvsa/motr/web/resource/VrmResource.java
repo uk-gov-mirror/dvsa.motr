@@ -3,6 +3,7 @@ package uk.gov.dvsa.motr.web.resource;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClientException;
+import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 import uk.gov.dvsa.motr.web.validator.VrmValidator;
@@ -21,6 +22,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
+import static uk.gov.dvsa.motr.web.analytics.DataLayerHelper.ERROR_KEY;
+import static uk.gov.dvsa.motr.web.analytics.DataLayerHelper.VRM_KEY;
 import static uk.gov.dvsa.motr.web.resource.RedirectResponseBuilder.redirect;
 
 @Singleton
@@ -39,6 +42,7 @@ public class VrmResource {
     private final TemplateEngine renderer;
     private final VehicleDetailsClient client;
     private final MotrSession motrSession;
+    private DataLayerHelper dataLayerHelper;
 
     @Inject
     public VrmResource(
@@ -50,17 +54,18 @@ public class VrmResource {
         this.motrSession = motrSession;
         this.renderer = renderer;
         this.client = client;
+        this.dataLayerHelper = new DataLayerHelper();
     }
 
     @GET
     public String vrmPageGet() throws Exception {
 
-        String regNumber = this.motrSession.getRegNumberFromSession();
+        String vrm = this.motrSession.getVrmFromSession();
 
         Map<String, Object> modelMap = new HashMap<>();
         updateMapBasedOnReviewFlow(modelMap);
 
-        modelMap.put(VRM_MODEL_KEY, regNumber);
+        modelMap.put(VRM_MODEL_KEY, vrm);
 
         return renderer.render("vrm", modelMap);
     }
@@ -71,6 +76,7 @@ public class VrmResource {
         String vrm = normalizeFormInputVrm(formParamVrm);
 
         Map<String, Object> modelMap = new HashMap<>();
+        dataLayerHelper.putAttribute(VRM_KEY, vrm);
         updateMapBasedOnReviewFlow(modelMap);
 
         modelMap.put(VRM_MODEL_KEY, vrm);
@@ -81,6 +87,7 @@ public class VrmResource {
             try {
                 Optional<VehicleDetails> vehicle = this.client.fetch(vrm);
                 if (!vehicle.isPresent()) {
+                    dataLayerHelper.putAttribute(ERROR_KEY, "Vehicle not found");
                     modelMap.put(MESSAGE_KEY, VEHICLE_NOT_FOUND_MESSAGE);
                     modelMap.put(SHOW_INLINE_KEY, false);
                 } else {
@@ -99,17 +106,14 @@ public class VrmResource {
             }
 
         } else {
+            dataLayerHelper.putAttribute(ERROR_KEY, validator.getMessage());
             modelMap.put(MESSAGE_KEY, validator.getMessage());
         }
 
         modelMap.put(VRM_MODEL_KEY, vrm);
+        modelMap.putAll(dataLayerHelper.formatAttributes());
 
         return Response.ok(renderer.render(VRM_TEMPLATE_NAME, modelMap)).build();
-    }
-
-    private static String normalizeFormInputVrm(String formInput) {
-
-        return formInput.replaceAll("\\s+", "").toUpperCase();
     }
 
     private void updateMapBasedOnReviewFlow(Map<String, Object> modelMap) throws URISyntaxException {
@@ -125,4 +129,8 @@ public class VrmResource {
         }
     }
 
+    private static String normalizeFormInputVrm(String formInput) {
+
+        return formInput.replaceAll("\\s+", "").toUpperCase();
+    }
 }

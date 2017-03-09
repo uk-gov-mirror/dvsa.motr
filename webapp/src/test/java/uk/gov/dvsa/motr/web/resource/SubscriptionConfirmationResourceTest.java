@@ -37,7 +37,7 @@ public class SubscriptionConfirmationResourceTest {
     @Test
     public void getResultsInSubscriptionConfirmationTemplate() throws VehicleDetailsClientException, URISyntaxException {
 
-        when(MOTR_SESSION.getRegNumberFromSession()).thenReturn(VRM);
+        when(MOTR_SESSION.getVrmFromSession()).thenReturn(VRM);
         when(MOTR_SESSION.isAllowedOnPage()).thenReturn(true);
 
         when(VEHICLE_DETAILS_CLIENT.fetch(VRM)).thenReturn(vehicleDetailsResponse());

@@ -63,7 +63,7 @@ public class ReviewResource {
         Map<String, Object> map = new HashMap<>();
         ReviewViewModel viewModel = new ReviewViewModel();
 
-        String regNumberFromSession = this.motrSession.getRegNumberFromSession();
+        String regNumberFromSession = this.motrSession.getVrmFromSession();
         String emailFromSession = this.motrSession.getEmailFromSession();
 
         Optional<VehicleDetails> vehicleOptional = this.vehicleDetailsClient.fetch(regNumberFromSession);
@@ -92,7 +92,7 @@ public class ReviewResource {
         Map<String, Object> map = new HashMap<>();
         ReviewViewModel viewModel = new ReviewViewModel();
 
-        String regNumberFromSession = this.motrSession.getRegNumberFromSession();
+        String regNumberFromSession = this.motrSession.getVrmFromSession();
         String emailFromSession = this.motrSession.getEmailFromSession();
 
         VrmValidator vrmValidator = new VrmValidator();

@@ -50,7 +50,7 @@ public class ReviewResourceTest {
                 SUBSCRIPTION_SERVICE,
                 VEHICLE_DETAILS_CLIENT
         );
-        when(MOTR_SESSION.getRegNumberFromSession()).thenReturn(VRM);
+        when(MOTR_SESSION.getVrmFromSession()).thenReturn(VRM);
         when(MOTR_SESSION.getEmailFromSession()).thenReturn(EMAIL);
     }
 

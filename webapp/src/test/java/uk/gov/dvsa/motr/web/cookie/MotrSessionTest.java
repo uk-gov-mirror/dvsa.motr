@@ -70,14 +70,14 @@ public class MotrSessionTest {
     public void getRegFromSessionReturnsRegWhenInSession() {
 
         motrSession.setVrm(VRM);
-        String actual = motrSession.getRegNumberFromSession();
+        String actual = motrSession.getVrmFromSession();
         assertEquals("VRZ", actual);
     }
 
     @Test
     public void getRegFromSessionReturnsEmptyStringWhenNoRegInSession() {
 
-        String actual = motrSession.getRegNumberFromSession();
+        String actual = motrSession.getVrmFromSession();
         assertEquals("", actual);
     }
 

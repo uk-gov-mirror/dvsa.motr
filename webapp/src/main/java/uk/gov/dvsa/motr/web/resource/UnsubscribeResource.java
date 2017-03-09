@@ -1,6 +1,7 @@
 package uk.gov.dvsa.motr.web.resource;
 
 import uk.gov.dvsa.motr.eventlog.EventLogger;
+import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.persistence.SubscriptionRepository;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
@@ -24,6 +25,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
+import static uk.gov.dvsa.motr.web.analytics.DataLayerHelper.VRM_KEY;
 import static uk.gov.dvsa.motr.web.resource.RedirectResponseBuilder.redirect;
 
 @Singleton
@@ -94,7 +96,11 @@ public class UnsubscribeResource {
                 .setExpiryDate(LocalDate.parse(params.getExpiryDate()))
                 .setEmail(params.getEmail());
 
+        DataLayerHelper helper = new DataLayerHelper();
+        helper.putAttribute(VRM_KEY, params.getRegistration());
+
         Map<String, Object> map = new HashMap<>();
+        map.putAll(helper.formatAttributes());
         map.put("viewModel", viewModel);
         return renderer.render("unsubscribe-confirmation", map);
     }

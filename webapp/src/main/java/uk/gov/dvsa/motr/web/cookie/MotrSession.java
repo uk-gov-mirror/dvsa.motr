@@ -27,7 +27,7 @@ public class MotrSession {
         this.shouldClearCookies = shouldClearCookies;
     }
 
-    public String getRegNumberFromSession() {
+    public String getVrmFromSession() {
 
         Object regFromSession = getAttribute(VRM_COOKIE_ID);
         return regFromSession == null ? "" : regFromSession.toString();
@@ -52,7 +52,7 @@ public class MotrSession {
 
     public boolean isAllowedOnEmailPage() {
 
-        return !getRegNumberFromSession().isEmpty();
+        return !getVrmFromSession().isEmpty();
     }
 
     public boolean isAllowedOnPage() {
