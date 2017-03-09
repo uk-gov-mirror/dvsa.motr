@@ -1,9 +1,5 @@
 package uk.gov.dvsa.motr.notifications.service;
 
-import uk.gov.dvsa.motr.eventlog.EventLogger;
-import uk.gov.dvsa.motr.web.eventlog.notify.NotifyConfirmationFailureEvent;
-import uk.gov.dvsa.motr.web.eventlog.notify.NotifyConfirmationSuccessEvent;
-import uk.gov.dvsa.motr.web.eventlog.notify.NotifyEvent;
 import uk.gov.dvsa.motr.web.helper.DateDisplayHelper;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
@@ -36,15 +32,6 @@ public class NotifyService {
         personalisation.put("mot_expiry_date", DateDisplayHelper.asDisplayDate(motExpiryDate));
         personalisation.put("unsubscribe_link", unsubscribeLink);
 
-        try {
-            SendEmailResponse response = notificationClient.sendEmail(confirmationTemplateId, emailAddress, personalisation, "");
-            NotifyEvent notifyEvent = new NotifyConfirmationSuccessEvent().setEmail(emailAddress).setVrm(registrationNumber);
-            EventLogger.logEvent(notifyEvent);
-            return response;
-        } catch (NotificationClientException exception) {
-            NotifyEvent notifyEvent = new NotifyConfirmationFailureEvent().setEmail(emailAddress).setVrm(registrationNumber);
-            EventLogger.logErrorEvent(notifyEvent, exception);
-            throw exception;
-        }
+        return notificationClient.sendEmail(confirmationTemplateId, emailAddress, personalisation, "");
     }
 }

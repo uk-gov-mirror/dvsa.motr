@@ -9,10 +9,4 @@ public class SessionMalformedEvent extends Event {
 
         return "SESSION-MALFORMED-ERROR";
     }
-
-    public SessionMalformedEvent setSessionCookieValue(String sessionCookieValue) {
-
-        params.put("session-cookie-value", sessionCookieValue);
-        return this;
-    }
 }

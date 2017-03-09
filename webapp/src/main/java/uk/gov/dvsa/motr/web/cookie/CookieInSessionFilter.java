@@ -59,7 +59,7 @@ public class CookieInSessionFilter implements ContainerResponseFilter, Container
         try {
             getSessionFromCookie(requestContext);
         } catch (Exception e) {
-            EventLogger.logErrorEvent(new SessionMalformedEvent().setSessionCookieValue(getSessionCookie(requestContext).getValue()), e);
+            EventLogger.logErrorEvent(new SessionMalformedEvent(), e);
             throw new NotFoundException();
         }
     }
