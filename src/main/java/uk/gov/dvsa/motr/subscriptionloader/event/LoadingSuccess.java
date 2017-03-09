@@ -7,7 +7,7 @@ public class LoadingSuccess extends Event {
     @Override
     public String getCode() {
 
-        return "LOADING_SUCCESS";
+        return "LOADING-SUCCESS";
     }
 
     public LoadingSuccess setProcessed(int processed) {

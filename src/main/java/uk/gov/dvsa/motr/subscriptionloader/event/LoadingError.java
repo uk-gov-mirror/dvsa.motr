@@ -7,6 +7,12 @@ public class LoadingError extends Event {
     @Override
     public String getCode() {
 
-        return "LOADING_ERROR";
+        return "LOADING-ERROR";
+    }
+
+    public LoadingError setProcessed(int processed) {
+
+        params.put("processed", String.valueOf(processed));
+        return this;
     }
 }

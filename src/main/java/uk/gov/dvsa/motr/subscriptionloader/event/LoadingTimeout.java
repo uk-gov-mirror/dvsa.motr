@@ -8,7 +8,7 @@ public class LoadingTimeout extends Event {
     @Override
     public String getCode() {
 
-        return "LOADING_TIMEOUT";
+        return "LOADING-TIMEOUT";
     }
 
     public LoadingTimeout setSubmittedForProcessing(int submittedForProcessing) {

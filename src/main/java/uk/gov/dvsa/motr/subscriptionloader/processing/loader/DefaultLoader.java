@@ -74,7 +74,7 @@ public class DefaultLoader implements Loader {
             );
 
         } catch (Exception e) {
-            EventLogger.logErrorEvent(new LoadingError(), e);
+            EventLogger.logErrorEvent(new LoadingError().setProcessed(report.getProcessed()), e);
             throw e;
         }
         return report;
