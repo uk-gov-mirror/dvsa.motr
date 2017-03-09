@@ -56,7 +56,8 @@ public class DefaultLoaderTest {
         Iterator mockIterator = createIteratorWithHasNextSequence(true, true, false);
         when(this.producer.getIterator(any(), any())).thenReturn(mockIterator);
 
-        Subscription mockSubscription = new Subscription();
+        Subscription mockSubscription = new Subscription().setEmail("email@email.com")
+                .setId("someId").setMotDueDate(LocalDate.now()).setVrm("aaa");
         when(mockIterator.next()).thenReturn(mockSubscription);
 
         when(this.dispatcher.dispatch(any())).thenReturn(

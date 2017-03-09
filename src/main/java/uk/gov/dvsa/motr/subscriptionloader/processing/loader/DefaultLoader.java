@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.dvsa.motr.eventlog.EventLogger;
+import uk.gov.dvsa.motr.subscriptionloader.event.ItemSuccess;
 import uk.gov.dvsa.motr.subscriptionloader.event.LoadingError;
 import uk.gov.dvsa.motr.subscriptionloader.event.LoadingSuccess;
 import uk.gov.dvsa.motr.subscriptionloader.event.LoadingTimeout;
@@ -107,7 +108,12 @@ public class DefaultLoader implements Loader {
                     report.incrementProcessed();
                     dispatchResultIterator.remove();
                     Subscription subscription = dispatchResult.getSubscription();
-                    logger.debug("Success vrm: {}, email: {}", subscription.getVrm(), subscription.getEmail());
+                    EventLogger.logEvent(new ItemSuccess()
+                            .setVrm(subscription.getVrm())
+                            .setEmail(subscription.getEmail())
+                            .setDueDate(subscription.getMotDueDate())
+                            .setId(subscription.getId())
+                    );
                 } else {
                     throw new LoadingException(dispatchResult.getError());
                 }
