@@ -1,16 +1,14 @@
 package uk.gov.dvsa.motr.web.cookie;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.web.eventlog.session.SessionMalformedEvent;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.time.Clock;
 import java.time.ZoneId;
@@ -129,20 +127,14 @@ public class CookieInSessionFilter implements ContainerResponseFilter, Container
 
     private String toString(Serializable object) throws IOException {
 
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
-        objectOutputStream.writeObject(object);
-        objectOutputStream.close();
-        return Base64.getEncoder().encodeToString(byteArrayOutputStream.toByteArray());
+        String value = new ObjectMapper().writeValueAsString(object);
+        return Base64.getEncoder().encodeToString(value.getBytes());
     }
 
     private Object fromString(String string) throws IOException, ClassNotFoundException {
 
         byte[] data = Base64.getDecoder().decode(string);
-        ObjectInputStream objectInputStream = new ObjectInputStream(new ByteArrayInputStream(data));
-        Object object = objectInputStream.readObject();
-        objectInputStream.close();
-        return object;
+        return new ObjectMapper().readValue(data, CookieSession.class);
     }
 
 }
