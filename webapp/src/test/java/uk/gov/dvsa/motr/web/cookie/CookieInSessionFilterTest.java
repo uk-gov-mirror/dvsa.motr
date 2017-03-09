@@ -1,11 +1,11 @@
 package uk.gov.dvsa.motr.web.cookie;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.time.Clock;
 import java.util.Base64;
@@ -31,8 +31,10 @@ public class CookieInSessionFilterTest {
 
     private final String attributeKey = "vrm";
     private final String attributeValue = "TEST-VRM";
-    private final String cookieString = "session=eyJhdHRyaWJ1dGVzIjp7InZybSI6IlRFU1QtVlJNIn19;" +
-            "Version=1;Path=/;Max-Age=1200;Secure;HttpOnly;Expires=Sat, 01 Jan 2000 10:20:00 GMT";
+    private final String cookieString = "session=rO0ABXNyACl1ay5nb3YuZHZzYS5tb3RyLndlYi5jb29raWUuQ29va2llU2Vzc2lvbsu1QnSCTN" +
+            "+xAgABTAAKYXR0cmlidXRlc3QAD0xqYXZhL3V0aWwvTWFwO3hwc3IAEWphdmEudXRpbC5IYXNoTWFwBQfawcMWYNEDAAJGAApsb2FkRmFjdG9y" +
+            "SQAJdGhyZXNob2xkeHA/QAAAAAAADHcIAAAAEAAAAAF0AAN2cm10AAhURVNULVZSTXg=;Version=1;Path=/;Max-Age=1200;Secure;HttpOnly;" +
+            "Expires=Sat, 01 Jan 2000 10:20:00 GMT";
 
     private Clock clockReference = Clock.fixed(parse("2000-01-01T10:00:00").toInstant(UTC), UTC);
 
@@ -112,8 +114,10 @@ public class CookieInSessionFilterTest {
     }
 
     private String toString(Serializable object) throws IOException {
-
-        String value = new ObjectMapper().writeValueAsString(object);
-        return Base64.getEncoder().encodeToString(value.getBytes());
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+        objectOutputStream.writeObject(object);
+        objectOutputStream.close();
+        return Base64.getEncoder().encodeToString(byteArrayOutputStream.toByteArray());
     }
 }
