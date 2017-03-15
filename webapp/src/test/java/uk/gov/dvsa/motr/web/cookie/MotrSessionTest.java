@@ -3,6 +3,8 @@ package uk.gov.dvsa.motr.web.cookie;
 import org.junit.Before;
 import org.junit.Test;
 
+import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -109,5 +111,16 @@ public class MotrSessionTest {
 
         String actual = motrSession.getEmailFromSession();
         assertEquals("", actual);
+    }
+
+    @Test
+    public void whenVehicleDetailsIsSetItCanBeRetrievedCorrectly() {
+
+        VehicleDetails vehicleDetails = new VehicleDetails();
+        vehicleDetails.setMake("TEST-MAKE");
+
+        motrSession.setVehicleDetails(vehicleDetails);
+        VehicleDetails actual = motrSession.getVehicleDetailsFromSession();
+        assertEquals("TEST-MAKE", actual.getMake());
     }
 }
