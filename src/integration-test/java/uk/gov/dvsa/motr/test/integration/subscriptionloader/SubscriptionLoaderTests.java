@@ -7,6 +7,7 @@ import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.sqs.model.Message;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,6 +40,7 @@ public class SubscriptionLoaderTests {
     private SqsHelper queueHelper;
     private EventHandler eventHandler;
     private SubscriptionItem subscriptionItem;
+    private DynamoDbFixture fixture;
 
     @Before
     public void setUp() {
@@ -46,8 +48,14 @@ public class SubscriptionLoaderTests {
         queueHelper = new SqsHelper();
         eventHandler = new EventHandler();
         subscriptionItem = new SubscriptionItem();
-        DynamoDbFixture fixture = new DynamoDbFixture(dynamoDbClient());
+        fixture = new DynamoDbFixture(dynamoDbClient());
         fixture.table(new SubscriptionTable().item(subscriptionItem)).run();
+    }
+
+    @After
+    public void cleanUp() {
+
+        fixture.removeItem(subscriptionItem);
     }
 
     @Test

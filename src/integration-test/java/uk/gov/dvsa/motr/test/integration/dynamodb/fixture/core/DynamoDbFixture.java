@@ -3,6 +3,9 @@ package uk.gov.dvsa.motr.test.integration.dynamodb.fixture.core;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Table;
+import com.amazonaws.services.dynamodbv2.document.spec.DeleteItemSpec;
+
+import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.model.SubscriptionItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +33,17 @@ public class DynamoDbFixture {
 
                 dynamoTable.putItem(i.toItem());
             });
+        });
+    }
+
+    public void removeItem(SubscriptionItem subscriptionItem) {
+
+        DeleteItemSpec itemSpec = new DeleteItemSpec().withPrimaryKey("email", subscriptionItem.getEmail(), "vrm", subscriptionItem
+                .getVrm());
+
+        tables.forEach(table -> {
+            Table dynamoTable = dynamoDb.getTable(table.name());
+            dynamoTable.deleteItem(itemSpec);
         });
     }
 }
