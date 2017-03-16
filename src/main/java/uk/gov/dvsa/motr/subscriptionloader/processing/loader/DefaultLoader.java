@@ -61,6 +61,7 @@ public class DefaultLoader implements Loader {
 
             while (subscriptionIterator.hasNext()) {
                 Subscription subscription = subscriptionIterator.next();
+                subscription.setLoadedOnDate(referenceDate);
                 report.incrementSubmittedForProcessing();
                 DispatchResult futureResult = dispatcher.dispatch(subscription);
                 inFlightOps.add(futureResult);

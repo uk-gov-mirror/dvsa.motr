@@ -66,9 +66,10 @@ public class SubscriptionTest {
         Subscription subscription = this.subscription.setId(TEST_ID)
                 .setMotDueDate(now)
                 .setVrm(TEST_VRM)
-                .setEmail(TEST_EMAIL);
+                .setEmail(TEST_EMAIL)
+                .setLoadedOnDate(now);
 
         assertEquals("Subscription{id='testId', motDueDate=" + now.toString() +
-                ", vrm='test_vrm', email='test_email'}", subscription.toString());
+                ", vrm='test_vrm', email='test_email', loadedOnDate=" + now.toString() + "}", subscription.toString());
     }
 }

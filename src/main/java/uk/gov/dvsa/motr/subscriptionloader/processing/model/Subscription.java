@@ -25,6 +25,11 @@ public class Subscription {
     @JsonProperty("email")
     private String email;
 
+    @JsonProperty("loadedOnDate")
+    @JsonSerialize(using = LocalDateSerialiser.class)
+    @JsonDeserialize(using = LocalDateDeserialiser.class)
+    private LocalDate loadedOnDate;
+
     public String getId() {
 
         return id;
@@ -69,6 +74,17 @@ public class Subscription {
         return this;
     }
 
+    public LocalDate getLoadedOnDate() {
+
+        return loadedOnDate;
+    }
+
+    public Subscription setLoadedOnDate(LocalDate loadedOnDate) {
+
+        this.loadedOnDate = loadedOnDate;
+        return this;
+    }
+
     @Override
     public String toString() {
         return "Subscription{" +
@@ -76,6 +92,7 @@ public class Subscription {
                 ", motDueDate=" + motDueDate +
                 ", vrm='" + vrm + '\'' +
                 ", email='" + email + '\'' +
+                ", loadedOnDate=" + loadedOnDate +
                 '}';
     }
 }
