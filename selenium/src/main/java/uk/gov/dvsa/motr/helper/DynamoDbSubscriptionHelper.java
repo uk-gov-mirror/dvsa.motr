@@ -47,8 +47,7 @@ public class DynamoDbSubscriptionHelper {
                 .withString("email", email)
                 .withString("mot_due_date", LocalDate.now().toString())
                 .withString("mot_due_date_md", LocalDate.now().format(DateTimeFormatter.ofPattern("MM-dd")))
-                .withString("created_at", ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT))
-                .withBoolean("confirmed", false);
+                .withString("created_at", ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT));
 
         dynamoDb.getTable(tableName).putItem(item);
 
