@@ -131,6 +131,10 @@ public abstract class Configurator {
         return getProp("test.dynamoDb.table.name");
     }
 
+    public static String dynamoDbTablePendingName() {
+        return getProp("test.dynamoDb.pendingTable.name");
+    }
+
     public String getChromeDriverPath() {
         return getProp("test.chromeDriverPath");
     }

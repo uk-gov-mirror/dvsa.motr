@@ -3,41 +3,37 @@ package uk.gov.dvsa.motr.web.component.subscription.persistence;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
-import com.amazonaws.services.dynamodbv2.document.Index;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.ItemCollection;
 import com.amazonaws.services.dynamodbv2.document.PrimaryKey;
-import com.amazonaws.services.dynamodbv2.document.QueryOutcome;
-import com.amazonaws.services.dynamodbv2.document.Table;
-import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
-import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
+import com.amazonaws.services.dynamodbv2.document.ScanOutcome;
+import com.amazonaws.services.dynamodbv2.document.spec.ScanSpec;
 
-import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
+import uk.gov.dvsa.motr.web.component.subscription.model.PendingSubscription;
 import uk.gov.dvsa.motr.web.helper.SystemVariableParam;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import static uk.gov.dvsa.motr.web.system.SystemVariable.DB_TABLE_SUBSCRIPTION;
+import static uk.gov.dvsa.motr.web.system.SystemVariable.DB_TABLE_PENDING_SUBSCRIPTION;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.REGION;
 
 @Singleton
-public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
+public class DynamoDbPendingSubscriptionRepository implements PendingSubscriptionRepository {
 
     private DynamoDB dynamoDb;
     private String tableName;
 
     @Inject
-    public DynamoDbSubscriptionRepository(
-            @SystemVariableParam(DB_TABLE_SUBSCRIPTION) String tableName,
+    public DynamoDbPendingSubscriptionRepository(
+            @SystemVariableParam(DB_TABLE_PENDING_SUBSCRIPTION) String tableName,
             @SystemVariableParam(REGION) String region) {
 
         AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard().withRegion(region).build();
@@ -47,63 +43,40 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
     }
 
     @Override
-    public Optional<Subscription> findById(String id) {
-        QuerySpec query = new QuerySpec()
-                .withKeyConditionExpression("id = :id")
-                .withValueMap(new ValueMap().withString(":id", id));
+    public Optional<PendingSubscription> findById(String id) {
 
-        Index table = dynamoDb.getTable(tableName).getIndex("id-gsi");
+        HashMap<String, Object> valueMap = new HashMap<>();
+        HashMap<String, String> nameMap = new HashMap<>();
 
-        ItemCollection<QueryOutcome> items = table.query(query);
-        Iterator<Item> resultIterator = items.iterator();
+        valueMap.put(":id", id);
+        nameMap.put("#id", "id");
 
-        if (!resultIterator.hasNext()) {
+        ScanSpec scanSpec = new ScanSpec()
+                .withFilterExpression("#id = :id")
+                .withNameMap(nameMap)
+                .withValueMap(valueMap);
+
+        ItemCollection<ScanOutcome> result = dynamoDb.getTable(tableName).scan(scanSpec);
+
+        if (!result.iterator().hasNext()) {
             return Optional.empty();
         }
 
-        Item item = resultIterator.next();
-        Subscription subscription = mapItemToSubscription(item);
+        Item item = result.iterator().next();
 
-        return Optional.of(subscription);
+        return Optional.of(mapItemToSubscription(item));
     }
 
-    @Override
-    public Optional<Subscription> findByVrmAndEmail(String vrm, String email) {
-        return findSubsctiptionByVrmAndEmail(vrm, email);
-    }
+    private PendingSubscription mapItemToSubscription(Item item) {
 
-    private Subscription mapItemToSubscription(Item item) {
-
-        Subscription subscription = new Subscription(item.getString("id"));
+        PendingSubscription subscription = new PendingSubscription(item.getString("id"));
         subscription.setVrm(item.getString("vrm"));
         subscription.setEmail(item.getString("email"));
         subscription.setMotDueDate(LocalDate.parse(item.getString("mot_due_date")));
         return subscription;
     }
 
-
-    public Optional<Subscription> findSubsctiptionByVrmAndEmail(String vrm, String email) {
-
-        QuerySpec query = new QuerySpec()
-                .withKeyConditionExpression("vrm = :vrm AND email = :email")
-                .withValueMap(new ValueMap().withString(":vrm", vrm).withString(":email", email));
-
-        Table table = dynamoDb.getTable(tableName);
-
-        ItemCollection<QueryOutcome> items = table.query(query);
-        Iterator<Item> resultIterator = items.iterator();
-
-        if (!resultIterator.hasNext()) {
-            return Optional.empty();
-        }
-
-        Item item = resultIterator.next();
-        Subscription subscription = mapItemToSubscription(item);
-
-        return Optional.of(subscription);
-    }
-
-    public void save(Subscription subscription) {
+    public void save(PendingSubscription subscription) {
 
         Item item = new Item()
                 .withString("id", subscription.getId())
@@ -116,7 +89,8 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
         dynamoDb.getTable(tableName).putItem(item);
     }
 
-    public void delete(Subscription subscription) {
+    @Override
+    public void delete(PendingSubscription subscription) {
         PrimaryKey key = new PrimaryKey("vrm", subscription.getVrm(), "email", subscription.getEmail());
         Map<String, Object> expressionAttributeValues = new HashMap<String, Object>();
         expressionAttributeValues.put(":id", subscription.getId());

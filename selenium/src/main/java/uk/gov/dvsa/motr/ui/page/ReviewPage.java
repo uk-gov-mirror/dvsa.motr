@@ -18,9 +18,9 @@ public class ReviewPage extends Page {
         return "Check your details";
     }
 
-    public SubscriptionConfirmationPage confirmSubscriptionDetails(){
+    public EmailConfirmationPendingPage confirmSubscriptionDetails(){
         continueButton.click();
-        return new SubscriptionConfirmationPage();
+        return new EmailConfirmationPendingPage();
     }
 
     public boolean isContinueButtonDisplayed() {

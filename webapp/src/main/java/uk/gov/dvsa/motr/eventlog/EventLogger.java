@@ -26,6 +26,11 @@ public class EventLogger {
         popContext(event);
     }
 
+    public static void logErrorEvent(Event event) {
+
+        logErrorEvent(event, null);
+    }
+
     private static void pushContext(Event event) {
 
         event.toMap().forEach((key, val) -> MDC.put(asCustomDatumKey(key), val));

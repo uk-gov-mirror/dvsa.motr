@@ -25,6 +25,7 @@ public class NotifyServiceTest {
 
     private String email = "test@test.com";
     private String templateId = "180";
+    private String emailConfirmationTemplateId = "180";
     private String registrationNumber = "testreg";
     private LocalDate motExpiryDate = LocalDate.of(2017, 1, 1);
     private String unsubscribeLink = "https://gov.uk";
@@ -32,7 +33,7 @@ public class NotifyServiceTest {
     @Before
     public void setUp() {
 
-        this.service = new NotifyService(CLIENT, templateId);
+        this.service = new NotifyService(CLIENT, templateId, emailConfirmationTemplateId);
     }
 
     @Test
@@ -42,17 +43,17 @@ public class NotifyServiceTest {
 
         when(CLIENT.sendEmail(any(), any(), any(), any())).thenReturn(mock(SendEmailResponse.class));
 
-        this.service.sendConfirmationEmail(email, registrationNumber, motExpiryDate, unsubscribeLink);
+        this.service.sendSubscriptionConfirmationEmail(email, registrationNumber, motExpiryDate, unsubscribeLink);
 
         verify(CLIENT, times(1)).sendEmail(templateId, email, personalisationMap, "");
     }
 
-    @Test(expected = NotificationClientException.class)
+    @Test(expected = RuntimeException.class)
     public void whenNotifyFailsExceptionIsThrown() throws NotificationClientException {
 
         when(CLIENT.sendEmail(any(), any(), any(), any())).thenThrow(NotificationClientException.class);
 
-        this.service.sendConfirmationEmail(email, registrationNumber, motExpiryDate, unsubscribeLink);
+        this.service.sendSubscriptionConfirmationEmail(email, registrationNumber, motExpiryDate, unsubscribeLink);
     }
 
     private Map<String, String> stubPersonalisationMap(String registrationNumber, LocalDate expiryDate, String link) {

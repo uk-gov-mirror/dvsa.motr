@@ -10,7 +10,6 @@ public class PageNavigator {
 
     public static <T extends Page> T goTo(Class<T> pageClass, Object... params) {
 
-        System.out.println(pageClass.getAnnotations().length);
         GotoUrl urlAn = ((GotoUrl) Stream.of(pageClass.getAnnotations())
                 .filter(a -> a.annotationType().equals(GotoUrl.class))
                 .findFirst()

@@ -6,7 +6,7 @@ Automated browser test suite for MOT Reminders
 
 ##### Commandline (for developers)
 To run locally against remote env:
-```./runTests <env_url>```
+```./runTests <env_url> <aws_region> <table_subscription_name> <table_pending_subscription_name>```
 
 ##### Properties file
 Tests suite can be configured through Java properties which can be pointed at with the help of following environment variables:
@@ -36,6 +36,9 @@ test.dyanmoDb.region=
 
 # dynamoDb table name for subscriptions
 test.dynamoDb.table.name=
+
+# dynamoDb table name for pending subscriptions
+test.dynamoDb.pendingTable.name=
 
 # whether to store PNG snapshot in case of error
 test.screenshots.error.enabled=yes

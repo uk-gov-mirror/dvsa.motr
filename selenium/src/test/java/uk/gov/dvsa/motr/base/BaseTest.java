@@ -10,6 +10,7 @@ import uk.gov.dvsa.motr.WebDriverConfiguratorRegistry;
 import uk.gov.dvsa.motr.config.Configurator;
 import uk.gov.dvsa.motr.config.TestExecutionListener;
 import uk.gov.dvsa.motr.config.webdriver.BaseAppDriver;
+import uk.gov.dvsa.motr.helper.MotReminder;
 import uk.gov.dvsa.motr.logging.Logger;
 
 import java.text.SimpleDateFormat;
@@ -18,6 +19,7 @@ import java.util.Date;
 @Listeners(TestExecutionListener.class)
 public abstract class BaseTest {
 
+    protected MotReminder motReminder = new MotReminder();
     protected BaseAppDriver driver = null;
     private final static SimpleDateFormat screenshotDateFormat =
             new SimpleDateFormat("yyyyMMdd-HHmmss");

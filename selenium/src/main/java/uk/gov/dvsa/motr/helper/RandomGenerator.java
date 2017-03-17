@@ -14,7 +14,7 @@ public class RandomGenerator {
 
     public static String generateVrm() {
 
-        return RandomStringUtils.randomAlphabetic(10);
+        return RandomStringUtils.randomAlphabetic(10).toUpperCase();
     }
 
 }

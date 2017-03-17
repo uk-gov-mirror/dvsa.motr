@@ -1,19 +1,17 @@
 package uk.gov.dvsa.motr.web.resource;
 
-import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClientException;
 import uk.gov.dvsa.motr.web.component.subscription.exception.SubscriptionAlreadyExistsException;
-import uk.gov.dvsa.motr.web.component.subscription.service.SubscriptionService;
+import uk.gov.dvsa.motr.web.component.subscription.service.PendingSubscriptionService;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
-import uk.gov.dvsa.motr.web.eventlog.subscription.SubscriptionConfirmationFailureEvent;
-import uk.gov.dvsa.motr.web.eventlog.subscription.SubscriptionConfirmationSuccessfulEvent;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 import uk.gov.dvsa.motr.web.validator.EmailValidator;
 import uk.gov.dvsa.motr.web.validator.VrmValidator;
 import uk.gov.dvsa.motr.web.viewmodel.ReviewViewModel;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -35,7 +33,7 @@ import static uk.gov.dvsa.motr.web.resource.RedirectResponseBuilder.redirect;
 public class ReviewResource {
 
     private final TemplateEngine renderer;
-    private final SubscriptionService subscriptionService;
+    private PendingSubscriptionService pendingSubscriptionService;
     private final VehicleDetailsClient vehicleDetailsClient;
     private final MotrSession motrSession;
 
@@ -43,12 +41,12 @@ public class ReviewResource {
     public ReviewResource(
             MotrSession motrSession,
             TemplateEngine renderer,
-            SubscriptionService subscriptionService,
+            PendingSubscriptionService pendingSubscriptionService,
             VehicleDetailsClient vehicleDetailsClient
     ) {
 
         this.renderer = renderer;
-        this.subscriptionService = subscriptionService;
+        this.pendingSubscriptionService = pendingSubscriptionService;
         this.vehicleDetailsClient = vehicleDetailsClient;
         this.motrSession = motrSession;
     }
@@ -87,54 +85,60 @@ public class ReviewResource {
     }
 
     @POST
-    public Response reviewPagePost() throws Exception {
+    public Response confirmationPagePost() throws Exception {
 
-        Map<String, Object> map = new HashMap<>();
-        ReviewViewModel viewModel = new ReviewViewModel();
+        String vrm = motrSession.getVrmFromSession();
+        String email = motrSession.getEmailFromSession();
+        Optional<VehicleDetails> vehicle;
 
-        String regNumberFromSession = this.motrSession.getVrmFromSession();
-        String emailFromSession = this.motrSession.getEmailFromSession();
+        if (!detailsAreValid(vrm, email)) {
+            return returnUserInputError(vrm, email);
+        }
+
+        vehicle = getVehicle(vrm);
+
+        if (!vehicle.isPresent()) {
+            return returnVehicleError(vrm);
+            //TODO this is to be covered in BL-4200
+        }
+
+        createPendingSubscription(vrm, email, vehicle.get().getMotExpiryDate());
+
+        return redirect("email-confirmation-pending");
+    }
+
+    private Response returnVehicleError(String vrm) {
+        return null;
+    }
+
+    private Response returnUserInputError(String vrm, String email) {
+        return null;
+    }
+
+    private boolean detailsAreValid(String vrm, String email) {
 
         VrmValidator vrmValidator = new VrmValidator();
         EmailValidator emailValidator = new EmailValidator();
 
-        if (vrmValidator.isValid(regNumberFromSession) && emailValidator.isValid(emailFromSession)) {
+        return vrmValidator.isValid(vrm) && emailValidator.isValid(email);
+    }
 
-            try {
-                Optional<VehicleDetails> vehicle = this.vehicleDetailsClient.fetch(regNumberFromSession);
+    private Optional<VehicleDetails> getVehicle(String vrm) {
 
-                if (vehicle.isPresent()) {
-                    VehicleDetails vehicleDetails = vehicle.get();
-                    viewModel.setColour(vehicleDetails.getPrimaryColour(), vehicleDetails.getSecondaryColour())
-                            .setEmail(emailFromSession)
-                            .setExpiryDate(vehicleDetails.getMotExpiryDate())
-                            .setMakeModel(vehicleDetails.getMake(), vehicleDetails.getModel())
-                            .setRegistration(regNumberFromSession)
-                            .setYearOfManufacture(vehicleDetails.getYearOfManufacture().toString());
-
-                    try {
-                        this.subscriptionService.createSubscription(vehicleDetails.getRegNumber(), emailFromSession,
-                                vehicleDetails.getMotExpiryDate());
-                        EventLogger.logEvent(new SubscriptionConfirmationSuccessfulEvent().setVrm(regNumberFromSession)
-                                .setEmail(emailFromSession).setExpiryDate(vehicleDetails.getMotExpiryDate()));
-
-                        return redirect("subscription-confirmation");
-
-                    } catch (SubscriptionAlreadyExistsException e) {
-                        EventLogger.logErrorEvent(new SubscriptionConfirmationFailureEvent().setVrm(regNumberFromSession)
-                                .setEmail(emailFromSession).setExpiryDate(vehicleDetails.getMotExpiryDate()), e);
-                        throw new NotFoundException();
-                    }
-                }
-            } catch (VehicleDetailsClientException exception) {
-                //TODO this is to be covered in BL-4200
-                //we will show a something went wrong banner message, so we will thread that
-                //through from here
-            }
+        try {
+            return vehicleDetailsClient.fetch(vrm);
+        } catch (VehicleDetailsClientException exception) {
+            return Optional.empty();
         }
+    }
 
-        map.put("viewModel", viewModel);
+    private void createPendingSubscription(String vrm, String email, LocalDate expiryDate) throws Exception {
 
-        return Response.ok(renderer.render("review", map)).build();
+        try {
+            pendingSubscriptionService.createPendingSubscription(vrm, email, expiryDate);
+
+        } catch (SubscriptionAlreadyExistsException subscriptionExistsException) {
+            throw new NotFoundException();
+        } 
     }
 }

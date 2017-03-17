@@ -2,7 +2,7 @@ package uk.gov.dvsa.motr.web.component.subscription.model;
 
 import java.time.LocalDate;
 
-public class Subscription {
+public class PendingSubscription {
 
     private String id;
 
@@ -12,8 +12,7 @@ public class Subscription {
 
     private LocalDate motDueDate;
 
-
-    public Subscription(String id) {
+    public PendingSubscription(String id) {
         this.id = id;
     }
 
@@ -25,7 +24,7 @@ public class Subscription {
         return vrm;
     }
 
-    public Subscription setVrm(String vrm) {
+    public PendingSubscription setVrm(String vrm) {
         this.vrm = vrm;
         return this;
     }
@@ -34,7 +33,7 @@ public class Subscription {
         return email;
     }
 
-    public Subscription setEmail(String email) {
+    public PendingSubscription setEmail(String email) {
         this.email = email;
         return this;
     }
@@ -43,7 +42,7 @@ public class Subscription {
         return motDueDate;
     }
 
-    public Subscription setMotDueDate(LocalDate motDueDate) {
+    public PendingSubscription setMotDueDate(LocalDate motDueDate) {
         this.motDueDate = motDueDate;
         return this;
     }

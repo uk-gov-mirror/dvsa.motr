@@ -7,11 +7,20 @@ import uk.gov.dvsa.motr.navigation.GotoUrl;
 import uk.gov.dvsa.motr.ui.base.Page;
 import uk.gov.dvsa.motr.ui.base.PageIdentityVerificationException;
 
-@GotoUrl("/subscription-confirmation")
+@GotoUrl("/confirm-email/{0}")
 public class SubscriptionConfirmationPage extends Page {
 
     @FindBy(className = "transaction-header__title")
     private WebElement headerTitle;
+
+    @FindBy(id = "email")
+    private WebElement userEmail;
+
+    @FindBy(id = "vrm")
+    private WebElement registration;
+
+    @FindBy(id = "expiry-date")
+    private WebElement expiryDate;
 
     @Override
     protected void selfVerify() {
@@ -33,5 +42,11 @@ public class SubscriptionConfirmationPage extends Page {
     public String getHeaderTitle() {
 
         return headerTitle.getText();
+    }
+
+    public boolean areDisplayedDetailsCorrect(String email, String vrm) {
+        return registration.getText().equals(vrm)
+                && userEmail.getText().equals(email)
+                && !expiryDate.getText().isEmpty();
     }
 }

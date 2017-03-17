@@ -6,8 +6,9 @@ import uk.gov.service.notify.NotificationClient;
 
 import javax.inject.Inject;
 
-import static uk.gov.dvsa.motr.web.system.SystemVariable.CONFIRMATION_TEMPLATE_ID;
+import static uk.gov.dvsa.motr.web.system.SystemVariable.EMAIL_CONFIRMATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.GOV_NOTIFY_API_TOKEN;
+import static uk.gov.dvsa.motr.web.system.SystemVariable.SUBSCRIPTION_CONFIRMATION_TEMPLATE_ID;
 
 public class NotifyServiceFactory implements BaseFactory<NotifyService> {
 
@@ -22,9 +23,10 @@ public class NotifyServiceFactory implements BaseFactory<NotifyService> {
     public NotifyService provide() {
 
         String apiKey = this.config.getValue(GOV_NOTIFY_API_TOKEN);
-        String templateId = this.config.getValue(CONFIRMATION_TEMPLATE_ID);
+        String subscriptionConfirmationTemplateId = this.config.getValue(SUBSCRIPTION_CONFIRMATION_TEMPLATE_ID);
+        String emailConfirmationTemplateId = this.config.getValue(EMAIL_CONFIRMATION_TEMPLATE_ID);
         NotificationClient client = new NotificationClient(apiKey);
 
-        return new NotifyService(client, templateId);
+        return new NotifyService(client, subscriptionConfirmationTemplateId, emailConfirmationTemplateId);
     }
 }

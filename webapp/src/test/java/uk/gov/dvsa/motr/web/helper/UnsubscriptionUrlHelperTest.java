@@ -25,18 +25,4 @@ public class UnsubscriptionUrlHelperTest {
 
         assertEquals(baseUri + "unsubscribe/TEST-ID", urlHelper.build("TEST-ID"));
     }
-
-    @Test
-    public void buildThrowsExceptionWhenSubscriptionIdNull() throws Exception {
-        expectedException.expect(Exception.class);
-        expectedException.expectMessage("Subscription id must not be null or empty");
-        urlHelper.build(null);
-    }
-
-    @Test
-    public void buildThrowsExceptionWhenSubscriptionIdEmpty() throws Exception {
-        expectedException.expect(Exception.class);
-        expectedException.expectMessage("Subscription id must not be null or empty");
-        urlHelper.build("");
-    }
 }

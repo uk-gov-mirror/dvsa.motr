@@ -123,7 +123,7 @@ public class UnsubscribeResourceTest {
     }
 
     private Subscription subscriptionStub() {
-        return new Subscription(subscriptionId)
+        return (Subscription) new Subscription(subscriptionId)
                 .setEmail("test@this-is-a-test-123")
                 .setMotDueDate(LocalDate.of(2015, 7, 10))
                 .setVrm("TEST-VRM");
