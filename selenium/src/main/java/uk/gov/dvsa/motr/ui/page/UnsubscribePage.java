@@ -14,7 +14,16 @@ public class UnsubscribePage extends Page {
 
 
     @Override
-    protected String getIdentity() {return "Are you sure you want to unsubscribe?";}
+    protected String getContentHeader() {
+
+        return "Are you sure you want to unsubscribe?";
+    }
+
+    @Override
+    protected String getPageTitle() {
+
+        return "Are you sure you want to unsubscribe? – MOT reminders";
+    }
 
     public UnsubscribeConfirmationPage clickUnsubscribe() {
 

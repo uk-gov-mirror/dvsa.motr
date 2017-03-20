@@ -26,6 +26,7 @@ public abstract class Page {
     protected WebElement termsAndConditionsLink;
 
     public Page() {
+
         this.driver = WebDriverConfiguratorRegistry.get().getDriver();
         DvsaElementLocatorFactory factory = new DvsaElementLocatorFactory(driver);
         PageFactory.initElements(factory, this);
@@ -39,15 +40,17 @@ public abstract class Page {
 
     protected void selfVerify() {
 
-        if (!getTitle().contains(getIdentity())) {
+        if (!getTitle().contains(getContentHeader()) || !getPageTitle().equals(getPageTitle())) {
 
             throw new PageIdentityVerificationException("Page identity verification failed: "
-                    + String.format("\n Expected: %s page, \n Found: %s page", getIdentity(), getTitle())
+                    + String.format("\n Expected: %s page, \n Found: %s page", getContentHeader(), getTitle())
             );
         }
     }
 
-    protected abstract String getIdentity();
+    protected abstract String getPageTitle();
+
+    protected abstract String getContentHeader();
 
     @Override
     public final String toString() {
@@ -56,6 +59,7 @@ public abstract class Page {
 
 
     protected String getElementText(By selector) {
+
         try {
             return driver.findElement(selector).getText();
         } catch (StaleElementReferenceException ex) {
@@ -64,6 +68,7 @@ public abstract class Page {
     }
 
     protected Boolean isElementVisible(By selector) {
+
         try {
             return driver.findElement(selector).isDisplayed();
         } catch (StaleElementReferenceException ex) {
@@ -72,6 +77,7 @@ public abstract class Page {
     }
 
     protected void clickElement(By selector) {
+
         try {
             driver.findElement(selector).click();
         } catch (StaleElementReferenceException ex) {
@@ -80,6 +86,7 @@ public abstract class Page {
     }
 
     protected WebElement getElement(By selector) {
+
         try {
             return DvsaWebElement.wrap(driver.findElement(selector), new FindElementLocator(driver, selector));
         } catch (StaleElementReferenceException ex) {

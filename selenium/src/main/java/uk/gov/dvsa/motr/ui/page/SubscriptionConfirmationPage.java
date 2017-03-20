@@ -25,18 +25,24 @@ public class SubscriptionConfirmationPage extends Page {
     @Override
     protected void selfVerify() {
 
-        if (!getHeaderTitle().contains(getIdentity())) {
+        if (!getHeaderTitle().contains(getContentHeader()) || !getPageTitle().equals(getPageTitle())) {
 
             throw new PageIdentityVerificationException("Page identity verification failed: "
-                    + String.format("\n Expected: %s page, \n Found: %s page", getIdentity(), getHeaderTitle())
+                    + String.format("\n Expected: %s page, \n Found: %s page", getContentHeader(), getHeaderTitle())
             );
         }
     }
 
     @Override
-    protected String getIdentity() {
+    protected String getContentHeader() {
 
         return "You've signed up for MOT reminders";
+    }
+
+    @Override
+    protected String getPageTitle() {
+
+        return "You’ve signed up for MOT reminders";
     }
 
     public String getHeaderTitle() {
@@ -45,6 +51,7 @@ public class SubscriptionConfirmationPage extends Page {
     }
 
     public boolean areDisplayedDetailsCorrect(String email, String vrm) {
+
         return registration.getText().equals(vrm)
                 && userEmail.getText().equals(email)
                 && !expiryDate.getText().isEmpty();

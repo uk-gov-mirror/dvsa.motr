@@ -85,6 +85,7 @@ public class ReviewResourceTest {
     }
 
     private Optional<VehicleDetails> vehicleDetailsResponse() {
+
         VehicleDetails vehicleDetails = new VehicleDetails();
         vehicleDetails.setMake("make");
         vehicleDetails.setModel("model");

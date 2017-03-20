@@ -42,6 +42,7 @@ public class EmailConfirmedResourceTest {
 
     @Test
     public void subscriptionIsCreatedWhenUserConfirmsEmail() throws Exception {
+
         resource.confirmEmailGet(UNSUBSCRIBE_ID);
 
         verify(pendingSubscriptionActivatorService, times(1)).confirmSubscription(UNSUBSCRIBE_ID);
@@ -64,6 +65,7 @@ public class EmailConfirmedResourceTest {
     }
 
     private void verifyViewModel(EmailConfirmedViewModel viewModel) {
+
         assertEquals(VRM, viewModel.getRegistration());
         assertEquals(EMAIL, viewModel.getEmail());
         assertEquals(DateDisplayHelper.asDisplayDate(DATE), viewModel.getExpiryDate());

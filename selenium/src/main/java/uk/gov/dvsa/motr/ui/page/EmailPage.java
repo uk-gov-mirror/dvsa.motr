@@ -15,18 +15,22 @@ public class EmailPage extends Page {
     private WebElement continueButton;
 
     @Override
-    protected String getIdentity() {
+    protected String getContentHeader() {
+
         return "What is your email address?";
     }
 
+    @Override
+    protected String getPageTitle() {
+
+        return "What is your email address? – MOT reminders";
+    }
+
     public ReviewPage enterEmailAddress(String email) {
+
         emailAddressField.clear();
         emailAddressField.sendKeys(email);
         continueButton.click();
         return new ReviewPage();
-    }
-
-    public boolean isEmailContinueButtonDisplayed() {
-        return continueButton.isDisplayed();
     }
 }

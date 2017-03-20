@@ -72,33 +72,9 @@ public class UnsubscribeResource {
         params.setExpiryDate(removedSubscription.getMotDueDate().toString());
         params.setRegistration(removedSubscription.getVrm());
 
-        String uri = UriBuilder.fromUri("unsubscribe/confirmed").toString();
         motrSession.setUnsubscribeConfirmationParams(params);
 
-        return redirect(uri);
-    }
-
-    @GET
-    @Path("confirmed")
-    public String unsubscribeConfirmed() throws Exception {
-
-        UnsubscribeConfirmationParams params = motrSession.getUnsubscribeConfirmationParams();
-        if (params == null) {
-            throw new NotFoundException();
-        }
-
-        UnsubscribeViewModel viewModel = new UnsubscribeViewModel()
-                .setRegistration(params.getRegistration())
-                .setExpiryDate(LocalDate.parse(params.getExpiryDate()))
-                .setEmail(params.getEmail());
-
-        DataLayerHelper helper = new DataLayerHelper();
-        helper.putAttribute(VRM_KEY, params.getRegistration());
-
-        Map<String, Object> map = new HashMap<>();
-        map.putAll(helper.formatAttributes());
-        map.put("viewModel", viewModel);
-        return renderer.render("unsubscribe-confirmation", map);
+        return redirect("unsubscribe/confirmed");
     }
 
     private UnsubscribeViewModel populateViewModelFromSubscription(Subscription subscription) {

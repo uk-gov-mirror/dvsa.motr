@@ -4,6 +4,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import uk.gov.dvsa.motr.base.BaseTest;
+import uk.gov.dvsa.motr.helper.MotReminder;
 import uk.gov.dvsa.motr.helper.RandomGenerator;
 import uk.gov.dvsa.motr.ui.page.CookiesPage;
 import uk.gov.dvsa.motr.ui.page.EmailConfirmationPendingPage;
@@ -95,7 +96,6 @@ public class MotReminderTests extends BaseTest {
         //Then I am taken to the terms and conditions page
         assertEquals(termsAndConditionsPage.getTitle(), "Terms and conditions", "Terms and conditions page is not returned");
     }
-
 
     @DataProvider(name = "dataProviderCreateMotReminderForMyVehicle")
     public Object[][] dataProviderCreateMotReminderForMyVehicle() throws IOException {

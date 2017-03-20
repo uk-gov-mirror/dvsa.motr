@@ -5,8 +5,14 @@ import uk.gov.dvsa.motr.ui.base.Page;
 public class TermsAndConditionsPage extends Page {
 
     @Override
-    protected String getIdentity() {
+    protected String getContentHeader() {
 
         return "Terms and conditions";
+    }
+
+    @Override
+    protected String getPageTitle() {
+
+        return "Terms and conditions – MOT reminders";
     }
 }
