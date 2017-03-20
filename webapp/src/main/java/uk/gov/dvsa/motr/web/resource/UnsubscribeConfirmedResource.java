@@ -1,7 +1,6 @@
 package uk.gov.dvsa.motr.web.resource;
 
 import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
-import uk.gov.dvsa.motr.web.component.subscription.persistence.SubscriptionRepository;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.cookie.UnsubscribeConfirmationParams;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;

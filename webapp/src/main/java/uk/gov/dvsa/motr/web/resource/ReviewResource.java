@@ -89,32 +89,16 @@ public class ReviewResource {
 
         String vrm = motrSession.getVrmFromSession();
         String email = motrSession.getEmailFromSession();
-        Optional<VehicleDetails> vehicle;
+        Optional<VehicleDetails> vehicle = getVehicle(vrm);
 
-        if (!detailsAreValid(vrm, email)) {
-            return returnUserInputError(vrm, email);
+        if (detailsAreValid(vrm, email) && vehicle.isPresent()) {
+
+            createPendingSubscription(vrm, email, vehicle.get().getMotExpiryDate());
+
+            return redirect("email-confirmation-pending");
+        } else {
+            throw new NotFoundException();
         }
-
-        vehicle = getVehicle(vrm);
-
-        if (!vehicle.isPresent()) {
-            return returnVehicleError(vrm);
-            //TODO this is to be covered in BL-4200
-        }
-
-        createPendingSubscription(vrm, email, vehicle.get().getMotExpiryDate());
-
-        return redirect("email-confirmation-pending");
-    }
-
-    private Response returnVehicleError(String vrm) {
-
-        return null;
-    }
-
-    private Response returnUserInputError(String vrm, String email) {
-
-        return null;
     }
 
     private boolean detailsAreValid(String vrm, String email) {

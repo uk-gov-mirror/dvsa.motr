@@ -1,10 +1,12 @@
 package uk.gov.dvsa.motr.web.resource;
 
+import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClientException;
 import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
+import uk.gov.dvsa.motr.web.eventlog.vehicle.VehicleDetailsExceptionEvent;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 import uk.gov.dvsa.motr.web.validator.VrmValidator;
 
@@ -38,6 +40,7 @@ public class VrmResource {
     private static final String MESSAGE_KEY = "message";
     private static final String SHOW_INLINE_KEY = "showInLine";
     private static final String VRM_TEMPLATE_NAME = "vrm";
+    private static final String SHOW_SYSTEM_ERROR = "showSystemError";
 
     private final TemplateEngine renderer;
     private final VehicleDetailsClient client;
@@ -60,7 +63,7 @@ public class VrmResource {
     @GET
     public String vrmPageGet() throws Exception {
 
-        String vrm = this.motrSession.getVrmFromSession();
+        String vrm = motrSession.getVrmFromSession();
 
         Map<String, Object> modelMap = new HashMap<>();
         updateMapBasedOnReviewFlow(modelMap);
@@ -81,6 +84,7 @@ public class VrmResource {
 
         modelMap.put(VRM_MODEL_KEY, vrm);
         modelMap.put(SHOW_INLINE_KEY, true);
+        modelMap.put(SHOW_SYSTEM_ERROR, false);
 
         VrmValidator validator = new VrmValidator();
         if (validator.isValid(vrm)) {
@@ -91,7 +95,7 @@ public class VrmResource {
                     modelMap.put(MESSAGE_KEY, VEHICLE_NOT_FOUND_MESSAGE);
                     modelMap.put(SHOW_INLINE_KEY, false);
                 } else {
-                    this.motrSession.setVrm(vrm);
+                    motrSession.setVrm(vrm);
                     if (this.motrSession.visitingFromReviewPage()) {
                         return redirect("review");
                     }
@@ -99,10 +103,11 @@ public class VrmResource {
                     return redirect("email");
                 }
             } catch (VehicleDetailsClientException exception) {
-                //TODO this is to be covered in BL-4200
-                //we will show a something went wrong banner message, so we will thread that
-                //through from here
-                throw exception;
+
+                EventLogger.logErrorEvent(new VehicleDetailsExceptionEvent().setVrm(vrm));
+                dataLayerHelper.putAttribute(ERROR_KEY, "Trade API error");
+                motrSession.setVrm(vrm);
+                modelMap.put(SHOW_SYSTEM_ERROR, true);
             }
 
         } else {

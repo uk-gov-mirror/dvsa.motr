@@ -12,6 +12,10 @@
         {{> partial/error-message }}
     {{/message}}
 
+    {{#showSystemError}}
+        {{> partial/system-error }}
+    {{/showSystemError}}
+
     <form method="POST" autocomplete="off" novalidate="">
         <fieldset>
             <div class="form-group {{#message}}has-error{{/message}}">
