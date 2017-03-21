@@ -17,7 +17,7 @@ public class EventHandler {
     private static final Logger logger = LoggerFactory.getLogger(EventHandler.class);
 
     public NotifierReport handle(Object request, Context context)  {
-        
+
         logger.info("Request: {}, context: {}", request, context);
         Injector injector = Guice.createInjector(
                 new InvocationContextModule(context),

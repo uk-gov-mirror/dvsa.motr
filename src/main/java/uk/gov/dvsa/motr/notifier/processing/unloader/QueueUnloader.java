@@ -7,7 +7,6 @@ import uk.gov.dvsa.motr.executor.BlockingExecutor;
 import uk.gov.dvsa.motr.notifier.events.RemindersProcessedEvent;
 import uk.gov.dvsa.motr.notifier.events.UnloadingTimedOutEvent;
 import uk.gov.dvsa.motr.notifier.processing.model.SubscriptionQueueItem;
-import uk.gov.dvsa.motr.notifier.processing.performance.MetricsPerfAspect;
 import uk.gov.dvsa.motr.notifier.processing.queue.QueueItemRemover;
 import uk.gov.dvsa.motr.notifier.processing.queue.SubscriptionsReceiver;
 import uk.gov.dvsa.motr.notifier.processing.service.ProcessSubscriptionService;
@@ -58,6 +57,7 @@ public class QueueUnloader {
         }
 
         try {
+            executor.shutdown();
             executor.awaitTermination(postProcessingDelayMs, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
