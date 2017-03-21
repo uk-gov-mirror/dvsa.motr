@@ -19,9 +19,9 @@ public abstract class SubscriptionEvent extends Event {
         return this;
     }
 
-    public SubscriptionEvent setExpiryDate(LocalDate expiryDate) {
+    public SubscriptionEvent setDueDate(LocalDate motDueDate) {
 
-        params.put("mot-expiry-date", expiryDate.format(DateTimeFormatter.ISO_DATE));
+        params.put("mot-due-date", motDueDate.format(DateTimeFormatter.ISO_DATE));
         return this;
     }
 }

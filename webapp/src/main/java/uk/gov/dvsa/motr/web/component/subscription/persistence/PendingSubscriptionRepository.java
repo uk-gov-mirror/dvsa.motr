@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface PendingSubscriptionRepository {
 
-    Optional<PendingSubscription> findById(String id);
+    Optional<PendingSubscription> findByConfirmationId(String id);
 
     void save(PendingSubscription subscription);
 

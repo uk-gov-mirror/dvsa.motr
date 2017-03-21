@@ -15,12 +15,8 @@ import com.amazonaws.services.kms.model.NotFoundException;
 
 import uk.gov.dvsa.motr.config.Configurator;
 
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.UUID;
 
 import static java.lang.String.format;
 
@@ -39,22 +35,7 @@ public class DynamoDbSubscriptionHelper {
         dynamoDb = new DynamoDB(client);
     }
 
-    public String addSubscription(String vrm, String email) {
-
-        Item item = new Item()
-                .withString("id", UUID.randomUUID().toString())
-                .withString("vrm", vrm)
-                .withString("email", email)
-                .withString("mot_due_date", LocalDate.now().toString())
-                .withString("mot_due_date_md", LocalDate.now().format(DateTimeFormatter.ofPattern("MM-dd")))
-                .withString("created_at", ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT));
-
-        dynamoDb.getTable(tableName).putItem(item);
-
-        return item.get("id").toString();
-    }
-
-    public String findSubscriptionIdByVrmAndEmail(String vrm, String email) {
+    public String findUnsubscribeIdByVrmAndEmail(String vrm, String email) {
 
         QuerySpec query = new QuerySpec()
                 .withKeyConditionExpression("vrm = :vrm AND email = :email")
@@ -74,7 +55,7 @@ public class DynamoDbSubscriptionHelper {
         return item.getString("id");
     }
 
-    public String findPendingSubscriptionIdByVrmAndEmail(String vrm, String email) {
+    public String findConfirmationIdByVrmAndEmail(String vrm, String email) {
 
         HashMap<String, Object> valueMap = new HashMap<>();
         HashMap<String, String> nameMap = new HashMap<>();

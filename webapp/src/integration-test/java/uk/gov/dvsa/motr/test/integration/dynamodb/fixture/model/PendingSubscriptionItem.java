@@ -12,7 +12,7 @@ import java.util.UUID;
 public class PendingSubscriptionItem implements DynamoDbFixtureTableItem {
 
 
-    private String id = UUID.randomUUID().toString();
+    private String confirmationId = UUID.randomUUID().toString();
 
     private LocalDate motDueDate = RandomDataUtil.dueDate();
 
@@ -20,8 +20,8 @@ public class PendingSubscriptionItem implements DynamoDbFixtureTableItem {
 
     private String email = RandomDataUtil.email();
 
-    public String getId() {
-        return id;
+    public String getConfirmationId() {
+        return confirmationId;
     }
 
     public LocalDate getMotDueDate() {
@@ -53,7 +53,7 @@ public class PendingSubscriptionItem implements DynamoDbFixtureTableItem {
 
     @Override
     public Item toItem() {
-        return new Item().with("id", id)
+        return new Item().with("id", confirmationId)
                 .with("mot_due_date", motDueDate.format(DateTimeFormatter.ISO_DATE))
                 .with("vrm", vrm)
                 .with("email", email);

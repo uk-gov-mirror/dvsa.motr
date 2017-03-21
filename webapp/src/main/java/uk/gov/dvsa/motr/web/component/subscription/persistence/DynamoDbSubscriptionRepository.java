@@ -47,7 +47,7 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
     }
 
     @Override
-    public Optional<Subscription> findById(String id) {
+    public Optional<Subscription> findByUnsubscribeId(String id) {
         QuerySpec query = new QuerySpec()
                 .withKeyConditionExpression("id = :id")
                 .withValueMap(new ValueMap().withString(":id", id));
@@ -74,7 +74,8 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
 
     private Subscription mapItemToSubscription(Item item) {
 
-        Subscription subscription = new Subscription(item.getString("id"));
+        Subscription subscription = new Subscription();
+        subscription.setUnsubscribeId(item.getString("id"));
         subscription.setVrm(item.getString("vrm"));
         subscription.setEmail(item.getString("email"));
         subscription.setMotDueDate(LocalDate.parse(item.getString("mot_due_date")));
@@ -106,7 +107,7 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
     public void save(Subscription subscription) {
 
         Item item = new Item()
-                .withString("id", subscription.getId())
+                .withString("id", subscription.getUnsubscribeId())
                 .withString("vrm", subscription.getVrm())
                 .withString("email", subscription.getEmail())
                 .withString("mot_due_date", subscription.getMotDueDate().format(DateTimeFormatter.ISO_LOCAL_DATE))
@@ -119,7 +120,7 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
     public void delete(Subscription subscription) {
         PrimaryKey key = new PrimaryKey("vrm", subscription.getVrm(), "email", subscription.getEmail());
         Map<String, Object> expressionAttributeValues = new HashMap<String, Object>();
-        expressionAttributeValues.put(":id", subscription.getId());
+        expressionAttributeValues.put(":id", subscription.getUnsubscribeId());
 
         dynamoDb.getTable(tableName).deleteItem(
                 key,

@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 public class PendingSubscription {
 
-    private String id;
+    private String confirmationId;
 
     private String vrm;
 
@@ -12,13 +12,15 @@ public class PendingSubscription {
 
     private LocalDate motDueDate;
 
-    public PendingSubscription(String id) {
-        this.id = id;
+    public String getConfirmationId() {
+        return confirmationId;
     }
 
-    public String getId() {
-        return id;
+    public PendingSubscription setConfirmationId(String id) {
+        this.confirmationId = id;
+        return this;
     }
+
 
     public String getVrm() {
         return vrm;

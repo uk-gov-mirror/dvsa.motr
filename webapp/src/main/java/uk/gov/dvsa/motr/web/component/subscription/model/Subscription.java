@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 public class Subscription {
 
-    private String id;
+    private String unsubscribeId;
 
     private String vrm;
 
@@ -12,13 +12,13 @@ public class Subscription {
 
     private LocalDate motDueDate;
 
-
-    public Subscription(String id) {
-        this.id = id;
+    public String getUnsubscribeId() {
+        return unsubscribeId;
     }
 
-    public String getId() {
-        return id;
+    public Subscription setUnsubscribeId(String id) {
+        this.unsubscribeId = id;
+        return this;
     }
 
     public String getVrm() {

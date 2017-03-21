@@ -34,8 +34,7 @@ public class MotReminderTests extends BaseTest {
         confirmationPage.areDisplayedDetailsCorrect(email, vrm);
 
         //When I select to unsubscribe from an email reminder
-        String subscriptionId = motReminder.subscriptionDb.findSubscriptionIdByVrmAndEmail(vrm, email);
-        UnsubscribePage unsubscribe = motReminder.navigateToUnsubscribe(subscriptionId);
+        UnsubscribePage unsubscribe = motReminder.navigateToUnsubscribe(email, vrm);
         //And confirm that I would like to unsubscribe
         UnsubscribeConfirmationPage unsubscribeConfirmed = unsubscribe.clickUnsubscribe();
 
@@ -73,22 +72,6 @@ public class MotReminderTests extends BaseTest {
         //Then my mot reminder is set up successfully with the updated vehicle vrm
         EmailConfirmationPendingPage confirmPage = reviewPageSubmit.confirmSubscriptionDetails();
         assertEquals(confirmPage.getTitle(), "You’ve nearly finished");
-    }
-
-    @Test(description = "Vehicle owner with an MOT reminder subscription can unsubscribe from the service")
-    public void unsubscribeFromMotReminders() {
-
-        //Given I have signed up for the MOT reminder service
-        String id = motReminder.subscriptionDb.addSubscription("SELENIUM-VRM", "SELENIUM@EMAIL.COM");
-
-        //When I select to unsubscribe from an email reminder
-        UnsubscribePage unsubscribe = motReminder.navigateToUnsubscribe(id);
-
-        //And confirm that I would like to unsubscribe
-        UnsubscribeConfirmationPage unsubscribeConfirmed = unsubscribe.clickUnsubscribe();
-
-        //Then my MOT reminder subscription has been cancelled
-        assertEquals(unsubscribeConfirmed.getBannerTitle(), "You’ve unsubscribed");
     }
 
     @Test(description = "As a user of the site with a vested interest in cookie policy, I can view them")

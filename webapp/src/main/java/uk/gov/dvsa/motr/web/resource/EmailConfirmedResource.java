@@ -1,9 +1,9 @@
 package uk.gov.dvsa.motr.web.resource;
 
 import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
-import uk.gov.dvsa.motr.web.component.subscription.exception.InvalidActivationIdException;
+import uk.gov.dvsa.motr.web.component.subscription.exception.InvalidConfirmationIdException;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
-import uk.gov.dvsa.motr.web.component.subscription.service.PendingSubscriptionActivatorService;
+import uk.gov.dvsa.motr.web.component.subscription.service.SubscriptionConfirmationService;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 import uk.gov.dvsa.motr.web.viewmodel.EmailConfirmedViewModel;
 
@@ -28,29 +28,29 @@ public class EmailConfirmedResource {
 
     private final TemplateEngine renderer;
     private final DataLayerHelper dataLayerHelper;
-    private PendingSubscriptionActivatorService pendingSubscriptionActivatorService;
+    private SubscriptionConfirmationService subscriptionConfirmationService;
 
     @Inject
     public EmailConfirmedResource(
             TemplateEngine renderer,
-            PendingSubscriptionActivatorService pendingSubscriptionActivatorService
+            SubscriptionConfirmationService pendingSubscriptionActivatorService
     ) {
 
         this.renderer = renderer;
-        this.pendingSubscriptionActivatorService = pendingSubscriptionActivatorService;
+        this.subscriptionConfirmationService = pendingSubscriptionActivatorService;
         this.dataLayerHelper = new DataLayerHelper();
     }
 
     @GET
-    @Path("{id}")
-    public String confirmEmailGet(@PathParam("id") String subscriptionId) {
+    @Path("{confirmationId}")
+    public String confirmEmailGet(@PathParam("confirmationId") String confirmationId) {
 
         try {
-            Subscription subscription = pendingSubscriptionActivatorService.activateSubscription(subscriptionId);
+            Subscription subscription = subscriptionConfirmationService.confirmSubscription(confirmationId);
             dataLayerHelper.putAttribute(VRM_KEY, subscription.getVrm());
 
             return renderer.render("subscription-confirmation", buildViewModel(subscription));
-        } catch (InvalidActivationIdException e) {
+        } catch (InvalidConfirmationIdException e) {
             return renderer.render("subscription-error", emptyMap());
         }
     }

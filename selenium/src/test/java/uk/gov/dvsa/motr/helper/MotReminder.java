@@ -37,19 +37,15 @@ public class MotReminder {
         return page.clickTermsAndConditionsLink();
     }
 
-    public UnsubscribePage navigateToUnsubscribe(String id) {
+    public UnsubscribePage navigateToUnsubscribe(String email, String vrm) {
 
-        return PageNavigator.goTo(UnsubscribePage.class, id);
-    }
-
-    public SubscriptionConfirmationPage navigateToEmailConfirmationPage(String pendingSubscriptionId) {
-
-        return PageNavigator.goTo(SubscriptionConfirmationPage.class, pendingSubscriptionId);
+        String unsubscribeId = subscriptionDb.findUnsubscribeIdByVrmAndEmail(vrm, email);
+        return PageNavigator.goTo(UnsubscribePage.class, unsubscribeId);
     }
 
     public SubscriptionConfirmationPage navigateToEmailConfirmationPage(String email, String vrm) {
 
-        String pendingSubscriptionId = subscriptionDb.findPendingSubscriptionIdByVrmAndEmail(vrm, email);
-        return navigateToEmailConfirmationPage(pendingSubscriptionId);
+        String confirmationId = subscriptionDb.findConfirmationIdByVrmAndEmail(vrm, email);
+        return PageNavigator.goTo(SubscriptionConfirmationPage.class, confirmationId);
     }
 }

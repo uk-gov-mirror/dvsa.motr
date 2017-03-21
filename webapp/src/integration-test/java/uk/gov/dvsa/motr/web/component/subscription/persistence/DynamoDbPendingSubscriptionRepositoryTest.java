@@ -43,7 +43,7 @@ public class DynamoDbPendingSubscriptionRepositoryTest {
         fixture.table(new PendingSubscriptionTable().item(expectedSubscription)).run();
 
         PendingSubscription actualSubscription = waitUntilPresent(
-                () -> repo.findById(expectedSubscription.getId()),
+                () -> repo.findByConfirmationId(expectedSubscription.getConfirmationId()),
                 true,
                 5000
         ).get();
@@ -58,8 +58,9 @@ public class DynamoDbPendingSubscriptionRepositoryTest {
 
         PendingSubscriptionItem subscriptionItem = new PendingSubscriptionItem();
 
-        PendingSubscription subscription = new PendingSubscription(subscriptionItem.getId());
+        PendingSubscription subscription = new PendingSubscription();
         subscription
+                .setConfirmationId(subscriptionItem.getConfirmationId())
                 .setEmail(subscriptionItem.getEmail())
                 .setVrm(subscriptionItem.getVrm())
                 .setMotDueDate(subscriptionItem.getMotDueDate());
@@ -67,7 +68,7 @@ public class DynamoDbPendingSubscriptionRepositoryTest {
         repo.save(subscription);
 
         PendingSubscription actualSubscription = waitUntilPresent(
-                () -> repo.findById(subscription.getId()),
+                () -> repo.findByConfirmationId(subscription.getConfirmationId()),
                 true,
                 5000
         ).get();
@@ -83,8 +84,9 @@ public class DynamoDbPendingSubscriptionRepositoryTest {
 
         PendingSubscriptionItem subscriptionItem = new PendingSubscriptionItem();
 
-        PendingSubscription subscription = new PendingSubscription(subscriptionItem.getId());
+        PendingSubscription subscription = new PendingSubscription();
         subscription
+                .setConfirmationId(subscriptionItem.getConfirmationId())
                 .setEmail(subscriptionItem.getEmail())
                 .setVrm(subscriptionItem.getVrm())
                 .setMotDueDate(subscriptionItem.getMotDueDate());
@@ -106,7 +108,7 @@ public class DynamoDbPendingSubscriptionRepositoryTest {
     @Test
     public void getByIdReturnsEmptyIfSubscriptionDoesNotExist() {
 
-        assertFalse(repo.findById("ID_THAT_DOES_NOT_EXIST").isPresent());
+        assertFalse(repo.findByConfirmationId("ID_THAT_DOES_NOT_EXIST").isPresent());
     }
 
     @Test
@@ -115,13 +117,14 @@ public class DynamoDbPendingSubscriptionRepositoryTest {
         PendingSubscriptionItem sub = new PendingSubscriptionItem();
         fixture.table(new PendingSubscriptionTable().item(sub)).run();
 
-        PendingSubscription subscription = new PendingSubscription(sub.getId());
+        PendingSubscription subscription = new PendingSubscription();
         subscription
+                .setConfirmationId(sub.getConfirmationId())
                 .setEmail(sub.getEmail())
                 .setVrm(sub.getVrm());
 
         repo.delete(subscription);
 
-        waitUntilPresent(() -> repo.findById(sub.getId()), false, 5000);
+        waitUntilPresent(() -> repo.findByConfirmationId(sub.getConfirmationId()), false, 5000);
     }
 }

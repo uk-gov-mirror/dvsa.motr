@@ -1,12 +1,10 @@
 package uk.gov.dvsa.motr.web.resource;
 
-import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
-import uk.gov.dvsa.motr.web.component.subscription.persistence.SubscriptionRepository;
+import uk.gov.dvsa.motr.web.component.subscription.service.UnsubscribeService;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.cookie.UnsubscribeConfirmationParams;
-import uk.gov.dvsa.motr.web.eventlog.unsubscribe.UnsubscribeEvent;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 import uk.gov.dvsa.motr.web.viewmodel.UnsubscribeViewModel;
 
@@ -33,48 +31,46 @@ import static uk.gov.dvsa.motr.web.resource.RedirectResponseBuilder.redirect;
 @Produces("text/html")
 public class UnsubscribeResource {
 
-    private SubscriptionRepository subscriptionRepository;
+    private UnsubscribeService unsubscribeService;
     private TemplateEngine renderer;
     private MotrSession motrSession;
 
     @Inject
     public UnsubscribeResource(
-            SubscriptionRepository subscriptionRepository,
+            UnsubscribeService unsubscribeService,
             TemplateEngine renderer,
             MotrSession motrSession
     ) {
 
-        this.subscriptionRepository = subscriptionRepository;
+        this.unsubscribeService = unsubscribeService;
         this.renderer = renderer;
         this.motrSession = motrSession;
     }
 
     @GET
-    @Path("{id}")
-    public String unsubscribeGet(@PathParam("id") String id) throws Exception {
+    @Path("{unsubscribeId}")
+    public String unsubscribeGet(@PathParam("unsubscribeId") String unsubscribeId) throws Exception {
 
-        Subscription subscription = this.subscriptionRepository.findById(id).orElseThrow(NotFoundException::new);
+        return unsubscribeService.findSubscriptionForUnsubscribe(unsubscribeId).map(subscription -> {
 
-        UnsubscribeViewModel viewModel = populateViewModelFromSubscription(subscription);
-        Map<String, Object> map = new HashMap<>();
-        map.put("viewModel", viewModel);
-        return renderer.render("unsubscribe", map);
+            UnsubscribeViewModel viewModel = populateViewModelFromSubscription(subscription);
+            Map<String, Object> map = new HashMap<>();
+            map.put("viewModel", viewModel);
+            return renderer.render("unsubscribe", map);
+
+        }).orElseThrow(NotFoundException::new);
     }
 
     @POST
-    @Path("{id}")
-    public Response unsubscribePost(@PathParam("id") String id) throws Exception {
+    @Path("{unsubscribeId}")
+    public Response unsubscribePost(@PathParam("unsubscribeId") String unsubscribeId) throws Exception {
 
-        Subscription subscription = this.subscriptionRepository.findById(id).orElseThrow(NotFoundException::new);
-        this.subscriptionRepository.delete(subscription);
-
-        EventLogger.logEvent(new UnsubscribeEvent().setVrm(subscription.getVrm())
-                .setEmail(subscription.getEmail()).setExpiryDate(subscription.getMotDueDate()));
+        Subscription removedSubscription = unsubscribeService.unsubscribe(unsubscribeId);
 
         UnsubscribeConfirmationParams params = new UnsubscribeConfirmationParams();
-        params.setEmail(subscription.getEmail());
-        params.setExpiryDate(subscription.getMotDueDate().toString());
-        params.setRegistration(subscription.getVrm());
+        params.setEmail(removedSubscription.getEmail());
+        params.setExpiryDate(removedSubscription.getMotDueDate().toString());
+        params.setRegistration(removedSubscription.getVrm());
 
         String uri = UriBuilder.fromUri("unsubscribe/confirmed").toString();
         motrSession.setUnsubscribeConfirmationParams(params);

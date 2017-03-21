@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface SubscriptionRepository {
 
-    Optional<Subscription> findById(String id);
+    Optional<Subscription> findByUnsubscribeId(String id);
 
     Optional<Subscription> findByVrmAndEmail(String vrm, String email);
 

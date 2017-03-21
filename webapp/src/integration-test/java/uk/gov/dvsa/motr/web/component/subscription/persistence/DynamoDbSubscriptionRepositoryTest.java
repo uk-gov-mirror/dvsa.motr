@@ -43,7 +43,7 @@ public class DynamoDbSubscriptionRepositoryTest {
         fixture.table(new SubscriptionTable().item(expectedSubscription)).run();
 
         Subscription actualSubscription = waitUntilPresent(
-                () -> repo.findById(expectedSubscription.getId()),
+                () -> repo.findByUnsubscribeId(expectedSubscription.getUnsubscribeId()),
                 true,
                 5000
         ).get();
@@ -58,8 +58,9 @@ public class DynamoDbSubscriptionRepositoryTest {
 
         SubscriptionItem subscriptionItem = new SubscriptionItem();
 
-        Subscription subscription = new Subscription(subscriptionItem.getId());
+        Subscription subscription = new Subscription();
         subscription
+                .setUnsubscribeId(subscriptionItem.getUnsubscribeId())
                 .setEmail(subscriptionItem.getEmail())
                 .setVrm(subscriptionItem.getVrm())
                 .setMotDueDate(subscriptionItem.getMotDueDate());
@@ -67,7 +68,7 @@ public class DynamoDbSubscriptionRepositoryTest {
         repo.save(subscription);
 
         Subscription actualSubscription = waitUntilPresent(
-                () -> repo.findById(subscription.getId()),
+                () -> repo.findByUnsubscribeId(subscription.getUnsubscribeId()),
                 true,
                 5000
         ).get();
@@ -83,8 +84,9 @@ public class DynamoDbSubscriptionRepositoryTest {
 
         SubscriptionItem subscriptionItem = new SubscriptionItem();
 
-        Subscription subscription = new Subscription(subscriptionItem.getId());
+        Subscription subscription = new Subscription();
         subscription
+                .setUnsubscribeId(subscriptionItem.getUnsubscribeId())
                 .setEmail(subscriptionItem.getEmail())
                 .setVrm(subscriptionItem.getVrm())
                 .setMotDueDate(subscriptionItem.getMotDueDate());
@@ -127,7 +129,7 @@ public class DynamoDbSubscriptionRepositoryTest {
     @Test
     public void getByIdReturnsEmptyIfSubscriptionDoesNotExist() {
 
-        assertFalse(repo.findById("ID_THAT_DOES_NOT_EXIST").isPresent());
+        assertFalse(repo.findByUnsubscribeId("ID_THAT_DOES_NOT_EXIST").isPresent());
     }
 
     @Test
@@ -136,13 +138,14 @@ public class DynamoDbSubscriptionRepositoryTest {
         SubscriptionItem sub = new SubscriptionItem();
         fixture.table(new SubscriptionTable().item(sub)).run();
 
-        Subscription subscription = new Subscription(sub.getId());
+        Subscription subscription = new Subscription();
         subscription
+                .setUnsubscribeId(sub.getUnsubscribeId())
                 .setEmail(sub.getEmail())
                 .setVrm(sub.getVrm());
 
         repo.delete(subscription);
 
-        waitUntilPresent(() -> repo.findById(sub.getId()), false, 5000);
+        waitUntilPresent(() -> repo.findByUnsubscribeId(sub.getUnsubscribeId()), false, 5000);
     }
 }

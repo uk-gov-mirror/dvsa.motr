@@ -43,7 +43,7 @@ public class DynamoDbPendingSubscriptionRepository implements PendingSubscriptio
     }
 
     @Override
-    public Optional<PendingSubscription> findById(String id) {
+    public Optional<PendingSubscription> findByConfirmationId(String id) {
 
         HashMap<String, Object> valueMap = new HashMap<>();
         HashMap<String, String> nameMap = new HashMap<>();
@@ -69,7 +69,8 @@ public class DynamoDbPendingSubscriptionRepository implements PendingSubscriptio
 
     private PendingSubscription mapItemToSubscription(Item item) {
 
-        PendingSubscription subscription = new PendingSubscription(item.getString("id"));
+        PendingSubscription subscription = new PendingSubscription();
+        subscription.setConfirmationId(item.getString("id"));
         subscription.setVrm(item.getString("vrm"));
         subscription.setEmail(item.getString("email"));
         subscription.setMotDueDate(LocalDate.parse(item.getString("mot_due_date")));
@@ -79,7 +80,7 @@ public class DynamoDbPendingSubscriptionRepository implements PendingSubscriptio
     public void save(PendingSubscription subscription) {
 
         Item item = new Item()
-                .withString("id", subscription.getId())
+                .withString("id", subscription.getConfirmationId())
                 .withString("vrm", subscription.getVrm())
                 .withString("email", subscription.getEmail())
                 .withString("mot_due_date", subscription.getMotDueDate().format(DateTimeFormatter.ISO_LOCAL_DATE))
@@ -93,7 +94,7 @@ public class DynamoDbPendingSubscriptionRepository implements PendingSubscriptio
     public void delete(PendingSubscription subscription) {
         PrimaryKey key = new PrimaryKey("vrm", subscription.getVrm(), "email", subscription.getEmail());
         Map<String, Object> expressionAttributeValues = new HashMap<String, Object>();
-        expressionAttributeValues.put(":id", subscription.getId());
+        expressionAttributeValues.put(":id", subscription.getConfirmationId());
 
         dynamoDb.getTable(tableName).deleteItem(
                 key,

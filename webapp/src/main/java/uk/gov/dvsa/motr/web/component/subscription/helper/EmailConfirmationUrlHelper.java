@@ -1,6 +1,7 @@
-package uk.gov.dvsa.motr.web.helper;
+package uk.gov.dvsa.motr.web.component.subscription.helper;
 
 import uk.gov.dvsa.motr.web.component.subscription.model.PendingSubscription;
+import uk.gov.dvsa.motr.web.helper.SystemVariableParam;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.UriBuilder;
@@ -19,6 +20,7 @@ public class EmailConfirmationUrlHelper {
 
     public String build(PendingSubscription subscription) {
 
-        return UriBuilder.fromPath(this.baseUrl).path("confirm-email").path(subscription.getId()).build().toString();
+        return UriBuilder.fromPath(this.baseUrl).path("confirm-email")
+                .path(subscription.getConfirmationId()).build().toString();
     }
 }

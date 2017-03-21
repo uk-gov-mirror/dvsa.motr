@@ -1,9 +1,9 @@
-package uk.gov.dvsa.motr.web.helper;
+package uk.gov.dvsa.motr.web.component.subscription.helper;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
+
+import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 
 import static org.junit.Assert.assertEquals;
 
@@ -11,9 +11,6 @@ public class UnsubscriptionUrlHelperTest {
 
     private static final String baseUri = "http://test-url/";
     private UnsubscriptionUrlHelper urlHelper;
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     @Before
     public void setup() {
@@ -23,6 +20,8 @@ public class UnsubscriptionUrlHelperTest {
     @Test
     public void buildReturnsCorrectUri() throws Exception {
 
-        assertEquals(baseUri + "unsubscribe/TEST-ID", urlHelper.build("TEST-ID"));
+        Subscription sub = new Subscription().setUnsubscribeId("AAAA").setEmail("email").setVrm("vrm");
+
+        assertEquals("http://test-url/unsubscribe/AAAA", urlHelper.build(sub));
     }
 }
