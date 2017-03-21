@@ -89,29 +89,8 @@ public class UnsubscribeResourceTest {
         );
     }
 
-    @Test(expected = NotFoundException.class)
-    public void unsubscribeConfirmedWillThrow404WhenSessionIsEmpty() throws Exception {
-
-        resource = new UnsubscribeResource(unsubscribeService, TEMPLATE_ENGINE_STUB, new MotrSession());
-        resource.unsubscribeConfirmed();
-    }
-
-    @Test
-    public void unsubscribeConfirmedDisplaysPage() throws Exception {
-
-        resource.unsubscribeConfirmed();
-
-        assertEquals(UnsubscribeViewModel.class, TEMPLATE_ENGINE_STUB.getContext(Map.class).get("viewModel").getClass());
-        String dataLayerString = (String) TEMPLATE_ENGINE_STUB.getContext(Map.class).get("dataLayer");
-        UnsubscribeViewModel viewModel = (UnsubscribeViewModel) TEMPLATE_ENGINE_STUB.getContext(Map.class).get("viewModel");
-        assertEquals("test@this-is-a-test-123", viewModel.getEmail());
-        assertEquals("10 July 2015", viewModel.getExpiryDate());
-        assertEquals("TEST-VRM", viewModel.getRegistration());
-        assertEquals("{\"vrm\":\"TEST-VRM\"}", dataLayerString);
-    }
-
-
     private Subscription subscriptionStub() {
+
         return new Subscription()
                 .setUnsubscribeId(UNSUBSCRIBE_ID)
                 .setEmail("test@this-is-a-test-123")

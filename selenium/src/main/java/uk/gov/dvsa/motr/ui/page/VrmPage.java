@@ -15,24 +15,29 @@ public class VrmPage extends Page {
     private WebElement continueButton;
 
     @Override
-    protected String getIdentity() {
+    protected String getContentHeader() {
+
         return "What is your vehicle's registration (number plate)?";
     }
 
+    @Override
+    protected String getPageTitle() {
+
+        return "What is the vehicle’s registration (number plate)? – MOT reminders";
+    }
+
     public EmailPage enterVrm(String vrm){
+
         vrmField.sendKeys(vrm);
         continueButton.click();
         return new EmailPage();
     }
 
     public ReviewPage enterVrmExpectingReturnToReview(String vrm) {
+
         vrmField.clear();
         vrmField.sendKeys(vrm);
         continueButton.click();
         return new ReviewPage();
-    }
-
-    public boolean isVrmContinueButtonDisplayed() {
-        return continueButton.isDisplayed();
     }
 }

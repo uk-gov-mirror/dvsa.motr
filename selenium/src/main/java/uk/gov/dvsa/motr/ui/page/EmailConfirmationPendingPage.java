@@ -7,8 +7,14 @@ import uk.gov.dvsa.motr.ui.base.Page;
 public class EmailConfirmationPendingPage extends Page {
 
     @Override
-    protected String getIdentity() {
+    protected String getContentHeader() {
 
         return "You’ve nearly finished";
+    }
+
+    @Override
+    protected String getPageTitle() {
+
+        return "You’ve nearly finished – MOT reminders";
     }
 }

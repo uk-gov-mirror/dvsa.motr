@@ -14,25 +14,31 @@ public class ReviewPage extends Page {
     @FindBy(id = "continue-button") private WebElement continueButton;
 
     @Override
-    protected String getIdentity() {
+    protected String getContentHeader() {
+
         return "Check your details";
     }
 
+    @Override
+    protected String getPageTitle() {
+
+        return "Check your details – MOT reminders";
+    }
+
     public EmailConfirmationPendingPage confirmSubscriptionDetails(){
+
         continueButton.click();
         return new EmailConfirmationPendingPage();
     }
 
-    public boolean isContinueButtonDisplayed() {
-        return continueButton.isDisplayed();
-    }
-
     public EmailPage clickChangeEmail() {
+
         changeEmailLink.click();
         return new EmailPage();
     }
 
     public VrmPage clickChangeVrm() {
+
         changeRegistrationLink.click();
         return new VrmPage();
     }

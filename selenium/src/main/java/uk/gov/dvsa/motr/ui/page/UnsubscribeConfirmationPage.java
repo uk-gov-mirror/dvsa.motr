@@ -7,8 +7,8 @@ import uk.gov.dvsa.motr.navigation.GotoUrl;
 import uk.gov.dvsa.motr.ui.base.Page;
 import uk.gov.dvsa.motr.ui.base.PageIdentityVerificationException;
 
-@GotoUrl("/unsubscribe/confirm")
-public class UnsubscribeConfirmationPage extends Page{
+@GotoUrl("/unsubscribe/confirmed")
+public class UnsubscribeConfirmationPage extends Page {
 
     @FindBy(className = "banner__heading-large")
     private WebElement bannerTitle;
@@ -16,23 +16,28 @@ public class UnsubscribeConfirmationPage extends Page{
     @Override
     protected void selfVerify() {
 
-        if (!getBannerTitle().contains(getIdentity())) {
+        if (!getBannerTitle().contains(getContentHeader()) || !getPageTitle().equals(getPageTitle())) {
 
             throw new PageIdentityVerificationException("Page identity verification failed: "
-                    + String.format("\n Expected: %s page, \n Found: %s page", getIdentity(), getBannerTitle())
+                    + String.format("\n Expected: %s page, \n Found: %s page", getContentHeader(), getBannerTitle())
             );
         }
     }
 
     @Override
-    protected String getIdentity() {
+    protected String getContentHeader() {
 
         return "You’ve unsubscribed";
+    }
+
+    @Override
+    protected String getPageTitle() {
+
+        return "Are you sure you want to unsubscribe? – MOT reminders";
     }
 
     public String getBannerTitle() {
 
         return bannerTitle.getText();
     }
-
 }

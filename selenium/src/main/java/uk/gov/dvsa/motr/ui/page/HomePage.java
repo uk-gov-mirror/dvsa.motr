@@ -13,21 +13,31 @@ public class HomePage extends Page {
     private WebElement startNowButton;
 
     @Override
-    protected String getIdentity() {
+    protected String getContentHeader() {
+
         return "Get reminders about your MOT";
     }
 
+    @Override
+    protected String getPageTitle() {
+
+        return "Get MOT reminders";
+    }
+
     public VrmPage clickStartNow() {
+
         startNowButton.click();
         return new VrmPage();
     }
 
     public CookiesPage clickCookiesLink() {
+
         cookiesLink.click();
         return new CookiesPage();
     }
 
     public TermsAndConditionsPage clickTermsAndConditionsLink(){
+
         termsAndConditionsLink.click();
         return new TermsAndConditionsPage();
     }
