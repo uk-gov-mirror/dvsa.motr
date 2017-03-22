@@ -15,7 +15,7 @@ public class HomePage extends Page {
     @Override
     protected String getContentHeader() {
 
-        return "Get reminders about your MOT";
+        return "Get MOT reminders";
     }
 
     @Override

@@ -20,7 +20,7 @@ public class VrmValidatorTest {
         VrmValidator vrmValidator = new VrmValidator();
 
         assertFalse(vrmValidator.isValid(null));
-        assertEquals("Enter your vehicle’s registration", vrmValidator.getMessage());
+        assertEquals("Enter the vehicle’s registration", vrmValidator.getMessage());
     }
 
     @Test

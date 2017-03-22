@@ -34,6 +34,7 @@ public class EmailValidator {
     }
 
     public String getMessage() {
+
         return this.message;
     }
 }
