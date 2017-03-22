@@ -40,7 +40,7 @@ public abstract class Page {
 
     protected void selfVerify() {
 
-        if (!getTitle().contains(getContentHeader()) || !getPageTitle().equals(getPageTitle())) {
+        if (!getTitle().contains(getContentHeader()) || !this.driver.getTitle().equals(getPageTitle())) {
 
             throw new PageIdentityVerificationException("Page identity verification failed: "
                     + String.format("\n Expected: %s page, \n Found: %s page", getContentHeader(), getTitle())

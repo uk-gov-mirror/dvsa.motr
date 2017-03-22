@@ -16,7 +16,7 @@ public class UnsubscribeConfirmationPage extends Page {
     @Override
     protected void selfVerify() {
 
-        if (!getBannerTitle().contains(getContentHeader()) || !getPageTitle().equals(getPageTitle())) {
+        if (!getBannerTitle().contains(getContentHeader()) || !this.driver.getTitle().equals(getPageTitle())) {
 
             throw new PageIdentityVerificationException("Page identity verification failed: "
                     + String.format("\n Expected: %s page, \n Found: %s page", getContentHeader(), getBannerTitle())
@@ -33,7 +33,7 @@ public class UnsubscribeConfirmationPage extends Page {
     @Override
     protected String getPageTitle() {
 
-        return "Are you sure you want to unsubscribe? – MOT reminders";
+        return "You’ve unsubscribed – MOT reminders";
     }
 
     public String getBannerTitle() {
