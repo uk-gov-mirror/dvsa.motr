@@ -6,13 +6,19 @@ import uk.gov.dvsa.motr.web.config.ConfigKey;
 import uk.gov.dvsa.motr.web.config.EncryptionAwareConfig;
 import uk.gov.dvsa.motr.web.config.EnvironmentVariableConfig;
 import uk.gov.dvsa.motr.web.encryption.Decryptor;
-import uk.gov.dvsa.motr.web.system.SystemVariable;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+
+import static org.apache.log4j.Level.toLevel;
+import static org.apache.log4j.Logger.getRootLogger;
+
+import static uk.gov.dvsa.motr.web.system.SystemVariable.GOV_NOTIFY_API_TOKEN;
+import static uk.gov.dvsa.motr.web.system.SystemVariable.LOG_LEVEL;
+import static uk.gov.dvsa.motr.web.system.SystemVariable.MOT_TEST_REMINDER_INFO_TOKEN;
 
 public class MotrConfigFactory implements BaseFactory<Config> {
 
@@ -26,8 +32,8 @@ public class MotrConfigFactory implements BaseFactory<Config> {
     private static Set<ConfigKey> secretVariables() {
 
         Set<ConfigKey> secretVariables = new HashSet<>();
-        secretVariables.add(SystemVariable.GOV_NOTIFY_API_TOKEN);
-        secretVariables.add(SystemVariable.MOT_TEST_REMINDER_INFO_TOKEN);
+        secretVariables.add(GOV_NOTIFY_API_TOKEN);
+        secretVariables.add(MOT_TEST_REMINDER_INFO_TOKEN);
 
         return secretVariables;
     }
@@ -35,12 +41,11 @@ public class MotrConfigFactory implements BaseFactory<Config> {
     @Override
     public Config provide() {
 
-        return new CachedConfig(
-                new EncryptionAwareConfig(
-                        new EnvironmentVariableConfig(),
-                        secretVariables(),
-                        decryptor
-                )
-        );
+        Config config = new CachedConfig(new EncryptionAwareConfig(new EnvironmentVariableConfig(), secretVariables(), decryptor));
+
+        String logLevel = config.getValue(LOG_LEVEL);
+        getRootLogger().setLevel(toLevel(logLevel));
+
+        return config;
     }
 }
