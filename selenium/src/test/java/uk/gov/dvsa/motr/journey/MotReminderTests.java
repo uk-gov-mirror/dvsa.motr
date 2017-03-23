@@ -4,7 +4,6 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import uk.gov.dvsa.motr.base.BaseTest;
-import uk.gov.dvsa.motr.helper.MotReminder;
 import uk.gov.dvsa.motr.helper.RandomGenerator;
 import uk.gov.dvsa.motr.ui.page.CookiesPage;
 import uk.gov.dvsa.motr.ui.page.EmailConfirmationPendingPage;
@@ -13,12 +12,13 @@ import uk.gov.dvsa.motr.ui.page.ReviewPage;
 import uk.gov.dvsa.motr.ui.page.SubscriptionConfirmationPage;
 import uk.gov.dvsa.motr.ui.page.TermsAndConditionsPage;
 import uk.gov.dvsa.motr.ui.page.UnsubscribeConfirmationPage;
-import uk.gov.dvsa.motr.ui.page.UnsubscribePage;
+import uk.gov.dvsa.motr.ui.page.UnsubscribeErrorPage;
 import uk.gov.dvsa.motr.ui.page.VrmPage;
 
 import java.io.IOException;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 public class MotReminderTests extends BaseTest {
 
@@ -28,19 +28,34 @@ public class MotReminderTests extends BaseTest {
 
         //Given I am a vehicle owner on the MOTR start page
         //When I enter the vehicle vrm and my email address
-        motReminder.enterReminderDetailsAndConfirm(vrm, email);
-
-        // And I confirm my email address
-        SubscriptionConfirmationPage confirmationPage = motReminder.navigateToEmailConfirmationPage(email, vrm);
-        confirmationPage.areDisplayedDetailsCorrect(email, vrm);
+        //And I confirm my email address
+        SubscriptionConfirmationPage confirmationPage = motReminder.subscribeAndConfrimReminder(vrm, email);
+        assertTrue(confirmationPage.areDisplayedDetailsCorrect(email, vrm));
 
         //When I select to unsubscribe from an email reminder
-        UnsubscribePage unsubscribe = motReminder.navigateToUnsubscribe(email, vrm);
         //And confirm that I would like to unsubscribe
-        UnsubscribeConfirmationPage unsubscribeConfirmed = unsubscribe.clickUnsubscribe();
+        UnsubscribeConfirmationPage unsubscribeConfirmed = motReminder.unsubscribeFromReminder(vrm, email);
 
         //Then my MOT reminder subscription has been cancelled
         assertEquals(unsubscribeConfirmed.getBannerTitle(), "You’ve unsubscribed");
+    }
+
+    @Test(dataProvider = "dataProviderCreateMotReminderForMyVehicle",
+            description = "A user who has previously unsubscribed from reminders will be displayed the unsubscribe error page")
+    public void reminderThatHasBeenUnsubscribedDisplaysErrorPage(String vrm, String email) {
+
+        //Given I am a user of the MOT reminders service with an active subscription
+        //When I unsubscribe from the email reminder via the unsubscribe link
+        motReminder.subscribeAndConfrimReminder(vrm, email);
+        String subscriptionId = motReminder.subscriptionDb.findUnsubscribeIdByVrmAndEmail(vrm, email);
+        motReminder.unsubscribeFromReminder(vrm, email);
+
+        //And select the unsubscribe link again
+        UnsubscribeErrorPage errorPage = motReminder.navigateToUnsubscribeExpectingErrorPage(subscriptionId);
+
+        //Then I receive a error message informing me that I have already unsubscribed
+        assertEquals(errorPage.getErrorMessageText(), "You’ve already unsubscribed or the " +
+                "link hasn’t worked. Copy and paste the link into the browser to try again.");
     }
 
     @Test(description = "Owner of a vehicle with a mot can change their email when creating MOT reminder")

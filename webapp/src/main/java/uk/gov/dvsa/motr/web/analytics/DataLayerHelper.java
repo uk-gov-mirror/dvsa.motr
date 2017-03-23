@@ -10,6 +10,7 @@ public class DataLayerHelper {
 
     public static final String ERROR_KEY = "error";
     public static final String VRM_KEY = "vrm";
+    public static final String UNSUBSCRIBE_FAILURE_KEY = "unsubscribe-failure";
 
     private Map<String, String> attributes;
 
