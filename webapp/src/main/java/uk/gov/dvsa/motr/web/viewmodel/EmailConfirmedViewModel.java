@@ -1,15 +1,11 @@
 package uk.gov.dvsa.motr.web.viewmodel;
 
-import uk.gov.dvsa.motr.web.helper.DateDisplayHelper;
-
-import java.time.LocalDate;
-
 public class EmailConfirmedViewModel {
 
     private static String UNKNOWN_STRING = "Unknown";
     private String registration;
     private String email;
-    private LocalDate expiryDate;
+    private String expiryDate;
 
     public String getRegistration() {
         return registration;
@@ -38,10 +34,10 @@ public class EmailConfirmedViewModel {
             return UNKNOWN_STRING;
         }
 
-        return DateDisplayHelper.asDisplayDate(expiryDate);
+        return expiryDate;
     }
 
-    public EmailConfirmedViewModel setExpiryDate(LocalDate expiryDate) {
+    public EmailConfirmedViewModel setExpiryDate(String expiryDate) {
 
         this.expiryDate = expiryDate;
         return this;
