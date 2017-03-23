@@ -43,7 +43,7 @@ public class SubscriptionDbItemQueueItemUnloaderTest {
     @Rule
     public final EnvironmentVariables environmentVariables = new TestEnvironmentVariables();
 
-    private static final LocalDate MOCK_API_RANDOM_VEHICLE_DATE = LocalDate.of(2017, 3, 9);
+    private static final LocalDate MOCK_API_RANDOM_VEHICLE_DATE = LocalDate.of(2026, 3, 9);
     private static final LocalDate DATE_NOT_MATCHING_VEHICLE_MOCK = LocalDate.of(2017, 5, 15);
     private static final String SPECIFIC_MOCKED_VEHICLE_VRM = "LOY-500";
     private static final LocalDate MOCK_API_SPECIFIC_VEHICLE_DATE = LocalDate.of(2017, 3, 14);

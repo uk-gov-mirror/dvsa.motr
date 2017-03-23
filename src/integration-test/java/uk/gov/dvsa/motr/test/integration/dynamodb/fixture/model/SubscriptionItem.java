@@ -15,7 +15,7 @@ public class SubscriptionItem implements DynamoDbFixtureTableItem {
 
     private LocalDate motDueDate = RandomDataUtil.dueDate();
 
-    private String vrm = RandomDataUtil.vrm();
+    private String vrm = "OLD-EXPIRY-" + RandomDataUtil.vrm();
 
     private String email = RandomDataUtil.email();
 
