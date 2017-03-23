@@ -32,9 +32,9 @@ public class CookieInSessionFilterTest {
     private final String attributeKey = "vrm";
     private final String attributeValue = "TEST-VRM";
     private final String cookieString = "session=rO0ABXNyACl1ay5nb3YuZHZzYS5tb3RyLndlYi5jb29raWUuQ29va2llU2Vzc2lvbsu1QnSCTN" +
-            "+xAgABTAAKYXR0cmlidXRlc3QAD0xqYXZhL3V0aWwvTWFwO3hwc3IAEWphdmEudXRpbC5IYXNoTWFwBQfawcMWYNEDAAJGAApsb2FkRmFjdG9y" +
-            "SQAJdGhyZXNob2xkeHA/QAAAAAAADHcIAAAAEAAAAAF0AAN2cm10AAhURVNULVZSTXg=;Version=1;Path=/;Max-Age=1200;Secure;HttpOnly;" +
-            "Expires=Sat, 01 Jan 2000 10:20:00 GMT";
+            "+xAgABTAAKYXR0cmlidXRlc3QAD0xqYXZhL3V0aWwvTWFwO3hwc3IAEWphdmEudXRpbC5IYXNoTWFwBQfawcMWYNEDAAJGAApsb2FkRmFjdG9ySQAJ" +
+            "dGhyZXNob2xkeHA/QAAAAAAADHcIAAAAEAAAAAF0AAN2cm10AAhURVNULVZSTXg=;Version=1;Path=/;Max-Age=1200;Secure;HttpOnly;Expires=Sat," +
+            " 01 Jan 2000 10:20:00 GMT";
 
     private Clock clockReference = Clock.fixed(parse("2000-01-01T10:00:00").toInstant(UTC), UTC);
 
@@ -107,6 +107,7 @@ public class CookieInSessionFilterTest {
     }
 
     private String setUpCookieString() throws IOException {
+
         CookieSession cookieSession = new CookieSession();
         cookieSession.setAttribute(attributeKey, attributeValue);
 
@@ -114,6 +115,7 @@ public class CookieInSessionFilterTest {
     }
 
     private String toString(Serializable object) throws IOException {
+
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
         objectOutputStream.writeObject(object);

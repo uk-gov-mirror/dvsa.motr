@@ -1,5 +1,7 @@
 package uk.gov.dvsa.motr.web.cookie;
 
+import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,6 +12,7 @@ public class MotrSession {
 
     private static final String VRM_COOKIE_ID = "regNumber";
     private static final String EMAIL_COOKIE_ID = "email";
+    private static final String VEHICLE_DETAILS_ID = "vehicleDetails";
     private static final String VISITING_FROM_REVIEW_COOKIE_ID = "visitingFromReview";
     private static final String UNSUBSCRIBE_CONFIRMATION_PARAMS = "UNSUBSCRIBE_CONFIRMATION_PARAMS";
 
@@ -37,6 +40,11 @@ public class MotrSession {
 
         Object emailFromSession = getAttribute(EMAIL_COOKIE_ID);
         return emailFromSession == null ? "" : emailFromSession.toString();
+    }
+
+    public VehicleDetails getVehicleDetailsFromSession() {
+
+        return (VehicleDetails) getAttribute(VEHICLE_DETAILS_ID);
     }
 
     public UnsubscribeConfirmationParams getUnsubscribeConfirmationParams() {
@@ -73,6 +81,11 @@ public class MotrSession {
     public void setVrm(String vrmValue) {
 
         this.setAttribute(VRM_COOKIE_ID, vrmValue);
+    }
+
+    public void setVehicleDetails(VehicleDetails vehicleDetails) {
+
+        this.setAttribute(VEHICLE_DETAILS_ID, vehicleDetails);
     }
 
     public void setUnsubscribeConfirmationParams(UnsubscribeConfirmationParams unsubscribeConfirmationParams) {

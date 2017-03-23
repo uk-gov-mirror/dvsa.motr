@@ -6,9 +6,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import uk.gov.dvsa.motr.web.serialisation.LocalDateDeserialiser;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
-public class VehicleDetails {
+public class VehicleDetails implements Serializable {
 
     @JsonProperty("make")
     private String make;

@@ -1,8 +1,6 @@
 package uk.gov.dvsa.motr.web.resource;
 
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClientException;
 import uk.gov.dvsa.motr.web.component.subscription.exception.SubscriptionAlreadyExistsException;
 import uk.gov.dvsa.motr.web.component.subscription.service.PendingSubscriptionService;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
@@ -14,7 +12,6 @@ import uk.gov.dvsa.motr.web.viewmodel.ReviewViewModel;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -34,20 +31,17 @@ public class ReviewResource {
 
     private final TemplateEngine renderer;
     private PendingSubscriptionService pendingSubscriptionService;
-    private final VehicleDetailsClient vehicleDetailsClient;
     private final MotrSession motrSession;
 
     @Inject
     public ReviewResource(
             MotrSession motrSession,
             TemplateEngine renderer,
-            PendingSubscriptionService pendingSubscriptionService,
-            VehicleDetailsClient vehicleDetailsClient
+            PendingSubscriptionService pendingSubscriptionService
     ) {
 
         this.renderer = renderer;
         this.pendingSubscriptionService = pendingSubscriptionService;
-        this.vehicleDetailsClient = vehicleDetailsClient;
         this.motrSession = motrSession;
     }
 
@@ -64,10 +58,9 @@ public class ReviewResource {
         String regNumberFromSession = this.motrSession.getVrmFromSession();
         String emailFromSession = this.motrSession.getEmailFromSession();
 
-        Optional<VehicleDetails> vehicleOptional = this.vehicleDetailsClient.fetch(regNumberFromSession);
+        VehicleDetails vehicle = this.motrSession.getVehicleDetailsFromSession();
 
-        if (vehicleOptional.isPresent()) {
-            VehicleDetails vehicle = vehicleOptional.get();
+        if (null != vehicle) {
             viewModel.setColour(vehicle.getPrimaryColour(), vehicle.getSecondaryColour())
                     .setEmail(emailFromSession)
                     .setExpiryDate(vehicle.getMotExpiryDate())
@@ -89,11 +82,11 @@ public class ReviewResource {
 
         String vrm = motrSession.getVrmFromSession();
         String email = motrSession.getEmailFromSession();
-        Optional<VehicleDetails> vehicle = getVehicle(vrm);
+        VehicleDetails vehicle = this.motrSession.getVehicleDetailsFromSession();
 
-        if (detailsAreValid(vrm, email) && vehicle.isPresent()) {
+        if (detailsAreValid(vrm, email) && null != vehicle) {
 
-            createPendingSubscription(vrm, email, vehicle.get().getMotExpiryDate());
+            createPendingSubscription(vrm, email, vehicle.getMotExpiryDate());
 
             return redirect("email-confirmation-pending");
         } else {
@@ -107,15 +100,6 @@ public class ReviewResource {
         EmailValidator emailValidator = new EmailValidator();
 
         return vrmValidator.isValid(vrm) && emailValidator.isValid(email);
-    }
-
-    private Optional<VehicleDetails> getVehicle(String vrm) {
-
-        try {
-            return vehicleDetailsClient.fetch(vrm);
-        } catch (VehicleDetailsClientException exception) {
-            return Optional.empty();
-        }
     }
 
     private void createPendingSubscription(String vrm, String email, LocalDate expiryDate) throws Exception {

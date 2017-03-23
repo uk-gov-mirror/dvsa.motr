@@ -96,6 +96,7 @@ public class VrmResource {
                     modelMap.put(SHOW_INLINE_KEY, false);
                 } else {
                     motrSession.setVrm(vrm);
+                    motrSession.setVehicleDetails(vehicle.get());
                     if (this.motrSession.visitingFromReviewPage()) {
                         return redirect("review");
                     }

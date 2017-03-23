@@ -19,9 +19,12 @@ import javax.ws.rs.core.Response;
 import static junit.framework.TestCase.assertNull;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class VrmResourceTest {
@@ -59,6 +62,7 @@ public class VrmResourceTest {
 
         when(client.fetch(eq(VALID_REG_NUMBER))).thenReturn(Optional.of(new VehicleDetails()));
         Response response = resource.vrmPagePost(VALID_REG_NUMBER);
+        verify(motrSession, times(1)).setVehicleDetails(any(VehicleDetails.class));
         assertEquals(302, response.getStatus());
     }
 
