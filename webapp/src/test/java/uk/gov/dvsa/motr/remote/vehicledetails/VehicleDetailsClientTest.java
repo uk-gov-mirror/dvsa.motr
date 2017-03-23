@@ -13,6 +13,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import uk.gov.dvsa.motr.web.system.binder.factory.VehicleDetailsClientFactory;
+
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Optional;
@@ -33,6 +35,8 @@ import static java.nio.charset.Charset.defaultCharset;
 
 @RunWith(DataProviderRunner.class)
 public class VehicleDetailsClientTest {
+
+    private static final String READ_TIMEOUT = "10000";
 
     @Rule
     public WireMockRule vehicleDetailsEndpoint = new WireMockRule(8098);
@@ -126,6 +130,14 @@ public class VehicleDetailsClientTest {
         withDefaultClient().fetch("VRM12345");
     }
 
+    @Test(expected = VehicleDetailsClientException.class)
+    public void throwsEndpointExceptionWhenEndpointTakesLongerThanReadTimeoutToRespond() throws Exception {
+
+        stubFor(onRequest().willReturn(aResponse().withFixedDelay(Integer.valueOf(READ_TIMEOUT)).withBody(validResponse())));
+
+        withDefaultClient().fetch("VRM12345");
+    }
+
     private MappingBuilder onRequest() {
 
         return get(urlEqualTo("/vehicle-details-endpoint/VRM12345"))
@@ -135,7 +147,8 @@ public class VehicleDetailsClientTest {
     private VehicleDetailsClient withDefaultClient() {
 
         final String endpointUri = "http://localhost:8098/vehicle-details-endpoint/{registration}";
-        return new VehicleDetailsClient(new ClientConfig(), endpointUri, "api-key");
+        VehicleDetailsClientFactory clientFactory = new VehicleDetailsClientFactory(endpointUri, "api-key", "10", "10");
+        return clientFactory.provide();
     }
 
     private String validResponse() throws IOException {

@@ -3,9 +3,6 @@ package uk.gov.dvsa.motr.web.resource;
 import org.junit.Before;
 import org.junit.Test;
 
-import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
-import uk.gov.dvsa.motr.web.component.subscription.persistence.SubscriptionRepository;
-import uk.gov.dvsa.motr.web.component.subscription.service.UnsubscribeService;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.cookie.UnsubscribeConfirmationParams;
 import uk.gov.dvsa.motr.web.test.render.TemplateEngineStub;

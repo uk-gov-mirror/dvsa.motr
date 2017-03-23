@@ -1,6 +1,5 @@
 package uk.gov.dvsa.motr.web.resource;
 
-import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.service.UnsubscribeService;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
@@ -8,7 +7,6 @@ import uk.gov.dvsa.motr.web.cookie.UnsubscribeConfirmationParams;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 import uk.gov.dvsa.motr.web.viewmodel.UnsubscribeViewModel;
 
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,9 +19,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 
-import static uk.gov.dvsa.motr.web.analytics.DataLayerHelper.VRM_KEY;
 import static uk.gov.dvsa.motr.web.resource.RedirectResponseBuilder.redirect;
 
 @Singleton

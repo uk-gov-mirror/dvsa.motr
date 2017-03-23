@@ -67,7 +67,7 @@ public class ReviewResourceTest {
         resource.reviewPage();
     }
 
-    @Test// TODO
+    @Test
     public void userIsRedirectedAfterSuccessfullFormSubmission() throws Exception {
 
         LocalDate now = LocalDate.now();
