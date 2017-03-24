@@ -36,6 +36,8 @@ import static java.nio.charset.Charset.defaultCharset;
 @RunWith(DataProviderRunner.class)
 public class VehicleDetailsClientTest {
 
+    private static final String MOT_DUE_DATE_PLACEHOLDER = "MOT-DUE-DATE-PLACEHOLDER";
+
     private static final String READ_TIMEOUT = "10000";
 
     @Rule
@@ -71,6 +73,25 @@ public class VehicleDetailsClientTest {
         assertEquals("", details.getSecondaryColour());
         assertEquals("VRM12345", details.getRegNumber());
         assertEquals(LocalDate.parse("2016-11-26"), details.getMotExpiryDate());
+        assertEquals(2006, details.getYearOfManufacture().intValue());
+    }
+
+    @Test
+    @UseDataProvider("dataProviderResponseWithMotDueDate")
+    public void vehicleDetailsHandlesUnknownMotDueDate(String vehicleClientResponse) throws Exception {
+
+        stubFor(onRequest().willReturn(aResponse().withBody(vehicleClientResponse)
+                .withHeader("Content-Type", "application/json")));
+
+        VehicleDetails details = withDefaultClient().fetch("VRM12345").get();
+
+        assertEquals(null, details.getMotExpiryDate());
+
+        assertEquals("MERCEDES-BENZ", details.getMake());
+        assertEquals("C220 ELEGANCE ED125 CDI BLU-CY", details.getModel());
+        assertEquals("Silver", details.getPrimaryColour());
+        assertEquals("", details.getSecondaryColour());
+        assertEquals("VRM12345", details.getRegNumber());
         assertEquals(2006, details.getYearOfManufacture().intValue());
     }
 
@@ -121,6 +142,16 @@ public class VehicleDetailsClientTest {
         };
     }
 
+    @DataProvider
+    public static Object[][] dataProviderResponseWithMotDueDate() throws IOException {
+
+        return new Object[][]{
+                {validResponseWithMotDueDate("")},
+                {validResponseWithMotDueDate("unknown")},
+                {validResponseWithMotDueDate("asd ads asd ")},
+        };
+    }
+
     @UseDataProvider("badResponses")
     @Test(expected = VehicleDetailsClientException.class)
     public void throwsEndpointExceptionWhenEndpointRespondsWithFault(Fault fault) throws Exception {
@@ -151,11 +182,22 @@ public class VehicleDetailsClientTest {
         return clientFactory.provide();
     }
 
-    private String validResponse() throws IOException {
+    private static String loadResponseMock(String resourcePath) throws IOException {
 
         return IOUtils.toString(
-                getClass().getClassLoader().getResourceAsStream("vehicledetails/response/ok.json"),
+                VehicleDetailsClientTest.class.getClassLoader().getResourceAsStream(resourcePath),
                 defaultCharset()
         );
     }
+
+    private static String validResponse() throws IOException {
+
+        return loadResponseMock("vehicledetails/response/ok.json");
+    }
+
+    private static String validResponseWithMotDueDate(String motDueDate) throws IOException {
+
+        return loadResponseMock("vehicledetails/response/ok-mot-due-date-placeholder.json").replace(MOT_DUE_DATE_PLACEHOLDER, motDueDate);
+    }
+
 }

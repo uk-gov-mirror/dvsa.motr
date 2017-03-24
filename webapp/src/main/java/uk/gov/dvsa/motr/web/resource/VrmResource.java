@@ -8,6 +8,7 @@ import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.eventlog.vehicle.VehicleDetailsExceptionEvent;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
+import uk.gov.dvsa.motr.web.validator.MotDueDateValidator;
 import uk.gov.dvsa.motr.web.validator.VrmValidator;
 
 import java.net.URISyntaxException;
@@ -35,7 +36,7 @@ public class VrmResource {
 
     private static final String VRM_MODEL_KEY = "vrm";
     private static final String VEHICLE_NOT_FOUND_MESSAGE = "Check that you’ve typed in the correct registration number.<br/>" +
-            "<br/>You can only sign up if your vehicle has had its first MOT.";
+            "<br/>You can only sign up if the vehicle has a current MOT.";
 
     private static final String MESSAGE_KEY = "message";
     private static final String SHOW_INLINE_KEY = "showInLine";
@@ -44,6 +45,7 @@ public class VrmResource {
 
     private final TemplateEngine renderer;
     private final VehicleDetailsClient client;
+    private MotDueDateValidator motDueDateValidator;
     private final MotrSession motrSession;
     private DataLayerHelper dataLayerHelper;
 
@@ -51,12 +53,14 @@ public class VrmResource {
     public VrmResource(
             MotrSession motrSession,
             TemplateEngine renderer,
-            VehicleDetailsClient client
+            VehicleDetailsClient client,
+            MotDueDateValidator motDueDateValidator
     ) {
 
         this.motrSession = motrSession;
         this.renderer = renderer;
         this.client = client;
+        this.motDueDateValidator = motDueDateValidator;
         this.dataLayerHelper = new DataLayerHelper();
     }
 
@@ -90,18 +94,13 @@ public class VrmResource {
         if (validator.isValid(vrm)) {
             try {
                 Optional<VehicleDetails> vehicle = this.client.fetch(vrm);
-                if (!vehicle.isPresent()) {
-                    dataLayerHelper.putAttribute(ERROR_KEY, "Vehicle not found");
-                    modelMap.put(MESSAGE_KEY, VEHICLE_NOT_FOUND_MESSAGE);
-                    modelMap.put(SHOW_INLINE_KEY, false);
-                } else {
+                if (vehicleDataIsValid(vehicle)) {
                     motrSession.setVrm(vrm);
                     motrSession.setVehicleDetails(vehicle.get());
-                    if (this.motrSession.visitingFromReviewPage()) {
-                        return redirect("review");
-                    }
 
-                    return redirect("email");
+                    return getRedirectAfterSuccessfulEdit();
+                } else {
+                    addVehicleNotFoundErrorMessageToViewModel(modelMap);
                 }
             } catch (VehicleDetailsClientException exception) {
 
@@ -120,6 +119,27 @@ public class VrmResource {
         modelMap.putAll(dataLayerHelper.formatAttributes());
 
         return Response.ok(renderer.render(VRM_TEMPLATE_NAME, modelMap)).build();
+    }
+
+    private void addVehicleNotFoundErrorMessageToViewModel(Map<String, Object> modelMap) {
+
+        dataLayerHelper.putAttribute(ERROR_KEY, "Vehicle not found");
+        modelMap.put(MESSAGE_KEY, VEHICLE_NOT_FOUND_MESSAGE);
+        modelMap.put(SHOW_INLINE_KEY, false);
+    }
+
+    private Response getRedirectAfterSuccessfulEdit() {
+
+        if (this.motrSession.visitingFromReviewPage()) {
+            return redirect("review");
+        }
+
+        return redirect("email");
+    }
+
+    private boolean vehicleDataIsValid(Optional<VehicleDetails> vehicle) {
+
+        return vehicle.isPresent() && motDueDateValidator.isDueDateValid(vehicle.get().getMotExpiryDate());
     }
 
     private void updateMapBasedOnReviewFlow(Map<String, Object> modelMap) throws URISyntaxException {

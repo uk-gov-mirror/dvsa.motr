@@ -8,6 +8,7 @@ import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClientException;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.test.render.TemplateEngineStub;
+import uk.gov.dvsa.motr.web.validator.MotDueDateValidator;
 import uk.gov.dvsa.motr.web.validator.VrmValidator;
 
 import java.util.HashMap;
@@ -34,6 +35,7 @@ public class VrmResourceTest {
     private static final String SYSTEM_ERROR_VRM = "ABC123";
 
     private VehicleDetailsClient client;
+    private MotDueDateValidator motDueDateValidator;
     private TemplateEngineStub templateEngine;
     private VrmResource resource;
     private MotrSession motrSession;
@@ -44,7 +46,8 @@ public class VrmResourceTest {
         templateEngine = new TemplateEngineStub();
         client = mock(VehicleDetailsClient.class);
         motrSession = mock(MotrSession.class);
-        resource = new VrmResource(motrSession, templateEngine, client);
+        motDueDateValidator = mock(MotDueDateValidator.class);
+        resource = new VrmResource(motrSession, templateEngine, client, motDueDateValidator);
         when(motrSession.getVrmFromSession()).thenReturn("VRZ");
     }
 
@@ -61,6 +64,7 @@ public class VrmResourceTest {
     public void postWithValidVrmResultsInRedirectToEmail() throws Exception {
 
         when(client.fetch(eq(VALID_REG_NUMBER))).thenReturn(Optional.of(new VehicleDetails()));
+        when(motDueDateValidator.isDueDateValid(any())).thenReturn(true);
         Response response = resource.vrmPagePost(VALID_REG_NUMBER);
         verify(motrSession, times(1)).setVehicleDetails(any(VehicleDetails.class));
         assertEquals(302, response.getStatus());
@@ -116,7 +120,30 @@ public class VrmResourceTest {
 
         HashMap<String, Object> expectedContext = new HashMap<>();
         expectedContext.put("message", "Check that you’ve typed in the correct registration number.<br/>" +
-                "<br/>You can only sign up if your vehicle has had its first MOT.");
+                "<br/>You can only sign up if the vehicle has a current MOT.");
+        expectedContext.put("back_url", "/");
+        expectedContext.put("vrm", VALID_REG_NUMBER);
+        expectedContext.put("continue_button_text", "Continue");
+        expectedContext.put("showSystemError", false);
+        expectedContext.put("showInLine", "false");
+        expectedContext.put("back_button_text", "Back");
+        expectedContext.put("dataLayer", "{\"vrm\":\"FP12345\",\"error\":\"Vehicle not found\"}");
+
+        assertEquals(expectedContext.toString(), templateEngine.getContext(Map.class).toString());
+        assertEquals("vrm", templateEngine.getTemplate());
+    }
+
+    @Test
+    public void whenVehicleDetailsFoundWithDueDateInThePastShowErrorMessage() throws Exception {
+
+        when(client.fetch(eq(VALID_REG_NUMBER))).thenReturn(Optional.of(new VehicleDetails()));
+        when(motDueDateValidator.isDueDateValid(any())).thenReturn(false);
+
+        resource.vrmPagePost(VALID_REG_NUMBER);
+
+        HashMap<String, Object> expectedContext = new HashMap<>();
+        expectedContext.put("message", "Check that you’ve typed in the correct registration number.<br/>" +
+                "<br/>You can only sign up if the vehicle has a current MOT.");
         expectedContext.put("back_url", "/");
         expectedContext.put("vrm", VALID_REG_NUMBER);
         expectedContext.put("continue_button_text", "Continue");
@@ -134,8 +161,9 @@ public class VrmResourceTest {
 
         when(motrSession.visitingFromReviewPage()).thenReturn(true);
         when(client.fetch(eq(VALID_REG_NUMBER))).thenReturn(Optional.of(new VehicleDetails()));
+        when(motDueDateValidator.isDueDateValid(any())).thenReturn(true);
 
-        resource = new VrmResource(motrSession, templateEngine, client);
+        resource = new VrmResource(motrSession, templateEngine, client, motDueDateValidator);
         Response response = resource.vrmPagePost(VALID_REG_NUMBER);
 
         assertEquals("review", response.getHeaders().get("Location").get(0).toString());
