@@ -21,6 +21,7 @@ public class MetricsPerfAspect {
     private Timer vehicleDetailsTimer = metricRegistry.timer("vehicleDetails_fetch");
     private Timer sendEmailTimer = metricRegistry.timer("notifyService_sendEmail");
     private Timer updateExpiryDateTimer = metricRegistry.timer("subscriptionRepository_updateExpiryDate");
+    private Timer processItemTimer = metricRegistry.timer("process_single_item");
 
     @Around("execution(* uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient.fetch(..))")
     public Object vehicleDetailsClientFetch(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -67,6 +68,21 @@ public class MetricsPerfAspect {
         return response;
     }
 
+    @Around("execution(* uk.gov.dvsa.motr.notifier.processing.service.ProcessSubscriptionService.processSubscription(..))")
+    public Object processSubscriptionCalls(ProceedingJoinPoint joinPoint) throws Throwable {
+
+        Object response;
+
+        Timer.Context updateExpiryContext = processItemTimer.time();
+        try {
+            response = joinPoint.proceed();
+        } finally {
+            updateExpiryContext.stop();
+        }
+
+        return response;
+    }
+
     @Before("execution(* uk.gov.dvsa.motr.notifier.processing.unloader.QueueUnloader.run(..))")
     public void beginMetrics() {
 
@@ -74,6 +90,7 @@ public class MetricsPerfAspect {
         vehicleDetailsTimer = metricRegistry.timer("vehicleDetails_fetch");
         sendEmailTimer = metricRegistry.timer("notifyService_sendEmail");
         updateExpiryDateTimer = metricRegistry.timer("subscriptionRepository_updateExpiryDate");
+        processItemTimer = metricRegistry.timer("process_single_item");
     }
 
     @Around("execution(* uk.gov.dvsa.motr.notifier.processing.unloader.QueueUnloader.run(..))")
@@ -86,6 +103,7 @@ public class MetricsPerfAspect {
             response.setVehicleDetailsTimer(vehicleDetailsTimer);
             response.setSendEmailTimer(sendEmailTimer);
             response.setUpdateExpiryDateTimer(updateExpiryDateTimer);
+            response.setProcessItemTimer(processItemTimer);
         } finally {
             EventLogger.logEvent(new MetricEvent()
                     .setVehicleDetails99thPercentile(vehicleDetailsTimer.getSnapshot().get99thPercentile())
@@ -108,7 +126,14 @@ public class MetricsPerfAspect {
                     .setExpiryDateUpdate75thPercentile(updateExpiryDateTimer.getSnapshot().get75thPercentile())
                     .setExpiryDateUpdateMax(updateExpiryDateTimer.getSnapshot().getMax())
                     .setExpiryDateUpdateMin(updateExpiryDateTimer.getSnapshot().getMin())
-                    .setExpiryDateUpdateStdDeviation(updateExpiryDateTimer.getSnapshot().getStdDev()));
+                    .setExpiryDateUpdateStdDeviation(updateExpiryDateTimer.getSnapshot().getStdDev())
+                    .setProcessItemCountOfCalls(processItemTimer.getCount())
+                    .setProcessItem99thPercentile(processItemTimer.getSnapshot().get99thPercentile())
+                    .setProcessItem95thPercentile(processItemTimer.getSnapshot().get95thPercentile())
+                    .setProcessItem75thPercentile(processItemTimer.getSnapshot().get75thPercentile())
+                    .setProcessItemMax(processItemTimer.getSnapshot().getMax())
+                    .setProcessItemMin(processItemTimer.getSnapshot().getMin())
+                    .setProcessItemStdDeviation(processItemTimer.getSnapshot().getStdDev()));
         }
 
         return response;

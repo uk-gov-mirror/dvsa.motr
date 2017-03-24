@@ -23,6 +23,8 @@ public class NotifierReport {
 
     private Timer updateExpiryDateTimer;
 
+    private Timer processItemTimer;
+
     public void incrementSuccessfullyProcessed() {
 
         successfullyProcessed.incrementAndGet();
@@ -75,5 +77,13 @@ public class NotifierReport {
 
     public void setUpdateExpiryDateTimer(Timer updateExpiryDateTimer) {
         this.updateExpiryDateTimer = updateExpiryDateTimer;
+    }
+
+    public MetricsTimerWrapper getProcessItemTimer() {
+        return new MetricsTimerWrapper(processItemTimer);
+    }
+
+    public void setProcessItemTimer(Timer processItemTimer) {
+        this.processItemTimer = processItemTimer;
     }
 }

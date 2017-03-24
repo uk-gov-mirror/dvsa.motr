@@ -135,4 +135,46 @@ public class MetricEvent extends Event {
         params.put("count-of-expiry-date-update-calls", String.valueOf(metric));
         return this;
     }
+
+    public MetricEvent setProcessItem99thPercentile(double metric) {
+
+        params.put("ninety-ninth-percentile-process-item-call", String.valueOf(metric));
+        return this;
+    }
+
+    public MetricEvent setProcessItem95thPercentile(double metric) {
+
+        params.put("ninety-fifth-percentile-process-item-call", String.valueOf(metric));
+        return this;
+    }
+
+    public MetricEvent setProcessItem75thPercentile(double metric) {
+
+        params.put("seventy-fifth-percentile-process-item-call", String.valueOf(metric));
+        return this;
+    }
+
+    public MetricEvent setProcessItemMax(long metric) {
+
+        params.put("max-time-process-item-call", String.valueOf(metric));
+        return this;
+    }
+
+    public MetricEvent setProcessItemMin(long metric) {
+
+        params.put("min-time-process-item-call", String.valueOf(metric));
+        return this;
+    }
+
+    public MetricEvent setProcessItemStdDeviation(double metric) {
+
+        params.put("std-deviation-process-item-call", String.valueOf(metric));
+        return this;
+    }
+
+    public MetricEvent setProcessItemCountOfCalls(long metric) {
+
+        params.put("count-of-process-item-calls", String.valueOf(metric));
+        return this;
+    }
 }
