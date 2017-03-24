@@ -36,6 +36,12 @@ public class CookieInSessionFilterTest {
             "dGhyZXNob2xkeHA/QAAAAAAADHcIAAAAEAAAAAF0AAN2cm10AAhURVNULVZSTXg=;Version=1;Path=/;Max-Age=1200;Secure;HttpOnly;Expires=Sat," +
             " 01 Jan 2000 10:20:00 GMT";
 
+    private final String cookieClearString = "session=rO0ABXNyACl1ay5nb3YuZHZzYS5tb3RyLndlYi5jb29raWUuQ29va2llU2Vzc2lvbsu1QnSCTN" +
+            "+xAgABTAAKYXR0cmlidXRlc3QAD0xqYXZhL3V0aWwvTWFwO3hwc3IAEWphdmEudXRpbC5IYXNoTWFwBQfawcMWYNEDAAJGAApsb2FkRmFjdG9ySQAJ" +
+            "dGhyZXNob2xkeHA/QAAAAAAADHcIAAAAEAAAAAF0AAN2cm10AAhURVNULVZSTXg=;Version=1;Path=/;Max-Age=0;Secure;HttpOnly;Expires=Sat," +
+            " 01 Jan 2000 10:20:00 GMT";
+
+
     private Clock clockReference = Clock.fixed(parse("2000-01-01T10:00:00").toInstant(UTC), UTC);
 
     private MotrSession motrSession;
@@ -102,6 +108,26 @@ public class CookieInSessionFilterTest {
 
         cookieInSessionFilter.filter(containerRequestContext, containerResponseContext);
         verify(headerMap, times(1)).add(eq("Set-Cookie"), eq(cookieString));
+        verify(motrSession, times(1)).clear();
+        verify(motrSession, times(1)).getAttributes();
+    }
+
+    @Test
+    public void whenClearCookiesIsSetMaxAgeIsSetToZero() throws Exception {
+
+        Map<String, Object> hashMap = new HashMap<>();
+        hashMap.put(attributeKey, attributeValue);
+        MultivaluedMap<String, Object> headerMap = mock(MultivaluedMap.class);
+
+        ContainerRequestContext containerRequestContext = mock(ContainerRequestContext.class);
+        ContainerResponseContext containerResponseContext = mock(ContainerResponseContext.class);
+        when(motrSession.getAttributes()).thenReturn(hashMap);
+        when(motrSession.isShouldClearCookies()).thenReturn(true);
+        when(containerResponseContext.getHeaders()).thenReturn(headerMap);
+
+        cookieInSessionFilter.filter(containerRequestContext, containerResponseContext);
+        verify(headerMap, times(1)).add(eq("Set-Cookie"), eq(cookieClearString));
+        verify(motrSession, times(2)).isShouldClearCookies();
         verify(motrSession, times(1)).clear();
         verify(motrSession, times(1)).getAttributes();
     }
