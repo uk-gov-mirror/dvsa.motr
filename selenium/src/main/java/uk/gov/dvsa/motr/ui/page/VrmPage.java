@@ -17,7 +17,7 @@ public class VrmPage extends Page {
     @Override
     protected String getContentHeader() {
 
-        return "What is your vehicle's registration (number plate)?";
+        return "What is the vehicle's registration (number plate)?";
     }
 
     @Override
