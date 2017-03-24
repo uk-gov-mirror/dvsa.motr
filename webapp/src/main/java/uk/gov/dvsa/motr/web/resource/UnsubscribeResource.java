@@ -1,5 +1,6 @@
 package uk.gov.dvsa.motr.web.resource;
 
+import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.service.UnsubscribeService;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
@@ -13,13 +14,13 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
+import static uk.gov.dvsa.motr.web.analytics.DataLayerHelper.UNSUBSCRIBE_FAILURE_KEY;
 import static uk.gov.dvsa.motr.web.resource.RedirectResponseBuilder.redirect;
 
 @Singleton
@@ -53,8 +54,13 @@ public class UnsubscribeResource {
             Map<String, Object> map = new HashMap<>();
             map.put("viewModel", viewModel);
             return renderer.render("unsubscribe", map);
-
-        }).orElseThrow(NotFoundException::new);
+        }).orElseGet(() -> {
+            DataLayerHelper helper = new DataLayerHelper();
+            helper.putAttribute(UNSUBSCRIBE_FAILURE_KEY, unsubscribeId);
+            Map<String, Object> map = new HashMap<>();
+            map.putAll(helper.formatAttributes());
+            return renderer.render("unsubscribe-error", map);
+        });
     }
 
     @POST

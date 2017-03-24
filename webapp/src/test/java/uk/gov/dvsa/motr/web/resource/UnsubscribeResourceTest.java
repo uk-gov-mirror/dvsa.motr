@@ -11,10 +11,10 @@ import uk.gov.dvsa.motr.web.test.render.TemplateEngineStub;
 import uk.gov.dvsa.motr.web.viewmodel.UnsubscribeViewModel;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
 
 import static org.junit.Assert.assertEquals;
@@ -48,14 +48,20 @@ public class UnsubscribeResourceTest {
         this.resource = new UnsubscribeResource(unsubscribeService, TEMPLATE_ENGINE_STUB, motrSession);
     }
 
-    @Test(expected = NotFoundException.class)
-    public void unsubscribeGetNotFoundExceptionThrownIfVehicleIsNotFound() throws Exception {
+    @Test
+    public void unsubscribeGetErrorPageShownIfSubscriptionIsNotFound() throws Exception {
 
         when(unsubscribeService.findSubscriptionForUnsubscribe(UNSUBSCRIBE_ID)).thenReturn(empty());
 
         resource.unsubscribeGet(UNSUBSCRIBE_ID);
 
         verify(unsubscribeService, times(1)).findSubscriptionForUnsubscribe(UNSUBSCRIBE_ID);
+
+        HashMap<String, Object> expectedContext = new HashMap<>();
+        expectedContext.put("dataLayer", "{\"unsubscribe-failure\":\"" + UNSUBSCRIBE_ID + "\"}");
+
+        assertEquals(expectedContext.toString(), TEMPLATE_ENGINE_STUB.getContext(Map.class).toString());
+        assertEquals("unsubscribe-error", TEMPLATE_ENGINE_STUB.getTemplate());
     }
 
     @Test
@@ -66,6 +72,7 @@ public class UnsubscribeResourceTest {
         resource.unsubscribeGet(UNSUBSCRIBE_ID);
 
         verify(unsubscribeService, times(1)).findSubscriptionForUnsubscribe(UNSUBSCRIBE_ID);
+        assertEquals("unsubscribe", TEMPLATE_ENGINE_STUB.getTemplate());
         assertEquals(UnsubscribeViewModel.class, TEMPLATE_ENGINE_STUB.getContext(Map.class).get("viewModel").getClass());
         UnsubscribeViewModel viewModel = (UnsubscribeViewModel) TEMPLATE_ENGINE_STUB.getContext(Map.class).get("viewModel");
         assertEquals("test@this-is-a-test-123", viewModel.getEmail());
