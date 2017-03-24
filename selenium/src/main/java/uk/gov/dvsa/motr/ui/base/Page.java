@@ -25,6 +25,9 @@ public abstract class Page {
     @FindBy(id = "terms-and-conditions-link")
     protected WebElement termsAndConditionsLink;
 
+    @FindBy(id = "privacy-policy-link")
+    protected WebElement privacyPolicyLink;
+
     public Page() {
 
         this.driver = WebDriverConfiguratorRegistry.get().getDriver();
@@ -39,7 +42,7 @@ public abstract class Page {
     }
 
     protected void selfVerify() {
-
+        
         if (!getTitle().contains(getContentHeader()) || !this.driver.getTitle().equals(getPageTitle())) {
 
             throw new PageIdentityVerificationException("Page identity verification failed: "

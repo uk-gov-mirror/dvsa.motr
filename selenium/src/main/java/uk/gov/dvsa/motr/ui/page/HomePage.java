@@ -41,4 +41,10 @@ public class HomePage extends Page {
         termsAndConditionsLink.click();
         return new TermsAndConditionsPage();
     }
+
+    public PrivacyPage clickPrivacyPolicyLink(){
+
+        privacyPolicyLink.click();
+        return new PrivacyPage();
+    }
 }
