@@ -54,8 +54,7 @@ public class MotReminderTests extends BaseTest {
         UnsubscribeErrorPage errorPage = motReminder.navigateToUnsubscribeExpectingErrorPage(subscriptionId);
 
         //Then I receive a error message informing me that I have already unsubscribed
-        assertEquals(errorPage.getErrorMessageText(), "You’ve already unsubscribed or the " +
-                "link hasn’t worked. Copy and paste the link into the browser to try again.");
+        assertEquals(errorPage.getErrorMessageText(), "You’ve already unsubscribed or the link hasn’t worked.");
     }
 
     @Test(description = "Owner of a vehicle with a mot can change their email when creating MOT reminder")
