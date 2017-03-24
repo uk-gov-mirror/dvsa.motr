@@ -98,8 +98,9 @@ public class CookieInSessionFilter implements ContainerResponseFilter, Container
                 this.motrSession.isShouldClearCookies());
         int maxAge = this.motrSession.isShouldClearCookies() ? 0 : MAX_COOKIE_AGE_IN_SECONDS;
 
-        Date expires = from(ZonedDateTime.now(clockReference).plus(MAX_COOKIE_AGE_IN_SECONDS, SECONDS)
+        Date expires = from(ZonedDateTime.now(clockReference).plus(maxAge, SECONDS)
                 .toInstant());
+
         NewCookie newCookie = new NewCookie(
                 key,
                 value.toString(),
