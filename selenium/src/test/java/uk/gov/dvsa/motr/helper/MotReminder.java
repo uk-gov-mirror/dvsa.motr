@@ -4,6 +4,7 @@ import uk.gov.dvsa.motr.navigation.PageNavigator;
 import uk.gov.dvsa.motr.ui.page.CookiesPage;
 import uk.gov.dvsa.motr.ui.page.EmailPage;
 import uk.gov.dvsa.motr.ui.page.HomePage;
+import uk.gov.dvsa.motr.ui.page.PrivacyPage;
 import uk.gov.dvsa.motr.ui.page.ReviewPage;
 import uk.gov.dvsa.motr.ui.page.SubscriptionConfirmationPage;
 import uk.gov.dvsa.motr.ui.page.TermsAndConditionsPage;
@@ -64,5 +65,10 @@ public class MotReminder {
 
         String confirmationId = subscriptionDb.findConfirmationIdByVrmAndEmail(vrm, email);
         return PageNavigator.goTo(SubscriptionConfirmationPage.class, confirmationId);
+    }
+
+    public PrivacyPage clickPrivacyPolicyLink() {
+        HomePage page = PageNavigator.goTo(HomePage.class);
+        return page.clickPrivacyPolicyLink();
     }
 }
