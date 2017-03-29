@@ -11,7 +11,6 @@ import uk.gov.dvsa.motr.web.render.TemplateEngine;
 import uk.gov.dvsa.motr.web.validator.MotDueDateValidator;
 import uk.gov.dvsa.motr.web.validator.VrmValidator;
 
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -104,7 +103,7 @@ public class VrmResource {
                 }
             } catch (VehicleDetailsClientException exception) {
 
-                EventLogger.logErrorEvent(new VehicleDetailsExceptionEvent().setVrm(vrm));
+                EventLogger.logErrorEvent(new VehicleDetailsExceptionEvent().setVrm(vrm), exception);
                 dataLayerHelper.putAttribute(ERROR_KEY, "Trade API error");
                 motrSession.setVrm(vrm);
                 modelMap.put(SHOW_SYSTEM_ERROR, true);
@@ -142,7 +141,7 @@ public class VrmResource {
         return vehicle.isPresent() && motDueDateValidator.isDueDateValid(vehicle.get().getMotExpiryDate());
     }
 
-    private void updateMapBasedOnReviewFlow(Map<String, Object> modelMap) throws URISyntaxException {
+    private void updateMapBasedOnReviewFlow(Map<String, Object> modelMap)  {
 
         if (this.motrSession.visitingFromReviewPage()) {
             modelMap.put("continue_button_text", "Save and return to review");

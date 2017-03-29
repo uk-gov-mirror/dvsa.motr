@@ -35,7 +35,7 @@ public class HandlebarsTemplateEngineTest {
         HandlebarsTemplateEngine instance =
                 new HandlebarsTemplateEngine(assetsPath, "12345", "baseUrl");
 
-        Map<String, String> context = new HashMap<String, String>();
+        Map<String, String> context = new HashMap<>();
         context.put("path", path);
 
         String actualOutput = instance.render("test-assetshelper", context);
@@ -50,7 +50,7 @@ public class HandlebarsTemplateEngineTest {
         HandlebarsTemplateEngine instance =
                 new HandlebarsTemplateEngine("/", "12345", "baseUrl");
 
-        Map<String, String> context = new HashMap<String, String>();
+        Map<String, String> context = new HashMap<>();
         context.put("key", "SomeValueOfTheKey");
 
         String actualOutput = instance.render("test-contextkey", context);
@@ -65,7 +65,7 @@ public class HandlebarsTemplateEngineTest {
         HandlebarsTemplateEngine instance =
                 new HandlebarsTemplateEngine("someassetPath", "12345", basePath);
 
-        Map<String, String> context = new HashMap<String, String>();
+        Map<String, String> context = new HashMap<>();
         context.put("path", path);
 
         String actualOutput = instance.render("test-urlhelper", context);

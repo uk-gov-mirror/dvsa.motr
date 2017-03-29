@@ -1,6 +1,5 @@
 package uk.gov.dvsa.motr.web.logging;
 
-import com.amazonaws.serverless.proxy.internal.model.ApiGatewayRequestContext;
 import com.amazonaws.services.lambda.runtime.Context;
 
 import org.slf4j.MDC;
@@ -55,10 +54,5 @@ public class LoggingFilter implements ContainerRequestFilter, ContainerResponseF
 
         Context ctx =  (Context) requestContext.getProperty("com.amazonaws.lambda.context");
         MDC.put("lambdaFunction", ctx.getFunctionName() + ":" + ctx.getFunctionVersion());
-    }
-
-    private ApiGatewayRequestContext getLambdaRequest(ContainerRequestContext requestContext) {
-
-        return (ApiGatewayRequestContext) requestContext.getProperty("com.amazonaws.apigateway.request.context");
     }
 }

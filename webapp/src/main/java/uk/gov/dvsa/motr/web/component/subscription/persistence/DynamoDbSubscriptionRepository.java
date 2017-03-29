@@ -119,7 +119,7 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
 
     public void delete(Subscription subscription) {
         PrimaryKey key = new PrimaryKey("vrm", subscription.getVrm(), "email", subscription.getEmail());
-        Map<String, Object> expressionAttributeValues = new HashMap<String, Object>();
+        Map<String, Object> expressionAttributeValues = new HashMap<>();
         expressionAttributeValues.put(":id", subscription.getUnsubscribeId());
 
         dynamoDb.getTable(tableName).deleteItem(

@@ -124,7 +124,7 @@ public class MotrSession {
         return attributes;
     }
 
-    protected void clear() {
+    public void clear() {
 
         this.attributes.clear();
         shouldClearCookies = false;
