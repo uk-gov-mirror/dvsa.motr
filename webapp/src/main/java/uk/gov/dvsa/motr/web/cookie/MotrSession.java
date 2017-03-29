@@ -14,7 +14,8 @@ public class MotrSession {
     private static final String EMAIL_COOKIE_ID = "email";
     private static final String VEHICLE_DETAILS_ID = "vehicleDetails";
     private static final String VISITING_FROM_REVIEW_COOKIE_ID = "visitingFromReview";
-    private static final String UNSUBSCRIBE_CONFIRMATION_PARAMS = "UNSUBSCRIBE_CONFIRMATION_PARAMS";
+    private static final String UNSUBSCRIBE_CONFIRMATION_PARAMS = "unsubscribeConfirmationParams";
+    private static final String EMAIL_CONFIRMATION_PARAMS = "emailConfirmationParams";
 
     private Map<String, Object> attributes;
 
@@ -45,6 +46,11 @@ public class MotrSession {
     public VehicleDetails getVehicleDetailsFromSession() {
 
         return (VehicleDetails) getAttribute(VEHICLE_DETAILS_ID);
+    }
+
+    public EmailConfirmationParams getEmailConfirmationParams() {
+
+        return (EmailConfirmationParams) getAttribute(EMAIL_CONFIRMATION_PARAMS);
     }
 
     public UnsubscribeConfirmationParams getUnsubscribeConfirmationParams() {
@@ -86,6 +92,11 @@ public class MotrSession {
     public void setVehicleDetails(VehicleDetails vehicleDetails) {
 
         this.setAttribute(VEHICLE_DETAILS_ID, vehicleDetails);
+    }
+
+    public void setEmailConfirmationParams(EmailConfirmationParams subscription) {
+
+        this.setAttribute(EMAIL_CONFIRMATION_PARAMS, subscription);
     }
 
     public void setUnsubscribeConfirmationParams(UnsubscribeConfirmationParams unsubscribeConfirmationParams) {

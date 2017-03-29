@@ -19,6 +19,7 @@ import uk.gov.dvsa.motr.ui.page.VrmPage;
 import java.io.IOException;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;
 
 public class MotReminderTests extends BaseTest {
@@ -30,7 +31,7 @@ public class MotReminderTests extends BaseTest {
         //Given I am a vehicle owner on the MOTR start page
         //When I enter the vehicle vrm and my email address
         //And I confirm my email address
-        SubscriptionConfirmationPage confirmationPage = motReminder.subscribeAndConfrimReminder(vrm, email);
+        SubscriptionConfirmationPage confirmationPage = motReminder.subscribeToReminderAndConfrimEmail(vrm, email);
         assertTrue(confirmationPage.areDisplayedDetailsCorrect(email, vrm));
 
         //When I select to unsubscribe from an email reminder
@@ -42,12 +43,51 @@ public class MotReminderTests extends BaseTest {
     }
 
     @Test(dataProvider = "dataProviderCreateMotReminderForMyVehicle",
+            description = "Reminder subscriber with an active subscription creates another subscription with the same VRM and email" +
+                    " does not need to confirm their email again")
+    public void createDuplicateMOTReminderDoesNotNeedToConfirmEmailAddressAgain(String vrm, String email)
+            throws IOException, InterruptedException {
+
+        // Given I am a user of the MOT reminders service with an active subscription
+        motReminder.subscribeToReminderAndConfrimEmail(vrm, email);
+
+        // When I create another MOT reminder subscription with the same VRM and email
+        SubscriptionConfirmationPage confirmationPage = motReminder.enterAndConfirmPendingReminderDetailsSecondTime(vrm, email);
+
+        // Then I do not need to confirm my email address and am taken directly to the subscription confirmed page
+        assertTrue(confirmationPage.areDisplayedDetailsCorrect(email, vrm));
+    }
+
+    @Test(dataProvider = "dataProviderCreateMotReminderForMyVehicle",
+            description = "Reminder subscriber with multiple pending subscriptions is directed to the confirm email error page when " +
+                    "selecting an old confirm email link")
+    public void userWithDuplicatePendingMotSubscriptionsIsDirectedToConfirmEmailErrorPageWhenSelectingOldConfirmEmailLink(
+            String vrm, String email
+    ) throws IOException, InterruptedException {
+
+        // Given I am a user of the MOT reminders service with a pending subscription
+        motReminder.enterAndConfirmPendingReminderDetails(vrm, email);
+        String oldConfirmationId = motReminder.subscriptionDb.findConfirmationIdByVrmAndEmail(vrm, email);
+
+        // When I create another MOT reminder subscription with the same VRM and email
+        // And I select an old confirm email link
+        motReminder.enterAndConfirmPendingReminderDetails(vrm, email);
+        String newConfirmationId = motReminder.subscriptionDb.findConfirmationIdByVrmAndEmail(vrm, email);
+
+        // Then I am directed to the MOT Reminder not found error page
+        assertNotEquals(oldConfirmationId, newConfirmationId);
+        motReminder.navigateToEmailConfirmationExpectingErrorPage(oldConfirmationId);
+        // And I can still confirm my email address using newest email
+        motReminder.navigateToEmailConfirmationPage(newConfirmationId);
+    }
+
+    @Test(dataProvider = "dataProviderCreateMotReminderForMyVehicle",
             description = "A user who has previously unsubscribed from reminders will be displayed the unsubscribe error page")
     public void reminderThatHasBeenUnsubscribedDisplaysErrorPage(String vrm, String email) {
 
         //Given I am a user of the MOT reminders service with an active subscription
         //When I unsubscribe from the email reminder via the unsubscribe link
-        motReminder.subscribeAndConfrimReminder(vrm, email);
+        motReminder.subscribeToReminderAndConfrimEmail(vrm, email);
         String subscriptionId = motReminder.subscriptionDb.findUnsubscribeIdByVrmAndEmail(vrm, email);
         motReminder.unsubscribeFromReminder(vrm, email);
 

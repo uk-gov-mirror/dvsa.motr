@@ -3,7 +3,7 @@ package uk.gov.dvsa.motr.web.component.subscription.service;
 import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.notifications.service.NotifyService;
 import uk.gov.dvsa.motr.web.component.subscription.exception.InvalidConfirmationIdException;
-import uk.gov.dvsa.motr.web.component.subscription.helper.UnsubscriptionUrlHelper;
+import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.component.subscription.model.PendingSubscription;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.persistence.PendingSubscriptionRepository;
@@ -19,7 +19,7 @@ import static uk.gov.dvsa.motr.web.component.subscription.service.RandomIdGenera
 public class SubscriptionConfirmationService {
 
     private final NotifyService notifyService;
-    private final UnsubscriptionUrlHelper unsubscriptionUrlHelper;
+    private final UrlHelper urlHelper;
     private final PendingSubscriptionRepository pendingSubscriptionRepository;
     private final SubscriptionRepository subscriptionRepository;
 
@@ -28,13 +28,13 @@ public class SubscriptionConfirmationService {
             PendingSubscriptionRepository pendingSubscriptionRepository,
             SubscriptionRepository subscriptionRepository,
             NotifyService notifyService,
-            UnsubscriptionUrlHelper unsubscriptionUrlHelper
+            UrlHelper urlHelper
     ) {
 
         this.pendingSubscriptionRepository = pendingSubscriptionRepository;
         this.subscriptionRepository = subscriptionRepository;
         this.notifyService = notifyService;
-        this.unsubscriptionUrlHelper = unsubscriptionUrlHelper;
+        this.urlHelper = urlHelper;
     }
 
     public Subscription confirmSubscription(String confirmationId) throws InvalidConfirmationIdException {
@@ -90,6 +90,6 @@ public class SubscriptionConfirmationService {
                 subscription.getEmail(),
                 subscription.getVrm(),
                 subscription.getMotDueDate(),
-                unsubscriptionUrlHelper.build(subscription));
+                urlHelper.unsubscribeLink(subscription.getUnsubscribeId()));
     }
 }

@@ -2,10 +2,10 @@ package uk.gov.dvsa.motr.web.component.subscription.service;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 
 import uk.gov.dvsa.motr.notifications.service.NotifyService;
-import uk.gov.dvsa.motr.web.component.subscription.exception.SubscriptionAlreadyExistsException;
-import uk.gov.dvsa.motr.web.component.subscription.helper.EmailConfirmationUrlHelper;
+import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.component.subscription.model.PendingSubscription;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.persistence.PendingSubscriptionRepository;
@@ -14,6 +14,7 @@ import uk.gov.dvsa.motr.web.component.subscription.persistence.SubscriptionRepos
 import java.time.LocalDate;
 import java.util.Optional;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
@@ -30,11 +31,14 @@ public class PendingSubscriptionServiceTest {
     private final PendingSubscriptionRepository pendingSubscriptionRepository = mock(PendingSubscriptionRepository.class);
     private final SubscriptionRepository subscriptionRepository = mock(SubscriptionRepository.class);
     private final NotifyService notifyService = mock(NotifyService.class);
-    private final EmailConfirmationUrlHelper emailConfirmationUrlHelper = mock(EmailConfirmationUrlHelper.class);
+    private final UrlHelper urlHelper = mock(UrlHelper.class);
 
     private static final String TEST_VRM = "TEST-REG";
     private static final String EMAIL = "TEST@TEST.com";
+    private static final String CONFIRMATION_ID = "Asd";
     private static final String CONFIRMATION_LINK = "CONFIRMATION_LINK";
+    private static final String ALREADY_CONFIRMED_LINK = "ALREADY_CONFIRMED_LINK";
+    private static final String CONFIRMATION_PENDING_LINK = "CONFIRMATION_PENDING_LINK";
 
     private PendingSubscriptionService subscriptionService;
 
@@ -45,21 +49,24 @@ public class PendingSubscriptionServiceTest {
                 pendingSubscriptionRepository,
                 subscriptionRepository,
                 notifyService,
-                emailConfirmationUrlHelper
+                urlHelper
         );
 
-        when(emailConfirmationUrlHelper.build(any(PendingSubscription.class))).thenReturn(CONFIRMATION_LINK);
+        when(urlHelper.confirmEmailLink(CONFIRMATION_ID)).thenReturn(CONFIRMATION_LINK);
+        when(urlHelper.emailConfirmedNthTimeLink()).thenReturn(ALREADY_CONFIRMED_LINK);
+        when(urlHelper.emailConfirmationPendingLink()).thenReturn(CONFIRMATION_PENDING_LINK);
     }
 
     @Test
     public void saveSubscriptionCallsDbToSaveDetailsAndSendsNotification() throws Exception {
 
         withExpectedSubscription(empty());
-        when(pendingSubscriptionRepository.findByConfirmationId("Asd")).thenReturn(empty());
-        doNothing().when(notifyService).sendEmailAddressConfirmationEmail(EMAIL, CONFIRMATION_LINK);
+        when(pendingSubscriptionRepository.findByConfirmationId(CONFIRMATION_ID)).thenReturn(empty());
+        doNothing().when(notifyService).sendEmailAddressConfirmationEmail(EMAIL, CONFIRMATION_ID);
         LocalDate date = LocalDate.now();
 
-        this.subscriptionService.createPendingSubscription(TEST_VRM, EMAIL, date);
+        this.subscriptionService.createPendingSubscription(TEST_VRM, EMAIL, date, CONFIRMATION_ID);
+
         verify(pendingSubscriptionRepository, times(1)).save(any(PendingSubscription.class));
         verify(notifyService, times(1)).sendEmailAddressConfirmationEmail(EMAIL, CONFIRMATION_LINK);
     }
@@ -71,19 +78,40 @@ public class PendingSubscriptionServiceTest {
         doThrow(new RuntimeException()).when(pendingSubscriptionRepository).save(any(PendingSubscription.class));
         LocalDate date = LocalDate.now();
 
-        this.subscriptionService.createPendingSubscription(TEST_VRM, EMAIL, date);
+        this.subscriptionService.createPendingSubscription(TEST_VRM, EMAIL, date, CONFIRMATION_ID);
         verify(pendingSubscriptionRepository, times(1)).save(any(PendingSubscription.class));
         verifyZeroInteractions(notifyService);
     }
 
-    @Test(expected = SubscriptionAlreadyExistsException.class)
-    public void expectSubscriptionAlreadyExistsExceptionWhenActiveSubscriptionAlreadyExists() throws Exception {
+    @Test
+    public void handleSubscriptionWithExistingSubscriptionWillUpdateMotExpiryDate() throws Exception {
 
-        Optional<Subscription> existingSubscription = Optional.of(new Subscription());
-        withExpectedSubscription(existingSubscription);
+        withExpectedSubscription(Optional.of(new Subscription()));
         LocalDate date = LocalDate.now();
+        ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
 
-        subscriptionService.createPendingSubscription(TEST_VRM, EMAIL, date);
+        String redirect = this.subscriptionService.handlePendingSubscriptionCreation(TEST_VRM, EMAIL, date);
+
+        verify(subscriptionRepository, times(1)).save(subscriptionArgumentCaptor.capture());
+        assertEquals(subscriptionArgumentCaptor.getValue().getMotDueDate(), date);
+        assertEquals(ALREADY_CONFIRMED_LINK, redirect);
+        verifyZeroInteractions(pendingSubscriptionRepository);
+    }
+
+    @Test
+    public void handleSubscriptionWillCreateNewPendingSubscription() throws Exception {
+
+        withExpectedSubscription(empty());
+        LocalDate date = LocalDate.now();
+        ArgumentCaptor<PendingSubscription> pendingSubscriptionArgumentCaptor = ArgumentCaptor.forClass(PendingSubscription.class);
+
+        String redirect = this.subscriptionService.handlePendingSubscriptionCreation(TEST_VRM, EMAIL, date);
+
+        verify(pendingSubscriptionRepository, times(1)).save(pendingSubscriptionArgumentCaptor.capture());
+        assertEquals(pendingSubscriptionArgumentCaptor.getValue().getMotDueDate(), date);
+        assertEquals(pendingSubscriptionArgumentCaptor.getValue().getEmail(), EMAIL);
+        assertEquals(pendingSubscriptionArgumentCaptor.getValue().getVrm(), TEST_VRM);
+        assertEquals(CONFIRMATION_PENDING_LINK, redirect);
     }
 
     private void withExpectedSubscription(Optional<Subscription> subscription) {

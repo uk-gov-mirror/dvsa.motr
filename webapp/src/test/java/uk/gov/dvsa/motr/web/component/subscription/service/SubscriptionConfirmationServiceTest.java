@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import uk.gov.dvsa.motr.notifications.service.NotifyService;
 import uk.gov.dvsa.motr.web.component.subscription.exception.InvalidConfirmationIdException;
-import uk.gov.dvsa.motr.web.component.subscription.helper.UnsubscriptionUrlHelper;
+import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.component.subscription.model.PendingSubscription;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.persistence.PendingSubscriptionRepository;
@@ -30,7 +30,7 @@ public class SubscriptionConfirmationServiceTest {
     private final PendingSubscriptionRepository pendingSubscriptionRepository = mock(PendingSubscriptionRepository.class);
     private final SubscriptionRepository subscriptionRepository = mock(SubscriptionRepository.class);
     private final NotifyService notifyService = mock(NotifyService.class);
-    private final UnsubscriptionUrlHelper unsubscriptionUrlHelper = mock(UnsubscriptionUrlHelper.class);
+    private final UrlHelper urlHelper = mock(UrlHelper.class);
     private static final String CONFIRMATION_ID = "asdasdasd";
     private static final LocalDate DATE = LocalDate.now();
     private static final String VRM = "vrm";
@@ -45,7 +45,7 @@ public class SubscriptionConfirmationServiceTest {
                 pendingSubscriptionRepository,
                 subscriptionRepository,
                 notifyService,
-                unsubscriptionUrlHelper
+                urlHelper
         );
     }
 

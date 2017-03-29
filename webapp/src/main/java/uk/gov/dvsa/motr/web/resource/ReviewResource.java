@@ -1,9 +1,10 @@
 package uk.gov.dvsa.motr.web.resource;
 
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
-import uk.gov.dvsa.motr.web.component.subscription.exception.SubscriptionAlreadyExistsException;
 import uk.gov.dvsa.motr.web.component.subscription.service.PendingSubscriptionService;
+import uk.gov.dvsa.motr.web.cookie.EmailConfirmationParams;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
+import uk.gov.dvsa.motr.web.helper.DateDisplayHelper;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 import uk.gov.dvsa.motr.web.validator.EmailValidator;
 import uk.gov.dvsa.motr.web.validator.VrmValidator;
@@ -85,13 +86,24 @@ public class ReviewResource {
         VehicleDetails vehicle = this.motrSession.getVehicleDetailsFromSession();
 
         if (detailsAreValid(vrm, email) && null != vehicle) {
+            LocalDate expiryDate = vehicle.getMotExpiryDate();
+            String redirectUri = pendingSubscriptionService.handlePendingSubscriptionCreation(vrm, email, expiryDate);
 
-            createPendingSubscription(vrm, email, vehicle.getMotExpiryDate());
-
-            return redirect("email-confirmation-pending");
+            return redirectToSuccessScreen(redirectUri, vrm, email, expiryDate);
         } else {
             throw new NotFoundException();
         }
+    }
+
+    private Response redirectToSuccessScreen(String redirectUri, String vrm, String email, LocalDate motExpiryDate) {
+
+        EmailConfirmationParams params = new EmailConfirmationParams();
+        params.setExpiryDate(DateDisplayHelper.asDisplayDate(motExpiryDate));
+        params.setEmail(email);
+        params.setRegistration(vrm);
+        motrSession.setEmailConfirmationParams(params);
+
+        return redirect(redirectUri);
     }
 
     private boolean detailsAreValid(String vrm, String email) {
@@ -100,15 +112,5 @@ public class ReviewResource {
         EmailValidator emailValidator = new EmailValidator();
 
         return vrmValidator.isValid(vrm) && emailValidator.isValid(email);
-    }
-
-    private void createPendingSubscription(String vrm, String email, LocalDate expiryDate) throws Exception {
-
-        try {
-            pendingSubscriptionService.createPendingSubscription(vrm, email, expiryDate);
-
-        } catch (SubscriptionAlreadyExistsException subscriptionExistsException) {
-            throw new NotFoundException();
-        } 
     }
 }
