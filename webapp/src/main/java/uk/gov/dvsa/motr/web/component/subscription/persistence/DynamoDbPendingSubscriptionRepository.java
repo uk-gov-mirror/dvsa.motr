@@ -93,7 +93,7 @@ public class DynamoDbPendingSubscriptionRepository implements PendingSubscriptio
     @Override
     public void delete(PendingSubscription subscription) {
         PrimaryKey key = new PrimaryKey("vrm", subscription.getVrm(), "email", subscription.getEmail());
-        Map<String, Object> expressionAttributeValues = new HashMap<String, Object>();
+        Map<String, Object> expressionAttributeValues = new HashMap<>();
         expressionAttributeValues.put(":id", subscription.getConfirmationId());
 
         dynamoDb.getTable(tableName).deleteItem(

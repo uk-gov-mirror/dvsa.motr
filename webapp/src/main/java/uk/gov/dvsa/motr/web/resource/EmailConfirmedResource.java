@@ -58,8 +58,8 @@ public class EmailConfirmedResource {
 
         try {
             Subscription subscription = subscriptionConfirmationService.confirmSubscription(confirmationId);
+            motrSession.clear();
             addSubscriptionDetailsToSession(subscription);
-
             return RedirectResponseBuilder.redirect(urlHelper.emailConfirmedFirstTimeLink());
         } catch (InvalidConfirmationIdException e) {
             return Response.ok(renderer.render("subscription-error", emptyMap())).build();

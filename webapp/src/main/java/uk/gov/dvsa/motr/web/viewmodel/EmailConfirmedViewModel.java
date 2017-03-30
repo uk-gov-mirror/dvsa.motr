@@ -2,7 +2,7 @@ package uk.gov.dvsa.motr.web.viewmodel;
 
 public class EmailConfirmedViewModel {
 
-    private static String UNKNOWN_STRING = "Unknown";
+    private static final String UNKNOWN_STRING = "Unknown";
     private String registration;
     private String email;
     private String expiryDate;

@@ -5,7 +5,6 @@ import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 import uk.gov.dvsa.motr.web.validator.EmailValidator;
 
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -87,7 +86,7 @@ public class EmailResource {
         return Response.status(200).entity(renderer.render(EMAIL_TEMPLATE_NAME, map)).build();
     }
 
-    private void updateMapBasedOnReviewFlow(Map<String, Object> modelMap) throws URISyntaxException {
+    private void updateMapBasedOnReviewFlow(Map<String, Object> modelMap) {
 
         if (this.motrSession.visitingFromReviewPage()) {
             modelMap.put("continue_button_text", "Save and return to review");

@@ -29,7 +29,8 @@ import static org.mockito.Mockito.when;
 
 public class EmailConfirmedResourceTest {
 
-    private static final String UNSUBSCRIBE_ID = "asdadasd";
+    private static final String CONFIRMATION_ID = "asdadasd";
+    private static final String UNSUBSCRIBE_ID = "unsubscribe_id";
     private static final String EMAIL = "email";
     private static final String VRM = "vrm";
 
@@ -51,7 +52,7 @@ public class EmailConfirmedResourceTest {
         );
 
         Subscription subscription = new Subscription().setUnsubscribeId(UNSUBSCRIBE_ID).setEmail(EMAIL).setVrm(VRM).setMotDueDate(DATE);
-        when(pendingSubscriptionActivatorService.confirmSubscription(UNSUBSCRIBE_ID)).thenReturn(subscription);
+        when(pendingSubscriptionActivatorService.confirmSubscription(CONFIRMATION_ID)).thenReturn(subscription);
         when(urlHelper.emailConfirmedFirstTimeLink()).thenReturn("confirm-email/confirmed");
     }
 
@@ -60,9 +61,9 @@ public class EmailConfirmedResourceTest {
 
         ArgumentCaptor<EmailConfirmationParams> paramsArgumentCaptor = ArgumentCaptor.forClass(EmailConfirmationParams.class);
 
-        Response response = resource.confirmEmailGet(UNSUBSCRIBE_ID);
+        Response response = resource.confirmEmailGet(CONFIRMATION_ID);
 
-        verify(pendingSubscriptionActivatorService, times(1)).confirmSubscription(UNSUBSCRIBE_ID);
+        verify(pendingSubscriptionActivatorService, times(1)).confirmSubscription(CONFIRMATION_ID);
         verify(motrSession, times(1)).setEmailConfirmationParams(paramsArgumentCaptor.capture());
         assertEquals(302, response.getStatus());
         assertEquals("confirm-email/confirmed", response.getLocation().toString());
@@ -72,7 +73,15 @@ public class EmailConfirmedResourceTest {
     }
 
     @Test
-    public void subscriptionDetailsAreBeignShownIfPresentInTheSessionOnFirstVisit() throws Exception {
+    public void sessionIsClearedPendingSubscriptionConfirmed() throws Exception {
+
+        resource.confirmEmailGet(CONFIRMATION_ID);
+
+        verify(motrSession).clear();
+    }
+
+    @Test
+    public void subscriptionDetailsAreBeingShownIfPresentInTheSessionOnFirstVisit() throws Exception {
 
         motrSessionWillReturnValidPageParams();
 
@@ -95,9 +104,9 @@ public class EmailConfirmedResourceTest {
     @Test
     public void errorPageIsShownWhenSubscriptionDoesntExist() throws Exception {
 
-        when(pendingSubscriptionActivatorService.confirmSubscription(UNSUBSCRIBE_ID)).thenThrow(InvalidConfirmationIdException.class);
+        when(pendingSubscriptionActivatorService.confirmSubscription(CONFIRMATION_ID)).thenThrow(InvalidConfirmationIdException.class);
 
-        resource.confirmEmailGet(UNSUBSCRIBE_ID);
+        resource.confirmEmailGet(CONFIRMATION_ID);
 
         assertEquals("subscription-error", engine.getTemplate());
     }

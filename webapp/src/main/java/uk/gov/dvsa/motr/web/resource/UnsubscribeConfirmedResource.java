@@ -54,7 +54,7 @@ public class UnsubscribeConfirmedResource {
         DataLayerHelper helper = new DataLayerHelper();
         helper.putAttribute(VRM_KEY, params.getRegistration());
 
-        Map<String, Object> map = new HashMap<>();;
+        Map<String, Object> map = new HashMap<>();
         map.putAll(helper.formatAttributes());
         map.put("viewModel", viewModel);
         return renderer.render("unsubscribe-confirmation", map);
