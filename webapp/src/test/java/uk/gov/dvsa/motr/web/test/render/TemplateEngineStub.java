@@ -26,4 +26,8 @@ public class TemplateEngineStub implements TemplateEngine {
         return RESPONSE;
     }
 
+    @Override
+    public void precompile(String templateName) {
+
+    }
 }

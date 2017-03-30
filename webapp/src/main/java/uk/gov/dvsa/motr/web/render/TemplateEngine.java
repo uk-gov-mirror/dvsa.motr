@@ -13,4 +13,10 @@ public interface TemplateEngine {
      * @return rendered content
      */
     String render(String templateName, Object context);
+    
+    /**
+     * Precompiles templates by templateName
+     * @param templateName
+     */
+    void precompile(String templateName);
 }

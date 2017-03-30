@@ -26,12 +26,12 @@ public class MotrWebHandler {
 
         MotrWebApplication application = new MotrWebApplication();
         handler = JerseyLambdaContainerHandler.getAwsProxyHandler(application);
-        handler.getApplicationHandler().getServiceLocator().getService(LambdaWarmUp.class).warmUp();
     }
 
     /**
      * Executes upon request. Request can either be PING request coming from Cloudwatch Events or HTTP request
      * proxies through API Gateway
+     *
      * @param request request envelope
      * @param context lambda invocation context
      * @return null in the case of Ping request, AwsProxyResponse for HTTP requests
@@ -41,6 +41,7 @@ public class MotrWebHandler {
         try {
 
             if (request.isPing()) {
+                handler.getApplicationHandler().getServiceLocator().getService(LambdaWarmUp.class).warmUp();
                 EventLogger.logEvent(new PingEvent().setColdStart(ColdStartMarker.isSet()));
                 return null;
             }

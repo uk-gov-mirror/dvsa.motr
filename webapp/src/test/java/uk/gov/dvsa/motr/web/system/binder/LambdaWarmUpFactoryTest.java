@@ -40,7 +40,6 @@ public class LambdaWarmUpFactoryTest {
         return new LambdaWarmUpBinder.LambdaWarmUpFactory(
                 mock(Provider.class),
                 mock(Provider.class),
-                mock(Provider.class),
                 config).provide();
     }
 }

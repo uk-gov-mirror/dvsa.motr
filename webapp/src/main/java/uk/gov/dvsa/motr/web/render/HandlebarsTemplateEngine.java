@@ -45,13 +45,6 @@ public class HandlebarsTemplateEngine implements TemplateEngine {
                 .registerHelper(URL_HELPER, urlHelper(baseUrl))
                 .with(new ConcurrentMapTemplateCache());
 
-
-        precompile("master");
-        precompile("home");
-        precompile("vrm");
-        precompile("email");
-        precompile("review");
-        precompile("subscription-confirmation");
     }
 
     @Override
@@ -64,7 +57,7 @@ public class HandlebarsTemplateEngine implements TemplateEngine {
         }
     }
 
-    private void precompile(String templateName) {
+    public void precompile(String templateName) {
 
         try {
             logger.debug("precompiling: {}", templateName);
