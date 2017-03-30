@@ -22,6 +22,9 @@ public class SubscriptionConfirmationPage extends Page {
     @FindBy(id = "expiry-date")
     private WebElement expiryDate;
 
+    @FindBy(id = "sign-up-for-another-reminder")
+    private WebElement signupForAnotherReminderLink;
+
     @Override
     protected void selfVerify() {
 
@@ -48,6 +51,12 @@ public class SubscriptionConfirmationPage extends Page {
     public String getHeaderTitle() {
 
         return headerTitle.getText();
+    }
+
+    public HomePage clickSignUpForAnotherReminder() {
+
+        signupForAnotherReminderLink.click();
+        return new HomePage();
     }
 
     public boolean areDisplayedDetailsCorrect(String email, String vrm) {
