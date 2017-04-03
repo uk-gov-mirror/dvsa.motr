@@ -6,6 +6,7 @@ import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClientException;
 import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
+import uk.gov.dvsa.motr.web.eventlog.HoneyPotTriggeredEvent;
 import uk.gov.dvsa.motr.web.eventlog.vehicle.VehicleDetailsExceptionEvent;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 import uk.gov.dvsa.motr.web.validator.MotDueDateValidator;
@@ -77,7 +78,14 @@ public class VrmResource {
     }
 
     @POST
-    public Response vrmPagePost(@FormParam("regNumber") String formParamVrm) throws Exception {
+    public Response vrmPagePost(@FormParam("regNumber") String formParamVrm, @FormParam("honey") String formParamHoney) throws Exception {
+
+        if (formParamHoney != null) {
+            if (!formParamHoney.isEmpty()) {
+                EventLogger.logEvent(new HoneyPotTriggeredEvent());
+                return redirect("email-confirmation-pending");
+            }
+        }
 
         String vrm = normalizeFormInputVrm(formParamVrm);
 
@@ -141,7 +149,7 @@ public class VrmResource {
         return vehicle.isPresent() && motDueDateValidator.isDueDateValid(vehicle.get().getMotExpiryDate());
     }
 
-    private void updateMapBasedOnReviewFlow(Map<String, Object> modelMap)  {
+    private void updateMapBasedOnReviewFlow(Map<String, Object> modelMap) {
 
         if (this.motrSession.visitingFromReviewPage()) {
             modelMap.put("continue_button_text", "Save and return to review");
