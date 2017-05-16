@@ -26,6 +26,11 @@ public class DynamoDbIntegrationHelper {
         return lookupProperty("test.dynamoDB.integration.table.pending_subscription");
     }
 
+    public static String cancelledSubscriptionTableName() {
+
+        return lookupProperty("test.dynamoDB.integration.table.cancelled_subscription");
+    }
+
     /**
      * Returns region for DynamoDB client
      *
