@@ -72,7 +72,6 @@ dependencies {
 
     compile 'com.github.szhem:log4j-json-layout:b657ab3466'
     compile 'com.amazonaws:aws-java-sdk-dynamodb:1.11.98'
-    compile 'javax.mail:mail:1.4.7'
     compile 'org.glassfish.jersey.media:jersey-media-json-jackson:2.25'
     compile 'uk.gov.service.notify:notifications-java-client:3.0.0-RELEASE'
     compile 'commons-codec:commons-codec:1.10'

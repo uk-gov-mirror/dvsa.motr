@@ -27,6 +27,11 @@ public class EmailValidatorTest {
                 {"@domain.com"},
                 {"email.domain.com"},
                 {"email@domain@domain.com"},
+                {"email@domain.;"},
+                {"email@domain"},
+                {"email@domain..com"},
+                {"email@domain.123"},
+                {"email@domain.0123456789012345678901234567890123456789012345678901234567890123.com"},
                 {"email @domain.com"}
         };
     }
@@ -37,8 +42,11 @@ public class EmailValidatorTest {
                 {"test@test.com"},
                 {"__@domain.com"},
                 {"email@domain.co.jp"},
-                {"firstname-lastname@domain.com"},
-                {"email@123.123.123.123"}
+                {"email@do©ßmain.com"},
+                {"email@d©ßain.co.uk"},
+                {"email@例え.テスト"},
+                {"email@domain.012345678901234567890123456789012345678901234567890123456789012.com"},
+                {"firstname-lastname@domain.com"}
         };
     }
 
