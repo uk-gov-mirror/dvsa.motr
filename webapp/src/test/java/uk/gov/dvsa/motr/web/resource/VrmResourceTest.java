@@ -33,6 +33,7 @@ public class VrmResourceTest {
     private static final String INVALID_REG_NUMBER = "________";
     private static final String VALID_REG_NUMBER = "FP12345";
     private static final String SYSTEM_ERROR_VRM = "ABC123";
+    private static final String HONEY_POT = "";
 
     private VehicleDetailsClient client;
     private MotDueDateValidator motDueDateValidator;
@@ -65,7 +66,7 @@ public class VrmResourceTest {
 
         when(client.fetch(eq(VALID_REG_NUMBER))).thenReturn(Optional.of(new VehicleDetails()));
         when(motDueDateValidator.isDueDateValid(any())).thenReturn(true);
-        Response response = resource.vrmPagePost(VALID_REG_NUMBER);
+        Response response = resource.vrmPagePost(VALID_REG_NUMBER, HONEY_POT);
         verify(motrSession, times(1)).setVehicleDetails(any(VehicleDetails.class));
         assertEquals(302, response.getStatus());
     }
@@ -73,7 +74,7 @@ public class VrmResourceTest {
     @Test
     public void postWithInvalidVrmResultsInVrmTemplateAndInlineErrorMessage() throws Exception {
 
-        resource.vrmPagePost(INVALID_REG_NUMBER);
+        resource.vrmPagePost(INVALID_REG_NUMBER, HONEY_POT);
 
         assertEquals("vrm", templateEngine.getTemplate());
 
@@ -95,7 +96,7 @@ public class VrmResourceTest {
     public void postWithValidVrmWhenVehicleServiceReturnsServiceErrorResultsInVrmTemplateAndSystemErrorMessage() throws Exception {
 
         doThrow(VehicleDetailsClientException.class).when(client).fetch(eq(SYSTEM_ERROR_VRM));
-        resource.vrmPagePost(SYSTEM_ERROR_VRM);
+        resource.vrmPagePost(SYSTEM_ERROR_VRM, HONEY_POT);
 
         assertEquals("vrm", templateEngine.getTemplate());
 
@@ -116,7 +117,7 @@ public class VrmResourceTest {
 
         when(client.fetch(eq(VALID_REG_NUMBER))).thenReturn(Optional.empty());
 
-        resource.vrmPagePost(VALID_REG_NUMBER);
+        resource.vrmPagePost(VALID_REG_NUMBER, HONEY_POT);
 
         HashMap<String, Object> expectedContext = new HashMap<>();
         expectedContext.put("message", "Check that you’ve typed in the correct registration number.<br/>" +
@@ -139,7 +140,7 @@ public class VrmResourceTest {
         when(client.fetch(eq(VALID_REG_NUMBER))).thenReturn(Optional.of(new VehicleDetails()));
         when(motDueDateValidator.isDueDateValid(any())).thenReturn(false);
 
-        resource.vrmPagePost(VALID_REG_NUMBER);
+        resource.vrmPagePost(VALID_REG_NUMBER, HONEY_POT);
 
         HashMap<String, Object> expectedContext = new HashMap<>();
         expectedContext.put("message", "Check that you’ve typed in the correct registration number.<br/>" +
@@ -164,7 +165,7 @@ public class VrmResourceTest {
         when(motDueDateValidator.isDueDateValid(any())).thenReturn(true);
 
         resource = new VrmResource(motrSession, templateEngine, client, motDueDateValidator);
-        Response response = resource.vrmPagePost(VALID_REG_NUMBER);
+        Response response = resource.vrmPagePost(VALID_REG_NUMBER, HONEY_POT);
 
         assertEquals("review", response.getHeaders().get("Location").get(0).toString());
         assertEquals(302, response.getStatus());
@@ -179,5 +180,19 @@ public class VrmResourceTest {
 
         Map context = templateEngine.getContext(Map.class);
         assertEquals("VRZ", context.get("vrm"));
+    }
+
+    @Test
+    public void whenHoneyPotValueIsNotEmpty_thenRedirectToEmailConfirmationPendingPage() throws Exception {
+
+        when(motrSession.visitingFromReviewPage()).thenReturn(true);
+        when(client.fetch(eq(VALID_REG_NUMBER))).thenReturn(Optional.of(new VehicleDetails()));
+        when(motDueDateValidator.isDueDateValid(any())).thenReturn(true);
+
+        resource = new VrmResource(motrSession, templateEngine, client, motDueDateValidator);
+        Response response = resource.vrmPagePost(VALID_REG_NUMBER, "Honey");
+
+        assertEquals("email-confirmation-pending", response.getHeaders().get("Location").get(0).toString());
+        assertEquals(302, response.getStatus());
     }
 }
