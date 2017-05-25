@@ -82,7 +82,6 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
         return subscription;
     }
 
-
     public Optional<Subscription> findSubscriptionByVrmAndEmail(String vrm, String email) {
 
         QuerySpec query = new QuerySpec()
