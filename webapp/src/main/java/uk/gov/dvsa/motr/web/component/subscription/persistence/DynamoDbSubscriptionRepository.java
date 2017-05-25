@@ -69,7 +69,7 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
 
     @Override
     public Optional<Subscription> findByVrmAndEmail(String vrm, String email) {
-        return findSubsctiptionByVrmAndEmail(vrm, email);
+        return findSubscriptionByVrmAndEmail(vrm, email);
     }
 
     private Subscription mapItemToSubscription(Item item) {
@@ -83,7 +83,7 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
     }
 
 
-    public Optional<Subscription> findSubsctiptionByVrmAndEmail(String vrm, String email) {
+    public Optional<Subscription> findSubscriptionByVrmAndEmail(String vrm, String email) {
 
         QuerySpec query = new QuerySpec()
                 .withKeyConditionExpression("vrm = :vrm AND email = :email")

@@ -38,7 +38,7 @@ public class VehicleDetailsClientTest {
 
     private static final String MOT_DUE_DATE_PLACEHOLDER = "MOT-DUE-DATE-PLACEHOLDER";
 
-    private static final String READ_TIMEOUT = "10000";
+    private static final String READ_TIMEOUT = "1000";
 
     @Rule
     public WireMockRule vehicleDetailsEndpoint = new WireMockRule(8098);
@@ -178,7 +178,7 @@ public class VehicleDetailsClientTest {
     private VehicleDetailsClient withDefaultClient() {
 
         final String endpointUri = "http://localhost:8098/vehicle-details-endpoint/{registration}";
-        VehicleDetailsClientFactory clientFactory = new VehicleDetailsClientFactory(endpointUri, "api-key", "10", "10");
+        VehicleDetailsClientFactory clientFactory = new VehicleDetailsClientFactory(endpointUri, "api-key", "1", "10");
         return clientFactory.provide();
     }
 
