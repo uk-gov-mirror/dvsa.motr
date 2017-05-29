@@ -41,6 +41,9 @@ public class MotReminderTests extends BaseTest {
 
         //Then my MOT reminder subscription has been cancelled
         assertEquals(unsubscribeConfirmed.getBannerTitle(), "You’ve unsubscribed");
+
+        //And I am shown a link to complete the unsubscribe survey
+        assertTrue(unsubscribeConfirmed.isSurveyLinkDisplayed());
     }
 
     @Test(dataProvider = "dataProviderCreateMotReminderForMyVehicle",
