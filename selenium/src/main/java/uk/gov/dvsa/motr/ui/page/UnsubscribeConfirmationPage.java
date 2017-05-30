@@ -13,6 +13,9 @@ public class UnsubscribeConfirmationPage extends Page {
     @FindBy(className = "banner__heading-large")
     private WebElement bannerTitle;
 
+    @FindBy(id = "unsubscribe-survey")
+    private WebElement surveyLink;
+
     @Override
     protected void selfVerify() {
 
@@ -39,5 +42,10 @@ public class UnsubscribeConfirmationPage extends Page {
     public String getBannerTitle() {
 
         return bannerTitle.getText();
+    }
+
+    public boolean isSurveyLinkDisplayed() {
+
+        return surveyLink.isDisplayed();
     }
 }
