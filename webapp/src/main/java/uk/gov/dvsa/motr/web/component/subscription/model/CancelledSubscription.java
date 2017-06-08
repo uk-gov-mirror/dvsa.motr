@@ -7,6 +7,8 @@ public class CancelledSubscription {
 
     private String email;
 
+    private String motTestNumber;
+
     public String getUnsubscribeId() {
         return unsubscribeId;
     }
@@ -31,6 +33,15 @@ public class CancelledSubscription {
 
     public CancelledSubscription setEmail(String email) {
         this.email = email;
+        return this;
+    }
+
+    public String getMotTestNumber() {
+        return motTestNumber;
+    }
+
+    public CancelledSubscription setMotTestNumber(String motTestNumber) {
+        this.motTestNumber = motTestNumber;
         return this;
     }
 }

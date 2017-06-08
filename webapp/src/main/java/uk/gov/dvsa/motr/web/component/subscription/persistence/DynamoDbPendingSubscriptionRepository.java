@@ -2,12 +2,17 @@ package uk.gov.dvsa.motr.web.component.subscription.persistence;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
+
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
+import com.amazonaws.services.dynamodbv2.document.Index;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.ItemCollection;
 import com.amazonaws.services.dynamodbv2.document.PrimaryKey;
-import com.amazonaws.services.dynamodbv2.document.ScanOutcome;
-import com.amazonaws.services.dynamodbv2.document.spec.ScanSpec;
+import com.amazonaws.services.dynamodbv2.document.QueryOutcome;
+import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
+import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
+
+
 
 import uk.gov.dvsa.motr.web.component.subscription.model.PendingSubscription;
 import uk.gov.dvsa.motr.web.helper.SystemVariableParam;
@@ -16,6 +21,7 @@ import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 
@@ -45,24 +51,20 @@ public class DynamoDbPendingSubscriptionRepository implements PendingSubscriptio
     @Override
     public Optional<PendingSubscription> findByConfirmationId(String id) {
 
-        HashMap<String, Object> valueMap = new HashMap<>();
-        HashMap<String, String> nameMap = new HashMap<>();
+        QuerySpec query = new QuerySpec()
+                .withKeyConditionExpression("id = :id")
+                .withValueMap(new ValueMap().withString(":id", id));
 
-        valueMap.put(":id", id);
-        nameMap.put("#id", "id");
+        Index table = dynamoDb.getTable(tableName).getIndex("id-gsi");
 
-        ScanSpec scanSpec = new ScanSpec()
-                .withFilterExpression("#id = :id")
-                .withNameMap(nameMap)
-                .withValueMap(valueMap);
+        ItemCollection<QueryOutcome> items = table.query(query);
+        Iterator<Item> resultIterator = items.iterator();
 
-        ItemCollection<ScanOutcome> result = dynamoDb.getTable(tableName).scan(scanSpec);
-
-        if (!result.iterator().hasNext()) {
+        if (!resultIterator.hasNext()) {
             return Optional.empty();
         }
 
-        Item item = result.iterator().next();
+        Item item = resultIterator.next();
 
         return Optional.of(mapItemToSubscription(item));
     }
@@ -74,6 +76,7 @@ public class DynamoDbPendingSubscriptionRepository implements PendingSubscriptio
         subscription.setVrm(item.getString("vrm"));
         subscription.setEmail(item.getString("email"));
         subscription.setMotDueDate(LocalDate.parse(item.getString("mot_due_date")));
+        subscription.setMotTestNumber(item.getString("mot_test_number"));
         return subscription;
     }
 
@@ -85,6 +88,7 @@ public class DynamoDbPendingSubscriptionRepository implements PendingSubscriptio
                 .withString("email", subscription.getEmail())
                 .withString("mot_due_date", subscription.getMotDueDate().format(DateTimeFormatter.ISO_LOCAL_DATE))
                 .withString("mot_due_date_md", subscription.getMotDueDate().format(DateTimeFormatter.ofPattern("MM-dd")))
+                .withString("mot_test_number", subscription.getMotTestNumber())
                 .withString("created_at", ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT));
 
         dynamoDb.getTable(tableName).putItem(item);

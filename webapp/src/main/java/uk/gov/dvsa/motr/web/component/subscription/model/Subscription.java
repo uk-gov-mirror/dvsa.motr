@@ -12,6 +12,8 @@ public class Subscription {
 
     private LocalDate motDueDate;
 
+    private String motTestNumber;
+
     public String getUnsubscribeId() {
         return unsubscribeId;
     }
@@ -45,6 +47,15 @@ public class Subscription {
 
     public Subscription setMotDueDate(LocalDate motDueDate) {
         this.motDueDate = motDueDate;
+        return this;
+    }
+
+    public String getMotTestNumber() {
+        return this.motTestNumber;
+    }
+
+    public Subscription setMotTestNumber(String motTestNumber) {
+        this.motTestNumber = motTestNumber;
         return this;
     }
 }

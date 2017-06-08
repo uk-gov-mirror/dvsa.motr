@@ -87,7 +87,8 @@ public class ReviewResource {
 
         if (detailsAreValid(vrm, email) && null != vehicle) {
             LocalDate expiryDate = vehicle.getMotExpiryDate();
-            String redirectUri = pendingSubscriptionService.handlePendingSubscriptionCreation(vrm, email, expiryDate);
+            String redirectUri =
+                    pendingSubscriptionService.handlePendingSubscriptionCreation(vrm, email, expiryDate, vehicle.getMotTestNumber());
 
             return redirectToSuccessScreen(redirectUri, vrm, email, expiryDate);
         } else {

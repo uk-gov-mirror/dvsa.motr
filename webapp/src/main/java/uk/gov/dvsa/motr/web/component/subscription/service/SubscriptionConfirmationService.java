@@ -76,7 +76,8 @@ public class SubscriptionConfirmationService {
                 .setUnsubscribeId(generateId())
                 .setVrm(pendingSubscription.getVrm())
                 .setEmail(pendingSubscription.getEmail())
-                .setMotDueDate(pendingSubscription.getMotDueDate());
+                .setMotDueDate(pendingSubscription.getMotDueDate())
+                .setMotTestNumber(pendingSubscription.getMotTestNumber());
 
         subscriptionRepository.save(subscription);
         pendingSubscriptionRepository.delete(pendingSubscription);

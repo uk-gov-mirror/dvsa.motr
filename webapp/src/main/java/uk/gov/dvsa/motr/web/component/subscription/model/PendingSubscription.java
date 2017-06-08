@@ -12,6 +12,8 @@ public class PendingSubscription {
 
     private LocalDate motDueDate;
 
+    private String motTestNumber;
+
     public String getConfirmationId() {
         return confirmationId;
     }
@@ -46,6 +48,15 @@ public class PendingSubscription {
 
     public PendingSubscription setMotDueDate(LocalDate motDueDate) {
         this.motDueDate = motDueDate;
+        return this;
+    }
+
+    public String getMotTestNumber() {
+        return this.motTestNumber;
+    }
+
+    public PendingSubscription setMotTestNumber(String motTestNumber) {
+        this.motTestNumber = motTestNumber;
         return this;
     }
 }

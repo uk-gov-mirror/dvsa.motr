@@ -12,6 +12,8 @@ public class CancelledSubscriptionItem {
 
     private String email = RandomDataUtil.email();
 
+    private String motTestNumber = RandomDataUtil.motTestNumber();
+
     public String getUnsubscribeId() {
         return unsubscribeId;
     }
@@ -24,12 +26,17 @@ public class CancelledSubscriptionItem {
         return email;
     }
 
+    public String getMotTestNumber() {
+        return motTestNumber;
+    }
+
     @Override
     public String toString() {
         return "CancelledSubscriptionItem{" +
                 "unsubscribeId='" + unsubscribeId + '\'' +
                 ", vrm='" + vrm + '\'' +
                 ", email='" + email + '\'' +
+                ", motTestNumber='" + motTestNumber + '\'' +
                 '}';
     }
 }

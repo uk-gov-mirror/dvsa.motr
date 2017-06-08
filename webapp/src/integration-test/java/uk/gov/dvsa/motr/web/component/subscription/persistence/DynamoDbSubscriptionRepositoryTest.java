@@ -51,6 +51,7 @@ public class DynamoDbSubscriptionRepositoryTest {
         assertEquals(actualSubscription.getEmail(), expectedSubscription.getEmail());
         assertEquals(actualSubscription.getVrm(), expectedSubscription.getVrm());
         assertEquals(actualSubscription.getMotDueDate(), expectedSubscription.getMotDueDate());
+        assertEquals(actualSubscription.getMotTestNumber(), expectedSubscription.getMotTestNumber());
     }
 
     @Test
@@ -63,7 +64,9 @@ public class DynamoDbSubscriptionRepositoryTest {
                 .setUnsubscribeId(subscriptionItem.getUnsubscribeId())
                 .setEmail(subscriptionItem.getEmail())
                 .setVrm(subscriptionItem.getVrm())
-                .setMotDueDate(subscriptionItem.getMotDueDate());
+                .setMotDueDate(subscriptionItem.getMotDueDate())
+                .setMotTestNumber(subscriptionItem.getMotTestNumber());
+
 
         repo.save(subscription);
 
@@ -76,6 +79,7 @@ public class DynamoDbSubscriptionRepositoryTest {
         assertEquals(subscriptionItem.getEmail(), actualSubscription.getEmail());
         assertEquals(subscriptionItem.getVrm(), actualSubscription.getVrm());
         assertEquals(subscriptionItem.getMotDueDate(), actualSubscription.getMotDueDate());
+        assertEquals(subscriptionItem.getMotTestNumber(), actualSubscription.getMotTestNumber());
     }
 
 
@@ -89,7 +93,8 @@ public class DynamoDbSubscriptionRepositoryTest {
                 .setUnsubscribeId(subscriptionItem.getUnsubscribeId())
                 .setEmail(subscriptionItem.getEmail())
                 .setVrm(subscriptionItem.getVrm())
-                .setMotDueDate(subscriptionItem.getMotDueDate());
+                .setMotDueDate(subscriptionItem.getMotDueDate())
+                .setMotTestNumber(subscriptionItem.getMotTestNumber());
 
         repo.save(subscription);
 
@@ -118,6 +123,7 @@ public class DynamoDbSubscriptionRepositoryTest {
         assertEquals(actualSubscription.getEmail(), expectedSubscription.getEmail());
         assertEquals(actualSubscription.getVrm(), expectedSubscription.getVrm());
         assertEquals(actualSubscription.getMotDueDate(), expectedSubscription.getMotDueDate());
+        assertEquals(actualSubscription.getMotTestNumber(), expectedSubscription.getMotTestNumber());
     }
 
     @Test
@@ -142,7 +148,8 @@ public class DynamoDbSubscriptionRepositoryTest {
         subscription
                 .setUnsubscribeId(sub.getUnsubscribeId())
                 .setEmail(sub.getEmail())
-                .setVrm(sub.getVrm());
+                .setVrm(sub.getVrm())
+                .setMotTestNumber(sub.getMotTestNumber());
 
         repo.delete(subscription);
 

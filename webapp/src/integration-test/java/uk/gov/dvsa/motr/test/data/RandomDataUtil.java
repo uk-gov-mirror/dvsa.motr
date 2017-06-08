@@ -25,4 +25,8 @@ public class RandomDataUtil {
                 "-" + "1" + RandomStringUtils.randomNumeric(1));
     }
 
+    public static String motTestNumber() {
+        return random(6, false, true);
+    }
+
 }
