@@ -112,6 +112,7 @@ public class DefaultLoader implements Loader {
                     EventLogger.logEvent(new ItemSuccess()
                             .setVrm(subscription.getVrm())
                             .setEmail(subscription.getEmail())
+                            .setMotTestNumber(subscription.getMotTestNumber())
                             .setDueDate(subscription.getMotDueDate())
                             .setId(subscription.getId())
                     );

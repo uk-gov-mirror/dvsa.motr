@@ -80,6 +80,7 @@ public class DynamoDbProducer implements SubscriptionProducer {
                         .setId(item.getString("id"))
                         .setVrm(item.getString("vrm"))
                         .setEmail(item.getString("email"))
+                        .setMotTestNumber(item.getString("mot_test_number"))
                         .setMotDueDate(motDueDate);
 
             }
