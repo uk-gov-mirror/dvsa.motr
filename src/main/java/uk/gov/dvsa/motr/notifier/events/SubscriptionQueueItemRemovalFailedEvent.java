@@ -16,6 +16,11 @@ public class SubscriptionQueueItemRemovalFailedEvent extends SubscriptionProcess
         return this;
     }
 
+    public SubscriptionQueueItemRemovalFailedEvent setMotTestNumber(String motTestNumber) {
+        params.put("mot-test-number", motTestNumber);
+        return this;
+    }
+
     public SubscriptionQueueItemRemovalFailedEvent setExpiryDate(LocalDate expiryDate) {
 
         params.put("expiry-date", expiryDate.toString());

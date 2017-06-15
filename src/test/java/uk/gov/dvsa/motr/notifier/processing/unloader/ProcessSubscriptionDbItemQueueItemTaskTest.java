@@ -33,6 +33,7 @@ public class ProcessSubscriptionDbItemQueueItemTaskTest {
         subscriptionQueueItemToProcess = new SubscriptionQueueItem().setId("TEST-ID")
                 .setMotDueDate(requestDate)
                 .setVrm("12345")
+                .setMotTestNumber("test-mot-number-123")
                 .setEmail("test@test.com");
 
         processSubscriptionTask = new ProcessSubscriptionTask(

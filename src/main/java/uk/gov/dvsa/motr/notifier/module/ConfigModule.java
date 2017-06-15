@@ -46,7 +46,7 @@ import static uk.gov.dvsa.motr.notifier.SystemVariable.GOV_NOTIFY_API_TOKEN;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.LOG_LEVEL;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MESSAGE_RECEIVE_TIMEOUT;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MESSAGE_VISIBILITY_TIMEOUT;
-import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_TEST_REMINDER_INFO_API_URI;
+import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_API_MOT_TEST_NUMBER_URI;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_TEST_REMINDER_INFO_TOKEN;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.ONE_MONTH_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.REGION;
@@ -132,7 +132,7 @@ public class ConfigModule extends AbstractModule {
         clientConfig = clientConfig.property(ClientProperties.CONNECT_TIMEOUT, timeoutInMs);
         clientConfig = clientConfig.property(ClientProperties.READ_TIMEOUT, timeoutInMs);
 
-        return new VehicleDetailsClient(clientConfig, config.getValue(MOT_TEST_REMINDER_INFO_API_URI),
+        return new VehicleDetailsClient(clientConfig, config.getValue(MOT_API_MOT_TEST_NUMBER_URI),
                 config.getValue(MOT_TEST_REMINDER_INFO_TOKEN));
     }
 

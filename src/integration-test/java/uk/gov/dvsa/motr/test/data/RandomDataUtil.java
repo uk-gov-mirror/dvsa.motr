@@ -14,6 +14,10 @@ public class RandomDataUtil {
                 "@" + UUID.randomUUID().toString().replaceAll("[-]", "") + ".com";
     }
 
+    public static String motTestNumber() {
+        return random(6, false, true);
+    }
+
     public static String vrm() {
         return random(3, true, false) +
                 random(4, false, true);

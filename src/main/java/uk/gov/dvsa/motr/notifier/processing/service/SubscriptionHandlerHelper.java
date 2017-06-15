@@ -22,4 +22,12 @@ public class SubscriptionHandlerHelper {
 
         return requestDate.plusDays(14).equals(vehicleDetailsMotExpiryDate);
     }
+
+    public static boolean motTestNumberUpdateRequired(String subscriptionMotTestNumber, String vehicleDetailsMotTestNumber) {
+        return !subscriptionMotTestNumber.equals(vehicleDetailsMotTestNumber);
+    }
+
+    public static boolean vrmUpdateRequired(String subscriptionVrm, String vehicleDetailsVrm) {
+        return !subscriptionVrm.equals(vehicleDetailsVrm);
+    }
 }

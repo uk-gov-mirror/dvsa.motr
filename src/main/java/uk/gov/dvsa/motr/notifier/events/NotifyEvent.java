@@ -18,6 +18,12 @@ public abstract class NotifyEvent extends Event {
         return this;
     }
 
+    public NotifyEvent setMotTestNumber(String motTestNumber) {
+        
+        params.put("mot-test-number", motTestNumber);
+        return this;
+    }
+
     public NotifyEvent setExpiryDate(LocalDate expiryDate) {
 
         params.put("expiry-date", expiryDate.toString());

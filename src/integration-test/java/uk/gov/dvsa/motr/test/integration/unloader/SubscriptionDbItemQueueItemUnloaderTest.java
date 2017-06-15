@@ -44,10 +44,9 @@ public class SubscriptionDbItemQueueItemUnloaderTest {
     public final EnvironmentVariables environmentVariables = new TestEnvironmentVariables();
 
     private static final LocalDate MOCK_API_RANDOM_VEHICLE_DATE = LocalDate.of(2026, 3, 9);
-    private static final LocalDate DATE_NOT_MATCHING_VEHICLE_MOCK = LocalDate.of(2017, 5, 15);
+    private static final LocalDate DATE_NOT_MATCHING_VEHICLE_MOCK = LocalDate.of(2015, 5, 15);
     private static final String SPECIFIC_MOCKED_VEHICLE_VRM = "LOY-500";
-    private static final LocalDate MOCK_API_SPECIFIC_VEHICLE_DATE = LocalDate.of(2017, 3, 14);
-    private static final String MOCK_API_NOT_FOUND_VRM = "12345";
+    private static final LocalDate MOCK_API_SPECIFIC_VEHICLE_DATE = LocalDate.of(2016, 11, 26);
 
     private ObjectMapper jsonMapper = new ObjectMapper();
     private LoaderHelper loaderHelper;
@@ -75,19 +74,10 @@ public class SubscriptionDbItemQueueItemUnloaderTest {
     public void whenAnItemIsInTheDb_TheLoaderAddsToQueue_ThenTheNotifierSuccessfullyProcessesIt()
             throws IOException, InterruptedException, ExecutionException, NotificationClientException {
 
-        //add a subscription item to the subscription table
         subscriptionItem = new SubscriptionItem();
         subscriptionItem.setMotDueDate(MOCK_API_RANDOM_VEHICLE_DATE);
-        fixture.table(new SubscriptionTable().item(subscriptionItem)).run();
 
-        //invoke the subscription loader with correct date to load items from db into queue
-        String testTime = subscriptionItem.getMotDueDate().minusMonths(1) + "T12:00:00Z";
-        loaderHelper.invokeLoader(buildLoaderRequest(testTime));
-
-        //invoke the notifiers handle event with correct date to read items from the queue
-        NotifierReport report = eventHandler.handle(new Object(), buildContext());
-
-        assertEquals(1, report.getSuccessfullyProcessed());
+        saveAndProcessSubscriptionItem(subscriptionItem);
     }
 
     @Test
@@ -96,30 +86,82 @@ public class SubscriptionDbItemQueueItemUnloaderTest {
 
         subscriptionItem = new SubscriptionItem();
         subscriptionItem
-                .setMotDueDate(DATE_NOT_MATCHING_VEHICLE_MOCK)
-                .setVrm(SPECIFIC_MOCKED_VEHICLE_VRM);
-        fixture.table(new SubscriptionTable().item(subscriptionItem)).run();
+            .setMotDueDate(DATE_NOT_MATCHING_VEHICLE_MOCK)
+            .setVrm(SPECIFIC_MOCKED_VEHICLE_VRM)
+            .setMotTestNumber("12345");
 
-        String testTime = subscriptionItem.getMotDueDate().minusMonths(1) + "T12:00:00Z";
-        loaderHelper.invokeLoader(buildLoaderRequest(testTime));
+        SubscriptionDbItem changedSubscriptionDbItem = saveAndProcessSubscriptionItem(subscriptionItem);
 
-        //assert that the db subscription date doesn't equal the mock api date
-        SubscriptionDbItem originalSubscriptionDbItem = repo.findById(subscriptionItem.getId()).get();
-        assertFalse(originalSubscriptionDbItem.getMotDueDate().equals(MOCK_API_SPECIFIC_VEHICLE_DATE));
-
-        NotifierReport report = eventHandler.handle(new Object(), buildContext());
-
-        //assert that the db subscription date now is equal to the mock api date
-        SubscriptionDbItem changedSubscriptionDbItem = repo.findById(subscriptionItem.getId()).get();
+        // Assert that the db subscription date now is equal to the mock api date.
         assertTrue(changedSubscriptionDbItem.getMotDueDate().equals(MOCK_API_SPECIFIC_VEHICLE_DATE));
+    }
 
-        assertEquals(1, report.getSuccessfullyProcessed());
+    @Test
+    public void whenProcessingASubscriptionWithAMismatchedMotTestNumber_TheSubscriptionMotTestNumberInTheDbIsUpdated() throws IOException,
+            InterruptedException, ExecutionException, NotificationClientException {
+
+        subscriptionItem = new SubscriptionItem();
+        subscriptionItem
+            .setMotDueDate(MOCK_API_SPECIFIC_VEHICLE_DATE)
+            .setVrm(SPECIFIC_MOCKED_VEHICLE_VRM)
+            .setMotTestNumber("987654321012");
+
+        SubscriptionDbItem changedSubscriptionDbItem = saveAndProcessSubscriptionItem(subscriptionItem);
+
+        // Assert that the db motTestNumber now is equal to the mock api motTestNumber.
+        assertTrue(changedSubscriptionDbItem.getMotTestNumber().equals("123456"));
+    }
+
+    @Test
+    public void whenProcessingASubscriptionWithAMismatchedVrm_TheSubscriptionVrmInTheDbIsUpdated() throws IOException,
+            InterruptedException, ExecutionException, NotificationClientException {
+
+        subscriptionItem = new SubscriptionItem();
+        subscriptionItem
+            .setMotDueDate(MOCK_API_SPECIFIC_VEHICLE_DATE)
+            .setVrm("ABC123")
+            .setMotTestNumber("123456");
+
+        SubscriptionDbItem changedSubscriptionDbItem = saveAndProcessSubscriptionItem(subscriptionItem);
+
+        // Assert the new  db item has the same id subscriptionItem
+        // (vrm update requires new record to be created, but want to keep original id).
+        assertEquals(subscriptionItem.getId(), changedSubscriptionDbItem.getId());
+
+        // Assert the db vrm now is equal to the mock api vrm.
+        assertTrue(changedSubscriptionDbItem.getVrm().equals("WDD2040022A65"));
     }
 
     private String buildLoaderRequest(String testTime) throws JsonProcessingException {
 
         LoaderInvocationEvent loaderInvocationEvent = new LoaderInvocationEvent(testTime);
         return jsonMapper.writeValueAsString(loaderInvocationEvent);
+    }
+
+    /**
+     * Processes a subscriptionItem. Saves to db, processes, returns updated version.
+     * @param subscriptionItem The subscription item to save.
+     */
+    private SubscriptionDbItem saveAndProcessSubscriptionItem(SubscriptionItem subscriptionItem)
+            throws IOException, InterruptedException, ExecutionException, NotificationClientException {
+
+        // Save the subscription to db.
+        fixture.table(new SubscriptionTable().item(subscriptionItem)).run();
+
+        // Invoke the subscription loader with correct date to load items from db into queue.
+        String testTime = subscriptionItem.getMotDueDate().minusMonths(1) + "T12:00:00Z";
+        loaderHelper.invokeLoader(buildLoaderRequest(testTime));
+
+        // Invoke the notifiers handle event with correct date to read items from the queue.
+        NotifierReport report = eventHandler.handle(new Object(), buildContext());
+        assertEquals(1, report.getSuccessfullyProcessed());
+
+        SubscriptionDbItem changedSubscriptionDbItem = repo.findById(subscriptionItem.getId()).get();
+
+        // If new vrm in changedSubscriptionDbItem, then also update vrm in
+        // subscriptionItem so cleanUp() will find it in the db.
+        subscriptionItem.setVrm(changedSubscriptionDbItem.getVrm());
+        return changedSubscriptionDbItem;
     }
 
     private Context buildContext() {
