@@ -57,7 +57,7 @@ public class DefaultLoaderTest {
         when(this.producer.getIterator(any(), any())).thenReturn(mockIterator);
 
         Subscription mockSubscription = new Subscription().setEmail("email@email.com")
-                .setId("someId").setMotDueDate(LocalDate.now()).setVrm("aaa");
+                .setId("someId").setMotDueDate(LocalDate.now()).setVrm("aaa").setMotTestNumber("123456");
         when(mockIterator.next()).thenReturn(mockSubscription);
 
         when(this.dispatcher.dispatch(any())).thenReturn(

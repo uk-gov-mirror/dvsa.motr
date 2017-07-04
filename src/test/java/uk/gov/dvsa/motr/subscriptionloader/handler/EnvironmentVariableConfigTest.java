@@ -1,8 +1,10 @@
-package uk.gov.dvsa.motr.config;
+package uk.gov.dvsa.motr.subscriptionloader.handler;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
+
+import uk.gov.dvsa.motr.config.EnvironmentVariableConfig;
 
 import static org.junit.Assert.assertEquals;
 

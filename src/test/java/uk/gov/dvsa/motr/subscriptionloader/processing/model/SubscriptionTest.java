@@ -14,6 +14,7 @@ public class SubscriptionTest {
     public static final String TEST_ID = "testId";
     public static final String TEST_VRM = "test_vrm";
     public static final String TEST_EMAIL = "test_email";
+    public static final String TEST_MOT_TEST_NUMBER = "test_mot_test_number";
     private Subscription subscription;
 
     @Before
@@ -60,6 +61,15 @@ public class SubscriptionTest {
     }
 
     @Test
+    public void testSetandGetMotTestNumber() {
+
+        Subscription returnedSub = this.subscription.setMotTestNumber(TEST_MOT_TEST_NUMBER);
+
+        assertEquals(TEST_MOT_TEST_NUMBER, this.subscription.getMotTestNumber());
+        assertThat(returnedSub, instanceOf(Subscription.class));
+    }
+
+    @Test
     public void testToString() {
 
         LocalDate now = LocalDate.now();
@@ -67,9 +77,12 @@ public class SubscriptionTest {
                 .setMotDueDate(now)
                 .setVrm(TEST_VRM)
                 .setEmail(TEST_EMAIL)
+                .setMotTestNumber(TEST_MOT_TEST_NUMBER)
                 .setLoadedOnDate(now);
 
-        assertEquals("Subscription{id='testId', motDueDate=" + now.toString() +
-                ", vrm='test_vrm', email='test_email', loadedOnDate=" + now.toString() + "}", subscription.toString());
+        assertEquals("Subscription{id='testId', motDueDate=" +
+                now.toString() +
+                ", vrm='test_vrm', email='test_email', motTestNumber='test_mot_test_number', loadedOnDate=" +
+                now.toString() + "}", subscription.toString());
     }
 }

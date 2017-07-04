@@ -71,8 +71,9 @@ public class SubscriptionLoaderTests {
 
         assertEquals(subscriptionItem.getVrm(), subscription.getVrm());
         assertEquals(subscriptionItem.getEmail(), subscription.getEmail());
+        assertEquals(subscriptionItem.getMotTestNumber(), subscription.getMotTestNumber());
         assertEquals(subscriptionItem.getMotDueDate(), subscription.getMotDueDate());
-        assertEquals(subscriptionItem.getId(), subscriptionItem.getId());
+        assertEquals(subscriptionItem.getId(), subscription.getId());
         assertEquals(1, loadReport.getSubmittedForProcessing());
         assertEquals(1, loadReport.getProcessed());
     }
@@ -90,6 +91,7 @@ public class SubscriptionLoaderTests {
 
         assertEquals(subscriptionItem.getVrm(), subscription.getVrm());
         assertEquals(subscriptionItem.getEmail(), subscription.getEmail());
+        assertEquals(subscriptionItem.getMotTestNumber(), subscription.getMotTestNumber());
         assertEquals(1, loadReport.getSubmittedForProcessing());
         assertEquals(1, loadReport.getProcessed());
     }

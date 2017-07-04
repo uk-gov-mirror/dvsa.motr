@@ -19,6 +19,10 @@ public class RandomDataUtil {
         return random(3, true, false) + random(4, false, true);
     }
 
+    public static String motTestNumber() {
+        return random(6, false, true);
+    }
+
     public static LocalDate dueDate() {
         long minDay = LocalDate.of(1970, 1, 1).toEpochDay();
         long maxDay = LocalDate.of(2017, 1, 1).toEpochDay();

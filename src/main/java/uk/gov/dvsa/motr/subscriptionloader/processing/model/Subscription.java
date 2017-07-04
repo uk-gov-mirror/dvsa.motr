@@ -25,6 +25,9 @@ public class Subscription {
     @JsonProperty("email")
     private String email;
 
+    @JsonProperty("motTestNumber")
+    private String motTestNumber;
+
     @JsonProperty("loadedOnDate")
     @JsonSerialize(using = LocalDateSerialiser.class)
     @JsonDeserialize(using = LocalDateDeserialiser.class)
@@ -74,6 +77,17 @@ public class Subscription {
         return this;
     }
 
+    public String getMotTestNumber() {
+
+        return motTestNumber;
+    }
+
+    public Subscription setMotTestNumber(String motTestNumber) {
+
+        this.motTestNumber = motTestNumber;
+        return this;
+    }
+
     public LocalDate getLoadedOnDate() {
 
         return loadedOnDate;
@@ -92,6 +106,7 @@ public class Subscription {
                 ", motDueDate=" + motDueDate +
                 ", vrm='" + vrm + '\'' +
                 ", email='" + email + '\'' +
+                ", motTestNumber='" + motTestNumber + '\'' +
                 ", loadedOnDate=" + loadedOnDate +
                 '}';
     }
