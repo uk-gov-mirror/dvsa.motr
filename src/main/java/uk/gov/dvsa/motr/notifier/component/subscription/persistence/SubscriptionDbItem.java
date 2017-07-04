@@ -10,6 +10,8 @@ public class SubscriptionDbItem {
 
     private String email;
 
+    private String motTestNumber;
+
     private LocalDate motDueDate;
 
     public SubscriptionDbItem(String id) {
@@ -35,6 +37,15 @@ public class SubscriptionDbItem {
 
     public SubscriptionDbItem setEmail(String email) {
         this.email = email;
+        return this;
+    }
+
+    public String getMotTestNumber() {
+        return motTestNumber;
+    }
+
+    public SubscriptionDbItem setMotTestNumber(String motTestNumber) {
+        this.motTestNumber = motTestNumber;
         return this;
     }
 

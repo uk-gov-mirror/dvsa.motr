@@ -3,6 +3,7 @@ package uk.gov.dvsa.motr.notifier.processing.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.dvsa.motr.notifier.component.subscription.persistence.SubscriptionDbItem;
 import uk.gov.dvsa.motr.notifier.component.subscription.persistence.SubscriptionRepository;
 import uk.gov.dvsa.motr.notifier.notify.NotifyService;
 import uk.gov.dvsa.motr.notifier.processing.model.SubscriptionQueueItem;
@@ -16,8 +17,11 @@ import java.time.LocalDate;
 import javax.ws.rs.core.UriBuilder;
 
 import static uk.gov.dvsa.motr.notifier.processing.service.SubscriptionHandlerHelper.motDueDateUpdateRequired;
+import static uk.gov.dvsa.motr.notifier.processing.service.SubscriptionHandlerHelper.motTestNumberUpdateRequired;
 import static uk.gov.dvsa.motr.notifier.processing.service.SubscriptionHandlerHelper.oneMonthEmailRequired;
 import static uk.gov.dvsa.motr.notifier.processing.service.SubscriptionHandlerHelper.twoWeekEmailRequired;
+import static uk.gov.dvsa.motr.notifier.processing.service.SubscriptionHandlerHelper.vrmUpdateRequired;
+
 
 public class ProcessSubscriptionService {
 
@@ -43,17 +47,22 @@ public class ProcessSubscriptionService {
     public void processSubscription(SubscriptionQueueItem subscriptionQueueItem, LocalDate requestDate) throws NotificationClientException,
             VehicleDetailsClientException, VehicleNotFoundException {
 
-        String vrm = subscriptionQueueItem.getVrm();
+        String subscriptionMotTestNumber = subscriptionQueueItem.getMotTestNumber();
 
-        VehicleDetails vehicleDetails = client.fetch(vrm).orElseThrow(() -> {
-            logger.debug("no vehicle found for vrm {}", vrm);
-            return new VehicleNotFoundException("no vehicle found for vrm: " + subscriptionQueueItem.getVrm());
+        VehicleDetails vehicleDetails = client.fetch(subscriptionMotTestNumber).orElseThrow(() -> {
+            logger.debug("no vehicle found for mot_test_number {}", subscriptionMotTestNumber);
+            return new VehicleNotFoundException("no vehicle found for mot_test_number: " + subscriptionMotTestNumber);
         });
 
+        String vrm = subscriptionQueueItem.getVrm();
         String email = subscriptionQueueItem.getEmail();
         String subscriptionId = subscriptionQueueItem.getId();
         LocalDate subscriptionMotDueDate = subscriptionQueueItem.getMotDueDate();
+
         LocalDate vehicleMotExpiryDate = vehicleDetails.getMotExpiryDate();
+        String vehicleMotTestNumber = vehicleDetails.getMotTestNumber();
+        String vehicleVrm = vehicleDetails.getRegNumber();
+
         String unSubscribeLink = UriBuilder.fromPath(webBaseUrl).path("unsubscribe").path(subscriptionId).build().toString();
 
         if (motDueDateUpdateRequired(subscriptionMotDueDate, vehicleMotExpiryDate)) {
@@ -61,11 +70,20 @@ public class ProcessSubscriptionService {
         }
 
         if (oneMonthEmailRequired(requestDate, vehicleMotExpiryDate)) {
-            notifyService.sendOneMonthNotificationEmail(email, vrm, vehicleMotExpiryDate, unSubscribeLink);
+            notifyService.sendOneMonthNotificationEmail(email, vehicleVrm, vehicleMotExpiryDate, unSubscribeLink);
         }
 
         if (twoWeekEmailRequired(requestDate, vehicleMotExpiryDate)) {
-            notifyService.sendTwoWeekNotificationEmail(email, vrm, vehicleMotExpiryDate, unSubscribeLink);
+            notifyService.sendTwoWeekNotificationEmail(email, vehicleVrm, vehicleMotExpiryDate, unSubscribeLink);
+        }
+
+        if (motTestNumberUpdateRequired(subscriptionMotTestNumber, vehicleMotTestNumber)) {
+            subscriptionRepository.updateMotTestNumber(vrm, email, vehicleMotTestNumber);
+        }
+
+        if (vrmUpdateRequired(vrm, vehicleVrm)) {
+            subscriptionRepository.updateVrm(vrm, email, vehicleVrm);
+            logger.info("SUBSCRIPTION-VRM-CHANGED {} => {}", vrm, vehicleVrm);
         }
     }
 }

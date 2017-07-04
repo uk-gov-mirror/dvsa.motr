@@ -7,10 +7,15 @@ import com.amazonaws.services.dynamodbv2.document.Index;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.ItemCollection;
 import com.amazonaws.services.dynamodbv2.document.QueryOutcome;
+import com.amazonaws.services.dynamodbv2.document.spec.DeleteItemSpec;
+import com.amazonaws.services.dynamodbv2.document.spec.GetItemSpec;
 import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
 import com.amazonaws.services.dynamodbv2.document.spec.UpdateItemSpec;
 import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 import com.amazonaws.services.dynamodbv2.model.ReturnValue;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
@@ -18,8 +23,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
 import java.util.Optional;
 
-public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
 
+public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
+    private static final Logger logger = LoggerFactory.getLogger(DynamoDbSubscriptionRepository.class);
     private String tableName;
     private DynamoDB dynamoDb;
 
@@ -51,6 +57,7 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
         SubscriptionDbItem subscriptionDbItem = new SubscriptionDbItem(item.getString("id"));
         subscriptionDbItem.setVrm(item.getString("vrm"));
         subscriptionDbItem.setEmail(item.getString("email"));
+        subscriptionDbItem.setMotTestNumber(item.getString("mot_test_number"));
         subscriptionDbItem.setMotDueDate(LocalDate.parse(item.getString("mot_due_date")));
 
         return Optional.of(subscriptionDbItem);
@@ -68,5 +75,40 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
                 .withReturnValues(ReturnValue.UPDATED_NEW);
 
         dynamoDb.getTable(tableName).updateItem(updateItemSpec);
+    }
+
+    public void updateMotTestNumber(String vrm, String email, String updatedMotTestNumber) {
+
+        UpdateItemSpec updateItemSpec = new UpdateItemSpec()
+                .withPrimaryKey("vrm", vrm, "email", email)
+                .withUpdateExpression("set mot_test_number = :updatedMotTestNumber, updated_at = :updatedAt")
+                .withValueMap(new ValueMap()
+                .withString(":updatedMotTestNumber", updatedMotTestNumber)
+                .withString(":updatedAt", ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT)))
+                .withReturnValues(ReturnValue.UPDATED_NEW);
+
+        dynamoDb.getTable(tableName).updateItem(updateItemSpec);
+    }
+
+    public void updateVrm(String vrm, String email, String updatedVrm) {
+
+        try {
+            GetItemSpec getItemSpec = new GetItemSpec().withPrimaryKey("vrm", vrm, "email", email);
+            Item originalItem = dynamoDb.getTable(tableName).getItem(getItemSpec);
+
+            // Because vrm is part of primary key, cannot update it. Instead, delete old record and create new one.
+            DeleteItemSpec deleteItemSpec = new DeleteItemSpec().withPrimaryKey("vrm", vrm, "email", email);
+            dynamoDb.getTable(tableName).deleteItem(deleteItemSpec);
+
+            Item item = new Item()
+                    .withPrimaryKey("id", originalItem.getString("id"))
+                    .withPrimaryKey("vrm", updatedVrm, "email", email)
+                    .withString("mot_test_number", originalItem.getString("mot_test_number"))
+                    .withString("mot_due_date", originalItem.getString("mot_due_date"))
+                    .withString("mot_due_date_md", originalItem.getString("mot_due_date_md"));
+            dynamoDb.getTable(tableName).putItem(item);
+        } catch (Exception e) {
+            logger.error("UPDATING-VRM-ERROR: {} => {}, {}", vrm, updatedVrm, e.getMessage());
+        }
     }
 }

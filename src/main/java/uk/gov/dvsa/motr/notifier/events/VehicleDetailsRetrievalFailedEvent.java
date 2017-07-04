@@ -22,6 +22,11 @@ public class VehicleDetailsRetrievalFailedEvent extends SubscriptionProcessedEve
         return this;
     }
 
+    public VehicleDetailsRetrievalFailedEvent setMotTestNumber(String motTestNumber) {
+        params.put("mot-test-number", motTestNumber);
+        return this;
+    }
+
     @Override
     public String getCode() {
 

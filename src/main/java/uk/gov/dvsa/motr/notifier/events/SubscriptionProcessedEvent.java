@@ -27,4 +27,10 @@ public abstract class SubscriptionProcessedEvent extends Event {
         params.put("vrm", vrm);
         return this;
     }
+
+    public SubscriptionProcessedEvent setMotTestNumber(String motTestNumber) {
+
+        params.put("mot-test-number", motTestNumber);
+        return this;
+    }
 }

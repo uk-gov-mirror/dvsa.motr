@@ -83,6 +83,7 @@ public class SubscriptionsReceiverTest  {
                 .setVrm("test-vrm")
                 .setEmail("test@email.com")
                 .setId("test-id")
+                .setMotTestNumber("test-mot-number-123")
                 .setMessageCorrelationId("test-correlation-id");
 
         return new ObjectMapper().writeValueAsString(subscriptionQueueItem);

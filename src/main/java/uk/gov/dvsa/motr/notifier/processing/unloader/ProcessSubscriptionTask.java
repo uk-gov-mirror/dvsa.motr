@@ -59,6 +59,7 @@ public class ProcessSubscriptionTask implements Runnable {
             EventLogger.logErrorEvent(new SubscriptionQueueItemRemovalFailedEvent()
                     .setEmail(subscriptionQueueItemToProcess.getEmail())
                     .setVrm(subscriptionQueueItemToProcess.getVrm())
+                    .setMotTestNumber(subscriptionQueueItemToProcess.getMotTestNumber())
                     .setExpiryDate(subscriptionQueueItemToProcess.getMotDueDate()), e);
 
             report.incrementFailedToProcess();
@@ -67,6 +68,7 @@ public class ProcessSubscriptionTask implements Runnable {
             EventLogger.logErrorEvent(new VehicleDetailsRetrievalFailedEvent()
                     .setEmail(subscriptionQueueItemToProcess.getEmail())
                     .setVrm(subscriptionQueueItemToProcess.getVrm())
+                    .setMotTestNumber(subscriptionQueueItemToProcess.getMotTestNumber())
                     .setExpiryDate(subscriptionQueueItemToProcess.getMotDueDate()), e);
 
             report.incrementFailedToProcess();
@@ -75,6 +77,7 @@ public class ProcessSubscriptionTask implements Runnable {
             EventLogger.logErrorEvent(new NotifyReminderFailedEvent()
                     .setEmail(subscriptionQueueItemToProcess.getEmail())
                     .setVrm(subscriptionQueueItemToProcess.getVrm())
+                    .setMotTestNumber(subscriptionQueueItemToProcess.getMotTestNumber())
                     .setExpiryDate(subscriptionQueueItemToProcess.getMotDueDate()), e);
 
             report.incrementFailedToProcess();

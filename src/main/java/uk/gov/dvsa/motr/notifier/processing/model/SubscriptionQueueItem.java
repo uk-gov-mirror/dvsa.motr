@@ -22,6 +22,9 @@ public class SubscriptionQueueItem {
     @JsonProperty("email")
     private String email;
 
+    @JsonProperty("motTestNumber")
+    private String motTestNumber;
+
     @JsonProperty("loadedOnDate")
     @JsonDeserialize(using = LocalDateDeserialiser.class)
     private LocalDate loadedOnDate;
@@ -66,6 +69,15 @@ public class SubscriptionQueueItem {
         return this;
     }
 
+    public String getMotTestNumber() {
+        return motTestNumber;
+    }
+
+    public SubscriptionQueueItem setMotTestNumber(String motTestNumber) {
+        this.motTestNumber = motTestNumber;
+        return this;
+    }
+
     public String getMessageReceiptHandle() {
         return messageReceiptHandle;
     }
@@ -104,6 +116,7 @@ public class SubscriptionQueueItem {
                 "id='" + id + '\'' +
                 ", motDueDate=" + motDueDate +
                 ", vrm='" + vrm + '\'' +
+                ", motTestNumber='" + motTestNumber + '\'' +
                 ", email='" + email + '\'' +
                 ", loadedOnDate=" + loadedOnDate +
                 ", messageReceiptHandle='" + messageReceiptHandle + '\'' +

@@ -41,7 +41,7 @@ public class VehicleDetailsClientTest {
     public void throwsClientExceptionWhenInvalidUrl() throws Exception {
 
         VehicleDetailsClient client = new VehicleDetailsClient(new ClientConfig(), "invalid_url", "api-key");
-        client.fetch("VRM12345");
+        client.fetch("11111111111");
     }
 
     @Test
@@ -50,7 +50,7 @@ public class VehicleDetailsClientTest {
         stubFor(onRequest().willReturn(aResponse().withBody(validResponse())
                 .withHeader("Content-Type", "application/json")));
 
-        withDefaultClient().fetch("VRM12345");
+        withDefaultClient().fetch("11111111111");
     }
 
     @Test
@@ -59,7 +59,7 @@ public class VehicleDetailsClientTest {
         stubFor(onRequest().willReturn(aResponse().withBody(validResponse())
                 .withHeader("Content-Type", "application/json")));
 
-        VehicleDetails details = withDefaultClient().fetch("VRM12345").get();
+        VehicleDetails details = withDefaultClient().fetch("11111111111").get();
 
         assertEquals("MERCEDES-BENZ", details.getMake());
         assertEquals("C220 ELEGANCE ED125 CDI BLU-CY", details.getModel());
@@ -75,10 +75,10 @@ public class VehicleDetailsClientTest {
 
         stubFor(onRequest().willReturn(aResponse().withStatus(404)));
 
-        Optional<VehicleDetails> response = withDefaultClient().fetch("VRM12345");
+        Optional<VehicleDetails> response = withDefaultClient().fetch("11111111111");
 
         assertFalse(response.isPresent());
-        verify(getRequestedFor(urlEqualTo("/vehicle-details-endpoint/VRM12345")));
+        verify(getRequestedFor(urlEqualTo("/vehicle-details-endpoint/11111111111")));
     }
 
     @DataProvider
@@ -97,7 +97,7 @@ public class VehicleDetailsClientTest {
 
         try {
 
-            withDefaultClient().fetch("VRM12345");
+            withDefaultClient().fetch("11111111111");
             fail();
 
         } catch (VehicleDetailsEndpointResponseException ex) {
@@ -123,18 +123,18 @@ public class VehicleDetailsClientTest {
 
         stubFor(onRequest().willReturn(aResponse().withFault(fault)));
 
-        withDefaultClient().fetch("VRM12345");
+        withDefaultClient().fetch("11111111111");
     }
 
     private MappingBuilder onRequest() {
 
-        return get(urlEqualTo("/vehicle-details-endpoint/VRM12345"))
+        return get(urlEqualTo("/vehicle-details-endpoint/11111111111"))
                 .withHeader("x-api-key", equalTo("api-key"));
     }
 
     private VehicleDetailsClient withDefaultClient() {
 
-        final String endpointUri = "http://localhost:8098/vehicle-details-endpoint/{registration}";
+        final String endpointUri = "http://localhost:8098/vehicle-details-endpoint/{number}";
         return new VehicleDetailsClient(new ClientConfig(), endpointUri, "api-key");
     }
 

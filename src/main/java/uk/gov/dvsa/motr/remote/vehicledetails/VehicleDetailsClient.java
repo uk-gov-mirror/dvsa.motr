@@ -15,7 +15,8 @@ import javax.ws.rs.core.Response;
  */
 public class VehicleDetailsClient {
 
-    private static final String REG_NUMBER_PATH_PARAM = "registration";
+    private static final String MOT_TESTS_PATH_PARAM = "number";
+
     private static final String API_KEY_HEADER = "x-api-key";
 
     private Client client;
@@ -33,18 +34,17 @@ public class VehicleDetailsClient {
 
     /**
      * Method to fetch vehicle information with custom api key
-     * @param vrm vehicle registration mark
+     * @param motTestNumber vehicle registration mark
      * @return vehicle data {@link VehicleDetailsClient}
      * @throws VehicleDetailsClientException thrown when unexpected response (5XX, garbled response, timeout, etc)
      */
-    public Optional<VehicleDetails> fetch(String vrm) throws VehicleDetailsClientException {
+    public Optional<VehicleDetails> fetch(String motTestNumber) throws VehicleDetailsClientException {
 
         Response response;
-
         try {
 
-            WebTarget target = this.client.target(uri)
-                    .resolveTemplate(REG_NUMBER_PATH_PARAM, vrm);
+            WebTarget target = this.client.target(this.uri)
+                    .resolveTemplate(MOT_TESTS_PATH_PARAM, motTestNumber);
 
             response = this.client.target(target.getUri())
                     .request()

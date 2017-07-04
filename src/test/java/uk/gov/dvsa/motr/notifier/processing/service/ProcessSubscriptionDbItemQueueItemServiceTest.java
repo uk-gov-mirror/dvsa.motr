@@ -29,6 +29,9 @@ public class ProcessSubscriptionDbItemQueueItemServiceTest {
     private NotifyService notifyService = mock(NotifyService.class);
     private String webBaseUrl = "http://gov.uk";
 
+    private static final String TEST_VRM = "TEST-VRM";
+    private static final String SUBSCRIPTION_ID = "12345";
+
     @Before
     public void setUp() {
         processSubscriptionService = new ProcessSubscriptionService(
@@ -54,7 +57,7 @@ public class ProcessSubscriptionDbItemQueueItemServiceTest {
 
         processSubscriptionService.processSubscription(subscriptionQueueItem, requestDate);
 
-        verify(subscriptionRepository, times(1)).updateExpiryDate("TEST-VRM", "test@this-is-a-test-123", vehicleExpiryDate);
+        verify(subscriptionRepository, times(1)).updateExpiryDate(TEST_VRM, "test@this-is-a-test-123", vehicleExpiryDate);
     }
 
     @Test
@@ -72,7 +75,7 @@ public class ProcessSubscriptionDbItemQueueItemServiceTest {
         verify(subscriptionRepository, times(0)).updateExpiryDate(any(), any(), any());
         verify(notifyService, times(0)).sendTwoWeekNotificationEmail(any(), any(), any(), any());
         verify(notifyService, times(1)).sendOneMonthNotificationEmail(
-                "test@this-is-a-test-123", "TEST-VRM", vehicleExpiryDate, getExpectedUnsubscribeLink()
+                "test@this-is-a-test-123", TEST_VRM, vehicleExpiryDate, getExpectedUnsubscribeLink()
         );
     }
 
@@ -91,7 +94,7 @@ public class ProcessSubscriptionDbItemQueueItemServiceTest {
         verify(subscriptionRepository, times(0)).updateExpiryDate(any(), any(), any());
         verify(notifyService, times(0)).sendOneMonthNotificationEmail(any(), any(), any(), any());
         verify(notifyService, times(1)).sendTwoWeekNotificationEmail(
-                "test@this-is-a-test-123", "TEST-VRM", vehicleExpiryDate, getExpectedUnsubscribeLink()
+                "test@this-is-a-test-123", TEST_VRM, vehicleExpiryDate, getExpectedUnsubscribeLink()
         );
     }
 
@@ -115,7 +118,7 @@ public class ProcessSubscriptionDbItemQueueItemServiceTest {
         verify(subscriptionRepository, times(1)).updateExpiryDate(any(), any(), any());
         verify(notifyService, times(0)).sendOneMonthNotificationEmail(any(), any(), any(), any());
         verify(notifyService, times(1)).sendTwoWeekNotificationEmail(
-                "test@this-is-a-test-123", "TEST-VRM", vehicleExpiryDate, getExpectedUnsubscribeLink()
+                "test@this-is-a-test-123", TEST_VRM, vehicleExpiryDate, getExpectedUnsubscribeLink()
         );
     }
 
@@ -138,27 +141,28 @@ public class ProcessSubscriptionDbItemQueueItemServiceTest {
 
         verify(subscriptionRepository, times(1)).updateExpiryDate(any(), any(), any());
         verify(notifyService, times(1)).sendOneMonthNotificationEmail(
-                "test@this-is-a-test-123", "TEST-VRM", vehicleExpiryDate, getExpectedUnsubscribeLink()
+                "test@this-is-a-test-123", TEST_VRM, vehicleExpiryDate, getExpectedUnsubscribeLink()
         );
         verify(notifyService, times(0)).sendTwoWeekNotificationEmail(
-                "test@this-is-a-test-123", "TEST-VRM", vehicleExpiryDate, getExpectedUnsubscribeLink()
+                "test@this-is-a-test-123", TEST_VRM, vehicleExpiryDate, getExpectedUnsubscribeLink()
         );
     }
 
     private SubscriptionQueueItem subscriptionStub(LocalDate motDueDate) {
         return new SubscriptionQueueItem()
-                .setId("12345")
+                .setId(SUBSCRIPTION_ID)
                 .setMessageReceiptHandle("Test-receipt-handle")
                 .setEmail("test@this-is-a-test-123")
+                .setMotTestNumber("test-mot-number-123")
                 .setMotDueDate(motDueDate)
-                .setVrm("TEST-VRM");
+                .setVrm(TEST_VRM);
     }
 
     private VehicleDetails vehicleDetailsStub(LocalDate expiryDate) {
-        return new VehicleDetails().setMotExpiryDate(expiryDate);
+        return new VehicleDetails().setMotExpiryDate(expiryDate).setRegNumber(TEST_VRM);
     }
 
     private String getExpectedUnsubscribeLink() {
-        return UriBuilder.fromPath(this.webBaseUrl).path("unsubscribe").path("12345").build().toString();
+        return UriBuilder.fromPath(this.webBaseUrl).path("unsubscribe").path(SUBSCRIPTION_ID).build().toString();
     }
 }
