@@ -3,8 +3,12 @@ package uk.gov.dvsa.motr.notifier.processing.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.dvsa.motr.eventlog.Event;
+import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.notifier.component.subscription.persistence.SubscriptionDbItem;
 import uk.gov.dvsa.motr.notifier.component.subscription.persistence.SubscriptionRepository;
+import uk.gov.dvsa.motr.notifier.events.UpdateVrmFailedEvent;
+import uk.gov.dvsa.motr.notifier.events.UpdateVrmSuccessfulEvent;
 import uk.gov.dvsa.motr.notifier.notify.NotifyService;
 import uk.gov.dvsa.motr.notifier.processing.model.SubscriptionQueueItem;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
@@ -82,8 +86,12 @@ public class ProcessSubscriptionService {
         }
 
         if (vrmUpdateRequired(vrm, vehicleVrm)) {
-            subscriptionRepository.updateVrm(vrm, email, vehicleVrm);
-            logger.info("SUBSCRIPTION-VRM-CHANGED {} => {}", vrm, vehicleVrm);
+            try {
+                subscriptionRepository.updateVrm(vrm, email, vehicleVrm);
+                EventLogger.logEvent(new UpdateVrmSuccessfulEvent().setExistingVrm(vrm).setNewVrm(vehicleVrm));
+            } catch (Exception e) {
+                EventLogger.logErrorEvent(new UpdateVrmFailedEvent().setExistingVrm(vrm).setNewVrm(vehicleVrm), e);
+            }
         }
     }
 }

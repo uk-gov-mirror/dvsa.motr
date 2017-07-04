@@ -25,7 +25,7 @@ import java.util.Optional;
 
 
 public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
-    private static final Logger logger = LoggerFactory.getLogger(DynamoDbSubscriptionRepository.class);
+
     private String tableName;
     private DynamoDB dynamoDb;
 
@@ -90,7 +90,7 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
         dynamoDb.getTable(tableName).updateItem(updateItemSpec);
     }
 
-    public void updateVrm(String vrm, String email, String updatedVrm) {
+    public void updateVrm(String vrm, String email, String updatedVrm) throws Exception {
 
         try {
             GetItemSpec getItemSpec = new GetItemSpec().withPrimaryKey("vrm", vrm, "email", email);
@@ -101,14 +101,16 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
             dynamoDb.getTable(tableName).deleteItem(deleteItemSpec);
 
             Item item = new Item()
-                    .withPrimaryKey("id", originalItem.getString("id"))
                     .withPrimaryKey("vrm", updatedVrm, "email", email)
+                    .withString("id", originalItem.getString("id"))
                     .withString("mot_test_number", originalItem.getString("mot_test_number"))
                     .withString("mot_due_date", originalItem.getString("mot_due_date"))
-                    .withString("mot_due_date_md", originalItem.getString("mot_due_date_md"));
+                    .withString("mot_due_date_md", originalItem.getString("mot_due_date_md"))
+                    .withString("created_at", originalItem.getString("created_at"))
+                    .withString("updated_at", ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT));
             dynamoDb.getTable(tableName).putItem(item);
         } catch (Exception e) {
-            logger.error("UPDATING-VRM-ERROR: {} => {}, {}", vrm, updatedVrm, e.getMessage());
+            throw new Exception(e);
         }
     }
 }
