@@ -20,12 +20,23 @@ public class PendingSubscriptionItem implements DynamoDbFixtureTableItem {
 
     private String email = RandomDataUtil.email();
 
+    private String motTestNumber = RandomDataUtil.motTestNumber();
+
     public String getConfirmationId() {
         return confirmationId;
     }
 
     public LocalDate getMotDueDate() {
         return motDueDate;
+    }
+
+    public String getMotTestNumber() {
+        return motTestNumber;
+    }
+
+    public PendingSubscriptionItem setMotTestNumber(String motTestNumber) {
+        this.motTestNumber = motTestNumber;
+        return this;
     }
 
     public PendingSubscriptionItem setMotDueDate(LocalDate motDueDate) {
@@ -56,6 +67,7 @@ public class PendingSubscriptionItem implements DynamoDbFixtureTableItem {
         return new Item().with("id", confirmationId)
                 .with("mot_due_date", motDueDate.format(DateTimeFormatter.ISO_DATE))
                 .with("vrm", vrm)
-                .with("email", email);
+                .with("email", email)
+                .with("mot_test_number", motTestNumber);
     }
 }

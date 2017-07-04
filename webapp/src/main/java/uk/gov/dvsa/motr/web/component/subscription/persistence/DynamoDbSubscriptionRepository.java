@@ -62,9 +62,8 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
         }
 
         Item item = resultIterator.next();
-        Subscription subscription = mapItemToSubscription(item);
 
-        return Optional.of(subscription);
+        return Optional.of(mapItemToSubscription(item));
     }
 
     @Override
@@ -79,6 +78,7 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
         subscription.setVrm(item.getString("vrm"));
         subscription.setEmail(item.getString("email"));
         subscription.setMotDueDate(LocalDate.parse(item.getString("mot_due_date")));
+        subscription.setMotTestNumber(item.getString("mot_test_number"));
         return subscription;
     }
 
@@ -98,9 +98,8 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
         }
 
         Item item = resultIterator.next();
-        Subscription subscription = mapItemToSubscription(item);
 
-        return Optional.of(subscription);
+        return Optional.of(mapItemToSubscription(item));
     }
 
     public void save(Subscription subscription) {
@@ -111,6 +110,7 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
                 .withString("email", subscription.getEmail())
                 .withString("mot_due_date", subscription.getMotDueDate().format(DateTimeFormatter.ISO_LOCAL_DATE))
                 .withString("mot_due_date_md", subscription.getMotDueDate().format(DateTimeFormatter.ofPattern("MM-dd")))
+                .withString("mot_test_number", subscription.getMotTestNumber())
                 .withString("created_at", ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT));
 
         dynamoDb.getTable(tableName).putItem(item);

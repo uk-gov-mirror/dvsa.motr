@@ -40,7 +40,8 @@ public class DynamoDbCancelledSubscriptionRepositoryTest {
         cancelledSubscription
                 .setUnsubscribeId(cancelledSubscriptionItem.getUnsubscribeId())
                 .setEmail(cancelledSubscriptionItem.getEmail())
-                .setVrm(cancelledSubscriptionItem.getVrm());
+                .setVrm(cancelledSubscriptionItem.getVrm())
+                .setMotTestNumber(cancelledSubscriptionItem.getMotTestNumber());
 
         repository.save(cancelledSubscription);
 

@@ -33,6 +33,7 @@ public class ReviewResourceTest {
     private static final MotrSession MOTR_SESSION = mock(MotrSession.class);
     private static final String VRM = "YN13NTX";
     private static final String EMAIL = "test@test.com";
+    private static final String TEST_MOT_TEST_NUMBER = "123456";
 
     private ReviewResource resource;
 
@@ -73,15 +74,17 @@ public class ReviewResourceTest {
         LocalDate now = LocalDate.now();
         VehicleDetails vehicleDetails = new VehicleDetails();
         vehicleDetails.setMotExpiryDate(now);
+        vehicleDetails.setMotTestNumber(TEST_MOT_TEST_NUMBER);
         ArgumentCaptor<EmailConfirmationParams> paramsArgumentCaptor = ArgumentCaptor.forClass(EmailConfirmationParams.class);
 
         when(MOTR_SESSION.getVehicleDetailsFromSession()).thenReturn(vehicleDetails);
-        when(PENDING_SUBSCRIPTION_SERVICE.handlePendingSubscriptionCreation(any(), any(), any())).thenReturn("email-confirmation-pending");
-        doNothing().when(PENDING_SUBSCRIPTION_SERVICE).createPendingSubscription(VRM, EMAIL, now, "randomID");
+        when(PENDING_SUBSCRIPTION_SERVICE.handlePendingSubscriptionCreation(any(), any(), any(), any()))
+                .thenReturn("email-confirmation-pending");
+        doNothing().when(PENDING_SUBSCRIPTION_SERVICE).createPendingSubscription(VRM, EMAIL, now, "randomID", TEST_MOT_TEST_NUMBER);
 
         Response response = resource.confirmationPagePost();
 
-        verify(PENDING_SUBSCRIPTION_SERVICE, times(1)).handlePendingSubscriptionCreation(VRM, EMAIL, now);
+        verify(PENDING_SUBSCRIPTION_SERVICE, times(1)).handlePendingSubscriptionCreation(VRM, EMAIL, now, TEST_MOT_TEST_NUMBER);
         verify(MOTR_SESSION, times(1)).setEmailConfirmationParams(paramsArgumentCaptor.capture());
         assertEquals(302, response.getStatus());
         assertEquals("email-confirmation-pending", response.getLocation().toString());
@@ -105,7 +108,7 @@ public class ReviewResourceTest {
         vehicleDetails.setModel("model");
         vehicleDetails.setYearOfManufacture(2000);
         vehicleDetails.setMotExpiryDate(LocalDate.now());
-
+        vehicleDetails.setMotTestNumber(TEST_MOT_TEST_NUMBER);
         return vehicleDetails;
     }
 }

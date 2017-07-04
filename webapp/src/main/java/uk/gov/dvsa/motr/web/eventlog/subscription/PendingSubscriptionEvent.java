@@ -24,4 +24,9 @@ public abstract class PendingSubscriptionEvent extends Event {
         params.put("mot-due-date", motDueDate.format(DateTimeFormatter.ISO_DATE));
         return this;
     }
+
+    public PendingSubscriptionEvent setMotTestNumber(String motTestNumber) {
+        params.put("mot-test-number", motTestNumber);
+        return this;
+    }
 }

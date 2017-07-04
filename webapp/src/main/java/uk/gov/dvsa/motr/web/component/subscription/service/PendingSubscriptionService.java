@@ -38,7 +38,7 @@ public class PendingSubscriptionService {
         this.urlHelper = urlHelper;
     }
 
-    public String handlePendingSubscriptionCreation(String vrm, String email, LocalDate motDueDate) {
+    public String handlePendingSubscriptionCreation(String vrm, String email, LocalDate motDueDate, String motTestNumber) {
 
         Optional<Subscription> subscription = subscriptionRepository.findByVrmAndEmail(vrm, email);
 
@@ -47,7 +47,7 @@ public class PendingSubscriptionService {
 
             return urlHelper.emailConfirmedNthTimeLink();
         } else {
-            createPendingSubscription(vrm, email, motDueDate, generateId());
+            createPendingSubscription(vrm, email, motDueDate, generateId(), motTestNumber);
 
             return urlHelper.emailConfirmationPendingLink();
         }
@@ -55,27 +55,31 @@ public class PendingSubscriptionService {
 
     /**
      * Creates pending subscription in the system to be confirmed later by confirmation link
-     *
      * @param vrm        subscription vrm
      * @param email      subscription email
      * @param motDueDate most recent mot due date
+     * @param motTestNumber
      */
-    public void createPendingSubscription(String vrm, String email, LocalDate motDueDate, String confirmationId) {
+    public void createPendingSubscription(String vrm, String email, LocalDate motDueDate, String confirmationId, String motTestNumber) {
 
         PendingSubscription pendingSubscription = new PendingSubscription()
                 .setConfirmationId(confirmationId)
                 .setEmail(email)
                 .setVrm(vrm)
-                .setMotDueDate(motDueDate);
+                .setMotDueDate(motDueDate)
+                .setMotTestNumber(motTestNumber);
 
         try {
             pendingSubscriptionRepository.save(pendingSubscription);
             notifyService.sendEmailAddressConfirmationEmail(email, urlHelper.confirmEmailLink(pendingSubscription.getConfirmationId()));
-            EventLogger.logEvent(new PendingSubscriptionCreatedEvent().setVrm(vrm).setEmail(email).setMotDueDate(motDueDate));
+            EventLogger.logEvent(
+                    new PendingSubscriptionCreatedEvent().setVrm(vrm).setEmail(email).setMotDueDate(motDueDate)
+                    .setMotTestNumber(motTestNumber)
+            );
         } catch (Exception e) {
             EventLogger.logErrorEvent(
-                    new PendingSubscriptionCreationFailedEvent().setVrm(vrm).setEmail(email).setMotDueDate(motDueDate), e
-            );
+                    new PendingSubscriptionCreationFailedEvent().setVrm(vrm).setEmail(email).setMotDueDate(motDueDate)
+                    .setMotTestNumber(motTestNumber), e);
             throw e;
         }
     }
