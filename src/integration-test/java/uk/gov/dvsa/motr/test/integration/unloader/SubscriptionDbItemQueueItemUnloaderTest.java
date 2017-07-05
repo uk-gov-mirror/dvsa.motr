@@ -1,5 +1,9 @@
 package uk.gov.dvsa.motr.test.integration.unloader;
 
+import com.amazonaws.services.dynamodbv2.document.DynamoDB;
+import com.amazonaws.services.dynamodbv2.document.Item;
+import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
+import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 import com.amazonaws.services.lambda.runtime.ClientContext;
 import com.amazonaws.services.lambda.runtime.CognitoIdentity;
 import com.amazonaws.services.lambda.runtime.Context;
@@ -31,7 +35,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import static uk.gov.dvsa.motr.test.environmant.variables.TestEnvironmentVariables.region;
@@ -45,7 +49,6 @@ public class SubscriptionDbItemQueueItemUnloaderTest {
 
     private static final LocalDate MOCK_API_RANDOM_VEHICLE_DATE = LocalDate.of(2026, 3, 9);
     private static final LocalDate DATE_NOT_MATCHING_VEHICLE_MOCK = LocalDate.of(2015, 5, 15);
-    private static final String SPECIFIC_MOCKED_VEHICLE_VRM = "LOY-500";
     private static final LocalDate MOCK_API_SPECIFIC_VEHICLE_DATE = LocalDate.of(2016, 11, 26);
 
     private ObjectMapper jsonMapper = new ObjectMapper();
@@ -87,13 +90,13 @@ public class SubscriptionDbItemQueueItemUnloaderTest {
         subscriptionItem = new SubscriptionItem();
         subscriptionItem
             .setMotDueDate(DATE_NOT_MATCHING_VEHICLE_MOCK)
-            .setVrm(SPECIFIC_MOCKED_VEHICLE_VRM)
+            .setVrm("WDD2040022A65")
             .setMotTestNumber("12345");
 
         SubscriptionDbItem changedSubscriptionDbItem = saveAndProcessSubscriptionItem(subscriptionItem);
 
         // Assert that the db subscription date now is equal to the mock api date.
-        assertTrue(changedSubscriptionDbItem.getMotDueDate().equals(MOCK_API_SPECIFIC_VEHICLE_DATE));
+        assertEquals(changedSubscriptionDbItem.getMotDueDate(), MOCK_API_SPECIFIC_VEHICLE_DATE);
     }
 
     @Test
@@ -103,13 +106,13 @@ public class SubscriptionDbItemQueueItemUnloaderTest {
         subscriptionItem = new SubscriptionItem();
         subscriptionItem
             .setMotDueDate(MOCK_API_SPECIFIC_VEHICLE_DATE)
-            .setVrm(SPECIFIC_MOCKED_VEHICLE_VRM)
+            .setVrm("XXXYYY")
             .setMotTestNumber("987654321012");
 
         SubscriptionDbItem changedSubscriptionDbItem = saveAndProcessSubscriptionItem(subscriptionItem);
 
         // Assert that the db motTestNumber now is equal to the mock api motTestNumber.
-        assertTrue(changedSubscriptionDbItem.getMotTestNumber().equals("123456"));
+        assertEquals(changedSubscriptionDbItem.getMotTestNumber(), "123456");
     }
 
     @Test
@@ -117,19 +120,24 @@ public class SubscriptionDbItemQueueItemUnloaderTest {
             InterruptedException, ExecutionException, NotificationClientException {
 
         subscriptionItem = new SubscriptionItem();
-        subscriptionItem
-            .setMotDueDate(MOCK_API_SPECIFIC_VEHICLE_DATE)
-            .setVrm("ABC123")
-            .setMotTestNumber("123456");
 
         SubscriptionDbItem changedSubscriptionDbItem = saveAndProcessSubscriptionItem(subscriptionItem);
+
+        QuerySpec spec = new QuerySpec()
+                .withKeyConditionExpression("vrm = :vrm AND email = :email")
+                .withValueMap(new ValueMap().withString(":vrm", changedSubscriptionDbItem.getVrm()).withString(":email",
+                changedSubscriptionDbItem.getEmail()));
+
+        Item savedItem = new DynamoDB(dynamoDbClient()).getTable(subscriptionTableName()).query(spec).iterator().next();
 
         // Assert the new  db item has the same id subscriptionItem
         // (vrm update requires new record to be created, but want to keep original id).
         assertEquals(subscriptionItem.getId(), changedSubscriptionDbItem.getId());
 
         // Assert the db vrm now is equal to the mock api vrm.
-        assertTrue(changedSubscriptionDbItem.getVrm().equals("WDD2040022A65"));
+        assertEquals(changedSubscriptionDbItem.getVrm(), "XXXYYY");
+        assertNotNull("created_at cannot be null when updating vrm", savedItem.getString("created_at"));
+        assertNotNull("updated_at cannot be null when updating vrm", savedItem.getString("updated_at"));
     }
 
     private String buildLoaderRequest(String testTime) throws JsonProcessingException {

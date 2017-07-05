@@ -8,5 +8,5 @@ public interface SubscriptionRepository {
 
     void updateMotTestNumber(String vrm, String email, String updatedMotTestNumber);
 
-    void updateVrm(String vrm, String email, String updatedVrm);
+    void updateVrm(String vrm, String email, String updatedVrm) throws Exception;
 }
