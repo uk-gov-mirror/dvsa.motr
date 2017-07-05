@@ -67,7 +67,7 @@ public class ReviewResource {
                     .setExpiryDate(vehicle.getMotExpiryDate())
                     .setMakeModel(vehicle.getMake(), vehicle.getModel())
                     .setRegistration(regNumberFromSession)
-                    .setYearOfManufacture(vehicle.getYearOfManufacture().toString());
+                    .setYearOfManufacture(vehicle.getYearOfManufacture() == null ? null : vehicle.getYearOfManufacture().toString());
         } else {
             throw new NotFoundException();
         }

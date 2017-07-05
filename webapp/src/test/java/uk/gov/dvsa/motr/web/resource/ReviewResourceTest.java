@@ -101,6 +101,20 @@ public class ReviewResourceTest {
         resource.confirmationPagePost();
     }
 
+    @Test
+    public void whenYearOfManufactureIsNull_thenReviewPageShouldDisplayViewModelProperly() throws Exception {
+
+        VehicleDetails vehicleDetails = vehicleDetailsInSession();
+        vehicleDetails.setYearOfManufacture(null);
+
+        when(MOTR_SESSION.isAllowedOnPage()).thenReturn(true);
+        when(MOTR_SESSION.getVehicleDetailsFromSession()).thenReturn(vehicleDetails);
+
+        assertEquals(200, resource.reviewPage().getStatus());
+        assertEquals("review", TEMPLATE_ENGINE_STUB.getTemplate());
+        assertEquals(ReviewViewModel.class, TEMPLATE_ENGINE_STUB.getContext(Map.class).get("viewModel").getClass());
+    }
+
     private VehicleDetails vehicleDetailsInSession() {
 
         VehicleDetails vehicleDetails = new VehicleDetails();
