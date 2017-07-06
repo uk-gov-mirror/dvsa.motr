@@ -30,6 +30,8 @@ import static uk.gov.dvsa.motr.web.resource.RedirectResponseBuilder.redirect;
 @Produces("text/html")
 public class ReviewResource {
 
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(ReviewResource.class);
+
     private final TemplateEngine renderer;
     private PendingSubscriptionService pendingSubscriptionService;
     private final MotrSession motrSession;
@@ -69,6 +71,7 @@ public class ReviewResource {
                     .setRegistration(regNumberFromSession)
                     .setYearOfManufacture(vehicle.getYearOfManufacture() == null ? null : vehicle.getYearOfManufacture().toString());
         } else {
+            logger.debug("vehicle is null on get request");
             throw new NotFoundException();
         }
 
@@ -92,6 +95,7 @@ public class ReviewResource {
 
             return redirectToSuccessScreen(redirectUri, vrm, email, expiryDate);
         } else {
+            logger.debug("detailsAreValid() {} or vehicle is null: {}", detailsAreValid(vrm, email), vehicle);
             throw new NotFoundException();
         }
     }
