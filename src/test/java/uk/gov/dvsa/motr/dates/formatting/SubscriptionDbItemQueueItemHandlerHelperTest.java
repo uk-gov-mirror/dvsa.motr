@@ -8,6 +8,7 @@ import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 
 import static uk.gov.dvsa.motr.notifier.processing.service.SubscriptionHandlerHelper.motDueDateUpdateRequired;
+import static uk.gov.dvsa.motr.notifier.processing.service.SubscriptionHandlerHelper.oneDayAfterEmailRequired;
 import static uk.gov.dvsa.motr.notifier.processing.service.SubscriptionHandlerHelper.oneMonthEmailRequired;
 import static uk.gov.dvsa.motr.notifier.processing.service.SubscriptionHandlerHelper.twoWeekEmailRequired;
 
@@ -59,5 +60,21 @@ public class SubscriptionDbItemQueueItemHandlerHelperTest {
         LocalDate vehicleDetailsMotExpiryDate = LocalDate.of(2017, 10, 11);
 
         assertFalse(twoWeekEmailRequired(subscriptionMotDueDate, vehicleDetailsMotExpiryDate));
+    }
+
+    @Test
+    public void oneDayAfterSubscriptionShouldBeSentIfDateIsOneDayAfter() {
+        LocalDate subscriptionMotDueDate = LocalDate.of(2017, 10, 10);
+        LocalDate vehicleDetailsMotExpiryDate = LocalDate.of(2017, 10, 9);
+
+        assertTrue(oneDayAfterEmailRequired(subscriptionMotDueDate, vehicleDetailsMotExpiryDate));
+    }
+
+    @Test
+    public void oneDayAfterSubscriptionShouldBeSentIfDateIsNotOneDayAfter() {
+        LocalDate subscriptionMotDueDate = LocalDate.of(2017, 10, 10);
+        LocalDate vehicleDetailsMotExpiryDate = LocalDate.of(2017, 10, 11);
+
+        assertFalse(oneDayAfterEmailRequired(subscriptionMotDueDate, vehicleDetailsMotExpiryDate));
     }
 }

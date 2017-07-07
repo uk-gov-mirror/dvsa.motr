@@ -48,6 +48,7 @@ import static uk.gov.dvsa.motr.notifier.SystemVariable.MESSAGE_RECEIVE_TIMEOUT;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MESSAGE_VISIBILITY_TIMEOUT;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_API_MOT_TEST_NUMBER_URI;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_TEST_REMINDER_INFO_TOKEN;
+import static uk.gov.dvsa.motr.notifier.SystemVariable.ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.ONE_MONTH_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.REGION;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.REMAINING_TIME_THRESHOLD;
@@ -158,9 +159,10 @@ public class ConfigModule extends AbstractModule {
         String apiKey = config.getValue(GOV_NOTIFY_API_TOKEN);
         String oneMonthTemplateId = config.getValue(ONE_MONTH_NOTIFICATION_TEMPLATE_ID);
         String twoWeekTemplateId = config.getValue(TWO_WEEK_NOTIFICATION_TEMPLATE_ID);
+        String oneDayAfterTemplateId = config.getValue(ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID);
         NotificationClient client = new NotificationClient(apiKey);
 
-        return new NotifyService(client, oneMonthTemplateId, twoWeekTemplateId);
+        return new NotifyService(client, oneMonthTemplateId, twoWeekTemplateId, oneDayAfterTemplateId);
     }
 
     @Provides

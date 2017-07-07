@@ -3,10 +3,11 @@ package uk.gov.dvsa.motr.notifier.processing.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.dvsa.motr.eventlog.Event;
 import uk.gov.dvsa.motr.eventlog.EventLogger;
-import uk.gov.dvsa.motr.notifier.component.subscription.persistence.SubscriptionDbItem;
 import uk.gov.dvsa.motr.notifier.component.subscription.persistence.SubscriptionRepository;
+import uk.gov.dvsa.motr.notifier.events.OneDayAfterEmailReminderEvent;
+import uk.gov.dvsa.motr.notifier.events.OneMonthEmailReminderEvent;
+import uk.gov.dvsa.motr.notifier.events.TwoWeekEmailReminderEvent;
 import uk.gov.dvsa.motr.notifier.events.UpdateVrmFailedEvent;
 import uk.gov.dvsa.motr.notifier.events.UpdateVrmSuccessfulEvent;
 import uk.gov.dvsa.motr.notifier.notify.NotifyService;
@@ -22,10 +23,10 @@ import javax.ws.rs.core.UriBuilder;
 
 import static uk.gov.dvsa.motr.notifier.processing.service.SubscriptionHandlerHelper.motDueDateUpdateRequired;
 import static uk.gov.dvsa.motr.notifier.processing.service.SubscriptionHandlerHelper.motTestNumberUpdateRequired;
+import static uk.gov.dvsa.motr.notifier.processing.service.SubscriptionHandlerHelper.oneDayAfterEmailRequired;
 import static uk.gov.dvsa.motr.notifier.processing.service.SubscriptionHandlerHelper.oneMonthEmailRequired;
 import static uk.gov.dvsa.motr.notifier.processing.service.SubscriptionHandlerHelper.twoWeekEmailRequired;
 import static uk.gov.dvsa.motr.notifier.processing.service.SubscriptionHandlerHelper.vrmUpdateRequired;
-
 
 public class ProcessSubscriptionService {
 
@@ -75,10 +76,29 @@ public class ProcessSubscriptionService {
 
         if (oneMonthEmailRequired(requestDate, vehicleMotExpiryDate)) {
             notifyService.sendOneMonthNotificationEmail(email, vehicleVrm, vehicleMotExpiryDate, unSubscribeLink);
+
+            EventLogger.logEvent(new OneMonthEmailReminderEvent()
+                    .setEmail(email)
+                    .setVrm(vehicleVrm)
+                    .setExpiryDate(vehicleMotExpiryDate));
         }
 
         if (twoWeekEmailRequired(requestDate, vehicleMotExpiryDate)) {
             notifyService.sendTwoWeekNotificationEmail(email, vehicleVrm, vehicleMotExpiryDate, unSubscribeLink);
+
+            EventLogger.logEvent(new TwoWeekEmailReminderEvent()
+                    .setEmail(email)
+                    .setVrm(vehicleVrm)
+                    .setExpiryDate(vehicleMotExpiryDate));
+        }
+
+        if (oneDayAfterEmailRequired(requestDate, vehicleMotExpiryDate)) {
+            notifyService.sendOneDayAfterNotificationEmail(email, vehicleVrm, vehicleMotExpiryDate, unSubscribeLink);
+
+            EventLogger.logEvent(new OneDayAfterEmailReminderEvent()
+                    .setEmail(email)
+                    .setVrm(vehicleVrm)
+                    .setExpiryDate(vehicleMotExpiryDate));
         }
 
         if (motTestNumberUpdateRequired(subscriptionMotTestNumber, vehicleMotTestNumber)) {
