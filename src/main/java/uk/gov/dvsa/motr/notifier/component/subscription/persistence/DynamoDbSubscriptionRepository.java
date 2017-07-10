@@ -14,9 +14,6 @@ import com.amazonaws.services.dynamodbv2.document.spec.UpdateItemSpec;
 import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 import com.amazonaws.services.dynamodbv2.model.ReturnValue;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -112,5 +109,11 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
         } catch (Exception e) {
             throw new Exception(e);
         }
+    }
+
+    public void deleteSubscription(String vrm, String email) {
+
+        DeleteItemSpec deleteItemSpec = new DeleteItemSpec().withPrimaryKey("vrm", vrm, "email", email);
+        dynamoDb.getTable(tableName).deleteItem(deleteItemSpec);
     }
 }
