@@ -7,5 +7,5 @@ import java.util.Iterator;
 
 public interface SubscriptionProducer {
 
-    Iterator<Subscription> getIterator(LocalDate secondNotificationDate, LocalDate firstNotificationDate);
+    Iterator<Subscription> getIterator(LocalDate oneMonthAhead, LocalDate twoWeeksAhead, LocalDate oneDayBehind);
 }

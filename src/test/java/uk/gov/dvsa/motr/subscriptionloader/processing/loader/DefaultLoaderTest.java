@@ -39,22 +39,23 @@ public class DefaultLoaderTest {
 
         Iterator mockIterator = mock(Iterator.class);
         when(mockIterator.hasNext()).thenReturn(false);
-        when(this.producer.getIterator(any(), any())).thenReturn(mockIterator);
+        when(this.producer.getIterator(any(), any(), any())).thenReturn(mockIterator);
 
         DefaultLoader loader = new DefaultLoader(this.producer, this.dispatcher);
         loader.run(getTestLocalDate(), context);
 
         LocalDate oneMonth = getTestLocalDate().plusMonths(1L);
         LocalDate twoWeeks = getTestLocalDate().plusDays(14L);
+        LocalDate oneDayBehind = getTestLocalDate().minusDays(1L);
 
-        verify(producer, times(1)).getIterator(eq(oneMonth), eq(twoWeeks));
+        verify(producer, times(1)).getIterator(eq(oneMonth), eq(twoWeeks), eq(oneDayBehind));
     }
 
     @Test
     public void whenThereAreDispatchedItems_thenTheResultsAreProcessedForTheReport() throws Exception {
 
         Iterator mockIterator = createIteratorWithHasNextSequence(true, true, false);
-        when(this.producer.getIterator(any(), any())).thenReturn(mockIterator);
+        when(this.producer.getIterator(any(), any(), any())).thenReturn(mockIterator);
 
         Subscription mockSubscription = new Subscription().setEmail("email@email.com")
                 .setId("someId").setMotDueDate(LocalDate.now()).setVrm("aaa").setMotTestNumber("123456");
@@ -75,7 +76,7 @@ public class DefaultLoaderTest {
     public void whenThereIsAFailedDispatchResult_thenProcessingStops() throws Exception {
 
         Iterator mockIterator = createIteratorWithHasNextSequence(true, true, false);
-        when(this.producer.getIterator(any(), any())).thenReturn(mockIterator);
+        when(this.producer.getIterator(any(), any(), any())).thenReturn(mockIterator);
 
         Subscription mockSubscription = new Subscription();
         when(mockIterator.next()).thenReturn(mockSubscription);
