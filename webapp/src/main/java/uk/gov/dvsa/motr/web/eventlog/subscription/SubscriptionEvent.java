@@ -24,4 +24,9 @@ public abstract class SubscriptionEvent extends Event {
         params.put("mot-due-date", motDueDate.format(DateTimeFormatter.ISO_DATE));
         return this;
     }
+
+    public SubscriptionEvent setReasonForCancellation(String reasonForCancellation) {
+        params.put("reason_for_cancellation", reasonForCancellation);
+        return this;
+    }
 }
