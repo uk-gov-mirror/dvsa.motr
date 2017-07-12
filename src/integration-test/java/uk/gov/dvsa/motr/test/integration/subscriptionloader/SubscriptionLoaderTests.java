@@ -96,6 +96,24 @@ public class SubscriptionLoaderTests {
         assertEquals(1, loadReport.getProcessed());
     }
 
+    @Test
+    public void runLoaderForOneDayAfterReminderThenEnsureItemsAddedToQueue() throws Exception {
+
+        String testTime = subscriptionItem.getMotDueDate().plusDays(1L) + "T12:00:00Z";
+        LoadReport loadReport = eventHandler.handle(buildRequest(testTime), buildContext());
+
+        List<Message> messages = queueHelper.getMessagesFromQueue();
+
+        Subscription subscription = jsonMapper.readValue(messages.get(0).getBody(), Subscription.class);
+        queueHelper.deleteMessageFromQueue(messages.get(0));
+
+        assertEquals(subscriptionItem.getVrm(), subscription.getVrm());
+        assertEquals(subscriptionItem.getEmail(), subscription.getEmail());
+        assertEquals(subscriptionItem.getMotTestNumber(), subscription.getMotTestNumber());
+        assertEquals(1, loadReport.getSubmittedForProcessing());
+        assertEquals(1, loadReport.getProcessed());
+    }
+
     private LoaderInvocationEvent buildRequest(String testTime) {
 
         return new LoaderInvocationEvent().setTime(testTime).setPurge(false);

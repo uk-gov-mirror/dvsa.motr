@@ -34,7 +34,8 @@ public class DynamoDbProducer implements SubscriptionProducer {
         this.subscriptionTableName = subscriptionTableName;
     }
 
-    public Iterator<Subscription> getIterator(LocalDate date1MonthAheadDueDate, LocalDate date2WeeksAheadDueDate) {
+    public Iterator<Subscription> getIterator(LocalDate date1MonthAheadDueDate, LocalDate date2WeeksAheadDueDate,
+            LocalDate date1DayBehindDueDate) {
 
         Index dueDateIndex = dynamoDb.getTable(subscriptionTableName).getIndex(INDEX_NAME);
 
@@ -50,19 +51,25 @@ public class DynamoDbProducer implements SubscriptionProducer {
                 .withKeyConditionExpression(keyCondExpr)
                 .withValueMap(new ValueMap().withString(":due_date", date2WeeksAheadDueDate.format(dateFormatter)));
 
+        QuerySpec querySpec1DayBehind = new QuerySpec()
+                .withKeyConditionExpression(keyCondExpr)
+                .withValueMap(new ValueMap().withString(":due_date", date1DayBehindDueDate.format(dateFormatter)));
+
 
         ItemCollection<QueryOutcome> result2WeeksAhead = dueDateIndex.query(querySpec2WeeksAhead);
         ItemCollection<QueryOutcome> result1MonthAhead = dueDateIndex.query(querySpec1MonthAhead);
+        ItemCollection<QueryOutcome> result1DayAfter = dueDateIndex.query(querySpec1DayBehind);
 
         Iterator<Item> iterator2WeeksAhead = result2WeeksAhead.iterator();
         Iterator<Item> iterator1MonthAhead = result1MonthAhead.iterator();
+        Iterator<Item> iterator1DayBehind = result1DayAfter.iterator();
 
         return new Iterator<Subscription>() {
 
             @Override
             public boolean hasNext() {
 
-                return iterator2WeeksAhead.hasNext() || iterator1MonthAhead.hasNext();
+                return iterator2WeeksAhead.hasNext() || iterator1MonthAhead.hasNext() || iterator1DayBehind.hasNext();
             }
 
             @Override
@@ -71,8 +78,10 @@ public class DynamoDbProducer implements SubscriptionProducer {
                 Item item;
                 if (iterator2WeeksAhead.hasNext()) {
                     item = iterator2WeeksAhead.next();
-                } else {
+                } else if (iterator1MonthAhead.hasNext()) {
                     item = iterator1MonthAhead.next();
+                } else {
+                    item = iterator1DayBehind.next();
                 }
 
                 LocalDate motDueDate = LocalDate.parse(item.getString("mot_due_date"), DateTimeFormatter.ISO_DATE);

@@ -27,6 +27,7 @@ public class DefaultLoader implements Loader {
     private static final Logger logger = LoggerFactory.getLogger(DefaultLoader.class.getSimpleName());
     private static final int FIRST_NOTIFICATION_TIME_MONTHS = 1;
     private static final int SECOND_NOTIFICATION_TIME_DAYS = 14;
+    private static final int THIRD_NOTIFICATION_TIME_DAYS = 1;
     /**
      * Time in milliseconds used define a threshold beyond which execution has timed out.
      */
@@ -45,11 +46,13 @@ public class DefaultLoader implements Loader {
     public LoadReport run(LocalDate referenceDate, Context context) throws Exception {
 
         LoadReport report = new LoadReport();
-        LocalDate firstDate = referenceDate.plusMonths(FIRST_NOTIFICATION_TIME_MONTHS);
-        LocalDate secondDate = referenceDate.plusDays(SECOND_NOTIFICATION_TIME_DAYS);
+        LocalDate oneMonthAhead = referenceDate.plusMonths(FIRST_NOTIFICATION_TIME_MONTHS);
+        LocalDate twoWeeksAhead = referenceDate.plusDays(SECOND_NOTIFICATION_TIME_DAYS);
+        LocalDate oneDayBehind = referenceDate.minusDays(THIRD_NOTIFICATION_TIME_DAYS);
 
-        logger.info("Reference date: {}, +14 days is {}, +1 month is {}", referenceDate, secondDate, firstDate);
-        Iterator<Subscription> subscriptionIterator = producer.getIterator(firstDate, secondDate);
+        logger.info("Reference date: {}, +14 days is {}, +1 month is {}, -1 day is {}", referenceDate, twoWeeksAhead, oneMonthAhead,
+                oneDayBehind);
+        Iterator<Subscription> subscriptionIterator = producer.getIterator(oneMonthAhead, twoWeeksAhead, oneDayBehind);
         List<DispatchResult> inFlightOps = new ArrayList<>();
 
         try {
