@@ -26,12 +26,14 @@ public class NotifyServiceTest {
     private NotificationClient notificationClient = mock(NotificationClient.class);
     private String oneMonthNotificationTemplateId = "TEMPLATE-ONE-MONTH";
     private String twoWeekNotificationTemplateId = "TEMPLATE-TWO-WEEK";
+    private String oneDayAfterNotificationTemplateId = "TEMPLATE-ONE-DAY-AFTER";
 
     private NotifyService notifyService;
 
     @Before
     public void setUp() {
-        notifyService = new NotifyService(notificationClient, oneMonthNotificationTemplateId, twoWeekNotificationTemplateId);
+        notifyService = new NotifyService(notificationClient, oneMonthNotificationTemplateId, twoWeekNotificationTemplateId,
+                oneDayAfterNotificationTemplateId);
     }
 
     @Test
@@ -58,6 +60,19 @@ public class NotifyServiceTest {
         notifyService.sendTwoWeekNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK);
 
         verify(notificationClient, times(1)).sendEmail(twoWeekNotificationTemplateId, EMAIL, personalisation, "");
+    }
+
+    @Test
+    public void oneDayAfterNotificationIsSentWithCorrectDetails() throws NotificationClientException {
+
+        Map<String, String> personalisation = new HashMap<>();
+        personalisation.put("registration_number", REG);
+        personalisation.put("mot_expiry_date", DateFormatterForEmailDisplay.asFormattedForEmailDate(EXPIRY_DATE));
+        personalisation.put("unsubscribe_link", UNSUBSCRIBE_LINK);
+
+        notifyService.sendOneDayAfterNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK);
+
+        verify(notificationClient, times(1)).sendEmail(oneDayAfterNotificationTemplateId, EMAIL, personalisation, "");
     }
 
     @Test(expected = NotificationClientException.class)

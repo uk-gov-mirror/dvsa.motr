@@ -13,13 +13,15 @@ public class NotifyService {
     private NotificationClient notificationClient;
     private String oneMonthNotificationTemplateId;
     private String twoWeekNotificationTemplateId;
+    private String oneDayAfterNotificationTemplateId;
 
     public NotifyService(NotificationClient notificationClient, String oneMonthNotificationTemplateId, String
-            twoWeekNotificationTemplateId) {
+            twoWeekNotificationTemplateId, String oneDayAfterNotificationTemplateId) {
 
         this.notificationClient = notificationClient;
         this.oneMonthNotificationTemplateId = oneMonthNotificationTemplateId;
         this.twoWeekNotificationTemplateId = twoWeekNotificationTemplateId;
+        this.oneDayAfterNotificationTemplateId = oneDayAfterNotificationTemplateId;
     }
 
     public SendEmailResponse sendOneMonthNotificationEmail(String emailAddress, String registrationNumber, LocalDate motExpiryDate,
@@ -32,6 +34,12 @@ public class NotifyService {
             unsubscribeLink) throws NotificationClientException {
 
         return sendEmail(emailAddress, registrationNumber, motExpiryDate, unsubscribeLink, this.twoWeekNotificationTemplateId);
+    }
+
+    public SendEmailResponse sendOneDayAfterNotificationEmail(String emailAddress, String registrationNumber, LocalDate motExpiryDate,
+            String unsubscribeLink) throws NotificationClientException {
+
+        return sendEmail(emailAddress, registrationNumber, motExpiryDate, unsubscribeLink, this.oneDayAfterNotificationTemplateId);
     }
 
     private SendEmailResponse sendEmail(String emailAddress, String registrationNumber, LocalDate motExpiryDate, String unsubscribeLink,

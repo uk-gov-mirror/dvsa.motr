@@ -23,6 +23,11 @@ public class SubscriptionHandlerHelper {
         return requestDate.plusDays(14).equals(vehicleDetailsMotExpiryDate);
     }
 
+    public static boolean oneDayAfterEmailRequired(LocalDate requestDate, LocalDate vehicleDetailsMotExpiryDate) {
+
+        return requestDate.minusDays(1).equals(vehicleDetailsMotExpiryDate);
+    }
+
     public static boolean motTestNumberUpdateRequired(String subscriptionMotTestNumber, String vehicleDetailsMotTestNumber) {
         return !subscriptionMotTestNumber.equals(vehicleDetailsMotTestNumber);
     }

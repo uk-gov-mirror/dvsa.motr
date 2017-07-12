@@ -76,6 +76,7 @@ public class ProcessSubscriptionDbItemQueueItemServiceTest {
 
         verify(subscriptionRepository, times(0)).updateExpiryDate(any(), any(), any());
         verify(notifyService, times(0)).sendTwoWeekNotificationEmail(any(), any(), any(), any());
+        verify(notifyService, times(0)).sendOneDayAfterNotificationEmail(any(), any(), any(), any());
         verify(notifyService, times(1)).sendOneMonthNotificationEmail(
                 "test@this-is-a-test-123", TEST_VRM, vehicleExpiryDate, getExpectedUnsubscribeLink()
         );
@@ -95,7 +96,28 @@ public class ProcessSubscriptionDbItemQueueItemServiceTest {
 
         verify(subscriptionRepository, times(0)).updateExpiryDate(any(), any(), any());
         verify(notifyService, times(0)).sendOneMonthNotificationEmail(any(), any(), any(), any());
+        verify(notifyService, times(0)).sendOneDayAfterNotificationEmail(any(), any(), any(), any());
         verify(notifyService, times(1)).sendTwoWeekNotificationEmail(
+                "test@this-is-a-test-123", TEST_VRM, vehicleExpiryDate, getExpectedUnsubscribeLink()
+        );
+    }
+
+    @Test
+    public void whenVehicleExpiryDateOneDayAgoReminderIsSent() throws Exception {
+
+        LocalDate vehicleExpiryDate = LocalDate.of(2017, 10, 24);
+        SubscriptionQueueItem subscriptionQueueItem = subscriptionStub(vehicleExpiryDate);
+        VehicleDetails vehicleDetails = vehicleDetailsStub(vehicleExpiryDate);
+        LocalDate requestDate = LocalDate.of(2017, 10, 25);
+
+        when(this.vehicleDetailsClient.fetch(any())).thenReturn(Optional.of(vehicleDetails));
+
+        processSubscriptionService.processSubscription(subscriptionQueueItem, requestDate);
+
+        verify(subscriptionRepository, times(0)).updateExpiryDate(any(), any(), any());
+        verify(notifyService, times(0)).sendOneMonthNotificationEmail(any(), any(), any(), any());
+        verify(notifyService, times(0)).sendTwoWeekNotificationEmail(any(), any(), any(), any());
+        verify(notifyService, times(1)).sendOneDayAfterNotificationEmail(
                 "test@this-is-a-test-123", TEST_VRM, vehicleExpiryDate, getExpectedUnsubscribeLink()
         );
     }
@@ -119,6 +141,7 @@ public class ProcessSubscriptionDbItemQueueItemServiceTest {
 
         verify(subscriptionRepository, times(1)).updateExpiryDate(any(), any(), any());
         verify(notifyService, times(0)).sendOneMonthNotificationEmail(any(), any(), any(), any());
+        verify(notifyService, times(0)).sendOneDayAfterNotificationEmail(any(), any(), any(), any());
         verify(notifyService, times(1)).sendTwoWeekNotificationEmail(
                 "test@this-is-a-test-123", TEST_VRM, vehicleExpiryDate, getExpectedUnsubscribeLink()
         );
@@ -142,10 +165,34 @@ public class ProcessSubscriptionDbItemQueueItemServiceTest {
         processSubscriptionService.processSubscription(subscription, requestDate);
 
         verify(subscriptionRepository, times(1)).updateExpiryDate(any(), any(), any());
+        verify(notifyService, times(0)).sendOneDayAfterNotificationEmail(any(), any(), any(), any());
+        verify(notifyService, times(0)).sendTwoWeekNotificationEmail(any(), any(), any(), any());
         verify(notifyService, times(1)).sendOneMonthNotificationEmail(
                 "test@this-is-a-test-123", TEST_VRM, vehicleExpiryDate, getExpectedUnsubscribeLink()
         );
-        verify(notifyService, times(0)).sendTwoWeekNotificationEmail(
+    }
+
+    /**
+     * When MOTR expiry date is over a year in the past, then the record gets updated from MOTH record in the subscription database and if
+     * it is 1 day after, an email is still sent
+     * @throws Exception
+     */
+    @Test
+    public void whenStoredExpiryDateIsBeforeTheVehicleApiButIsOneDayAfterReminder_ThenRecordIsUpdatedAndEmailSent() throws Exception {
+
+        LocalDate vehicleExpiryDate = LocalDate.of(2017, 10, 24);
+        SubscriptionQueueItem subscription = subscriptionStub(LocalDate.of(2014, 10, 24));
+        VehicleDetails vehicleDetails = vehicleDetailsStub(vehicleExpiryDate);
+        LocalDate requestDate = LocalDate.of(2017, 10, 25);
+
+        when(this.vehicleDetailsClient.fetch(any())).thenReturn(Optional.of(vehicleDetails));
+
+        processSubscriptionService.processSubscription(subscription, requestDate);
+
+        verify(subscriptionRepository, times(1)).updateExpiryDate(any(), any(), any());
+        verify(notifyService, times(0)).sendTwoWeekNotificationEmail(any(), any(), any(), any());
+        verify(notifyService, times(0)).sendOneMonthNotificationEmail(any(), any(), any(), any());
+        verify(notifyService, times(1)).sendOneDayAfterNotificationEmail(
                 "test@this-is-a-test-123", TEST_VRM, vehicleExpiryDate, getExpectedUnsubscribeLink()
         );
     }

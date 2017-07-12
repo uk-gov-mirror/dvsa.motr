@@ -13,6 +13,7 @@ import static uk.gov.dvsa.motr.notifier.SystemVariable.MESSAGE_RECEIVE_TIMEOUT;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MESSAGE_VISIBILITY_TIMEOUT;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_API_MOT_TEST_NUMBER_URI;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_TEST_REMINDER_INFO_TOKEN;
+import static uk.gov.dvsa.motr.notifier.SystemVariable.ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.ONE_MONTH_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.REGION;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.REMAINING_TIME_THRESHOLD;
@@ -34,6 +35,7 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
         set(MOT_API_MOT_TEST_NUMBER_URI, motTestNumberApiEndpoint());
         set(ONE_MONTH_NOTIFICATION_TEMPLATE_ID, notifyOneMonthTemplateId());
         set(TWO_WEEK_NOTIFICATION_TEMPLATE_ID, notifyTwoWeekTemplateId());
+        set(ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID, notifyOneDayAfterTemplateId());
         set(GOV_NOTIFY_API_TOKEN, govNotifyApiToken());
         set(WORKER_COUNT, "1");
         set(MESSAGE_RECEIVE_TIMEOUT, "10");
@@ -85,6 +87,11 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
     public static String notifyOneMonthTemplateId() {
 
         return lookupProperty("test.notify.template.one.month");
+    }
+
+    public static String notifyOneDayAfterTemplateId() {
+
+        return lookupProperty("test.notify.template.one.day.after");
     }
 
     private static String lookupProperty(String property) {
