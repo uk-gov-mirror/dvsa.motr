@@ -11,6 +11,7 @@ import org.junit.Test;
 import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.core.DynamoDbFixture;
 import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.model.CancelledSubscriptionItem;
 import uk.gov.dvsa.motr.web.component.subscription.model.CancelledSubscription;
+import uk.gov.dvsa.motr.web.component.subscription.service.UnsubscribeService;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -20,6 +21,8 @@ import static uk.gov.dvsa.motr.test.integration.dynamodb.DynamoDbIntegrationHelp
 import static uk.gov.dvsa.motr.test.integration.dynamodb.DynamoDbIntegrationHelper.region;
 
 public class DynamoDbCancelledSubscriptionRepositoryTest {
+
+    private static final String REASON_FOR_CANCELLATION_USER_CANCELLED = "User cancelled";
 
     CancelledSubscriptionRepository repository;
     DynamoDbFixture fixture;
@@ -41,7 +44,8 @@ public class DynamoDbCancelledSubscriptionRepositoryTest {
                 .setUnsubscribeId(cancelledSubscriptionItem.getUnsubscribeId())
                 .setEmail(cancelledSubscriptionItem.getEmail())
                 .setVrm(cancelledSubscriptionItem.getVrm())
-                .setMotTestNumber(cancelledSubscriptionItem.getMotTestNumber());
+                .setMotTestNumber(cancelledSubscriptionItem.getMotTestNumber())
+                .setReasonForCancellation(REASON_FOR_CANCELLATION_USER_CANCELLED);
 
         repository.save(cancelledSubscription);
 

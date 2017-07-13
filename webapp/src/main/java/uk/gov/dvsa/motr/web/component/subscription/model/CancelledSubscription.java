@@ -9,6 +9,8 @@ public class CancelledSubscription {
 
     private String motTestNumber;
 
+    private String reasonForCancellation;
+
     public String getUnsubscribeId() {
         return unsubscribeId;
     }
@@ -29,6 +31,15 @@ public class CancelledSubscription {
 
     public String getEmail() {
         return email;
+    }
+
+    public String getReasonForCancellation() {
+        return reasonForCancellation;
+    }
+
+    public CancelledSubscription setReasonForCancellation(String reasonForCancellation) {
+        this.reasonForCancellation = reasonForCancellation;
+        return this;
     }
 
     public CancelledSubscription setEmail(String email) {

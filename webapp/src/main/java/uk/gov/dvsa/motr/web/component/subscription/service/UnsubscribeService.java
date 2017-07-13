@@ -15,6 +15,8 @@ import javax.ws.rs.NotFoundException;
 
 public class UnsubscribeService {
 
+    private static final String REASON_FOR_CANCELLATION_USER_CANCELLED = "User cancelled";
+
     private SubscriptionRepository subscriptionRepository;
     private CancelledSubscriptionRepository cancelledSubscriptionRepository;
 
@@ -40,6 +42,7 @@ public class UnsubscribeService {
                     .setVrm(sub.getVrm())
                     .setEmail(sub.getEmail())
                     .setDueDate(sub.getMotDueDate())
+                    .setReasonForCancellation(REASON_FOR_CANCELLATION_USER_CANCELLED)
             );
 
             return sub;
@@ -57,6 +60,7 @@ public class UnsubscribeService {
         return new CancelledSubscription()
                 .setUnsubscribeId(subscription.getUnsubscribeId())
                 .setVrm(subscription.getVrm())
-                .setEmail(subscription.getEmail());
+                .setEmail(subscription.getEmail())
+                .setReasonForCancellation(REASON_FOR_CANCELLATION_USER_CANCELLED);
     }
 }

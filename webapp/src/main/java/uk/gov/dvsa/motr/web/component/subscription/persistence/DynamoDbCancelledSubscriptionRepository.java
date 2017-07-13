@@ -38,6 +38,7 @@ public class DynamoDbCancelledSubscriptionRepository implements CancelledSubscri
                 .withString("id", cancelledSubscription.getUnsubscribeId())
                 .withString("vrm", cancelledSubscription.getVrm())
                 .withString("email", cancelledSubscription.getEmail())
+                .withString("reason_for_cancellation", cancelledSubscription.getReasonForCancellation())
                 .withString("cancelled_at", ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT));
 
         dynamoDb.getTable(tableName).putItem(item);
