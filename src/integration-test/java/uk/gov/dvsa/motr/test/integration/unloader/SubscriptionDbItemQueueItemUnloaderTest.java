@@ -96,7 +96,7 @@ public class SubscriptionDbItemQueueItemUnloaderTest {
         SubscriptionDbItem changedSubscriptionDbItem = saveAndProcessSubscriptionItem(subscriptionItem);
 
         // Assert that the db subscription date now is equal to the mock api date.
-        assertEquals(changedSubscriptionDbItem.getMotDueDate(), MOCK_API_SPECIFIC_VEHICLE_DATE);
+        assertEquals(MOCK_API_SPECIFIC_VEHICLE_DATE, changedSubscriptionDbItem.getMotDueDate());
     }
 
     @Test
@@ -112,7 +112,7 @@ public class SubscriptionDbItemQueueItemUnloaderTest {
         SubscriptionDbItem changedSubscriptionDbItem = saveAndProcessSubscriptionItem(subscriptionItem);
 
         // Assert that the db motTestNumber now is equal to the mock api motTestNumber.
-        assertEquals(changedSubscriptionDbItem.getMotTestNumber(), "123456");
+        assertEquals("2321321", changedSubscriptionDbItem.getMotTestNumber());
     }
 
     @Test
@@ -135,7 +135,7 @@ public class SubscriptionDbItemQueueItemUnloaderTest {
         assertEquals(subscriptionItem.getId(), changedSubscriptionDbItem.getId());
 
         // Assert the db vrm now is equal to the mock api vrm.
-        assertEquals(changedSubscriptionDbItem.getVrm(), "XXXYYY");
+        assertEquals("XXXYYY", changedSubscriptionDbItem.getVrm());
         assertNotNull("created_at cannot be null when updating vrm", savedItem.getString("created_at"));
         assertNotNull("updated_at cannot be null when updating vrm", savedItem.getString("updated_at"));
     }
