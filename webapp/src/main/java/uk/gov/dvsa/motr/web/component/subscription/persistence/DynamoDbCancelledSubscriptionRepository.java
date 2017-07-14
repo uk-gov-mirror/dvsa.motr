@@ -18,6 +18,8 @@ import static uk.gov.dvsa.motr.web.system.SystemVariable.REGION;
 
 public class DynamoDbCancelledSubscriptionRepository implements CancelledSubscriptionRepository {
 
+    private static final int MONTHS_TO_DELETION = 59;
+
     private DynamoDB dynamoDb;
     private String tableName;
 
@@ -34,12 +36,14 @@ public class DynamoDbCancelledSubscriptionRepository implements CancelledSubscri
 
     @Override
     public void save(CancelledSubscription cancelledSubscription) {
+
         Item item = new Item()
                 .withString("id", cancelledSubscription.getUnsubscribeId())
                 .withString("vrm", cancelledSubscription.getVrm())
                 .withString("email", cancelledSubscription.getEmail())
                 .withString("reason_for_cancellation", cancelledSubscription.getReasonForCancellation())
-                .withString("cancelled_at", ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT));
+                .withString("cancelled_at", ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT))
+                .withNumber("deletion_date", ZonedDateTime.now().plusMonths(MONTHS_TO_DELETION).toEpochSecond());
 
         dynamoDb.getTable(tableName).putItem(item);
     }
