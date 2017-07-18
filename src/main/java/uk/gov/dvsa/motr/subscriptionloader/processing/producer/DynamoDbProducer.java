@@ -58,11 +58,11 @@ public class DynamoDbProducer implements SubscriptionProducer {
 
         ItemCollection<QueryOutcome> result2WeeksAhead = dueDateIndex.query(querySpec2WeeksAhead);
         ItemCollection<QueryOutcome> result1MonthAhead = dueDateIndex.query(querySpec1MonthAhead);
-        ItemCollection<QueryOutcome> result1DayAfter = dueDateIndex.query(querySpec1DayBehind);
+        ItemCollection<QueryOutcome> result1DayBehind = dueDateIndex.query(querySpec1DayBehind);
 
         Iterator<Item> iterator2WeeksAhead = result2WeeksAhead.iterator();
         Iterator<Item> iterator1MonthAhead = result1MonthAhead.iterator();
-        Iterator<Item> iterator1DayBehind = result1DayAfter.iterator();
+        Iterator<Item> iterator1DayBehind = result1DayBehind.iterator();
 
         return new Iterator<Subscription>() {
 
