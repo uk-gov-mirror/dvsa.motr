@@ -23,6 +23,10 @@ public class RandomDataUtil {
         return random(6, false, true);
     }
 
+    public static String dvlaId() {
+        return random(6, false, true);
+    }
+
     public static LocalDate dueDate() {
         long minDay = LocalDate.of(1970, 1, 1).toEpochDay();
         long maxDay = LocalDate.of(2017, 1, 1).toEpochDay();

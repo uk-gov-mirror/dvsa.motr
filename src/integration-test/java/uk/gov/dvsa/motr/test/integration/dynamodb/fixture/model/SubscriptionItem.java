@@ -19,7 +19,21 @@ public class SubscriptionItem implements DynamoDbFixtureTableItem {
 
     private String email = RandomDataUtil.email();
 
-    private String motTestNumber = RandomDataUtil.motTestNumber();
+    private String motTestNumber;
+
+    private String dvlaId;
+
+    public SubscriptionItem generateMotTestNumber() {
+
+        this.motTestNumber = RandomDataUtil.motTestNumber();
+        return this;
+    }
+
+    public SubscriptionItem generateDvlaId() {
+
+        this.dvlaId = RandomDataUtil.dvlaId();
+        return this;
+    }
 
     public String getId() {
 
@@ -60,11 +74,24 @@ public class SubscriptionItem implements DynamoDbFixtureTableItem {
     }
 
     public String getMotTestNumber() {
+
         return this.motTestNumber;
     }
 
     public SubscriptionItem setMotTestNumber(String motTestNumber) {
+
         this.motTestNumber = motTestNumber;
+        return this;
+    }
+
+    public String getDvlaId() {
+
+        return this.dvlaId;
+    }
+
+    public SubscriptionItem setDvlaId(String dvlaId) {
+
+        this.dvlaId = dvlaId;
         return this;
     }
 
@@ -76,7 +103,8 @@ public class SubscriptionItem implements DynamoDbFixtureTableItem {
                 .with("vrm", vrm)
                 .with("mot_due_date_md", motDueDate.format(DateTimeFormatter.ofPattern("MM-dd")))
                 .with("email", email)
-                .with("mot_test_number", motTestNumber);
+                .with("mot_test_number", motTestNumber)
+                .with("dvla_id", dvlaId);
 
     }
 }

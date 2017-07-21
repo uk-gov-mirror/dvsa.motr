@@ -1,6 +1,7 @@
 package uk.gov.dvsa.motr.subscriptionloader.processing.loader;
 
 import com.amazonaws.services.lambda.runtime.Context;
+import com.google.common.base.Strings;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,12 +75,12 @@ public class DefaultLoader implements Loader {
             reportRemaining(inFlightOps, report, context);
 
             EventLogger.logEvent(new LoadingSuccess()
-                    .setProcessed(report.getProcessed())
+                    .setProcessed(report.getTotalProcessed())
                     .setDuration(report.getDuration())
             );
 
         } catch (Exception e) {
-            EventLogger.logErrorEvent(new LoadingError().setProcessed(report.getProcessed()), e);
+            EventLogger.logErrorEvent(new LoadingError().setProcessed(report.getTotalProcessed()), e);
             throw e;
         }
         return report;
@@ -109,16 +110,29 @@ public class DefaultLoader implements Loader {
             DispatchResult dispatchResult = dispatchResultIterator.next();
             if (dispatchResult.isDone()) {
                 if (!dispatchResult.isFailed()) {
-                    report.incrementProcessed();
+                    report.incrementTotalProcessed();
                     dispatchResultIterator.remove();
                     Subscription subscription = dispatchResult.getSubscription();
-                    EventLogger.logEvent(new ItemSuccess()
-                            .setVrm(subscription.getVrm())
-                            .setEmail(subscription.getEmail())
-                            .setMotTestNumber(subscription.getMotTestNumber())
-                            .setDueDate(subscription.getMotDueDate())
-                            .setId(subscription.getId())
-                    );
+
+                    if (Strings.isNullOrEmpty(subscription.getMotTestNumber())) {
+                        report.incrementDvlaVehiclesProcessed();
+                        EventLogger.logEvent(new ItemSuccess()
+                                .setVrm(subscription.getVrm())
+                                .setEmail(subscription.getEmail())
+                                .setDvlaId(subscription.getDvlaId())
+                                .setDueDate(subscription.getMotDueDate())
+                                .setId(subscription.getId())
+                        );
+                    } else {
+                        report.incrementNonDvlaVehiclesProcessed();
+                        EventLogger.logEvent(new ItemSuccess()
+                                .setVrm(subscription.getVrm())
+                                .setEmail(subscription.getEmail())
+                                .setMotTestNumber(subscription.getMotTestNumber())
+                                .setDueDate(subscription.getMotDueDate())
+                                .setId(subscription.getId())
+                        );
+                    }
                 } else {
                     throw new LoadingException(dispatchResult.getError());
                 }
@@ -130,7 +144,7 @@ public class DefaultLoader implements Loader {
 
         if (context.getRemainingTimeInMillis() < LOADING_CUTOFF_DELTA_MS) {
             EventLogger.logEvent(new LoadingTimeout()
-                    .setProcessed(report.getProcessed())
+                    .setProcessed(report.getTotalProcessed())
                     .setSubmittedForProcessing(report.getSubmittedForProcessing())
                     .setDuration(report.getDuration()));
             throw new LoadingException(new Exception("Ran out of time. Unable to process all subscriptions"));
