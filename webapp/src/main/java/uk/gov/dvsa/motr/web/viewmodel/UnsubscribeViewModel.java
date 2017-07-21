@@ -1,6 +1,6 @@
 package uk.gov.dvsa.motr.web.viewmodel;
 
-import uk.gov.dvsa.motr.web.helper.DateDisplayHelper;
+import uk.gov.dvsa.motr.web.formatting.DateFormatter;
 
 import java.time.LocalDate;
 
@@ -9,6 +9,7 @@ public class UnsubscribeViewModel {
     private String registration;
     private String email;
     private LocalDate expiryDate;
+    private String makeModel;
 
     public String getRegistration() {
         return registration;
@@ -37,12 +38,23 @@ public class UnsubscribeViewModel {
             return "Unknown";
         }
 
-        return DateDisplayHelper.asDisplayDate(expiryDate);
+        return DateFormatter.asDisplayDate(expiryDate);
     }
 
     public UnsubscribeViewModel setExpiryDate(LocalDate expiryDate) {
 
         this.expiryDate = expiryDate;
+        return this;
+    }
+
+    public String getMakeModel() {
+
+        return this.makeModel;
+    }
+
+    public UnsubscribeViewModel setMakeModel(String makeModel) {
+
+        this.makeModel = makeModel;
         return this;
     }
 }

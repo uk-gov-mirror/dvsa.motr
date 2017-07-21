@@ -1,6 +1,5 @@
 package uk.gov.dvsa.motr.web.security;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import javax.ws.rs.container.ContainerResponseContext;

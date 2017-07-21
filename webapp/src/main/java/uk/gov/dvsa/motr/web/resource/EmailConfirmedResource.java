@@ -7,7 +7,6 @@ import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.service.SubscriptionConfirmationService;
 import uk.gov.dvsa.motr.web.cookie.EmailConfirmationParams;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
-import uk.gov.dvsa.motr.web.helper.DateDisplayHelper;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 
 import java.util.HashMap;
@@ -35,6 +34,7 @@ public class EmailConfirmedResource {
     private SubscriptionConfirmationService subscriptionConfirmationService;
     private MotrSession motrSession;
     private UrlHelper urlHelper;
+
 
     @Inject
     public EmailConfirmedResource(

@@ -2,7 +2,6 @@ package uk.gov.dvsa.motr.web.component.subscription.persistence;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
-
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Index;
 import com.amazonaws.services.dynamodbv2.document.Item;
@@ -11,8 +10,6 @@ import com.amazonaws.services.dynamodbv2.document.PrimaryKey;
 import com.amazonaws.services.dynamodbv2.document.QueryOutcome;
 import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
 import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
-
-
 
 import uk.gov.dvsa.motr.web.component.subscription.model.PendingSubscription;
 import uk.gov.dvsa.motr.web.helper.SystemVariableParam;

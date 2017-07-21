@@ -3,6 +3,8 @@ package uk.gov.dvsa.motr.web.resource;
 import org.junit.Before;
 import org.junit.Test;
 
+import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
+import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.service.UnsubscribeService;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
@@ -18,6 +20,7 @@ import java.util.Optional;
 import javax.ws.rs.core.Response;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -32,6 +35,7 @@ public class UnsubscribeResourceTest {
 
     private UnsubscribeResource resource;
     private UnsubscribeService unsubscribeService;
+    private VehicleDetailsClient client = mock(VehicleDetailsClient.class);
 
     @Before
     public void setUp() {
@@ -45,7 +49,7 @@ public class UnsubscribeResourceTest {
         motrSession.setUnsubscribeConfirmationParams(params);
 
         this.unsubscribeService = mock(UnsubscribeService.class);
-        this.resource = new UnsubscribeResource(unsubscribeService, TEMPLATE_ENGINE_STUB, motrSession);
+        this.resource = new UnsubscribeResource(unsubscribeService, TEMPLATE_ENGINE_STUB, motrSession, client);
     }
 
     @Test
@@ -67,6 +71,7 @@ public class UnsubscribeResourceTest {
     @Test
     public void unsubscribeGetWhenFoundDisplayPage() throws Exception {
 
+        when(client.fetch(eq("TEST-VRM"))).thenReturn(Optional.of(new VehicleDetails()));
         when(unsubscribeService.findSubscriptionForUnsubscribe(UNSUBSCRIBE_ID)).thenReturn(Optional.of(subscriptionStub()));
 
         resource.unsubscribeGet(UNSUBSCRIBE_ID);

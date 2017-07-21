@@ -1,10 +1,14 @@
 package uk.gov.dvsa.motr.web.resource;
 
+import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
+import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
+import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsService;
 import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.service.UnsubscribeService;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.cookie.UnsubscribeConfirmationParams;
+import uk.gov.dvsa.motr.web.formatting.MakeModelFormatter;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 import uk.gov.dvsa.motr.web.viewmodel.UnsubscribeViewModel;
 
@@ -31,17 +35,20 @@ public class UnsubscribeResource {
     private UnsubscribeService unsubscribeService;
     private TemplateEngine renderer;
     private MotrSession motrSession;
+    private VehicleDetailsClient client;
 
     @Inject
     public UnsubscribeResource(
             UnsubscribeService unsubscribeService,
             TemplateEngine renderer,
-            MotrSession motrSession
+            MotrSession motrSession,
+            VehicleDetailsClient client
     ) {
 
         this.unsubscribeService = unsubscribeService;
         this.renderer = renderer;
         this.motrSession = motrSession;
+        this.client = client;
     }
 
     @GET
@@ -81,9 +88,12 @@ public class UnsubscribeResource {
 
     private UnsubscribeViewModel populateViewModelFromSubscription(Subscription subscription) {
 
+        VehicleDetails vehicleDetails = VehicleDetailsService.getVehicleDetails(subscription.getVrm(), client);
+
         return new UnsubscribeViewModel()
                 .setEmail(subscription.getEmail())
                 .setExpiryDate(subscription.getMotDueDate())
-                .setRegistration(subscription.getVrm());
+                .setRegistration(subscription.getVrm())
+                .setMakeModel(MakeModelFormatter.getMakeModelDisplayStringFromVehicleDetails(vehicleDetails, ", "));
     }
 }

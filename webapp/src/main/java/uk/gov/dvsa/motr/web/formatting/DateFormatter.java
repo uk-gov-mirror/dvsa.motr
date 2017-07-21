@@ -1,9 +1,9 @@
-package uk.gov.dvsa.motr.web.helper;
+package uk.gov.dvsa.motr.web.formatting;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-public class DateDisplayHelper {
+public class DateFormatter {
 
     private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM u");
 

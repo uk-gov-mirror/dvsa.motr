@@ -1,6 +1,6 @@
 package uk.gov.dvsa.motr.web.viewmodel;
 
-import uk.gov.dvsa.motr.web.helper.DateDisplayHelper;
+import uk.gov.dvsa.motr.web.formatting.DateFormatter;
 
 import java.time.LocalDate;
 
@@ -23,7 +23,7 @@ public class SubscriptionConfirmationViewModel {
 
     public String getExpiryDate() {
 
-        return DateDisplayHelper.asDisplayDate(expiryDate);
+        return DateFormatter.asDisplayDate(expiryDate);
     }
 
     public SubscriptionConfirmationViewModel setExpiryDate(LocalDate expiryDate) {

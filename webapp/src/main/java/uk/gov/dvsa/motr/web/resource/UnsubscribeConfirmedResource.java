@@ -1,8 +1,12 @@
 package uk.gov.dvsa.motr.web.resource;
 
+import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
+import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
+import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsService;
 import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.cookie.UnsubscribeConfirmationParams;
+import uk.gov.dvsa.motr.web.formatting.MakeModelFormatter;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 import uk.gov.dvsa.motr.web.viewmodel.UnsubscribeViewModel;
 
@@ -26,15 +30,19 @@ public class UnsubscribeConfirmedResource {
 
     private TemplateEngine renderer;
     private MotrSession motrSession;
+    private VehicleDetailsClient client;
 
     @Inject
     public UnsubscribeConfirmedResource(
             TemplateEngine renderer,
-            MotrSession motrSession
+            MotrSession motrSession,
+            VehicleDetailsClient client
+
     ) {
 
         this.renderer = renderer;
         this.motrSession = motrSession;
+        this.client = client;
     }
 
     @GET
@@ -46,10 +54,13 @@ public class UnsubscribeConfirmedResource {
             throw new NotFoundException();
         }
 
+        VehicleDetails vehicleDetails = VehicleDetailsService.getVehicleDetails(params.getRegistration(), client);
+
         UnsubscribeViewModel viewModel = new UnsubscribeViewModel()
                 .setRegistration(params.getRegistration())
                 .setExpiryDate(LocalDate.parse(params.getExpiryDate()))
-                .setEmail(params.getEmail());
+                .setEmail(params.getEmail())
+                .setMakeModel(MakeModelFormatter.getMakeModelDisplayStringFromVehicleDetails(vehicleDetails, ", "));
 
         DataLayerHelper helper = new DataLayerHelper();
         helper.putAttribute(VRM_KEY, params.getRegistration());
@@ -59,5 +70,4 @@ public class UnsubscribeConfirmedResource {
         map.put("viewModel", viewModel);
         return renderer.render("unsubscribe-confirmation", map);
     }
-
 }

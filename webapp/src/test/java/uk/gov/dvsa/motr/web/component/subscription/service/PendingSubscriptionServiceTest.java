@@ -5,6 +5,8 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
 import uk.gov.dvsa.motr.notifications.service.NotifyService;
+import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
+import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.component.subscription.model.PendingSubscription;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
@@ -16,6 +18,7 @@ import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -32,6 +35,7 @@ public class PendingSubscriptionServiceTest {
     private final SubscriptionRepository subscriptionRepository = mock(SubscriptionRepository.class);
     private final NotifyService notifyService = mock(NotifyService.class);
     private final UrlHelper urlHelper = mock(UrlHelper.class);
+    private final VehicleDetailsClient client = mock(VehicleDetailsClient.class);
 
     private static final String TEST_VRM = "TEST-REG";
     private static final String EMAIL = "TEST@TEST.com";
@@ -50,26 +54,36 @@ public class PendingSubscriptionServiceTest {
                 pendingSubscriptionRepository,
                 subscriptionRepository,
                 notifyService,
-                urlHelper
+                urlHelper,
+                client
         );
 
         when(urlHelper.confirmEmailLink(CONFIRMATION_ID)).thenReturn(CONFIRMATION_LINK);
         when(urlHelper.emailConfirmedNthTimeLink()).thenReturn(ALREADY_CONFIRMED_LINK);
         when(urlHelper.emailConfirmationPendingLink()).thenReturn(CONFIRMATION_PENDING_LINK);
+
     }
 
     @Test
     public void saveSubscriptionCallsDbToSaveDetailsAndSendsNotification() throws Exception {
+        VehicleDetails vehicleDetails = new VehicleDetails();
+        vehicleDetails.setMake("TEST-MAKE");
+        vehicleDetails.setModel("TEST-MODEL");
+        when(client.fetch(eq(TEST_VRM))).thenReturn(Optional.of(vehicleDetails));
 
         withExpectedSubscription(empty());
         when(pendingSubscriptionRepository.findByConfirmationId(CONFIRMATION_ID)).thenReturn(empty());
-        doNothing().when(notifyService).sendEmailAddressConfirmationEmail(EMAIL, CONFIRMATION_ID);
+        doNothing().when(notifyService).sendEmailAddressConfirmationEmail(EMAIL, CONFIRMATION_LINK, "TEST-MAKE TEST-MODEL, ");
         LocalDate date = LocalDate.now();
 
         this.subscriptionService.createPendingSubscription(TEST_VRM, EMAIL, date, CONFIRMATION_ID, TEST_MOT_TEST_NUMBER);
 
         verify(pendingSubscriptionRepository, times(1)).save(any(PendingSubscription.class));
-        verify(notifyService, times(1)).sendEmailAddressConfirmationEmail(EMAIL, CONFIRMATION_LINK);
+        verify(notifyService, times(1)).sendEmailAddressConfirmationEmail(
+                EMAIL,
+                CONFIRMATION_LINK,
+                "TEST-MAKE TEST-MODEL, TEST-REG"
+        );
     }
 
     @Test(expected = RuntimeException.class)
@@ -101,7 +115,7 @@ public class PendingSubscriptionServiceTest {
 
     @Test
     public void handleSubscriptionWillCreateNewPendingSubscription() throws Exception {
-
+        when(client.fetch(eq(TEST_VRM))).thenReturn(Optional.of(new VehicleDetails()));
         withExpectedSubscription(empty());
         LocalDate date = LocalDate.now();
         ArgumentCaptor<PendingSubscription> pendingSubscriptionArgumentCaptor = ArgumentCaptor.forClass(PendingSubscription.class);
