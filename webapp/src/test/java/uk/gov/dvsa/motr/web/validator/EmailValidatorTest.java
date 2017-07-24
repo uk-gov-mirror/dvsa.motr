@@ -46,6 +46,9 @@ public class EmailValidatorTest {
                 {"email@d©ßain.co.uk"},
                 {"email@例え.テスト"},
                 {"email@domain.012345678901234567890123456789012345678901234567890123456789012.com"},
+                {"email@DOMAIN.COM"},
+                {"email@DOMAIN.com"},
+                {"EMAIL@domain.COM"},
                 {"firstname-lastname@domain.com"}
         };
     }
