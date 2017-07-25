@@ -43,8 +43,8 @@ public class EmailValidator {
     private boolean isValidAccordingToGovNotify(String email) {
 
         Pattern emailRegex = Pattern.compile("^[^\\s\";@]+@([^.@][^@]+)$");
-        Pattern hostnamePart = Pattern.compile("^(xn-|[a-z0-9]+)(-[a-z0-9]+)*$");
-        Pattern tldPart = Pattern.compile("^([a-z]{2,63}|xn--([a-z0-9]+-)*[a-z0-9]+)$");
+        Pattern hostnamePart = Pattern.compile("^(xn-|[a-z0-9]+)(-[a-z0-9]+)*$", Pattern.CASE_INSENSITIVE);
+        Pattern tldPart = Pattern.compile("^([a-z]{2,63}|xn--([a-z0-9]+-)*[a-z0-9]+)$", Pattern.CASE_INSENSITIVE);
 
         Matcher emailMatcher = emailRegex.matcher(email);
         if (!emailMatcher.matches()) {
