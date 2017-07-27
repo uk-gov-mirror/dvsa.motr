@@ -39,13 +39,13 @@ public class SubscriptionConfirmationPage extends Page {
     @Override
     protected String getContentHeader() {
 
-        return "You've signed up for MOT reminders";
+        return "You’ve signed up for an MOT reminder";
     }
 
     @Override
     protected String getPageTitle() {
 
-        return "You’ve signed up for MOT reminders";
+        return "You’ve signed up for an MOT reminder";
     }
 
     public String getHeaderTitle() {
