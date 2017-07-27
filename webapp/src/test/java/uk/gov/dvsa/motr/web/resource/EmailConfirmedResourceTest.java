@@ -65,8 +65,6 @@ public class EmailConfirmedResourceTest {
         assertEquals(302, response.getStatus());
         assertEquals("confirm-email/confirmed", response.getLocation().toString());
         assertEquals(VRM, paramsArgumentCaptor.getValue().getRegistration());
-        assertEquals(EMAIL, paramsArgumentCaptor.getValue().getEmail());
-        assertEquals(DATE.format(DateTimeFormatter.ofPattern("d MMMM u")), paramsArgumentCaptor.getValue().getExpiryDate());
     }
 
     @Test

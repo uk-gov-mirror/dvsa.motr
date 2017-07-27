@@ -89,8 +89,6 @@ public class ReviewResourceTest {
         assertEquals(302, response.getStatus());
         assertEquals("email-confirmation-pending", response.getLocation().toString());
         assertEquals(EMAIL, paramsArgumentCaptor.getValue().getEmail());
-        assertEquals(VRM, paramsArgumentCaptor.getValue().getRegistration());
-        assertEquals(now.format(DateTimeFormatter.ofPattern("d MMMM u")), paramsArgumentCaptor.getValue().getExpiryDate());
     }
 
     @Test(expected = NotFoundException.class)

@@ -83,8 +83,6 @@ public class EmailConfirmedResource {
 
         EmailConfirmationParams params = new EmailConfirmationParams();
         params.setRegistration(subscription.getVrm());
-        params.setExpiryDate(DateDisplayHelper.asDisplayDate(subscription.getMotDueDate()));
-        params.setEmail(subscription.getEmail());
         motrSession.setEmailConfirmationParams(params);
     }
 

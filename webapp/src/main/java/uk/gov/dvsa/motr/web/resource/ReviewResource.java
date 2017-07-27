@@ -93,19 +93,17 @@ public class ReviewResource {
             String redirectUri =
                     pendingSubscriptionService.handlePendingSubscriptionCreation(vrm, email, expiryDate, vehicle.getMotTestNumber());
 
-            return redirectToSuccessScreen(redirectUri, vrm, email, expiryDate);
+            return redirectToSuccessScreen(redirectUri, email);
         } else {
             logger.debug("detailsAreValid() {} or vehicle is null: {}", detailsAreValid(vrm, email), vehicle);
             throw new NotFoundException();
         }
     }
 
-    private Response redirectToSuccessScreen(String redirectUri, String vrm, String email, LocalDate motExpiryDate) {
+    private Response redirectToSuccessScreen(String redirectUri, String email) {
 
         EmailConfirmationParams params = new EmailConfirmationParams();
-        params.setExpiryDate(DateDisplayHelper.asDisplayDate(motExpiryDate));
         params.setEmail(email);
-        params.setRegistration(vrm);
         motrSession.setEmailConfirmationParams(params);
 
         return redirect(redirectUri);
