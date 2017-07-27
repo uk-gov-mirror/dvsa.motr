@@ -11,13 +11,10 @@ import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.service.SubscriptionConfirmationService;
 import uk.gov.dvsa.motr.web.cookie.EmailConfirmationParams;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
-import uk.gov.dvsa.motr.web.helper.DateDisplayHelper;
 import uk.gov.dvsa.motr.web.test.render.TemplateEngineStub;
-import uk.gov.dvsa.motr.web.viewmodel.EmailConfirmedViewModel;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Map;
 
 import javax.ws.rs.core.Response;
 
@@ -86,18 +83,14 @@ public class EmailConfirmedResourceTest {
         motrSessionWillReturnValidPageParams();
 
         resource.confirmEmailFirstTimeGet();
-
-        verifyViewModel(getViewModel());
     }
 
     @Test
-    public void subscriptionDetailsAreBeignShownIfPresentInTheSessionOnNthVisit() throws Exception {
+    public void subscriptionDetailsAreBeingShownIfPresentInTheSessionOnNthVisit() throws Exception {
 
         motrSessionWillReturnValidPageParams();
 
         resource.confirmEmailNthTimeGet();
-
-        verifyViewModel(getViewModel());
     }
 
 
@@ -134,17 +127,5 @@ public class EmailConfirmedResourceTest {
         confirmationParams.setRegistration(VRM);
         confirmationParams.setExpiryDate(DATE.format(DateTimeFormatter.ofPattern("d MMMM u")));
         when(motrSession.getEmailConfirmationParams()).thenReturn(confirmationParams);
-    }
-
-    private EmailConfirmedViewModel getViewModel() {
-
-        return (EmailConfirmedViewModel) engine.getContext(Map.class).get("viewModel");
-    }
-
-    private void verifyViewModel(EmailConfirmedViewModel viewModel) {
-
-        assertEquals(VRM, viewModel.getRegistration());
-        assertEquals(EMAIL, viewModel.getEmail());
-        assertEquals(DateDisplayHelper.asDisplayDate(DATE), viewModel.getExpiryDate());
     }
 }

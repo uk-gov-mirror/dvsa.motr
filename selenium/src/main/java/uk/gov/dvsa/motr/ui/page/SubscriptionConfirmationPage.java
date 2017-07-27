@@ -58,11 +58,4 @@ public class SubscriptionConfirmationPage extends Page {
         signupForAnotherReminderLink.click();
         return new HomePage();
     }
-
-    public boolean areDisplayedDetailsCorrect(String email, String vrm) {
-
-        return registration.getText().equals(vrm)
-                && userEmail.getText().equals(email)
-                && !expiryDate.getText().isEmpty();
-    }
 }
