@@ -14,7 +14,7 @@ import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.test.render.TemplateEngineStub;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.util.Map;
 
 import javax.ws.rs.core.Response;
 
@@ -76,19 +76,21 @@ public class EmailConfirmedResourceTest {
     }
 
     @Test
-    public void subscriptionDetailsAreBeingShownIfPresentInTheSessionOnFirstVisit() throws Exception {
+    public void dataLayerIsBeingStoredOnFirstVisit() throws Exception {
 
         motrSessionWillReturnValidPageParams();
 
         resource.confirmEmailFirstTimeGet();
+        verifyDataLayer(getDataLayer());
     }
 
     @Test
-    public void subscriptionDetailsAreBeingShownIfPresentInTheSessionOnNthVisit() throws Exception {
+    public void dataLayerIsBeingStoredOnNthVisit() throws Exception {
 
         motrSessionWillReturnValidPageParams();
 
         resource.confirmEmailNthTimeGet();
+        verifyDataLayer(getDataLayer());
     }
 
 
@@ -121,9 +123,17 @@ public class EmailConfirmedResourceTest {
     private void motrSessionWillReturnValidPageParams() {
 
         EmailConfirmationParams confirmationParams = new EmailConfirmationParams();
-        confirmationParams.setEmail(EMAIL);
         confirmationParams.setRegistration(VRM);
-        confirmationParams.setExpiryDate(DATE.format(DateTimeFormatter.ofPattern("d MMMM u")));
         when(motrSession.getEmailConfirmationParams()).thenReturn(confirmationParams);
+    }
+
+    private String getDataLayer() {
+
+        return engine.getContext(Map.class).get("dataLayer").toString();
+    }
+
+    private void verifyDataLayer(String dataLayer) {
+
+        assertEquals("{\"vrm\":\"vrm\"}", dataLayer);
     }
 }
