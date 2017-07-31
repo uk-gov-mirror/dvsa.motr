@@ -39,13 +39,13 @@ public class SubscriptionConfirmationPage extends Page {
     @Override
     protected String getContentHeader() {
 
-        return "You've signed up for MOT reminders";
+        return "You’ve signed up for an MOT reminder";
     }
 
     @Override
     protected String getPageTitle() {
 
-        return "You’ve signed up for MOT reminders";
+        return "You’ve signed up for an MOT reminder";
     }
 
     public String getHeaderTitle() {
@@ -57,12 +57,5 @@ public class SubscriptionConfirmationPage extends Page {
 
         signupForAnotherReminderLink.click();
         return new HomePage();
-    }
-
-    public boolean areDisplayedDetailsCorrect(String email, String vrm) {
-
-        return registration.getText().equals(vrm)
-                && userEmail.getText().equals(email)
-                && !expiryDate.getText().isEmpty();
     }
 }

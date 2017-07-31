@@ -11,12 +11,9 @@ import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.service.SubscriptionConfirmationService;
 import uk.gov.dvsa.motr.web.cookie.EmailConfirmationParams;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
-import uk.gov.dvsa.motr.web.helper.DateDisplayHelper;
 import uk.gov.dvsa.motr.web.test.render.TemplateEngineStub;
-import uk.gov.dvsa.motr.web.viewmodel.EmailConfirmedViewModel;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 import javax.ws.rs.core.Response;
@@ -68,8 +65,6 @@ public class EmailConfirmedResourceTest {
         assertEquals(302, response.getStatus());
         assertEquals("confirm-email/confirmed", response.getLocation().toString());
         assertEquals(VRM, paramsArgumentCaptor.getValue().getRegistration());
-        assertEquals(EMAIL, paramsArgumentCaptor.getValue().getEmail());
-        assertEquals(DATE.format(DateTimeFormatter.ofPattern("d MMMM u")), paramsArgumentCaptor.getValue().getExpiryDate());
     }
 
     @Test
@@ -81,23 +76,21 @@ public class EmailConfirmedResourceTest {
     }
 
     @Test
-    public void subscriptionDetailsAreBeingShownIfPresentInTheSessionOnFirstVisit() throws Exception {
+    public void dataLayerIsBeingStoredOnFirstVisit() throws Exception {
 
         motrSessionWillReturnValidPageParams();
 
         resource.confirmEmailFirstTimeGet();
-
-        verifyViewModel(getViewModel());
+        verifyDataLayer(getDataLayer());
     }
 
     @Test
-    public void subscriptionDetailsAreBeignShownIfPresentInTheSessionOnNthVisit() throws Exception {
+    public void dataLayerIsBeingStoredOnNthVisit() throws Exception {
 
         motrSessionWillReturnValidPageParams();
 
         resource.confirmEmailNthTimeGet();
-
-        verifyViewModel(getViewModel());
+        verifyDataLayer(getDataLayer());
     }
 
 
@@ -130,21 +123,17 @@ public class EmailConfirmedResourceTest {
     private void motrSessionWillReturnValidPageParams() {
 
         EmailConfirmationParams confirmationParams = new EmailConfirmationParams();
-        confirmationParams.setEmail(EMAIL);
         confirmationParams.setRegistration(VRM);
-        confirmationParams.setExpiryDate(DATE.format(DateTimeFormatter.ofPattern("d MMMM u")));
         when(motrSession.getEmailConfirmationParams()).thenReturn(confirmationParams);
     }
 
-    private EmailConfirmedViewModel getViewModel() {
+    private String getDataLayer() {
 
-        return (EmailConfirmedViewModel) engine.getContext(Map.class).get("viewModel");
+        return engine.getContext(Map.class).get("dataLayer").toString();
     }
 
-    private void verifyViewModel(EmailConfirmedViewModel viewModel) {
+    private void verifyDataLayer(String dataLayer) {
 
-        assertEquals(VRM, viewModel.getRegistration());
-        assertEquals(EMAIL, viewModel.getEmail());
-        assertEquals(DateDisplayHelper.asDisplayDate(DATE), viewModel.getExpiryDate());
+        assertEquals("{\"vrm\":\"vrm\"}", dataLayer);
     }
 }

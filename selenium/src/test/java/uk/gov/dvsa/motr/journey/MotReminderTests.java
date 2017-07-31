@@ -32,8 +32,7 @@ public class MotReminderTests extends BaseTest {
         //Given I am a vehicle owner on the MOTR start page
         //When I enter the vehicle vrm and my email address
         //And I confirm my email address
-        SubscriptionConfirmationPage confirmationPage = motReminder.subscribeToReminderAndConfrimEmail(vrm, email);
-        assertTrue(confirmationPage.areDisplayedDetailsCorrect(email, vrm));
+        motReminder.subscribeToReminderAndConfrimEmail(vrm, email);
 
         //When I select to unsubscribe from an email reminder
         //And confirm that I would like to unsubscribe
@@ -70,10 +69,8 @@ public class MotReminderTests extends BaseTest {
         motReminder.subscribeToReminderAndConfrimEmail(vrm, email);
 
         // When I create another MOT reminder subscription with the same VRM and email
-        SubscriptionConfirmationPage confirmationPage = motReminder.enterAndConfirmPendingReminderDetailsSecondTime(vrm, email);
-
         // Then I do not need to confirm my email address and am taken directly to the subscription confirmed page
-        assertTrue(confirmationPage.areDisplayedDetailsCorrect(email, vrm));
+        motReminder.enterAndConfirmPendingReminderDetailsSecondTime(vrm, email);
     }
 
     @Test(dataProvider = "dataProviderCreateMotReminderForMyVehicle",

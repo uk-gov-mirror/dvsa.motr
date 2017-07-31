@@ -186,7 +186,7 @@ public class VehicleDetailsClientTest {
 
         return IOUtils.toString(
                 VehicleDetailsClientTest.class.getClassLoader().getResourceAsStream(resourcePath),
-                defaultCharset()
+                defaultCharset().toString()
         );
     }
 

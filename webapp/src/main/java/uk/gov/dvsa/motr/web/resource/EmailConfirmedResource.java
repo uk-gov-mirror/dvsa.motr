@@ -9,7 +9,6 @@ import uk.gov.dvsa.motr.web.cookie.EmailConfirmationParams;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.helper.DateDisplayHelper;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
-import uk.gov.dvsa.motr.web.viewmodel.EmailConfirmedViewModel;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -84,8 +83,6 @@ public class EmailConfirmedResource {
 
         EmailConfirmationParams params = new EmailConfirmationParams();
         params.setRegistration(subscription.getVrm());
-        params.setExpiryDate(DateDisplayHelper.asDisplayDate(subscription.getMotDueDate()));
-        params.setEmail(subscription.getEmail());
         motrSession.setEmailConfirmationParams(params);
     }
 
@@ -94,22 +91,16 @@ public class EmailConfirmedResource {
         EmailConfirmationParams subscription = motrSession.getEmailConfirmationParams();
         if (null != subscription) {
             dataLayerHelper.putAttribute(VRM_KEY, subscription.getRegistration());
-            return renderer.render("subscription-confirmation", buildViewModel(subscription));
+            return renderer.render("subscription-confirmation", buildMap());
         } else {
             return renderer.render("subscription-error", emptyMap());
         }
     }
 
-    private Map<String, Object> buildViewModel(EmailConfirmationParams subscription) {
+    private Map<String, Object> buildMap() {
 
         Map<String, Object> map = new HashMap<>();
-        EmailConfirmedViewModel viewModel = new EmailConfirmedViewModel();
-
         map.putAll(dataLayerHelper.formatAttributes());
-        map.put("viewModel", viewModel
-                .setEmail(subscription.getEmail())
-                .setExpiryDate(subscription.getExpiryDate())
-                .setRegistration(subscription.getRegistration()));
 
         return map;
     }
