@@ -24,29 +24,29 @@ public class NotifyService {
         this.oneDayAfterNotificationTemplateId = oneDayAfterNotificationTemplateId;
     }
 
-    public SendEmailResponse sendOneMonthNotificationEmail(String emailAddress, String registrationNumber, LocalDate motExpiryDate,
+    public SendEmailResponse sendOneMonthNotificationEmail(String emailAddress, String vehicleDetails, LocalDate motExpiryDate,
             String unsubscribeLink) throws NotificationClientException {
 
-        return sendEmail(emailAddress, registrationNumber, motExpiryDate, unsubscribeLink, this.oneMonthNotificationTemplateId);
+        return sendEmail(emailAddress, vehicleDetails, motExpiryDate, unsubscribeLink, this.oneMonthNotificationTemplateId);
     }
 
-    public SendEmailResponse sendTwoWeekNotificationEmail(String emailAddress, String registrationNumber, LocalDate motExpiryDate, String
+    public SendEmailResponse sendTwoWeekNotificationEmail(String emailAddress, String vehicleDetails, LocalDate motExpiryDate, String
             unsubscribeLink) throws NotificationClientException {
 
-        return sendEmail(emailAddress, registrationNumber, motExpiryDate, unsubscribeLink, this.twoWeekNotificationTemplateId);
+        return sendEmail(emailAddress, vehicleDetails, motExpiryDate, unsubscribeLink, this.twoWeekNotificationTemplateId);
     }
 
-    public SendEmailResponse sendOneDayAfterNotificationEmail(String emailAddress, String registrationNumber, LocalDate motExpiryDate,
+    public SendEmailResponse sendOneDayAfterNotificationEmail(String emailAddress, String vehicleDetails, LocalDate motExpiryDate,
             String unsubscribeLink) throws NotificationClientException {
 
-        return sendEmail(emailAddress, registrationNumber, motExpiryDate, unsubscribeLink, this.oneDayAfterNotificationTemplateId);
+        return sendEmail(emailAddress, vehicleDetails, motExpiryDate, unsubscribeLink, this.oneDayAfterNotificationTemplateId);
     }
 
-    private SendEmailResponse sendEmail(String emailAddress, String registrationNumber, LocalDate motExpiryDate, String unsubscribeLink,
+    private SendEmailResponse sendEmail(String emailAddress, String vehicleDetails, LocalDate motExpiryDate, String unsubscribeLink,
             String emailTemplateId) throws NotificationClientException {
 
         Map<String, String> personalisation = new HashMap<>();
-        personalisation.put("registration_number", registrationNumber);
+        personalisation.put("vehicle_details", vehicleDetails);
         personalisation.put("mot_expiry_date", DateFormatterForEmailDisplay.asFormattedForEmailDate(motExpiryDate));
         personalisation.put("unsubscribe_link", unsubscribeLink);
 
