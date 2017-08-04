@@ -1,8 +1,13 @@
 package uk.gov.dvsa.motr.smsreceiver.resource;
 
-import uk.gov.dvsa.motr.eventlog.Event;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import uk.gov.dvsa.motr.eventlog.EventLogger;
-import uk.gov.dvsa.motr.smsreceiver.events.RecceivedMessageEvent;
+import uk.gov.dvsa.motr.smsreceiver.events.ReceivedMessageEvent;
+import uk.gov.dvsa.motr.smsreceiver.events.ReceivedMessageFailedEvent;
+import uk.gov.dvsa.motr.smsreceiver.model.Message;
+
+import java.io.IOException;
 
 import javax.inject.Singleton;
 import javax.ws.rs.POST;
@@ -18,6 +23,14 @@ public class ReceiverResource {
     @POST
     public void receiveMessages(String data) {
 
-        EventLogger.logEvent(new RecceivedMessageEvent().setMessageBody(data));
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+            Message message = mapper.readValue(data, Message.class);
+            EventLogger.logEvent(new ReceivedMessageEvent()
+                    .setMessageBody(message.getMessage()).setRecipientMobile(message.getRecipientNumber()));
+        } catch (IOException e) {
+            EventLogger.logErrorEvent(new ReceivedMessageFailedEvent(), e);
+        }
     }
 }
