@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.notifier.component.subscription.persistence.SubscriptionRepository;
 import uk.gov.dvsa.motr.notifier.events.DeleteSubscriptionSuccessfulEvent;
+import uk.gov.dvsa.motr.notifier.events.DvlaIdUpdatedToMotTestNumberEvent;
 import uk.gov.dvsa.motr.notifier.events.OneDayAfterEmailReminderEvent;
 import uk.gov.dvsa.motr.notifier.events.OneMonthEmailReminderEvent;
 import uk.gov.dvsa.motr.notifier.events.TwoWeekEmailReminderEvent;
@@ -55,17 +56,14 @@ public class ProcessSubscriptionService {
     public void processSubscription(SubscriptionQueueItem subscriptionQueueItem, LocalDate requestDate) throws NotificationClientException,
             VehicleDetailsClientException, VehicleNotFoundException {
 
-        String subscriptionMotTestNumber = subscriptionQueueItem.getMotTestNumber();
-
-        VehicleDetails vehicleDetails = client.fetch(subscriptionMotTestNumber).orElseThrow(() -> {
-            logger.debug("no vehicle found for mot_test_number {}", subscriptionMotTestNumber);
-            return new VehicleNotFoundException("no vehicle found for mot_test_number: " + subscriptionMotTestNumber);
-        });
+        VehicleDetails vehicleDetails = getVehicleDetails(subscriptionQueueItem);
 
         String vrm = subscriptionQueueItem.getVrm();
         String email = subscriptionQueueItem.getEmail();
         String subscriptionId = subscriptionQueueItem.getId();
         LocalDate subscriptionMotDueDate = subscriptionQueueItem.getMotDueDate();
+        String subscriptionMotTestNumber = subscriptionQueueItem.getMotTestNumber();
+        String subscriptionDvlaId = subscriptionQueueItem.getDvlaId();
 
         LocalDate vehicleMotExpiryDate = vehicleDetails.getMotExpiryDate();
         String vehicleMotTestNumber = vehicleDetails.getMotTestNumber();
@@ -91,7 +89,9 @@ public class ProcessSubscriptionService {
                     email,
                     vehicleDetailsString,
                     vehicleMotExpiryDate,
-                    unSubscribeLink);
+                    unSubscribeLink,
+                    vehicleDetails.getDvlaId()
+            );
 
             EventLogger.logEvent(new OneMonthEmailReminderEvent()
                     .setEmail(email)
@@ -104,7 +104,8 @@ public class ProcessSubscriptionService {
                     email,
                     vehicleDetailsString,
                     vehicleMotExpiryDate,
-                    unSubscribeLink
+                    unSubscribeLink,
+                    vehicleDetails.getDvlaId()
             );
 
             EventLogger.logEvent(new TwoWeekEmailReminderEvent()
@@ -114,7 +115,13 @@ public class ProcessSubscriptionService {
         }
 
         if (oneDayAfterEmailRequired(requestDate, vehicleMotExpiryDate)) {
-            notifyService.sendOneDayAfterNotificationEmail(email, vehicleDetailsString, vehicleMotExpiryDate, unSubscribeLink);
+            notifyService.sendOneDayAfterNotificationEmail(
+                    email,
+                    vehicleDetailsString,
+                    vehicleMotExpiryDate,
+                    unSubscribeLink,
+                    vehicleDetails.getDvlaId()
+            );
 
             EventLogger.logEvent(new OneDayAfterEmailReminderEvent()
                     .setEmail(email)
@@ -124,6 +131,12 @@ public class ProcessSubscriptionService {
 
         if (motTestNumberUpdateRequired(subscriptionMotTestNumber, vehicleMotTestNumber)) {
             subscriptionRepository.updateMotTestNumber(vrm, email, vehicleMotTestNumber);
+
+            if (subscriptionDvlaId != null) {
+                EventLogger.logEvent(new DvlaIdUpdatedToMotTestNumberEvent()
+                        .setExistingDvlaId(subscriptionDvlaId)
+                        .setNewMotTestNumber(vehicleMotTestNumber));
+            }
         }
 
         if (vrmUpdateRequired(vrm, vehicleVrm)) {
@@ -134,5 +147,31 @@ public class ProcessSubscriptionService {
                 EventLogger.logErrorEvent(new UpdateVrmFailedEvent().setExistingVrm(vrm).setNewVrm(vehicleVrm), e);
             }
         }
+    }
+
+    private VehicleDetails getVehicleDetails(SubscriptionQueueItem subscriptionQueueItem) throws VehicleDetailsClientException,
+            VehicleNotFoundException {
+
+        String subscriptionDvlaId = subscriptionQueueItem.getDvlaId();
+        String subscriptionMotTestNumber = subscriptionQueueItem.getMotTestNumber();
+
+        logger.debug("Subscription dvlaId is {}, and subscription mot test number is {}", subscriptionDvlaId, subscriptionMotTestNumber);
+
+        if (subscriptionMotTestNumber == null && subscriptionDvlaId != null) {
+
+            logger.trace("going to fetch by dvla id");
+
+            return client.fetchByDvlaId(subscriptionDvlaId).orElseThrow(() -> {
+                logger.debug("no vehicle found for dvla id {}", subscriptionDvlaId);
+                return new VehicleNotFoundException("no vehicle found for dvlaid: " + subscriptionDvlaId);
+            });
+        }
+
+        logger.trace("going to fetch by mot test number");
+
+        return client.fetchByMotTestNumber(subscriptionMotTestNumber).orElseThrow(() -> {
+            logger.debug("no vehicle found for mot_test_number {}", subscriptionMotTestNumber);
+            return new VehicleNotFoundException("no vehicle found for mot_test_number: " + subscriptionMotTestNumber);
+        });
     }
 }

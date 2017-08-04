@@ -34,7 +34,12 @@ public class VehicleDetails {
     private LocalDate motExpiryDate;
 
     @JsonProperty("motTestNumber")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String motTestNumber;
+
+    @JsonProperty("dvlaId")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String dvlaId;
 
     public String getMake() {
 
@@ -124,6 +129,17 @@ public class VehicleDetails {
         return this;
     }
 
+    public String getDvlaId() {
+
+        return dvlaId;
+    }
+
+    public VehicleDetails setDvlaId(String dvlaId) {
+
+        this.dvlaId = dvlaId;
+        return this;
+    }
+
     @Override
     public String toString() {
 
@@ -136,6 +152,7 @@ public class VehicleDetails {
                 ", yearOfManufacture=" + yearOfManufacture +
                 ", motExpiryDate=" + motExpiryDate +
                 ", motTestNumber='" + motTestNumber + '\'' +
+                ", dvlaId='" + dvlaId + '\'' +
                 '}';
     }
 }

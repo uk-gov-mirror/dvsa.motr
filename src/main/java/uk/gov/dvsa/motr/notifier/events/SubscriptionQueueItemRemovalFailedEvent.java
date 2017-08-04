@@ -21,6 +21,11 @@ public class SubscriptionQueueItemRemovalFailedEvent extends SubscriptionProcess
         return this;
     }
 
+    public SubscriptionQueueItemRemovalFailedEvent setDvlaId(String dvlaId) {
+        params.put("dvla-id", dvlaId);
+        return this;
+    }
+
     public SubscriptionQueueItemRemovalFailedEvent setExpiryDate(LocalDate expiryDate) {
 
         params.put("expiry-date", expiryDate.toString());

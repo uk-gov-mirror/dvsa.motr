@@ -40,8 +40,8 @@ public class VehicleDetailsClientTest {
     @Test(expected = VehicleDetailsClientException.class)
     public void throwsClientExceptionWhenInvalidUrl() throws Exception {
 
-        VehicleDetailsClient client = new VehicleDetailsClient(new ClientConfig(), "invalid_url", "api-key");
-        client.fetch("11111111111");
+        VehicleDetailsClient client = new VehicleDetailsClient(new ClientConfig(), "invalid_url", "api-key", "invalid_url");
+        client.fetchByMotTestNumber("11111111111");
     }
 
     @Test
@@ -50,7 +50,7 @@ public class VehicleDetailsClientTest {
         stubFor(onRequest().willReturn(aResponse().withBody(validResponse())
                 .withHeader("Content-Type", "application/json")));
 
-        withDefaultClient().fetch("11111111111");
+        withDefaultClient().fetchByMotTestNumber("11111111111");
     }
 
     @Test
@@ -59,7 +59,7 @@ public class VehicleDetailsClientTest {
         stubFor(onRequest().willReturn(aResponse().withBody(validResponse())
                 .withHeader("Content-Type", "application/json")));
 
-        VehicleDetails details = withDefaultClient().fetch("11111111111").get();
+        VehicleDetails details = withDefaultClient().fetchByMotTestNumber("11111111111").get();
 
         assertEquals("MERCEDES-BENZ", details.getMake());
         assertEquals("C220 ELEGANCE ED125 CDI BLU-CY", details.getModel());
@@ -75,7 +75,7 @@ public class VehicleDetailsClientTest {
 
         stubFor(onRequest().willReturn(aResponse().withStatus(404)));
 
-        Optional<VehicleDetails> response = withDefaultClient().fetch("11111111111");
+        Optional<VehicleDetails> response = withDefaultClient().fetchByMotTestNumber("11111111111");
 
         assertFalse(response.isPresent());
         verify(getRequestedFor(urlEqualTo("/vehicle-details-endpoint/11111111111")));
@@ -97,7 +97,7 @@ public class VehicleDetailsClientTest {
 
         try {
 
-            withDefaultClient().fetch("11111111111");
+            withDefaultClient().fetchByMotTestNumber("11111111111");
             fail();
 
         } catch (VehicleDetailsEndpointResponseException ex) {
@@ -123,7 +123,7 @@ public class VehicleDetailsClientTest {
 
         stubFor(onRequest().willReturn(aResponse().withFault(fault)));
 
-        withDefaultClient().fetch("11111111111");
+        withDefaultClient().fetchByMotTestNumber("11111111111");
     }
 
     private MappingBuilder onRequest() {
@@ -134,8 +134,9 @@ public class VehicleDetailsClientTest {
 
     private VehicleDetailsClient withDefaultClient() {
 
-        final String endpointUri = "http://localhost:8098/vehicle-details-endpoint/{number}";
-        return new VehicleDetailsClient(new ClientConfig(), endpointUri, "api-key");
+        final String endpointUriByMotTestNumber = "http://localhost:8098/vehicle-details-endpoint/{number}";
+        final String endpointUriByDvlaId = "http://localhost:8098/vehicle-details-endpoint/{dvlaId}";
+        return new VehicleDetailsClient(new ClientConfig(), endpointUriByMotTestNumber, "api-key", endpointUriByDvlaId);
     }
 
     private String validResponse() throws IOException {

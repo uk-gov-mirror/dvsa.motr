@@ -18,21 +18,37 @@ public class MetricsPerfAspect {
     public static MetricRegistry metricRegistry = new MetricRegistry();
     private static final int MULTIPLIER = 1000000;
 
-    private Timer vehicleDetailsTimer = metricRegistry.timer("vehicleDetails_fetch");
+    private Timer vehicleDetailsFetchByMotTestNumber = metricRegistry.timer("vehicleDetailsFetchByMotTestNumber");
+    private Timer vehicleDetailsFetchByDvlaId = metricRegistry.timer("vehicleDetailsFetchByDvlaId");
     private Timer sendEmailTimer = metricRegistry.timer("notifyService_sendEmail");
     private Timer updateExpiryDateTimer = metricRegistry.timer("subscriptionRepository_updateExpiryDate");
     private Timer processItemTimer = metricRegistry.timer("process_single_item");
 
-    @Around("execution(* uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient.fetch(..))")
+    @Around("execution(* uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient.fetchByMotTestNumber(..))")
     public Object vehicleDetailsClientFetch(ProceedingJoinPoint joinPoint) throws Throwable {
 
         Object response;
 
-        Timer.Context vehicleDetailsContext = vehicleDetailsTimer.time();
+        Timer.Context vehicleDetailsContext = vehicleDetailsFetchByMotTestNumber.time();
         try {
             response = joinPoint.proceed();
         } finally {
             vehicleDetailsContext.stop();
+        }
+
+        return response;
+    }
+
+    @Around("execution(* uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient.fetchByDvlaId(..))")
+    public Object vehicleDetailsClientFetchByDvlaId(ProceedingJoinPoint joinPoint) throws Throwable {
+
+        Object response;
+
+        Timer.Context vehicleDetailsFetchByDvlaIdContext = vehicleDetailsFetchByDvlaId.time();
+        try {
+            response = joinPoint.proceed();
+        } finally {
+            vehicleDetailsFetchByDvlaIdContext.stop();
         }
 
         return response;
@@ -87,7 +103,8 @@ public class MetricsPerfAspect {
     public void beginMetrics() {
 
         metricRegistry = new MetricRegistry();
-        vehicleDetailsTimer = metricRegistry.timer("vehicleDetails_fetch");
+        vehicleDetailsFetchByMotTestNumber = metricRegistry.timer("vehicleDetailsFetchByMotTestNumber");
+        vehicleDetailsFetchByDvlaId = metricRegistry.timer("vehicleDetailsFetchByDvlaId");
         sendEmailTimer = metricRegistry.timer("notifyService_sendEmail");
         updateExpiryDateTimer = metricRegistry.timer("subscriptionRepository_updateExpiryDate");
         processItemTimer = metricRegistry.timer("process_single_item");
@@ -100,19 +117,30 @@ public class MetricsPerfAspect {
 
         try {
             response = (NotifierReport)joinPoint.proceed();
-            response.setVehicleDetailsTimer(vehicleDetailsTimer);
+            response.setVehicleDetailsTimerFetchByMotTestNumber(vehicleDetailsFetchByMotTestNumber);
             response.setSendEmailTimer(sendEmailTimer);
             response.setUpdateExpiryDateTimer(updateExpiryDateTimer);
             response.setProcessItemTimer(processItemTimer);
+            response.setVehicleDetailsTimerFetchByDvlaId(vehicleDetailsFetchByDvlaId);
         } finally {
             EventLogger.logEvent(new MetricEvent()
-                    .setVehicleDetails99thPercentile(vehicleDetailsTimer.getSnapshot().get99thPercentile())
-                    .setVehicleDetails95thPercentile(vehicleDetailsTimer.getSnapshot().get95thPercentile())
-                    .setVehicleDetails75thPercentile(vehicleDetailsTimer.getSnapshot().get75thPercentile())
-                    .setVehicleDetailsFetchCountOfCalls(vehicleDetailsTimer.getCount())
-                    .setVehicleDetailsFetchMax(vehicleDetailsTimer.getSnapshot().getMax())
-                    .setVehicleDetailsFetchMin(vehicleDetailsTimer.getSnapshot().getMin())
-                    .setVehicleDetailsStdDeviation(vehicleDetailsTimer.getSnapshot().getStdDev())
+                    .setVehicleDetails99thPercentileFetchByMotTestNumber(vehicleDetailsFetchByMotTestNumber.getSnapshot()
+                    .get99thPercentile())
+                    .setVehicleDetails99thPercentileFetchByDvlaId(vehicleDetailsFetchByDvlaId.getSnapshot().get99thPercentile())
+                    .setVehicleDetails95thPercentileFetchByMotTestNumber(vehicleDetailsFetchByMotTestNumber.getSnapshot()
+                    .get95thPercentile())
+                    .setVehicleDetails95thPercentileFetchByDvlaId(vehicleDetailsFetchByDvlaId.getSnapshot().get95thPercentile())
+                    .setVehicleDetails75thPercentileFetchByMotTestNumber(vehicleDetailsFetchByMotTestNumber.getSnapshot()
+                    .get75thPercentile())
+                    .setVehicleDetails75thPercentileFetchByDvlaId(vehicleDetailsFetchByDvlaId.getSnapshot().get75thPercentile())
+                    .setVehicleDetailsFetchCountOfCallsFetchByMotTestNumber(vehicleDetailsFetchByMotTestNumber.getCount())
+                    .setVehicleDetailsFetchCountOfCallsFetchByDvlaId(vehicleDetailsFetchByDvlaId.getCount())
+                    .setVehicleDetailsFetchMaxFetchByMotTestNumber(vehicleDetailsFetchByMotTestNumber.getSnapshot().getMax())
+                    .setVehicleDetailsFetchMaxFetchByDvlaId(vehicleDetailsFetchByDvlaId.getSnapshot().getMax())
+                    .setVehicleDetailsFetchMinFetchByMotTestNumber(vehicleDetailsFetchByMotTestNumber.getSnapshot().getMin())
+                    .setVehicleDetailsFetchMinFetchByDvlaId(vehicleDetailsFetchByDvlaId.getSnapshot().getMin())
+                    .setVehicleDetailsStdDeviationFetchByMotTestNumber(vehicleDetailsFetchByMotTestNumber.getSnapshot().getStdDev())
+                    .setVehicleDetailsStdDeviationFetchByDvlaId(vehicleDetailsFetchByDvlaId.getSnapshot().getStdDev())
                     .setSendEmailCountOfCalls(sendEmailTimer.getCount())
                     .setSendEmail99thPercentile(sendEmailTimer.getSnapshot().get99thPercentile())
                     .setSendEmail95thPercentile(sendEmailTimer.getSnapshot().get95thPercentile())

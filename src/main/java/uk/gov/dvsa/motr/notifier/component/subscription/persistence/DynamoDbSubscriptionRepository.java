@@ -54,8 +54,13 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
         SubscriptionDbItem subscriptionDbItem = new SubscriptionDbItem(item.getString("id"));
         subscriptionDbItem.setVrm(item.getString("vrm"));
         subscriptionDbItem.setEmail(item.getString("email"));
-        subscriptionDbItem.setMotTestNumber(item.getString("mot_test_number"));
         subscriptionDbItem.setMotDueDate(LocalDate.parse(item.getString("mot_due_date")));
+
+        if (item.isPresent("dvla_id")) {
+            subscriptionDbItem.setDvlaId(item.getString("dvla_id"));
+        } else {
+            subscriptionDbItem.setMotTestNumber(item.getString("mot_test_number"));
+        }
 
         return Optional.of(subscriptionDbItem);
     }
@@ -78,11 +83,11 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
 
         UpdateItemSpec updateItemSpec = new UpdateItemSpec()
                 .withPrimaryKey("vrm", vrm, "email", email)
-                .withUpdateExpression("set mot_test_number = :updatedMotTestNumber, updated_at = :updatedAt")
+                .withUpdateExpression("SET mot_test_number = :updatedMotTestNumber, updated_at = :updatedAt REMOVE dvla_id")
                 .withValueMap(new ValueMap()
                 .withString(":updatedMotTestNumber", updatedMotTestNumber)
                 .withString(":updatedAt", ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT)))
-                .withReturnValues(ReturnValue.UPDATED_NEW);
+                .withReturnValues(ReturnValue.ALL_NEW);
 
         dynamoDb.getTable(tableName).updateItem(updateItemSpec);
     }
@@ -100,11 +105,17 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
             Item item = new Item()
                     .withPrimaryKey("vrm", updatedVrm, "email", email)
                     .withString("id", originalItem.getString("id"))
-                    .withString("mot_test_number", originalItem.getString("mot_test_number"))
                     .withString("mot_due_date", originalItem.getString("mot_due_date"))
                     .withString("mot_due_date_md", originalItem.getString("mot_due_date_md"))
                     .withString("created_at", originalItem.getString("created_at"))
                     .withString("updated_at", ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT));
+
+            if (originalItem.isPresent("dvla_id")) {
+                item.withString("dvla_id", originalItem.getString("dvla_id"));
+            } else {
+                item.withString("mot_test_number", originalItem.getString("mot_test_number"));
+            }
+
             dynamoDb.getTable(tableName).putItem(item);
         } catch (Exception e) {
             throw new Exception(e);

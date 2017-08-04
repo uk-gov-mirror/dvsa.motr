@@ -37,42 +37,103 @@ public class NotifyServiceTest {
     }
 
     @Test
-    public void oneMonthNotificationIsSentWithCorrectDetails() throws NotificationClientException {
+    public void oneMonthNotificationIsSentWithCorrectDetails_whenMotTestNumber() throws NotificationClientException {
 
-        Map<String, String> personalisation = new HashMap<>();
-        personalisation.put("vehicle_details", REG);
+        notifyService.sendOneMonthNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK, "");
+
+        Map<String, String> personalisation = stubGenericPersonalisation();
         personalisation.put("mot_expiry_date", DateFormatterForEmailDisplay.asFormattedForEmailDate(EXPIRY_DATE));
-        personalisation.put("unsubscribe_link", UNSUBSCRIBE_LINK);
+        personalisation.put("is_due_or_expires", "expires");
+        personalisation.put("due_or_expiry", "expiry");
 
-        notifyService.sendOneMonthNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK);
-
-        verify(notificationClient, times(1)).sendEmail(oneMonthNotificationTemplateId, EMAIL, personalisation, "");
+        verify(notificationClient, times(1)).sendEmail(
+                oneMonthNotificationTemplateId,
+                EMAIL,
+                personalisation,
+                ""
+        );
     }
 
     @Test
-    public void twoWeekNotificationIsSentWithCorrectDetails() throws NotificationClientException {
+    public void oneMonthNotificationIsSentWithCorrectDetails_whenDvlaId() throws NotificationClientException {
 
-        Map<String, String> personalisation = new HashMap<>();
-        personalisation.put("vehicle_details", REG);
+        notifyService.sendOneMonthNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK, "12234");
+
+        Map<String, String> personalisation = stubGenericPersonalisation();
         personalisation.put("mot_expiry_date", DateFormatterForEmailDisplay.asFormattedForEmailDate(EXPIRY_DATE));
-        personalisation.put("unsubscribe_link", UNSUBSCRIBE_LINK);
+        personalisation.put("is_due_or_expires", "is due");
+        personalisation.put("due_or_expiry", "due");
 
-        notifyService.sendTwoWeekNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK);
-
-        verify(notificationClient, times(1)).sendEmail(twoWeekNotificationTemplateId, EMAIL, personalisation, "");
+        verify(notificationClient, times(1)).sendEmail(
+                oneMonthNotificationTemplateId,
+                EMAIL,
+                personalisation,
+                ""
+        );
     }
 
     @Test
-    public void oneDayAfterNotificationIsSentWithCorrectDetails() throws NotificationClientException {
+    public void twoWeekNotificationIsSentWithCorrectDetails_whenMotTestNumber() throws NotificationClientException {
 
-        Map<String, String> personalisation = new HashMap<>();
-        personalisation.put("vehicle_details", REG);
+        notifyService.sendTwoWeekNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK, "");
+
+        Map<String, String> personalisation = stubGenericPersonalisation();
         personalisation.put("mot_expiry_date", DateFormatterForEmailDisplay.asFormattedForEmailDate(EXPIRY_DATE));
-        personalisation.put("unsubscribe_link", UNSUBSCRIBE_LINK);
+        personalisation.put("is_due_or_expires", "expires");
 
-        notifyService.sendOneDayAfterNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK);
+        verify(notificationClient, times(1)).sendEmail(
+                twoWeekNotificationTemplateId,
+                EMAIL,
+                personalisation,
+                ""
+        );
+    }
 
-        verify(notificationClient, times(1)).sendEmail(oneDayAfterNotificationTemplateId, EMAIL, personalisation, "");
+    @Test
+    public void twoWeekNotificationIsSentWithCorrectDetails_whenDvlaId() throws NotificationClientException {
+
+        notifyService.sendTwoWeekNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK, "122133");
+
+        Map<String, String> personalisation = stubGenericPersonalisation();
+        personalisation.put("mot_expiry_date", DateFormatterForEmailDisplay.asFormattedForEmailDate(EXPIRY_DATE));
+        personalisation.put("is_due_or_expires", "is due");
+
+        verify(notificationClient, times(1)).sendEmail(
+                twoWeekNotificationTemplateId,
+                EMAIL,
+                personalisation,
+                ""
+        );
+    }
+
+    @Test
+    public void oneDayAfterNotificationIsSentWithCorrectDetails_whenMotTestNumber() throws NotificationClientException {
+
+
+        notifyService.sendOneDayAfterNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK, "");
+        Map<String, String> personalisation = stubGenericPersonalisation();
+        personalisation.put("was_due_or_expired", "expired");
+
+        verify(notificationClient, times(1)).sendEmail(
+                oneDayAfterNotificationTemplateId,
+                EMAIL,
+                personalisation,
+                "");
+    }
+
+    @Test
+    public void oneDayAfterNotificationIsSentWithCorrectDetails_whenDvlaId() throws NotificationClientException {
+
+
+        notifyService.sendOneDayAfterNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK, "123456");
+        Map<String, String> personalisation = stubGenericPersonalisation();
+        personalisation.put("was_due_or_expired", "was due");
+
+        verify(notificationClient, times(1)).sendEmail(
+                oneDayAfterNotificationTemplateId,
+                EMAIL,
+                personalisation,
+                "");
     }
 
     @Test(expected = NotificationClientException.class)
@@ -80,7 +141,21 @@ public class NotifyServiceTest {
 
         when(notificationClient.sendEmail(any(), any(), any(), any())).thenThrow(NotificationClientException.class);
 
-        notifyService.sendOneMonthNotificationEmail("","",LocalDate.of(2017, 10, 10), "");
+        notifyService.sendOneMonthNotificationEmail(
+                "",
+                "",
+                LocalDate.of(2017, 10, 10),
+                "",
+                ""
+        );
     }
 
+    private Map<String, String> stubGenericPersonalisation() {
+
+        Map<String, String> personalisation = new HashMap<>();
+        personalisation.put("vehicle_details", REG);
+        personalisation.put("unsubscribe_link", UNSUBSCRIBE_LINK);
+
+        return personalisation;
+    }
 }

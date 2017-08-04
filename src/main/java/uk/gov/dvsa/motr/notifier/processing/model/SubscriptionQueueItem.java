@@ -1,5 +1,6 @@
 package uk.gov.dvsa.motr.notifier.processing.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
@@ -23,7 +24,12 @@ public class SubscriptionQueueItem {
     private String email;
 
     @JsonProperty("motTestNumber")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String motTestNumber;
+
+    @JsonProperty("dvlaId")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String dvlaId;
 
     @JsonProperty("loadedOnDate")
     @JsonDeserialize(using = LocalDateDeserialiser.class)
@@ -78,6 +84,17 @@ public class SubscriptionQueueItem {
         return this;
     }
 
+    public String getDvlaId() {
+
+        return dvlaId;
+    }
+
+    public SubscriptionQueueItem setDvlaId(String dvlaId) {
+
+        this.dvlaId = dvlaId;
+        return this;
+    }
+
     public String getMessageReceiptHandle() {
         return messageReceiptHandle;
     }
@@ -117,6 +134,7 @@ public class SubscriptionQueueItem {
                 ", motDueDate=" + motDueDate +
                 ", vrm='" + vrm + '\'' +
                 ", motTestNumber='" + motTestNumber + '\'' +
+                ", dvlaId='" + dvlaId + '\'' +
                 ", email='" + email + '\'' +
                 ", loadedOnDate=" + loadedOnDate +
                 ", messageReceiptHandle='" + messageReceiptHandle + '\'' +

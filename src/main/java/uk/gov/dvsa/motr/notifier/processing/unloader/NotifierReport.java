@@ -1,7 +1,5 @@
 package uk.gov.dvsa.motr.notifier.processing.unloader;
 
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.Snapshot;
 import com.codahale.metrics.Timer;
 
 import uk.gov.dvsa.motr.notifier.processing.performance.MetricsTimerWrapper;
@@ -17,13 +15,15 @@ public class NotifierReport {
 
     private AtomicLong allMessagesStartTime = new AtomicLong(0);
 
-    private Timer vehicleDetailsTimer;
+    private Timer vehicleDetailsTimerFetchByMotTestNumber;
 
     private Timer sendEmailTimer;
 
     private Timer updateExpiryDateTimer;
 
     private Timer processItemTimer;
+
+    private Timer vehicleDetailsTimerFetchByDvlaId;
 
     public void incrementSuccessfullyProcessed() {
 
@@ -55,12 +55,22 @@ public class NotifierReport {
         return System.currentTimeMillis() - allMessagesStartTime.get();
     }
 
-    public MetricsTimerWrapper getVehicleDetailsTimer() {
-        return new MetricsTimerWrapper(vehicleDetailsTimer);
+    public MetricsTimerWrapper getVehicleDetailsTimerFetchByMotTestNumber() {
+        return new MetricsTimerWrapper(vehicleDetailsTimerFetchByMotTestNumber);
     }
 
-    public void setVehicleDetailsTimer(Timer vehicleDetailsTimer) {
-        this.vehicleDetailsTimer = vehicleDetailsTimer;
+    public void setVehicleDetailsTimerFetchByMotTestNumber(Timer vehicleDetailsTimerFetchByMotTestNumber) {
+        this.vehicleDetailsTimerFetchByMotTestNumber = vehicleDetailsTimerFetchByMotTestNumber;
+    }
+
+    public MetricsTimerWrapper getVehicleDetailsTimerFetchByDvlaId() {
+
+        return new MetricsTimerWrapper(vehicleDetailsTimerFetchByDvlaId);
+    }
+
+    public void setVehicleDetailsTimerFetchByDvlaId(Timer vehicleDetailsTimerFetchByDvlaId) {
+
+        this.vehicleDetailsTimerFetchByDvlaId = vehicleDetailsTimerFetchByDvlaId;
     }
 
     public MetricsTimerWrapper getSendEmailTimer() {
