@@ -40,7 +40,7 @@ public class NotifyServiceTest {
     public void oneMonthNotificationIsSentWithCorrectDetails() throws NotificationClientException {
 
         Map<String, String> personalisation = new HashMap<>();
-        personalisation.put("registration_number", REG);
+        personalisation.put("vehicle_details", REG);
         personalisation.put("mot_expiry_date", DateFormatterForEmailDisplay.asFormattedForEmailDate(EXPIRY_DATE));
         personalisation.put("unsubscribe_link", UNSUBSCRIBE_LINK);
 
@@ -53,7 +53,7 @@ public class NotifyServiceTest {
     public void twoWeekNotificationIsSentWithCorrectDetails() throws NotificationClientException {
 
         Map<String, String> personalisation = new HashMap<>();
-        personalisation.put("registration_number", REG);
+        personalisation.put("vehicle_details", REG);
         personalisation.put("mot_expiry_date", DateFormatterForEmailDisplay.asFormattedForEmailDate(EXPIRY_DATE));
         personalisation.put("unsubscribe_link", UNSUBSCRIBE_LINK);
 
@@ -66,7 +66,7 @@ public class NotifyServiceTest {
     public void oneDayAfterNotificationIsSentWithCorrectDetails() throws NotificationClientException {
 
         Map<String, String> personalisation = new HashMap<>();
-        personalisation.put("registration_number", REG);
+        personalisation.put("vehicle_details", REG);
         personalisation.put("mot_expiry_date", DateFormatterForEmailDisplay.asFormattedForEmailDate(EXPIRY_DATE));
         personalisation.put("unsubscribe_link", UNSUBSCRIBE_LINK);
 

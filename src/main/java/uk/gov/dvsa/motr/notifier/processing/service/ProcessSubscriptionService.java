@@ -11,6 +11,7 @@ import uk.gov.dvsa.motr.notifier.events.TwoWeekEmailReminderEvent;
 import uk.gov.dvsa.motr.notifier.events.UpdateVrmFailedEvent;
 import uk.gov.dvsa.motr.notifier.events.UpdateVrmSuccessfulEvent;
 import uk.gov.dvsa.motr.notifier.notify.NotifyService;
+import uk.gov.dvsa.motr.notifier.processing.formatting.MakeModelFormatter;
 import uk.gov.dvsa.motr.notifier.processing.model.SubscriptionQueueItem;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
@@ -70,12 +71,19 @@ public class ProcessSubscriptionService {
 
         String unSubscribeLink = UriBuilder.fromPath(webBaseUrl).path("unsubscribe").path(subscriptionId).build().toString();
 
+        String vehicleDetailsString = MakeModelFormatter.getMakeModelDisplayStringFromVehicleDetails(vehicleDetails, ", ") + vehicleVrm;
+
         if (motDueDateUpdateRequired(subscriptionMotDueDate, vehicleMotExpiryDate)) {
             subscriptionRepository.updateExpiryDate(vrm, email, vehicleMotExpiryDate);
         }
 
         if (oneMonthEmailRequired(requestDate, vehicleMotExpiryDate)) {
-            notifyService.sendOneMonthNotificationEmail(email, vehicleVrm, vehicleMotExpiryDate, unSubscribeLink);
+
+            notifyService.sendOneMonthNotificationEmail(
+                    email,
+                    vehicleDetailsString,
+                    vehicleMotExpiryDate,
+                    unSubscribeLink);
 
             EventLogger.logEvent(new OneMonthEmailReminderEvent()
                     .setEmail(email)
@@ -84,7 +92,12 @@ public class ProcessSubscriptionService {
         }
 
         if (twoWeekEmailRequired(requestDate, vehicleMotExpiryDate)) {
-            notifyService.sendTwoWeekNotificationEmail(email, vehicleVrm, vehicleMotExpiryDate, unSubscribeLink);
+            notifyService.sendTwoWeekNotificationEmail(
+                    email,
+                    vehicleDetailsString,
+                    vehicleMotExpiryDate,
+                    unSubscribeLink
+            );
 
             EventLogger.logEvent(new TwoWeekEmailReminderEvent()
                     .setEmail(email)
@@ -93,7 +106,7 @@ public class ProcessSubscriptionService {
         }
 
         if (oneDayAfterEmailRequired(requestDate, vehicleMotExpiryDate)) {
-            notifyService.sendOneDayAfterNotificationEmail(email, vehicleVrm, vehicleMotExpiryDate, unSubscribeLink);
+            notifyService.sendOneDayAfterNotificationEmail(email, vehicleDetailsString, vehicleMotExpiryDate, unSubscribeLink);
 
             EventLogger.logEvent(new OneDayAfterEmailReminderEvent()
                     .setEmail(email)
