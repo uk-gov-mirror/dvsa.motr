@@ -4,6 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import uk.gov.dvsa.motr.notifications.service.NotifyService;
+import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
+import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.web.component.subscription.exception.InvalidConfirmationIdException;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.component.subscription.model.PendingSubscription;
@@ -35,6 +37,7 @@ public class SubscriptionConfirmationServiceTest {
     private static final LocalDate DATE = LocalDate.now();
     private static final String VRM = "vrm";
     private static final String EMAIL = "email";
+    private final VehicleDetailsClient client = mock(VehicleDetailsClient.class);
 
     private SubscriptionConfirmationService subscriptionService;
 
@@ -45,13 +48,14 @@ public class SubscriptionConfirmationServiceTest {
                 pendingSubscriptionRepository,
                 subscriptionRepository,
                 notifyService,
-                urlHelper
+                urlHelper,
+                client
         );
     }
 
     @Test
     public void saveSubscriptionWhenSubscriptionDoesNotExistCallsDbToSaveDetails() throws Exception {
-
+        when(client.fetch(eq(VRM))).thenReturn(Optional.of(new VehicleDetails()));
         PendingSubscription pendingSubscription = pendingSubscriptionStub();
         withPendingSubscriptionFound(of(pendingSubscription));
 

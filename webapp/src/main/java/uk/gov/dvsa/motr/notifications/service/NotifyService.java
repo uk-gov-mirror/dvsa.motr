@@ -2,7 +2,7 @@ package uk.gov.dvsa.motr.notifications.service;
 
 import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.web.eventlog.subscription.NotifyClientFailedEvent;
-import uk.gov.dvsa.motr.web.helper.DateDisplayHelper;
+import uk.gov.dvsa.motr.web.formatting.DateFormatter;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
@@ -32,14 +32,14 @@ public class NotifyService {
 
     public void sendSubscriptionConfirmationEmail(
             String emailAddress,
-            String registrationNumber,
+            String vehicleDetails,
             LocalDate motExpiryDate,
             String unsubscribeLink
     ) {
 
         Map<String, String> personalisation = new HashMap<>();
-        personalisation.put("registration_number", registrationNumber);
-        personalisation.put("mot_expiry_date", DateDisplayHelper.asDisplayDate(motExpiryDate));
+        personalisation.put("vehicle_details", vehicleDetails);
+        personalisation.put("mot_expiry_date", DateFormatter.asDisplayDate(motExpiryDate));
         personalisation.put("unsubscribe_link", unsubscribeLink);
 
         try {
@@ -54,10 +54,11 @@ public class NotifyService {
         }
     }
 
-    public void sendEmailAddressConfirmationEmail(String emailAddress, String confirmationLink) {
+    public void sendEmailAddressConfirmationEmail(String emailAddress, String confirmationLink, String vehicleDetails) {
 
         Map<String, String> personalisation = new HashMap<>();
         personalisation.put("confirmation_link", confirmationLink);
+        personalisation.put("vehicle_details", vehicleDetails);
 
         try {
 

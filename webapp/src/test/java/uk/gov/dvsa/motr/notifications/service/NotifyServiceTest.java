@@ -3,7 +3,7 @@ package uk.gov.dvsa.motr.notifications.service;
 import org.junit.Before;
 import org.junit.Test;
 
-import uk.gov.dvsa.motr.web.helper.DateDisplayHelper;
+import uk.gov.dvsa.motr.web.formatting.DateFormatter;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 import uk.gov.service.notify.SendEmailResponse;
@@ -26,7 +26,7 @@ public class NotifyServiceTest {
     private String email = "test@test.com";
     private String templateId = "180";
     private String emailConfirmationTemplateId = "180";
-    private String registrationNumber = "testreg";
+    private String vehicleDetails = "TEST-MAKE TEST-MODEL, TEST-REG";
     private LocalDate motExpiryDate = LocalDate.of(2017, 1, 1);
     private String unsubscribeLink = "https://gov.uk";
 
@@ -39,11 +39,11 @@ public class NotifyServiceTest {
     @Test
     public void notifyCalledWithCorrectValues() throws NotificationClientException {
 
-        Map<String, String> personalisationMap = stubPersonalisationMap(registrationNumber, motExpiryDate, unsubscribeLink);
+        Map<String, String> personalisationMap = stubPersonalisationMap(vehicleDetails, motExpiryDate, unsubscribeLink);
 
         when(CLIENT.sendEmail(any(), any(), any(), any())).thenReturn(mock(SendEmailResponse.class));
 
-        this.service.sendSubscriptionConfirmationEmail(email, registrationNumber, motExpiryDate, unsubscribeLink);
+        this.service.sendSubscriptionConfirmationEmail(email, vehicleDetails, motExpiryDate, unsubscribeLink);
 
         verify(CLIENT, times(1)).sendEmail(templateId, email, personalisationMap, "");
     }
@@ -53,13 +53,13 @@ public class NotifyServiceTest {
 
         when(CLIENT.sendEmail(any(), any(), any(), any())).thenThrow(NotificationClientException.class);
 
-        this.service.sendSubscriptionConfirmationEmail(email, registrationNumber, motExpiryDate, unsubscribeLink);
+        this.service.sendSubscriptionConfirmationEmail(email, vehicleDetails, motExpiryDate, unsubscribeLink);
     }
 
-    private Map<String, String> stubPersonalisationMap(String registrationNumber, LocalDate expiryDate, String link) {
+    private Map<String, String> stubPersonalisationMap(String vehicleDetails, LocalDate expiryDate, String link) {
         Map<String, String> map = new HashMap<>();
-        map.put("registration_number", registrationNumber);
-        map.put("mot_expiry_date", DateDisplayHelper.asDisplayDate(expiryDate));
+        map.put("vehicle_details", vehicleDetails);
+        map.put("mot_expiry_date", DateFormatter.asDisplayDate(expiryDate));
         map.put("unsubscribe_link", link);
         return map;
     }

@@ -4,7 +4,6 @@ import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.web.component.subscription.service.PendingSubscriptionService;
 import uk.gov.dvsa.motr.web.cookie.EmailConfirmationParams;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
-import uk.gov.dvsa.motr.web.helper.DateDisplayHelper;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 import uk.gov.dvsa.motr.web.validator.EmailValidator;
 import uk.gov.dvsa.motr.web.validator.VrmValidator;

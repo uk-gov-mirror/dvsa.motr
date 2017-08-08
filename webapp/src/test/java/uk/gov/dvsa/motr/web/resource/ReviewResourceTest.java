@@ -12,7 +12,6 @@ import uk.gov.dvsa.motr.web.test.render.TemplateEngineStub;
 import uk.gov.dvsa.motr.web.viewmodel.ReviewViewModel;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 import javax.ws.rs.NotFoundException;

@@ -2,6 +2,9 @@ package uk.gov.dvsa.motr.web.component.subscription.service;
 
 import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.notifications.service.NotifyService;
+import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
+import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
+import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsService;
 import uk.gov.dvsa.motr.web.component.subscription.exception.InvalidConfirmationIdException;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.component.subscription.model.PendingSubscription;
@@ -11,6 +14,7 @@ import uk.gov.dvsa.motr.web.component.subscription.persistence.SubscriptionRepos
 import uk.gov.dvsa.motr.web.eventlog.subscription.InvalidSubscriptionConfirmationIdUsedEvent;
 import uk.gov.dvsa.motr.web.eventlog.subscription.SubscriptionConfirmationFailedEvent;
 import uk.gov.dvsa.motr.web.eventlog.subscription.SubscriptionConfirmedEvent;
+import uk.gov.dvsa.motr.web.formatting.MakeModelFormatter;
 
 import javax.inject.Inject;
 
@@ -22,19 +26,22 @@ public class SubscriptionConfirmationService {
     private final UrlHelper urlHelper;
     private final PendingSubscriptionRepository pendingSubscriptionRepository;
     private final SubscriptionRepository subscriptionRepository;
+    private VehicleDetailsClient client;
 
     @Inject
     public SubscriptionConfirmationService(
             PendingSubscriptionRepository pendingSubscriptionRepository,
             SubscriptionRepository subscriptionRepository,
             NotifyService notifyService,
-            UrlHelper urlHelper
+            UrlHelper urlHelper,
+            VehicleDetailsClient client
     ) {
 
         this.pendingSubscriptionRepository = pendingSubscriptionRepository;
         this.subscriptionRepository = subscriptionRepository;
         this.notifyService = notifyService;
         this.urlHelper = urlHelper;
+        this.client = client;
     }
 
     public Subscription confirmSubscription(String confirmationId) throws InvalidConfirmationIdException {
@@ -87,9 +94,11 @@ public class SubscriptionConfirmationService {
 
     private void sendSubscriptionConfirmationEmail(Subscription subscription) {
 
+        VehicleDetails vehicleDetails = VehicleDetailsService.getVehicleDetails(subscription.getVrm(), client);
+
         notifyService.sendSubscriptionConfirmationEmail(
                 subscription.getEmail(),
-                subscription.getVrm(),
+                MakeModelFormatter.getMakeModelDisplayStringFromVehicleDetails(vehicleDetails, ", ") + subscription.getVrm(),
                 subscription.getMotDueDate(),
                 urlHelper.unsubscribeLink(subscription.getUnsubscribeId()));
     }

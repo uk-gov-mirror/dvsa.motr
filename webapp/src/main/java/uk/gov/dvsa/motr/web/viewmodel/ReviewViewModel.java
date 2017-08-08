@@ -1,6 +1,6 @@
 package uk.gov.dvsa.motr.web.viewmodel;
 
-import uk.gov.dvsa.motr.web.helper.DateDisplayHelper;
+import uk.gov.dvsa.motr.web.formatting.DateFormatter;
 
 import java.time.LocalDate;
 
@@ -95,7 +95,7 @@ public class ReviewViewModel {
             return UNKNOWN_STRING;
         }
 
-        return DateDisplayHelper.asDisplayDate(expiryDate);
+        return DateFormatter.asDisplayDate(expiryDate);
     }
 
     public ReviewViewModel setExpiryDate(LocalDate expiryDate) {
