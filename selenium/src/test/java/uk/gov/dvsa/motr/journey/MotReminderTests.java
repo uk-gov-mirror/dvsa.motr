@@ -126,7 +126,7 @@ public class MotReminderTests extends BaseTest {
 
         //Then my mot reminder is set up successfully with the updated email address
         EmailConfirmationPendingPage confirmPage = reviewPageSubmit.confirmSubscriptionDetails();
-        assertEquals(confirmPage.getTitle(), "You’ve nearly finished");
+        assertEquals(confirmPage.getTitle(), "One more step");
     }
 
     @Test(description = "Owner of a vehicle with a mot can change their vrm when creating MOT reminder")
@@ -142,7 +142,7 @@ public class MotReminderTests extends BaseTest {
 
         //Then my mot reminder is set up successfully with the updated vehicle vrm
         EmailConfirmationPendingPage confirmPage = reviewPageSubmit.confirmSubscriptionDetails();
-        assertEquals(confirmPage.getTitle(), "You’ve nearly finished");
+        assertEquals(confirmPage.getTitle(), "One more step");
     }
 
     @Test(description = "As a user of the site with a vested interest in cookie policy, I can view them")
