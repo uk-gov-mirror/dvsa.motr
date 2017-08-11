@@ -23,14 +23,14 @@ public class MotrBouncingEmailCleanerHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(MotrBouncingEmailCleanerHandler.class);
 
-    public BouncingEmailCleanerReport handleRequest(Object request, Context context) {
+    public BouncingEmailCleanerReport handleRequest(LoaderInvocationEvent request, Context context) {
 
         logger.info("Request: {}, context: {}", request, context);
 
         Injector injector = Guice.createInjector(new ConfigModule());
 
         try {
-            return injector.getInstance(UnsubscribeBouncingEmailAddressService.class).run();
+            return injector.getInstance(UnsubscribeBouncingEmailAddressService.class).run(request.getTimeAsDateTime());
         } catch (NotificationClientException e) {
             EventLogger.logErrorEvent(new NotificationClientErrorEvent(), e);
             throw new ServerErrorException(500);

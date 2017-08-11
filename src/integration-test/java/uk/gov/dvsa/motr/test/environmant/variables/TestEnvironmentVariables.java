@@ -11,6 +11,7 @@ import static uk.gov.dvsa.motr.SystemVariable.DB_TABLE_SUBSCRIPTION;
 import static uk.gov.dvsa.motr.SystemVariable.GOV_NOTIFY_API_TOKEN;
 import static uk.gov.dvsa.motr.SystemVariable.LOG_LEVEL;
 import static uk.gov.dvsa.motr.SystemVariable.REGION;
+import static uk.gov.dvsa.motr.SystemVariable.STATUS_EMAIL_RECIPIENTS;
 
 public class TestEnvironmentVariables extends EnvironmentVariables {
 
@@ -21,6 +22,7 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
         set(DB_TABLE_SUBSCRIPTION, subscriptionTableName());
         set(DB_TABLE_CANCELLED_SUBSCRIPTION, cancelledSubscriptionTableName());
         set(GOV_NOTIFY_API_TOKEN, govNotifyApiToken());
+        set(STATUS_EMAIL_RECIPIENTS, "test1@email.com, test2@email.com");
     }
 
     public static String subscriptionTableName() {

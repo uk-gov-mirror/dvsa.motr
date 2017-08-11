@@ -69,6 +69,7 @@ dependencies {
     compile 'com.amazonaws:aws-java-sdk-sqs:1.11.86'
     compile 'org.slf4j:slf4j-log4j12:1.7.21'
     compile 'com.github.awslabs:aws-serverless-java-container:af1ec224af'
+    compile 'net.logstash.log4j:jsonevent-layout:1.7'
     compile 'com.github.szhem:log4j-json-layout:b657ab3466'
     compile 'com.google.inject:guice:4.1.0'
     compile 'org.glassfish.jersey.media:jersey-media-json-jackson:2.25'
