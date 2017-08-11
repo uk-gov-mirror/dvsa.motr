@@ -21,7 +21,7 @@ public class NotifyService {
             String emailTemplateId) throws NotificationClientException {
 
         Map<String, String> personalisation = new HashMap<>();
-        personalisation.put("registration_number", registrationNumber);
+        personalisation.put("vehicle_details", registrationNumber);
         personalisation.put("mot_expiry_date", motExpiryDate.toString());
         personalisation.put("unsubscribe_link", "integration/test");
 
