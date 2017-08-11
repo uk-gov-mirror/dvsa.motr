@@ -66,8 +66,7 @@ public class SubscriptionLoaderDvlaVehicleTests extends SubscriptionLoaderBase {
         Subscription subscription = jsonMapper.readValue(messages.get(0).getBody(), Subscription.class);
         queueHelper.deleteMessageFromQueue(messages.get(0));
 
-        assertEquals(subscriptionItem.getVrm(), subscription.getVrm());
-        assertEquals(subscriptionItem.getEmail(), subscription.getEmail());
+        assertSubscriptionIsAddedToQueue(subscription);
         assertEquals(subscriptionItem.getDvlaId(), subscription.getDvlaId());
         assertNull(subscription.getMotTestNumber());
 
@@ -91,8 +90,7 @@ public class SubscriptionLoaderDvlaVehicleTests extends SubscriptionLoaderBase {
         Subscription subscription = jsonMapper.readValue(messages.get(0).getBody(), Subscription.class);
         queueHelper.deleteMessageFromQueue(messages.get(0));
 
-        assertEquals(subscriptionItem.getVrm(), subscription.getVrm());
-        assertEquals(subscriptionItem.getEmail(), subscription.getEmail());
+        assertSubscriptionIsAddedToQueue(subscription);
         assertEquals(subscriptionItem.getMotTestNumber(), subscription.getMotTestNumber());
 
         assertEquals(1, loadReport.getSubmittedForProcessing());
@@ -116,8 +114,7 @@ public class SubscriptionLoaderDvlaVehicleTests extends SubscriptionLoaderBase {
         Subscription subscription = jsonMapper.readValue(messages.get(0).getBody(), Subscription.class);
         queueHelper.deleteMessageFromQueue(messages.get(0));
 
-        assertEquals(subscriptionItem.getVrm(), subscription.getVrm());
-        assertEquals(subscriptionItem.getEmail(), subscription.getEmail());
+        assertSubscriptionIsAddedToQueue(subscription);
         assertEquals(subscriptionItem.getMotTestNumber(), subscription.getMotTestNumber());
         assertNull(subscription.getDvlaId());
 
@@ -125,5 +122,12 @@ public class SubscriptionLoaderDvlaVehicleTests extends SubscriptionLoaderBase {
         assertEquals(0, loadReport.getDvlaVehiclesProcessed());
         assertEquals(1, loadReport.getNonDvlaVehiclesProcessed());
         assertEquals(1, loadReport.getTotalProcessed());
+    }
+
+    private void assertSubscriptionIsAddedToQueue(Subscription subscription) {
+
+        assertEquals(subscriptionItem.getVrm(), subscription.getVrm());
+        assertEquals(subscriptionItem.getEmail(), subscription.getEmail());
+        assertEquals(subscriptionItem.getContactType().getValue(), subscription.getContactType().getValue());
     }
 }
