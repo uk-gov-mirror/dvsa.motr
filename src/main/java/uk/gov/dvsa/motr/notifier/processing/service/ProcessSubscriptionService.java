@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.notifier.component.subscription.persistence.SubscriptionRepository;
+import uk.gov.dvsa.motr.notifier.events.DeleteSubscriptionSuccessfulEvent;
 import uk.gov.dvsa.motr.notifier.events.OneDayAfterEmailReminderEvent;
 import uk.gov.dvsa.motr.notifier.events.OneMonthEmailReminderEvent;
 import uk.gov.dvsa.motr.notifier.events.TwoWeekEmailReminderEvent;
@@ -26,6 +27,7 @@ import static uk.gov.dvsa.motr.notifier.processing.service.SubscriptionHandlerHe
 import static uk.gov.dvsa.motr.notifier.processing.service.SubscriptionHandlerHelper.motTestNumberUpdateRequired;
 import static uk.gov.dvsa.motr.notifier.processing.service.SubscriptionHandlerHelper.oneDayAfterEmailRequired;
 import static uk.gov.dvsa.motr.notifier.processing.service.SubscriptionHandlerHelper.oneMonthEmailRequired;
+import static uk.gov.dvsa.motr.notifier.processing.service.SubscriptionHandlerHelper.subscriptionDeletionRequired;
 import static uk.gov.dvsa.motr.notifier.processing.service.SubscriptionHandlerHelper.twoWeekEmailRequired;
 import static uk.gov.dvsa.motr.notifier.processing.service.SubscriptionHandlerHelper.vrmUpdateRequired;
 
@@ -71,11 +73,17 @@ public class ProcessSubscriptionService {
 
         String unSubscribeLink = UriBuilder.fromPath(webBaseUrl).path("unsubscribe").path(subscriptionId).build().toString();
 
-        String vehicleDetailsString = MakeModelFormatter.getMakeModelDisplayStringFromVehicleDetails(vehicleDetails, ", ") + vehicleVrm;
+        if (subscriptionDeletionRequired(vehicleMotExpiryDate, requestDate)) {
+            subscriptionRepository.deleteSubscription(vrm, email);
+            EventLogger.logEvent(new DeleteSubscriptionSuccessfulEvent().setVrm(vrm).setMotExpiryDate(vehicleMotExpiryDate));
+            return;
+        }
 
         if (motDueDateUpdateRequired(subscriptionMotDueDate, vehicleMotExpiryDate)) {
             subscriptionRepository.updateExpiryDate(vrm, email, vehicleMotExpiryDate);
         }
+
+        String vehicleDetailsString = MakeModelFormatter.getMakeModelDisplayStringFromVehicleDetails(vehicleDetails, ", ") + vehicleVrm;
 
         if (oneMonthEmailRequired(requestDate, vehicleMotExpiryDate)) {
 

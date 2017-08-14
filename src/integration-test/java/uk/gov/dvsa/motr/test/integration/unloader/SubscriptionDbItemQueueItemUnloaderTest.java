@@ -31,12 +31,13 @@ import uk.gov.service.notify.NotificationClientException;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNull;
 
 import static uk.gov.dvsa.motr.test.environmant.variables.TestEnvironmentVariables.region;
 import static uk.gov.dvsa.motr.test.environmant.variables.TestEnvironmentVariables.subscriptionTableName;
@@ -50,6 +51,7 @@ public class SubscriptionDbItemQueueItemUnloaderTest {
     private static final LocalDate MOCK_API_RANDOM_VEHICLE_DATE = LocalDate.of(2026, 3, 9);
     private static final LocalDate DATE_NOT_MATCHING_VEHICLE_MOCK = LocalDate.of(2015, 5, 15);
     private static final LocalDate MOCK_API_SPECIFIC_VEHICLE_DATE = LocalDate.of(2016, 11, 26);
+    private static final LocalDate MOCK_DELETE_SUBSCRIPTION_DATE = LocalDate.of(2021, 11, 26);
 
     private ObjectMapper jsonMapper = new ObjectMapper();
     private LoaderHelper loaderHelper;
@@ -140,6 +142,21 @@ public class SubscriptionDbItemQueueItemUnloaderTest {
         assertNotNull("updated_at cannot be null when updating vrm", savedItem.getString("updated_at"));
     }
 
+    @Test
+    public void whenProcessingASubscriptionWithDeletionRequired_TheSubscriptionInTheDbIsDeleted() throws IOException,
+            InterruptedException, ExecutionException, NotificationClientException {
+
+        subscriptionItem = new SubscriptionItem();
+        subscriptionItem.setMotTestNumber("12345");
+
+        // The actual MOT date will come from the mock ( = MOCK_API_SPECIFIC_VEHICLE_DATE).
+        // (MOCK_DELETE_SUBSCRIPTION_DATE - one month) is used to trigger the loader and set the requestDate in ProcessSubscription.
+        subscriptionItem.setMotDueDate(MOCK_DELETE_SUBSCRIPTION_DATE);
+
+        SubscriptionDbItem changedSubscriptionDbItem = saveAndProcessSubscriptionItem(subscriptionItem);
+        assertNull(changedSubscriptionDbItem);
+    }
+
     private String buildLoaderRequest(String testTime) throws JsonProcessingException {
 
         LoaderInvocationEvent loaderInvocationEvent = new LoaderInvocationEvent(testTime);
@@ -147,7 +164,7 @@ public class SubscriptionDbItemQueueItemUnloaderTest {
     }
 
     /**
-     * Processes a subscriptionItem. Saves to db, processes, returns updated version.
+     * Processes a subscriptionItem. Saves to db, processes, returns updated version (or null if was deleted).
      * @param subscriptionItem The subscription item to save.
      */
     private SubscriptionDbItem saveAndProcessSubscriptionItem(SubscriptionItem subscriptionItem)
@@ -164,10 +181,14 @@ public class SubscriptionDbItemQueueItemUnloaderTest {
         NotifierReport report = eventHandler.handle(new Object(), buildContext());
         assertEquals(1, report.getSuccessfullyProcessed());
 
-        SubscriptionDbItem changedSubscriptionDbItem = repo.findById(subscriptionItem.getId()).get();
+        Optional<SubscriptionDbItem> subscriptionContainer = repo.findById(subscriptionItem.getId());
+        if (!subscriptionContainer.isPresent()) {
+            return null;
+        }
 
-        // If new vrm in changedSubscriptionDbItem, then also update vrm in
-        // subscriptionItem so cleanUp() will find it in the db.
+        SubscriptionDbItem changedSubscriptionDbItem = subscriptionContainer.get();
+
+        // Update vrm in subscriptionItem to match changeSubscriptionDbItem so cleanUp() will find it in the db.
         subscriptionItem.setVrm(changedSubscriptionDbItem.getVrm());
         return changedSubscriptionDbItem;
     }

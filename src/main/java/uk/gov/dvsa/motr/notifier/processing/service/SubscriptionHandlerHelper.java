@@ -1,5 +1,7 @@
 package uk.gov.dvsa.motr.notifier.processing.service;
 
+import org.omg.PortableInterceptor.LOCATION_FORWARD;
+
 import java.time.LocalDate;
 
 /**
@@ -7,6 +9,8 @@ import java.time.LocalDate;
  * or if an email needs to be sent to remind them
  */
 public class SubscriptionHandlerHelper {
+
+    private static final int MONTHS_BEFORE_DELETION = 59;
 
     public static boolean motDueDateUpdateRequired(LocalDate subscriptionMotDueDate, LocalDate vehicleDetailsMotExpiryDate) {
 
@@ -34,5 +38,11 @@ public class SubscriptionHandlerHelper {
 
     public static boolean vrmUpdateRequired(String subscriptionVrm, String vehicleDetailsVrm) {
         return !subscriptionVrm.equals(vehicleDetailsVrm);
+    }
+
+    public static boolean subscriptionDeletionRequired(LocalDate vehicleMotExpiryDate, LocalDate requestDate) {
+
+        LocalDate deletionDate = vehicleMotExpiryDate.plusMonths(MONTHS_BEFORE_DELETION);
+        return  (requestDate.isAfter(deletionDate) || requestDate.isEqual(deletionDate));
     }
 }
