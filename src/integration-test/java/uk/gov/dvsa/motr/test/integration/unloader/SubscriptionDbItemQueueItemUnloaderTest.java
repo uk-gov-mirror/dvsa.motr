@@ -80,7 +80,9 @@ public class SubscriptionDbItemQueueItemUnloaderTest {
             throws IOException, InterruptedException, ExecutionException, NotificationClientException {
 
         subscriptionItem = new SubscriptionItem();
-        subscriptionItem.setMotDueDate(MOCK_API_RANDOM_VEHICLE_DATE);
+        subscriptionItem
+                .setMotDueDate(MOCK_API_RANDOM_VEHICLE_DATE)
+                .setRandomMotTestNumber();
 
         saveAndProcessSubscriptionItem(subscriptionItem);
     }
@@ -121,7 +123,9 @@ public class SubscriptionDbItemQueueItemUnloaderTest {
     public void whenProcessingASubscriptionWithAMismatchedVrm_TheSubscriptionVrmInTheDbIsUpdated() throws IOException,
             InterruptedException, ExecutionException, NotificationClientException {
 
-        subscriptionItem = new SubscriptionItem();
+        subscriptionItem = new SubscriptionItem()
+                .setMotDueDate(MOCK_API_SPECIFIC_VEHICLE_DATE)
+                .setMotTestNumber("987654321012");
 
         SubscriptionDbItem changedSubscriptionDbItem = saveAndProcessSubscriptionItem(subscriptionItem);
 
@@ -155,6 +159,90 @@ public class SubscriptionDbItemQueueItemUnloaderTest {
 
         SubscriptionDbItem changedSubscriptionDbItem = saveAndProcessSubscriptionItem(subscriptionItem);
         assertNull(changedSubscriptionDbItem);
+    }
+
+    @Test
+    public void whenProcessingASubscriptionWithADvlaId_whichHasNowGotATestNumber_thenTheSubscriptionIsSuccessfullyProcessed()
+            throws IOException, InterruptedException, ExecutionException, NotificationClientException {
+
+        subscriptionItem = new SubscriptionItem()
+                .setMotDueDate(MOCK_API_SPECIFIC_VEHICLE_DATE)
+                .setVrm("WDD2040022A65")
+                .setDvlaId("12345");
+
+        SubscriptionDbItem changedSubscriptionDbItem = saveAndProcessSubscriptionItem(subscriptionItem);
+
+        QuerySpec spec = new QuerySpec()
+                .withKeyConditionExpression("vrm = :vrm AND email = :email")
+                .withValueMap(new ValueMap().withString(":vrm", changedSubscriptionDbItem.getVrm()).withString(":email",
+                changedSubscriptionDbItem.getEmail()));
+
+        Item savedItem = new DynamoDB(dynamoDbClient()).getTable(subscriptionTableName()).query(spec).iterator().next();
+
+        // Assert the new  db item has the same id subscriptionItem
+        // (vrm update requires new record to be created, but want to keep original id).
+        assertEquals(subscriptionItem.getId(), changedSubscriptionDbItem.getId());
+
+        // Assert the db vrm now is equal to the mock api vrm.
+        assertEquals("WDD2040022A65", changedSubscriptionDbItem.getVrm());
+        assertNotNull("mot_test_number cannot be null when trade api returns an motTestNumber", savedItem.getString("mot_test_number"));
+        assertNull("dvla_id is not null even though there is a motTestNumber", savedItem.getString("dvla_id"));
+    }
+
+    @Test
+    public void whenProcessingASubscriptionWithADvlaId_whichHasUndergoneACherishedTransfer_thenTheSubscriptionIsSuccessfullyProcessed()
+            throws IOException, InterruptedException, ExecutionException, NotificationClientException {
+
+        subscriptionItem = new SubscriptionItem()
+                .setMotDueDate(MOCK_API_SPECIFIC_VEHICLE_DATE)
+                .setDvlaId("12345");
+
+        SubscriptionDbItem changedSubscriptionDbItem = saveAndProcessSubscriptionItem(subscriptionItem);
+
+        QuerySpec spec = new QuerySpec()
+                .withKeyConditionExpression("vrm = :vrm AND email = :email")
+                .withValueMap(new ValueMap().withString(":vrm", changedSubscriptionDbItem.getVrm()).withString(":email",
+                changedSubscriptionDbItem.getEmail()));
+
+        Item savedItem = new DynamoDB(dynamoDbClient()).getTable(subscriptionTableName()).query(spec).iterator().next();
+
+        // Assert the new  db item has the same id subscriptionItem
+        // (vrm update requires new record to be created, but want to keep original id).
+        assertEquals(subscriptionItem.getId(), changedSubscriptionDbItem.getId());
+
+        // Assert the db vrm now is equal to the mock api vrm.
+        assertEquals("WDD2040022A65", changedSubscriptionDbItem.getVrm());
+        assertNotNull("mot_test_number cannot be null when trade api returns an motTestNumber", savedItem.getString("mot_test_number"));
+        assertNull("dvla_id is not null even though there is a motTestNumber", savedItem.getString("dvla_id"));
+    }
+
+    @Test
+    public void whenProcessingASubscriptionWithADvlaId_whichHasGotANewExpiryDate_thenTheSubscriptionIsSuccessfullyProcessed()
+            throws IOException, InterruptedException, ExecutionException, NotificationClientException {
+
+        subscriptionItem = new SubscriptionItem()
+                .setMotDueDate(MOCK_API_SPECIFIC_VEHICLE_DATE)
+                .setVrm("SUP4R")
+                .setDvlaId("412321");
+
+        SubscriptionDbItem changedSubscriptionDbItem = saveAndProcessSubscriptionItem(subscriptionItem);
+
+        QuerySpec spec = new QuerySpec()
+                .withKeyConditionExpression("vrm = :vrm AND email = :email")
+                .withValueMap(new ValueMap().withString(":vrm", changedSubscriptionDbItem.getVrm()).withString(":email",
+                changedSubscriptionDbItem.getEmail()));
+
+        Item savedItem = new DynamoDB(dynamoDbClient()).getTable(subscriptionTableName()).query(spec).iterator().next();
+
+        // Assert the new  db item has the same id subscriptionItem
+        // (vrm update requires new record to be created, but want to keep original id).
+        assertEquals(subscriptionItem.getId(), changedSubscriptionDbItem.getId());
+
+        // Assert the db vrm now is equal to the mock api vrm.
+        assertEquals("mot due date is not updated", "2007-11-26", savedItem.getString("mot_due_date"));
+        assertEquals("vrm is changed when it wasn't meant too", "SUP4R", changedSubscriptionDbItem.getVrm());
+        assertNull("mot_test_number is not null, when it is meant to be", savedItem.getString("mot_test_number"));
+        assertNotNull("dvla_id is null even though it is meant to be kept", savedItem.getString("dvla_id"));
     }
 
     private String buildLoaderRequest(String testTime) throws JsonProcessingException {

@@ -10,45 +10,87 @@ public class MetricEvent extends Event {
         return "METRICS-STATISTICS";
     }
 
-    public MetricEvent setVehicleDetails99thPercentile(double metric) {
+    public MetricEvent setVehicleDetails99thPercentileFetchByMotTestNumber(double metric) {
 
-        params.put("ninety-ninth-percentile-vehicle-details-fetch", String.valueOf(metric));
+        params.put("ninety-ninth-percentile-vehicle-details-fetchByMotTestNumber", String.valueOf(metric));
         return this;
     }
 
-    public MetricEvent setVehicleDetails95thPercentile(double metric) {
+    public MetricEvent setVehicleDetails99thPercentileFetchByDvlaId(double metric) {
 
-        params.put("ninety-fifth-percentile-vehicle-details-fetch", String.valueOf(metric));
+        params.put("ninety-ninth-percentile-vehicle-details-fetchByDvlaId", String.valueOf(metric));
         return this;
     }
 
-    public MetricEvent setVehicleDetails75thPercentile(double metric) {
+    public MetricEvent setVehicleDetails95thPercentileFetchByMotTestNumber(double metric) {
 
-        params.put("seventy-fifth-percentile-vehicle-details-fetch", String.valueOf(metric));
+        params.put("ninety-fifth-percentile-vehicle-details-fetchByMotTestNumber", String.valueOf(metric));
         return this;
     }
 
-    public MetricEvent setVehicleDetailsFetchCountOfCalls(long metric) {
+    public MetricEvent setVehicleDetails95thPercentileFetchByDvlaId(double metric) {
 
-        params.put("count-of-vehicle-details-fetch-calls", String.valueOf(metric));
+        params.put("ninety-fifth-percentile-vehicle-details-fetchByDvlaId", String.valueOf(metric));
         return this;
     }
 
-    public MetricEvent setVehicleDetailsFetchMax(long metric) {
+    public MetricEvent setVehicleDetails75thPercentileFetchByMotTestNumber(double metric) {
 
-        params.put("max-time-vehicle-details-fetch-call", String.valueOf(metric));
+        params.put("seventy-fifth-percentile-vehicle-details-fetchByMotTestNumber", String.valueOf(metric));
         return this;
     }
 
-    public MetricEvent setVehicleDetailsFetchMin(long metric) {
+    public MetricEvent setVehicleDetails75thPercentileFetchByDvlaId(double metric) {
 
-        params.put("min-time-vehicle-details-fetch-call", String.valueOf(metric));
+        params.put("seventy-fifth-percentile-vehicle-details-fetchByDvlaId", String.valueOf(metric));
         return this;
     }
 
-    public MetricEvent setVehicleDetailsStdDeviation(double metric) {
+    public MetricEvent setVehicleDetailsFetchCountOfCallsFetchByMotTestNumber(long metric) {
 
-        params.put("std-deviation-vehicle-details-fetch-call", String.valueOf(metric));
+        params.put("count-of-vehicle-details-fetchByMotTestNumber-calls", String.valueOf(metric));
+        return this;
+    }
+
+    public MetricEvent setVehicleDetailsFetchCountOfCallsFetchByDvlaId(long metric) {
+
+        params.put("count-of-vehicle-details-fetchByDvlaIdr-calls", String.valueOf(metric));
+        return this;
+    }
+
+    public MetricEvent setVehicleDetailsFetchMaxFetchByMotTestNumber(long metric) {
+
+        params.put("max-time-vehicle-details-fetchByMotTestNumber-call", String.valueOf(metric));
+        return this;
+    }
+
+    public MetricEvent setVehicleDetailsFetchMaxFetchByDvlaId(long metric) {
+
+        params.put("max-time-vehicle-details-fetchByDvlaId-call", String.valueOf(metric));
+        return this;
+    }
+
+    public MetricEvent setVehicleDetailsFetchMinFetchByMotTestNumber(long metric) {
+
+        params.put("min-time-vehicle-details-fetchByMotTestNumber-call", String.valueOf(metric));
+        return this;
+    }
+
+    public MetricEvent setVehicleDetailsFetchMinFetchByDvlaId(long metric) {
+
+        params.put("min-time-vehicle-details-fetchByDvlaId-call", String.valueOf(metric));
+        return this;
+    }
+
+    public MetricEvent setVehicleDetailsStdDeviationFetchByMotTestNumber(double metric) {
+
+        params.put("std-deviation-vehicle-details-fetchByMotTestNumber-call", String.valueOf(metric));
+        return this;
+    }
+
+    public MetricEvent setVehicleDetailsStdDeviationFetchByDvlaId(double metric) {
+
+        params.put("std-deviation-vehicle-details-fetchByDvlaId-call", String.valueOf(metric));
         return this;
     }
 

@@ -14,6 +14,8 @@ public class SubscriptionDbItem {
 
     private LocalDate motDueDate;
 
+    private String dvlaId;
+
     public SubscriptionDbItem(String id) {
         this.id = id;
     }
@@ -55,6 +57,17 @@ public class SubscriptionDbItem {
 
     public SubscriptionDbItem setMotDueDate(LocalDate motDueDate) {
         this.motDueDate = motDueDate;
+        return this;
+    }
+
+    public String getDvlaId() {
+
+        return dvlaId;
+    }
+
+    public SubscriptionDbItem setDvlaId(String dvlaId) {
+
+        this.dvlaId = dvlaId;
         return this;
     }
 }

@@ -24,6 +24,12 @@ public abstract class NotifyEvent extends Event {
         return this;
     }
 
+    public NotifyEvent setDvlaId(String dvlaId) {
+
+        params.put("dvla-id", dvlaId);
+        return this;
+    }
+
     public NotifyEvent setExpiryDate(LocalDate expiryDate) {
 
         params.put("expiry-date", expiryDate.toString());

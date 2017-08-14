@@ -27,6 +27,11 @@ public class VehicleDetailsRetrievalFailedEvent extends SubscriptionProcessedEve
         return this;
     }
 
+    public VehicleDetailsRetrievalFailedEvent setDvlaId(String dvlaId) {
+        params.put("dvla-id", dvlaId);
+        return this;
+    }
+
     @Override
     public String getCode() {
 

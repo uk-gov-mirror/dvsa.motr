@@ -11,6 +11,7 @@ import static uk.gov.dvsa.motr.notifier.SystemVariable.GOV_NOTIFY_API_TOKEN;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.LOG_LEVEL;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MESSAGE_RECEIVE_TIMEOUT;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MESSAGE_VISIBILITY_TIMEOUT;
+import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_API_DVLA_ID_URI;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_API_MOT_TEST_NUMBER_URI;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_TEST_REMINDER_INFO_TOKEN;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID;
@@ -33,6 +34,7 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
         set(SUBSCRIPTIONS_QUEUE_URL, sqsEndpoint());
         set(MOT_TEST_REMINDER_INFO_TOKEN, motTestReminderInfoToken());
         set(MOT_API_MOT_TEST_NUMBER_URI, motTestNumberApiEndpoint());
+        set(MOT_API_DVLA_ID_URI, dvlaIdApiEndpoint());
         set(ONE_MONTH_NOTIFICATION_TEMPLATE_ID, notifyOneMonthTemplateId());
         set(TWO_WEEK_NOTIFICATION_TEMPLATE_ID, notifyTwoWeekTemplateId());
         set(ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID, notifyOneDayAfterTemplateId());
@@ -47,6 +49,10 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
 
     public static String motTestNumberApiEndpoint() {
         return lookupProperty("test.mottestnumber.api.integration.endpoint");
+    }
+
+    public static String dvlaIdApiEndpoint() {
+        return lookupProperty("test.dvlaId.api.integration.endpoint");
     }
 
     public static String subscriptionTableName() {

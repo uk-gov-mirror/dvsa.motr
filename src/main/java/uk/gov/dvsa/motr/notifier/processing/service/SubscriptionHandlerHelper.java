@@ -1,7 +1,5 @@
 package uk.gov.dvsa.motr.notifier.processing.service;
 
-import org.omg.PortableInterceptor.LOCATION_FORWARD;
-
 import java.time.LocalDate;
 
 /**
@@ -33,7 +31,10 @@ public class SubscriptionHandlerHelper {
     }
 
     public static boolean motTestNumberUpdateRequired(String subscriptionMotTestNumber, String vehicleDetailsMotTestNumber) {
-        return !subscriptionMotTestNumber.equals(vehicleDetailsMotTestNumber);
+
+        return (subscriptionMotTestNumber == null && vehicleDetailsMotTestNumber != null)
+                || (subscriptionMotTestNumber != null && vehicleDetailsMotTestNumber != null
+                && !subscriptionMotTestNumber.equals(vehicleDetailsMotTestNumber));
     }
 
     public static boolean vrmUpdateRequired(String subscriptionVrm, String vehicleDetailsVrm) {

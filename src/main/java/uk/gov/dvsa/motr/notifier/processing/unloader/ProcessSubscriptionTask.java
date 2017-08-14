@@ -1,6 +1,7 @@
 package uk.gov.dvsa.motr.notifier.processing.unloader;
 
 import uk.gov.dvsa.motr.eventlog.EventLogger;
+import uk.gov.dvsa.motr.notifier.events.NotifyEvent;
 import uk.gov.dvsa.motr.notifier.events.NotifyReminderFailedEvent;
 import uk.gov.dvsa.motr.notifier.events.SubscriptionProcessingFailedEvent;
 import uk.gov.dvsa.motr.notifier.events.SubscriptionQueueItemRemovalFailedEvent;
@@ -56,29 +57,53 @@ public class ProcessSubscriptionTask implements Runnable {
             report.incrementSuccessfullyProcessed();
 
         } catch (RemoveSubscriptionFromQueueException e) {
-            EventLogger.logErrorEvent(new SubscriptionQueueItemRemovalFailedEvent()
+
+            SubscriptionQueueItemRemovalFailedEvent event = new SubscriptionQueueItemRemovalFailedEvent()
                     .setEmail(subscriptionQueueItemToProcess.getEmail())
                     .setVrm(subscriptionQueueItemToProcess.getVrm())
-                    .setMotTestNumber(subscriptionQueueItemToProcess.getMotTestNumber())
-                    .setExpiryDate(subscriptionQueueItemToProcess.getMotDueDate()), e);
+                    .setExpiryDate(subscriptionQueueItemToProcess.getMotDueDate());
+
+            if (subscriptionQueueItemToProcess.getMotTestNumber() == null) {
+                event.setDvlaId(subscriptionQueueItemToProcess.getDvlaId());
+            } else {
+                event.setMotTestNumber(subscriptionQueueItemToProcess.getMotTestNumber());
+            }
+
+            EventLogger.logErrorEvent(event, e);
 
             report.incrementFailedToProcess();
 
         } catch (VehicleDetailsClientException | VehicleNotFoundException e) {
-            EventLogger.logErrorEvent(new VehicleDetailsRetrievalFailedEvent()
+
+            VehicleDetailsRetrievalFailedEvent event = new VehicleDetailsRetrievalFailedEvent()
                     .setEmail(subscriptionQueueItemToProcess.getEmail())
                     .setVrm(subscriptionQueueItemToProcess.getVrm())
-                    .setMotTestNumber(subscriptionQueueItemToProcess.getMotTestNumber())
-                    .setExpiryDate(subscriptionQueueItemToProcess.getMotDueDate()), e);
+                    .setExpiryDate(subscriptionQueueItemToProcess.getMotDueDate());
+
+            if (subscriptionQueueItemToProcess.getMotTestNumber() == null) {
+                event.setDvlaId(subscriptionQueueItemToProcess.getDvlaId());
+            } else {
+                event.setMotTestNumber(subscriptionQueueItemToProcess.getMotTestNumber());
+            }
+
+            EventLogger.logErrorEvent(event, e);
 
             report.incrementFailedToProcess();
 
         } catch (NotificationClientException e) {
-            EventLogger.logErrorEvent(new NotifyReminderFailedEvent()
+
+            NotifyEvent event = new NotifyReminderFailedEvent()
                     .setEmail(subscriptionQueueItemToProcess.getEmail())
                     .setVrm(subscriptionQueueItemToProcess.getVrm())
-                    .setMotTestNumber(subscriptionQueueItemToProcess.getMotTestNumber())
-                    .setExpiryDate(subscriptionQueueItemToProcess.getMotDueDate()), e);
+                    .setExpiryDate(subscriptionQueueItemToProcess.getMotDueDate());
+
+            if (subscriptionQueueItemToProcess.getMotTestNumber() == null) {
+                event.setDvlaId(subscriptionQueueItemToProcess.getDvlaId());
+            } else {
+                event.setMotTestNumber(subscriptionQueueItemToProcess.getMotTestNumber());
+            }
+
+            EventLogger.logErrorEvent(event, e);
 
             report.incrementFailedToProcess();
 
