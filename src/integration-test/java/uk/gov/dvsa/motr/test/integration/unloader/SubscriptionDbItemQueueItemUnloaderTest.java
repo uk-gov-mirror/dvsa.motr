@@ -221,7 +221,7 @@ public class SubscriptionDbItemQueueItemUnloaderTest {
             throws IOException, InterruptedException, ExecutionException, NotificationClientException {
 
         subscriptionItem = new SubscriptionItem()
-                .setMotDueDate(MOCK_API_SPECIFIC_VEHICLE_DATE)
+                .setMotDueDate(LocalDate.of(1991, 3, 9))
                 .setVrm("SUP4R")
                 .setDvlaId("412321");
 
