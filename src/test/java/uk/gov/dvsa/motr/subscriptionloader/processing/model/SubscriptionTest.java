@@ -15,6 +15,7 @@ public class SubscriptionTest {
     public static final String TEST_VRM = "test_vrm";
     public static final String TEST_EMAIL = "test_email";
     public static final String TEST_MOT_TEST_NUMBER = "test_mot_test_number";
+    public static final String TEST_DVLA_ID = "test_dvla_id";
     private Subscription subscription;
 
     @Before
@@ -24,7 +25,7 @@ public class SubscriptionTest {
     }
 
     @Test
-    public void testSetandGetId() {
+    public void testSetAndGetId() {
 
         Subscription returnedSub = this.subscription.setId(TEST_ID);
 
@@ -43,7 +44,7 @@ public class SubscriptionTest {
     }
 
     @Test
-    public void testSetandGetVrm() {
+    public void testSetAndGetVrm() {
 
         Subscription returnedSub = this.subscription.setVrm(TEST_VRM);
 
@@ -52,7 +53,7 @@ public class SubscriptionTest {
     }
 
     @Test
-    public void testSetandGetEmail() {
+    public void testSetAndGetEmail() {
 
         Subscription returnedSub = this.subscription.setEmail(TEST_EMAIL);
 
@@ -61,7 +62,7 @@ public class SubscriptionTest {
     }
 
     @Test
-    public void testSetandGetMotTestNumber() {
+    public void testSetAndGetMotTestNumber() {
 
         Subscription returnedSub = this.subscription.setMotTestNumber(TEST_MOT_TEST_NUMBER);
 
@@ -70,7 +71,16 @@ public class SubscriptionTest {
     }
 
     @Test
-    public void testToString() {
+    public void testSetAndGetDvlaId() {
+
+        Subscription returnedSub = this.subscription.setDvlaId(TEST_DVLA_ID);
+
+        assertEquals(TEST_DVLA_ID, this.subscription.getDvlaId());
+        assertThat(returnedSub, instanceOf(Subscription.class));
+    }
+
+    @Test
+    public void testToStringWhenMotTestNumberIsSet() {
 
         LocalDate now = LocalDate.now();
         Subscription subscription = this.subscription.setId(TEST_ID)
@@ -82,7 +92,24 @@ public class SubscriptionTest {
 
         assertEquals("Subscription{id='testId', motDueDate=" +
                 now.toString() +
-                ", vrm='test_vrm', email='test_email', motTestNumber='test_mot_test_number', loadedOnDate=" +
+                ", vrm='test_vrm', email='test_email', motTestNumber='test_mot_test_number', dvlaId='null', loadedOnDate=" +
+                now.toString() + "}", subscription.toString());
+    }
+
+    @Test
+    public void testToStringWhenDvlaIdIsSet() {
+
+        LocalDate now = LocalDate.now();
+        Subscription subscription = this.subscription.setId(TEST_ID)
+                .setMotDueDate(now)
+                .setVrm(TEST_VRM)
+                .setEmail(TEST_EMAIL)
+                .setDvlaId(TEST_DVLA_ID)
+                .setLoadedOnDate(now);
+
+        assertEquals("Subscription{id='testId', motDueDate=" +
+                now.toString() +
+                ", vrm='test_vrm', email='test_email', motTestNumber='null', dvlaId='test_dvla_id', loadedOnDate=" +
                 now.toString() + "}", subscription.toString());
     }
 }

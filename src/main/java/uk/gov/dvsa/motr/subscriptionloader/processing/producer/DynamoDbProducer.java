@@ -22,7 +22,6 @@ import java.util.Iterator;
  */
 public class DynamoDbProducer implements SubscriptionProducer {
 
-    private static final Logger logger = LoggerFactory.getLogger(DynamoDbProducer.class);
     private static final String INDEX_NAME = "due-date-md-gsi";
 
     private String subscriptionTableName;
@@ -85,13 +84,22 @@ public class DynamoDbProducer implements SubscriptionProducer {
                 }
 
                 LocalDate motDueDate = LocalDate.parse(item.getString("mot_due_date"), DateTimeFormatter.ISO_DATE);
+
+                if (!item.isNull("mot_test_number") && item.isPresent("mot_test_number")) {
+                    return new Subscription()
+                            .setId(item.getString("id"))
+                            .setVrm(item.getString("vrm"))
+                            .setEmail(item.getString("email"))
+                            .setMotTestNumber(item.getString("mot_test_number"))
+                            .setMotDueDate(motDueDate);
+                }
+
                 return new Subscription()
                         .setId(item.getString("id"))
                         .setVrm(item.getString("vrm"))
                         .setEmail(item.getString("email"))
-                        .setMotTestNumber(item.getString("mot_test_number"))
+                        .setDvlaId(item.getString("dvla_id"))
                         .setMotDueDate(motDueDate);
-
             }
         };
     }

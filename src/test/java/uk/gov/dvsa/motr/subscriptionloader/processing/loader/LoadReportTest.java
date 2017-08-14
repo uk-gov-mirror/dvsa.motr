@@ -20,8 +20,8 @@ public class LoadReportTest {
     @Test
     public void whenIncrementProcessed_thenProcessedIsIncremented() {
 
-        this.loadReport.incrementProcessed();
-        assertEquals(1, loadReport.getProcessed());
+        this.loadReport.incrementTotalProcessed();
+        assertEquals(1, loadReport.getTotalProcessed());
     }
 
     @Test
@@ -32,10 +32,29 @@ public class LoadReportTest {
     }
 
     @Test
-    public void testToStringReflectsValuesCoeecrtly() {
+    public void whenIncrementDvlaVehiclesProcessed_thenDvlaVehiclesProcessedIsIncremented() {
 
-        this.loadReport.incrementProcessed();
+        this.loadReport.incrementDvlaVehiclesProcessed();
+        assertEquals(1, loadReport.getDvlaVehiclesProcessed());
+    }
+
+    @Test
+    public void whenIncrementNonDvlaVehiclesProcessed_thenNonDvlaVehiclesProcessedIsIncremented() {
+
+        this.loadReport.incrementNonDvlaVehiclesProcessed();
+        assertEquals(1, loadReport.getNonDvlaVehiclesProcessed());
+    }
+
+    @Test
+    public void testToStringReflectsValuesCorrectly() {
+
         this.loadReport.incrementSubmittedForProcessing();
-        assertTrue(loadReport.toString().contains("LoadReport{submittedForProcessing=1, processed=1, startedTime="));
+        this.loadReport.incrementSubmittedForProcessing();
+        this.loadReport.incrementTotalProcessed();
+        this.loadReport.incrementDvlaVehiclesProcessed();
+        this.loadReport.incrementNonDvlaVehiclesProcessed();
+
+        assertTrue(loadReport.toString().contains("LoadReport{submittedForProcessing=2, totalProcessed=1, " +
+                "dvlaVehiclesProcessed=1, nonDvlaVehiclesProcessed=1, startedTime="));
     }
 }

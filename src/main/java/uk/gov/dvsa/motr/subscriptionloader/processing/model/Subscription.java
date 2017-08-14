@@ -1,5 +1,6 @@
 package uk.gov.dvsa.motr.subscriptionloader.processing.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -26,7 +27,12 @@ public class Subscription {
     private String email;
 
     @JsonProperty("motTestNumber")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String motTestNumber;
+
+    @JsonProperty("dvlaId")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private String dvlaId;
 
     @JsonProperty("loadedOnDate")
     @JsonSerialize(using = LocalDateSerialiser.class)
@@ -88,6 +94,17 @@ public class Subscription {
         return this;
     }
 
+    public String getDvlaId() {
+
+        return dvlaId;
+    }
+
+    public Subscription setDvlaId(String dvlaId) {
+
+        this.dvlaId = dvlaId;
+        return this;
+    }
+
     public LocalDate getLoadedOnDate() {
 
         return loadedOnDate;
@@ -107,6 +124,7 @@ public class Subscription {
                 ", vrm='" + vrm + '\'' +
                 ", email='" + email + '\'' +
                 ", motTestNumber='" + motTestNumber + '\'' +
+                ", dvlaId='" + dvlaId + '\'' +
                 ", loadedOnDate=" + loadedOnDate +
                 '}';
     }

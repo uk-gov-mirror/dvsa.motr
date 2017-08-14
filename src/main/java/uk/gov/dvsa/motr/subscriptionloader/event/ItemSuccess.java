@@ -27,7 +27,14 @@ public class ItemSuccess extends Event {
     }
 
     public ItemSuccess setMotTestNumber(String motTestNumber) {
+
         params.put("mot-test-number", motTestNumber);
+        return this;
+    }
+
+    public ItemSuccess setDvlaId(String dvlaId) {
+
+        params.put("dvla-id", dvlaId);
         return this;
     }
 

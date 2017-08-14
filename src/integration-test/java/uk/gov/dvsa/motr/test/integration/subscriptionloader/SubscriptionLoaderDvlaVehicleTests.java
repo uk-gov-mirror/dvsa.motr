@@ -21,11 +21,12 @@ import uk.gov.dvsa.motr.test.integration.sqs.SqsHelper;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import static uk.gov.dvsa.motr.test.integration.dynamodb.DynamoDbIntegrationHelper.dynamoDbClient;
 
 
-public class SubscriptionLoaderTests extends SubscriptionLoaderBase {
+public class SubscriptionLoaderDvlaVehicleTests extends SubscriptionLoaderBase {
 
     @Rule
     public final EnvironmentVariables environmentVariables = new TestEnvironmentVariables();
@@ -41,9 +42,8 @@ public class SubscriptionLoaderTests extends SubscriptionLoaderBase {
 
         queueHelper = new SqsHelper();
         eventHandler = new EventHandler();
-        subscriptionItem = new SubscriptionItem().generateMotTestNumber();
+        subscriptionItem = new SubscriptionItem();
         fixture = new DynamoDbFixture(dynamoDbClient());
-        fixture.table(new SubscriptionTable().item(subscriptionItem)).run();
     }
 
     @After
@@ -53,25 +53,10 @@ public class SubscriptionLoaderTests extends SubscriptionLoaderBase {
     }
 
     @Test
-    public void runLoaderForOneMonthReminderThenEnsureItemsAddedToQueue() throws Exception {
+    public void runLoaderForTwoWeeksReminderWithDvlaIdThenEnsureItemsAddedToQueue() throws Exception {
 
-        String testTime = subscriptionItem.getMotDueDate().minusMonths(1) + "T12:00:00Z";
-        LoadReport loadReport = eventHandler.handle(buildRequest(testTime), buildContext());
-
-        List<Message> messages = queueHelper.getMessagesFromQueue();
-
-        Subscription subscription = jsonMapper.readValue(messages.get(0).getBody(), Subscription.class);
-        queueHelper.deleteMessageFromQueue(messages.get(0));
-
-        assertEquals(subscriptionItem.getMotDueDate(), subscription.getMotDueDate());
-        assertEquals(subscriptionItem.getId(), subscription.getId());
-
-        assertSubscriptionIsAddedToQueue(subscription);
-        assertReportIsUpdatedCorrectly(loadReport);
-    }
-
-    @Test
-    public void runLoaderForTwoWeeksReminderThenEnsureItemsAddedToQueue() throws Exception {
+        subscriptionItem.generateDvlaId();
+        fixture.table(new SubscriptionTable().item(subscriptionItem)).run();
 
         String testTime = subscriptionItem.getMotDueDate().minusDays(14) + "T12:00:00Z";
         LoadReport loadReport = eventHandler.handle(buildRequest(testTime), buildContext());
@@ -81,14 +66,24 @@ public class SubscriptionLoaderTests extends SubscriptionLoaderBase {
         Subscription subscription = jsonMapper.readValue(messages.get(0).getBody(), Subscription.class);
         queueHelper.deleteMessageFromQueue(messages.get(0));
 
-        assertSubscriptionIsAddedToQueue(subscription);
-        assertReportIsUpdatedCorrectly(loadReport);
+        assertEquals(subscriptionItem.getVrm(), subscription.getVrm());
+        assertEquals(subscriptionItem.getEmail(), subscription.getEmail());
+        assertEquals(subscriptionItem.getDvlaId(), subscription.getDvlaId());
+        assertNull(subscription.getMotTestNumber());
+
+        assertEquals(1, loadReport.getSubmittedForProcessing());
+        assertEquals(1, loadReport.getDvlaVehiclesProcessed());
+        assertEquals(0, loadReport.getNonDvlaVehiclesProcessed());
+        assertEquals(1, loadReport.getTotalProcessed());
     }
 
     @Test
-    public void runLoaderForOneDayAfterReminderThenEnsureItemsAddedToQueue() throws Exception {
+    public void runLoaderForTwoWeeksReminderWithMotTestNumberThenEnsureItemsAddedToQueue() throws Exception {
 
-        String testTime = subscriptionItem.getMotDueDate().plusDays(1L) + "T12:00:00Z";
+        subscriptionItem.generateMotTestNumber();
+        fixture.table(new SubscriptionTable().item(subscriptionItem)).run();
+
+        String testTime = subscriptionItem.getMotDueDate().minusDays(14) + "T12:00:00Z";
         LoadReport loadReport = eventHandler.handle(buildRequest(testTime), buildContext());
 
         List<Message> messages = queueHelper.getMessagesFromQueue();
@@ -96,18 +91,35 @@ public class SubscriptionLoaderTests extends SubscriptionLoaderBase {
         Subscription subscription = jsonMapper.readValue(messages.get(0).getBody(), Subscription.class);
         queueHelper.deleteMessageFromQueue(messages.get(0));
 
-        assertSubscriptionIsAddedToQueue(subscription);
-        assertReportIsUpdatedCorrectly(loadReport);
+        assertEquals(subscriptionItem.getVrm(), subscription.getVrm());
+        assertEquals(subscriptionItem.getEmail(), subscription.getEmail());
+        assertEquals(subscriptionItem.getMotTestNumber(), subscription.getMotTestNumber());
+
+        assertEquals(1, loadReport.getSubmittedForProcessing());
+        assertEquals(0, loadReport.getDvlaVehiclesProcessed());
+        assertEquals(1, loadReport.getNonDvlaVehiclesProcessed());
+        assertEquals(1, loadReport.getTotalProcessed());
     }
 
-    private void assertSubscriptionIsAddedToQueue(Subscription subscription) {
+    @Test
+    public void runLoaderForTwoWeeksReminderWithMotTestNumberAndDvlaIdThenEnsureItemsAddedToQueueWithoutDvlaId() throws Exception {
+
+        subscriptionItem.generateMotTestNumber()
+                        .generateDvlaId();
+        fixture.table(new SubscriptionTable().item(subscriptionItem)).run();
+
+        String testTime = subscriptionItem.getMotDueDate().minusDays(14) + "T12:00:00Z";
+        LoadReport loadReport = eventHandler.handle(buildRequest(testTime), buildContext());
+
+        List<Message> messages = queueHelper.getMessagesFromQueue();
+
+        Subscription subscription = jsonMapper.readValue(messages.get(0).getBody(), Subscription.class);
+        queueHelper.deleteMessageFromQueue(messages.get(0));
 
         assertEquals(subscriptionItem.getVrm(), subscription.getVrm());
         assertEquals(subscriptionItem.getEmail(), subscription.getEmail());
         assertEquals(subscriptionItem.getMotTestNumber(), subscription.getMotTestNumber());
-    }
-
-    private void assertReportIsUpdatedCorrectly(LoadReport loadReport) {
+        assertNull(subscription.getDvlaId());
 
         assertEquals(1, loadReport.getSubmittedForProcessing());
         assertEquals(0, loadReport.getDvlaVehiclesProcessed());

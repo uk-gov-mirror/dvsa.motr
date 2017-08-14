@@ -70,6 +70,30 @@ public class DefaultLoaderTest {
 
         verify(dispatcher, times(2)).dispatch(mockSubscription);
         assertEquals(2, report.getSubmittedForProcessing());
+        assertEquals(2, report.getNonDvlaVehiclesProcessed());
+    }
+
+    @Test
+    public void whenThereAreDispatchedItems_thenTheResultsAreProcessedForTheReportWithDvlaVehicles() throws Exception {
+
+        Iterator mockIterator = createIteratorWithHasNextSequence(true, true, false);
+        when(this.producer.getIterator(any(), any(), any())).thenReturn(mockIterator);
+
+        Subscription mockSubscription = new Subscription().setEmail("email@email.com")
+                .setId("someId").setMotDueDate(LocalDate.now()).setVrm("aaa").setDvlaId("123456");
+        when(mockIterator.next()).thenReturn(mockSubscription);
+
+        when(this.dispatcher.dispatch(any())).thenReturn(
+                new DispatchResult(mockSubscription, completedFuture(mock(SendMessageResult.class))));
+        when(context.getRemainingTimeInMillis()).thenReturn(400000);
+
+        DefaultLoader loader = new DefaultLoader(this.producer, this.dispatcher);
+        LoadReport report = loader.run(getTestLocalDate(), context);
+
+        verify(dispatcher, times(2)).dispatch(mockSubscription);
+        assertEquals(2, report.getSubmittedForProcessing());
+        assertEquals(2, report.getDvlaVehiclesProcessed());
+        assertEquals(0, report.getNonDvlaVehiclesProcessed());
     }
 
     @Test(expected = LoadingException.class)
