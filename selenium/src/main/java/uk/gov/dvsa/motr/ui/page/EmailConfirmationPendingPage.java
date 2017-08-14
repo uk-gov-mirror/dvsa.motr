@@ -9,7 +9,7 @@ public class EmailConfirmationPendingPage extends Page {
     @Override
     protected String getContentHeader() {
 
-        return "You’ve nearly finished";
+        return "One more step";
     }
 
     @Override
