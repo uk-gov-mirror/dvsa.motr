@@ -1,10 +1,12 @@
 MESSAGE SUBJECT
 ---------------------
-Activate your MOT reminder for ((vehicle_details))
+Confirm your email address for MOT reminders
 
 MESSAGE CONTENT
 ---------------------
-Click to activate your MOT reminder:
+You’ve nearly finished signing up for MOT reminders.
+
+Click to confirm your email address:
 
 ((confirmation_link))
 

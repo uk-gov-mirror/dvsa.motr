@@ -1,13 +1,13 @@
 MESSAGE SUBJECT
 ---------------------
-You’ve signed up for an MOT reminder for ((vehicle_details))
+You’ve signed up for MOT reminders
 
 MESSAGE CONTENT
 ---------------------
 ^#You’ve signed up for MOT reminders
-The MOT for ((vehicle_details)) ((is_due_or_expires)) on ((mot_expiry_ date))
+The MOT for ((registration_number)) expires on ((mot_expiry_ date))
 
-You'll get an annual reminder a month before your MOT is due, and again 2 weeks later if you don't have your MOT yet.
+DVSA will send you a reminder a month before the vehicle’s MOT expiry date and again 2 weeks later.
 
 DVSA (Driver and Vehicle Standards Agency)
 
