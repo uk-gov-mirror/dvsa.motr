@@ -1,6 +1,6 @@
 MESSAGE SUBJECT
 ---------------------
-The MOT for ((vehicle_details))  ((is_due_or_expires)) in a month
+The MOT for ((vehicle_details)) ((is_due_or_expires)) in a month
 
 MESSAGE CONTENT
 ---------------------
