@@ -58,7 +58,7 @@ public class ReviewResourceTest {
     @Test
     public void reviewTemplateIsRenderedOnGetWithViewModel() throws Exception {
 
-        when(MOTR_SESSION.isAllowedOnPage()).thenReturn(true);
+        when(MOTR_SESSION.isAllowedOnReviewPage()).thenReturn(true);
         when(MOTR_SESSION.getVehicleDetailsFromSession()).thenReturn(vehicleDetailsInSession());
 
         assertEquals(200, resource.reviewPage().getStatus());
@@ -69,7 +69,7 @@ public class ReviewResourceTest {
     @Test(expected = NotFoundException.class)
     public void whenNoVehicleReturnedFromApiNotFoundThrown() throws Exception {
 
-        when(MOTR_SESSION.isAllowedOnPage()).thenReturn(true);
+        when(MOTR_SESSION.isAllowedOnReviewPage()).thenReturn(true);
         when(MOTR_SESSION.getVehicleDetailsFromSession()).thenReturn(null);
         resource.reviewPage();
     }
@@ -84,6 +84,7 @@ public class ReviewResourceTest {
         ArgumentCaptor<EmailConfirmationParams> paramsArgumentCaptor = ArgumentCaptor.forClass(EmailConfirmationParams.class);
 
         when(MOTR_SESSION.getVehicleDetailsFromSession()).thenReturn(vehicleDetails);
+        when(MOTR_SESSION.isUsingEmailChannel()).thenReturn(true);
         when(PENDING_SUBSCRIPTION_SERVICE.handlePendingSubscriptionCreation(any(), any(), any(), any(), any()))
                 .thenReturn("email-confirmation-pending");
         doNothing().when(PENDING_SUBSCRIPTION_SERVICE).createPendingSubscription(
@@ -113,7 +114,7 @@ public class ReviewResourceTest {
         VehicleDetails vehicleDetails = vehicleDetailsInSession();
         vehicleDetails.setYearOfManufacture(null);
 
-        when(MOTR_SESSION.isAllowedOnPage()).thenReturn(true);
+        when(MOTR_SESSION.isAllowedOnReviewPage()).thenReturn(true);
         when(MOTR_SESSION.getVehicleDetailsFromSession()).thenReturn(vehicleDetails);
 
         assertEquals(200, resource.reviewPage().getStatus());
