@@ -13,6 +13,7 @@ import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 
 import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.web.component.subscription.model.PendingSubscription;
+import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.helper.SystemVariableParam;
 
 import java.time.LocalDate;
@@ -79,7 +80,8 @@ public class DynamoDbPendingSubscriptionRepository implements PendingSubscriptio
                 .withString("mot_due_date", subscription.getMotDueDate().format(DateTimeFormatter.ISO_LOCAL_DATE))
                 .withString("mot_due_date_md", subscription.getMotDueDate().format(DateTimeFormatter.ofPattern("MM-dd")))
                 .withString("created_at", ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT))
-                .withNumber("deletion_date", ZonedDateTime.now().plusMonths(MONTHS_TO_DELETION).toEpochSecond());
+                .withNumber("deletion_date", ZonedDateTime.now().plusMonths(MONTHS_TO_DELETION).toEpochSecond())
+                .withString("contact_type", subscription.getContactType().getValue());
 
         subscription.getMotIdentification().getMotTestNumber()
                 .ifPresent(motTestNumber -> item.withString("mot_test_number", motTestNumber));
@@ -111,6 +113,7 @@ public class DynamoDbPendingSubscriptionRepository implements PendingSubscriptio
         subscription.setEmail(item.getString("email"));
         subscription.setMotDueDate(LocalDate.parse(item.getString("mot_due_date")));
         subscription.setMotIdentification(new MotIdentification(item.getString("mot_test_number"), item.getString("dvla_id")));
+        subscription.setContactType(Subscription.ContactType.valueOf(item.getString("contact_type")));
         return subscription;
     }
 }

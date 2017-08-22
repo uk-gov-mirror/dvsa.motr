@@ -46,6 +46,7 @@ public class PendingSubscriptionServiceTest {
     private static final String CONFIRMATION_PENDING_LINK = "CONFIRMATION_PENDING_LINK";
     private static final String TEST_MOT_TEST_NUMBER = "123456";
     private static final String TEST_DVLA_ID = "3456789";
+    private static final Subscription.ContactType CONTACT_TYPE = Subscription.ContactType.EMAIL;
 
     private PendingSubscriptionService subscriptionService;
 
@@ -78,7 +79,7 @@ public class PendingSubscriptionServiceTest {
         LocalDate date = LocalDate.now();
 
         this.subscriptionService.createPendingSubscription(TEST_VRM, EMAIL, date, CONFIRMATION_ID,
-                new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID));
+                new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID), CONTACT_TYPE);
 
         verify(pendingSubscriptionRepository, times(1)).save(any(PendingSubscription.class));
         verify(notifyService, times(1)).sendEmailAddressConfirmationEmail(
@@ -96,7 +97,7 @@ public class PendingSubscriptionServiceTest {
         LocalDate date = LocalDate.now();
 
         this.subscriptionService.createPendingSubscription(TEST_VRM, EMAIL, date, CONFIRMATION_ID,
-                new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID));
+                new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID), CONTACT_TYPE);
         verify(pendingSubscriptionRepository, times(1)).save(any(PendingSubscription.class));
         verifyZeroInteractions(notifyService);
     }
@@ -109,7 +110,7 @@ public class PendingSubscriptionServiceTest {
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
 
         String redirect = this.subscriptionService.handlePendingSubscriptionCreation(TEST_VRM, EMAIL, date,
-                new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID));
+                new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID), CONTACT_TYPE);
 
         verify(subscriptionRepository, times(1)).save(subscriptionArgumentCaptor.capture());
         assertEquals(subscriptionArgumentCaptor.getValue().getMotDueDate(), date);
@@ -125,7 +126,7 @@ public class PendingSubscriptionServiceTest {
         ArgumentCaptor<PendingSubscription> pendingSubscriptionArgumentCaptor = ArgumentCaptor.forClass(PendingSubscription.class);
 
         String redirect = this.subscriptionService.handlePendingSubscriptionCreation(TEST_VRM, EMAIL, date,
-                new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID));
+                new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID), CONTACT_TYPE);
 
         verify(pendingSubscriptionRepository, times(1)).save(pendingSubscriptionArgumentCaptor.capture());
         assertEquals(pendingSubscriptionArgumentCaptor.getValue().getMotDueDate(), date);
