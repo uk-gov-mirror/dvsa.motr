@@ -79,8 +79,7 @@ public class SubscriptionDbItemQueueItemUnloaderTest {
     public void whenAnItemIsInTheDb_TheLoaderAddsToQueue_ThenTheNotifierSuccessfullyProcessesIt()
             throws IOException, InterruptedException, ExecutionException, NotificationClientException {
 
-        subscriptionItem = new SubscriptionItem();
-        subscriptionItem
+        subscriptionItem = new SubscriptionItem()
                 .setMotDueDate(MOCK_API_RANDOM_VEHICLE_DATE)
                 .setRandomMotTestNumber();
 
@@ -150,8 +149,7 @@ public class SubscriptionDbItemQueueItemUnloaderTest {
     public void whenProcessingASubscriptionWithDeletionRequired_TheSubscriptionInTheDbIsDeleted() throws IOException,
             InterruptedException, ExecutionException, NotificationClientException {
 
-        subscriptionItem = new SubscriptionItem();
-        subscriptionItem.setMotTestNumber("12345");
+        subscriptionItem = new SubscriptionItem().setMotTestNumber("12345");
 
         // The actual MOT date will come from the mock ( = MOCK_API_SPECIFIC_VEHICLE_DATE).
         // (MOCK_DELETE_SUBSCRIPTION_DATE - one month) is used to trigger the loader and set the requestDate in ProcessSubscription.

@@ -23,6 +23,11 @@ public class SubscriptionQueueItem {
     @JsonProperty("email")
     private String email;
 
+    // The NON_NULL is temporary. Should be an enum too
+    @JsonProperty("contactType")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String contactType;
+
     @JsonProperty("motTestNumber")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String motTestNumber;
@@ -72,6 +77,15 @@ public class SubscriptionQueueItem {
 
     public SubscriptionQueueItem setEmail(String email) {
         this.email = email;
+        return this;
+    }
+
+    public String getContactType() {
+        return email;
+    }
+
+    public SubscriptionQueueItem setContactType(String contactType) {
+        this.contactType = contactType;
         return this;
     }
 
