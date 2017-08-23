@@ -9,6 +9,7 @@ import static uk.gov.dvsa.motr.web.system.SystemVariable.DO_WARM_UP;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.LOG_LEVEL;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.MOT_TEST_REMINDER_INFO_API_URI;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.MOT_TEST_REMINDER_INFO_TOKEN;
+import static uk.gov.dvsa.motr.web.system.SystemVariable.RELEASE_VERSION;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.STATIC_ASSETS_HASH;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.STATIC_ASSETS_URL;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.WARM_UP_TIMEOUT_SEC;
@@ -25,6 +26,7 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
         doWarmUp(false);
         warmUpTimeoutSec(10);
         motTestReminderInfoToken("test-token");
+        releaseVersion("releaseVersion");
     }
 
     public TestEnvironmentVariables assetsUrl(String value) {
@@ -57,6 +59,11 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
 
     public TestEnvironmentVariables motTestReminderInfoToken(String value) {
         return set(MOT_TEST_REMINDER_INFO_TOKEN, value);
+    }
+
+    public TestEnvironmentVariables releaseVersion(String value) {
+
+        return set(RELEASE_VERSION, value);
     }
 
     private TestEnvironmentVariables set(SystemVariable var, String value) {

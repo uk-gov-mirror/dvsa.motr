@@ -15,6 +15,7 @@ import uk.gov.dvsa.motr.web.helper.SystemVariableParam;
 import java.io.IOException;
 
 import static uk.gov.dvsa.motr.web.system.SystemVariable.BASE_URL;
+import static uk.gov.dvsa.motr.web.system.SystemVariable.RELEASE_VERSION;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.STATIC_ASSETS_HASH;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.STATIC_ASSETS_URL;
 
@@ -25,13 +26,15 @@ public class HandlebarsTemplateEngine implements TemplateEngine {
     private static final String ASSETS_HELPER_NAME = "asset";
     private static final String REQUEST_ID_HELPER_NAME = "requestId";
     private static final String URL_HELPER = "url";
+    private static final String RELEASE_VERSION_HELPER = "release-version";
 
     private final Handlebars handlebars;
 
     public HandlebarsTemplateEngine(
             @SystemVariableParam(STATIC_ASSETS_URL) String assetsRootPath,
             @SystemVariableParam(STATIC_ASSETS_HASH) String assetsHash,
-            @SystemVariableParam(BASE_URL) String baseUrl
+            @SystemVariableParam(BASE_URL) String baseUrl,
+            @SystemVariableParam(RELEASE_VERSION) String releaseVersion
     ) {
 
         TemplateLoader loader = new ClassPathTemplateLoader();
@@ -43,6 +46,7 @@ public class HandlebarsTemplateEngine implements TemplateEngine {
                 .registerHelper(ASSETS_HELPER_NAME, assetsHelper(assetsPathFormat, assetsHash))
                 .registerHelper(REQUEST_ID_HELPER_NAME, (context, options) -> MDC.get("AWSRequestId"))
                 .registerHelper(URL_HELPER, urlHelper(baseUrl))
+                .registerHelper(RELEASE_VERSION_HELPER, (context, options) -> releaseVersion)
                 .with(new ConcurrentMapTemplateCache());
 
     }
