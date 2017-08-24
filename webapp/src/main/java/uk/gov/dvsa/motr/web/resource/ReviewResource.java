@@ -1,6 +1,7 @@
 package uk.gov.dvsa.motr.web.resource;
 
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
+import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.service.PendingSubscriptionService;
 import uk.gov.dvsa.motr.web.cookie.EmailConfirmationParams;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
@@ -95,7 +96,8 @@ public class ReviewResource {
         if (detailsAreValid(vrm, email) && null != vehicle) {
             LocalDate expiryDate = vehicle.getMotExpiryDate();
             String redirectUri =
-                    pendingSubscriptionService.handlePendingSubscriptionCreation(vrm, email, expiryDate, vehicle.getMotIdentification());
+                    pendingSubscriptionService.handlePendingSubscriptionCreation(
+                    vrm, email, expiryDate, vehicle.getMotIdentification(), Subscription.ContactType.EMAIL);
 
             return redirectToSuccessScreen(redirectUri, email);
         } else {

@@ -20,6 +20,8 @@ public class PendingSubscription {
 
     private String motTestNumber;
 
+    private Subscription.ContactType contactType;
+
     public String getConfirmationId() {
         return confirmationId;
     }
@@ -73,5 +75,14 @@ public class PendingSubscription {
     public void setMotTestNumber(String motTestNumber) {
         this.motTestNumber = motTestNumber;
         this.motIdentification = new MotIdentification(motTestNumber, this.dvlaId);
+    }
+
+    public PendingSubscription setContactType(Subscription.ContactType contactType) {
+        this.contactType = contactType;
+        return this;
+    }
+
+    public Subscription.ContactType getContactType() {
+        return this.contactType;
     }
 }

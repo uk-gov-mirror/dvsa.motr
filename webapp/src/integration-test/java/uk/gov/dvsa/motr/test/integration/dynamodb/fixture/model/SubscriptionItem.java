@@ -4,6 +4,7 @@ import com.amazonaws.services.dynamodbv2.document.Item;
 
 import uk.gov.dvsa.motr.test.data.RandomDataUtil;
 import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.core.DynamoDbFixtureTableItem;
+import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -23,6 +24,8 @@ public class SubscriptionItem implements DynamoDbFixtureTableItem {
     private String motTestNumber = RandomDataUtil.motTestNumber();
 
     private String dvlaId = RandomDataUtil.motTestNumber();
+
+    private Subscription.ContactType contactType = Subscription.ContactType.EMAIL;
 
     public String getUnsubscribeId() {
         return unsubscribeId;
@@ -73,6 +76,15 @@ public class SubscriptionItem implements DynamoDbFixtureTableItem {
         return this;
     }
 
+    public Subscription.ContactType getContactType() {
+        return this.contactType;
+    }
+
+    public SubscriptionItem setContactType(Subscription.ContactType contactType) {
+        this.contactType = contactType;
+        return this;
+    }
+
     @Override
     public Item toItem() {
 
@@ -80,7 +92,8 @@ public class SubscriptionItem implements DynamoDbFixtureTableItem {
                 .with("id", unsubscribeId)
                 .with("mot_due_date", motDueDate.format(DateTimeFormatter.ISO_DATE))
                 .with("vrm", vrm)
-                .with("email", email);
+                .with("email", email)
+                .with("contact_type", contactType.getValue());
 
         if (motTestNumber != null) {
             item.with("mot_test_number", motTestNumber);

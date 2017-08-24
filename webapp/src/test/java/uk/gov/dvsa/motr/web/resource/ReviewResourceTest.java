@@ -6,6 +6,7 @@ import org.mockito.ArgumentCaptor;
 
 import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
+import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.service.PendingSubscriptionService;
 import uk.gov.dvsa.motr.web.cookie.EmailConfirmationParams;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
@@ -36,6 +37,7 @@ public class ReviewResourceTest {
     private static final String EMAIL = "test@test.com";
     private static final String TEST_MOT_TEST_NUMBER = "123456";
     private static final String TEST_DVLA_ID = "3456789";
+    private static final Subscription.ContactType CONTACT_TYPE = Subscription.ContactType.EMAIL;
 
     private ReviewResource resource;
 
@@ -80,14 +82,15 @@ public class ReviewResourceTest {
         ArgumentCaptor<EmailConfirmationParams> paramsArgumentCaptor = ArgumentCaptor.forClass(EmailConfirmationParams.class);
 
         when(MOTR_SESSION.getVehicleDetailsFromSession()).thenReturn(vehicleDetails);
-        when(PENDING_SUBSCRIPTION_SERVICE.handlePendingSubscriptionCreation(any(), any(), any(), any()))
+        when(PENDING_SUBSCRIPTION_SERVICE.handlePendingSubscriptionCreation(any(), any(), any(), any(), any()))
                 .thenReturn("email-confirmation-pending");
-        doNothing().when(PENDING_SUBSCRIPTION_SERVICE).createPendingSubscription(VRM, EMAIL, now, "randomID", expectedMotIdentification);
+        doNothing().when(PENDING_SUBSCRIPTION_SERVICE).createPendingSubscription(
+                VRM, EMAIL, now, "randomID", expectedMotIdentification, CONTACT_TYPE);
 
         Response response = resource.confirmationPagePost();
 
         verify(PENDING_SUBSCRIPTION_SERVICE, times(1)).handlePendingSubscriptionCreation(eq(VRM), eq(EMAIL), eq(now),
-                any(MotIdentification.class));
+                any(MotIdentification.class), eq(CONTACT_TYPE));
         verify(MOTR_SESSION, times(1)).setEmailConfirmationParams(paramsArgumentCaptor.capture());
         assertEquals(302, response.getStatus());
         assertEquals("email-confirmation-pending", response.getLocation().toString());

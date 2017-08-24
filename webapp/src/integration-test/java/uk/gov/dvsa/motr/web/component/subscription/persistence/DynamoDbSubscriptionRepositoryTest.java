@@ -67,8 +67,8 @@ public class DynamoDbSubscriptionRepositoryTest {
                 .setEmail(subscriptionItem.getEmail())
                 .setVrm(subscriptionItem.getVrm())
                 .setMotDueDate(subscriptionItem.getMotDueDate())
-                .setMotIdentification(motIdentification);
-
+                .setMotIdentification(motIdentification)
+                .setContactType(subscriptionItem.getContactType());
 
         repo.save(subscription);
 
@@ -97,7 +97,8 @@ public class DynamoDbSubscriptionRepositoryTest {
                 .setEmail(subscriptionItem.getEmail())
                 .setVrm(subscriptionItem.getVrm())
                 .setMotDueDate(subscriptionItem.getMotDueDate())
-                .setMotIdentification(motIdentification);
+                .setMotIdentification(motIdentification)
+                .setContactType(subscriptionItem.getContactType());
 
         repo.save(subscription);
 

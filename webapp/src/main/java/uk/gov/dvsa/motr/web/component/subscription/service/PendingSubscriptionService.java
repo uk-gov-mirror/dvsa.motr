@@ -46,7 +46,8 @@ public class PendingSubscriptionService {
         this.client = client;
     }
 
-    public String handlePendingSubscriptionCreation(String vrm, String email, LocalDate motDueDate, MotIdentification motIdentification) {
+    public String handlePendingSubscriptionCreation(
+            String vrm, String email, LocalDate motDueDate, MotIdentification motIdentification, Subscription.ContactType contactType) {
 
         Optional<Subscription> subscription = subscriptionRepository.findByVrmAndEmail(vrm, email);
 
@@ -55,7 +56,7 @@ public class PendingSubscriptionService {
 
             return urlHelper.emailConfirmedNthTimeLink();
         } else {
-            createPendingSubscription(vrm, email, motDueDate, generateId(), motIdentification);
+            createPendingSubscription(vrm, email, motDueDate, generateId(), motIdentification, contactType);
 
             return urlHelper.emailConfirmationPendingLink();
         }
@@ -69,15 +70,18 @@ public class PendingSubscriptionService {
      * @param confirmationId confirmation id
      * @param motIdentification the identifier for this vehicle (may be dvla id or mot test number)
      */
-    public void createPendingSubscription(String vrm, String email, LocalDate motDueDate,
-            String confirmationId, MotIdentification motIdentification) {
+    public void createPendingSubscription(
+            String vrm, String email, LocalDate motDueDate,
+            String confirmationId, MotIdentification motIdentification,
+            Subscription.ContactType contactType) {
 
         PendingSubscription pendingSubscription = new PendingSubscription()
                 .setConfirmationId(confirmationId)
                 .setEmail(email)
                 .setVrm(vrm)
                 .setMotDueDate(motDueDate)
-                .setMotIdentification(motIdentification);
+                .setMotIdentification(motIdentification)
+                .setContactType(contactType);
 
         try {
             pendingSubscriptionRepository.save(pendingSubscription);

@@ -6,6 +6,21 @@ import java.time.LocalDate;
 
 public class Subscription {
 
+    public enum ContactType {
+
+        EMAIL("EMAIL"), MOBILE("MOBILE");
+
+        private String value;
+
+        ContactType(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
+
     private String unsubscribeId;
 
     private String vrm;
@@ -15,6 +30,8 @@ public class Subscription {
     private LocalDate motDueDate;
 
     private MotIdentification motIdentification;
+
+    private ContactType contactType;
 
     public String getUnsubscribeId() {
         return unsubscribeId;
@@ -59,5 +76,14 @@ public class Subscription {
     public Subscription setMotIdentification(MotIdentification motIdentification) {
         this.motIdentification = motIdentification;
         return this;
+    }
+
+    public Subscription setContactType(ContactType contactType) {
+        this.contactType = contactType;
+        return this;
+    }
+
+    public ContactType getContactType() {
+        return this.contactType;
     }
 }

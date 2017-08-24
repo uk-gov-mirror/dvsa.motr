@@ -90,7 +90,8 @@ public class DynamoDbPendingSubscriptionRepositoryTest {
                 .setEmail(subscriptionItemForMotVehicle.getEmail())
                 .setVrm(subscriptionItemForMotVehicle.getVrm())
                 .setMotDueDate(subscriptionItemForMotVehicle.getMotDueDate())
-                .setMotIdentification(motIdentification);
+                .setMotIdentification(motIdentification)
+                .setContactType(subscriptionItemForMotVehicle.getContactType());
 
         repo.save(subscription);
 
@@ -119,7 +120,8 @@ public class DynamoDbPendingSubscriptionRepositoryTest {
                 .setEmail(subscriptionItemForDvlaVehicle.getEmail())
                 .setVrm(subscriptionItemForDvlaVehicle.getVrm())
                 .setMotDueDate(subscriptionItemForDvlaVehicle.getMotDueDate())
-                .setMotIdentification(motIdentification);
+                .setMotIdentification(motIdentification)
+                .setContactType(subscriptionItemForDvlaVehicle.getContactType());
 
         repo.save(subscription);
 
@@ -149,7 +151,8 @@ public class DynamoDbPendingSubscriptionRepositoryTest {
                 .setEmail(subscriptionItem.getEmail())
                 .setVrm(subscriptionItem.getVrm())
                 .setMotDueDate(subscriptionItem.getMotDueDate())
-                .setMotIdentification(motIdentification);
+                .setMotIdentification(motIdentification)
+                .setContactType(subscriptionItem.getContactType());
 
         repo.save(subscription);
 
@@ -184,7 +187,8 @@ public class DynamoDbPendingSubscriptionRepositoryTest {
                 .setConfirmationId(sub.getConfirmationId())
                 .setEmail(sub.getEmail())
                 .setVrm(sub.getVrm())
-                .setMotIdentification(motIdentification);
+                .setMotIdentification(motIdentification)
+                .setContactType(sub.getContactType());
 
         repo.delete(subscription);
 
