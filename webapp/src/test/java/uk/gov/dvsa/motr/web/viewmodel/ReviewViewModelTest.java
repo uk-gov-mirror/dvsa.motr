@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import java.time.LocalDate;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class ReviewViewModelTest {
@@ -91,10 +92,25 @@ public class ReviewViewModelTest {
     }
 
     @Test
-    public void makeModelIsUpperCasedWhenSet() {
+    public void makeIsUpperCasedWhenSet() {
 
         ReviewViewModel viewModel = new ReviewViewModel();
-        viewModel.setMakeModel("Honda", "CIVIC");
-        assertTrue(viewModel.getMakeModel().equals("HONDA CIVIC"));
+        viewModel.setMake("Honda");
+        assertEquals("HONDA", viewModel.getMake());
+    }
+
+    @Test
+    public void modelIsUpperCasedWhenSet() {
+
+        ReviewViewModel viewModel = new ReviewViewModel();
+        viewModel.setModel("Civic");
+        assertEquals("CIVIC", viewModel.getModel());
+    }
+
+    @Test
+    public void modelIsUnknownWhenNotSet() {
+
+        ReviewViewModel viewModel = new ReviewViewModel();
+        assertEquals("Unknown", viewModel.getModel());
     }
 }

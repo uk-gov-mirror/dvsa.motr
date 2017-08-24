@@ -16,7 +16,7 @@ public abstract class Page {
 
     protected BaseAppDriver driver;
 
-    @FindBy(className = "content-header__title")
+    @FindBy(tagName = "h1")
     protected WebElement title;
     
     @FindBy(id = "cookiesLink")
@@ -36,17 +36,19 @@ public abstract class Page {
         selfVerify();
     }
 
-    public final String getTitle() {
+    public String getTitle() {
 
         return title.getText();
     }
 
     protected void selfVerify() {
-        
+
         if (!getTitle().contains(getContentHeader()) || !this.driver.getTitle().equals(getPageTitle())) {
 
             throw new PageIdentityVerificationException("Page identity verification failed: "
-                    + String.format("\n Expected: %s page, \n Found: %s page", getContentHeader(), getTitle())
+                    + String.format("\n Expected: %s page, \n Found: %s page, "
+                    + "\n with expected page title of: %s \n and actual page title of: %s",
+                    getContentHeader(), getTitle(), getPageTitle(), this.driver.getTitle())
             );
         }
     }

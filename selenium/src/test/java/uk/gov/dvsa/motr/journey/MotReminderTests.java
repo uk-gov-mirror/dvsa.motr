@@ -39,7 +39,7 @@ public class MotReminderTests extends BaseTest {
         UnsubscribeConfirmationPage unsubscribeConfirmed = motReminder.unsubscribeFromReminder(vrm, email);
 
         //Then my MOT reminder subscription has been cancelled
-        assertEquals(unsubscribeConfirmed.getBannerTitle(), "You’ve unsubscribed");
+        assertEquals(unsubscribeConfirmed.getBannerTitle(), "You've unsubscribed");
 
         //And I am shown a link to complete the unsubscribe survey
         assertTrue(unsubscribeConfirmed.isSurveyLinkDisplayed());
@@ -110,7 +110,7 @@ public class MotReminderTests extends BaseTest {
         UnsubscribeErrorPage errorPage = motReminder.navigateToUnsubscribeExpectingErrorPage(subscriptionId);
 
         //Then I receive a error message informing me that I have already unsubscribed
-        assertEquals(errorPage.getErrorMessageText(), "You’ve already unsubscribed or the link hasn’t worked.");
+        assertEquals(errorPage.getErrorMessageText(), "You've already unsubscribed or the link hasn't worked.");
     }
 
     @Test(description = "Owner of a vehicle with a mot can change their email when creating MOT reminder")
@@ -188,7 +188,7 @@ public class MotReminderTests extends BaseTest {
         SubscriptionConfirmationPage subscriptionConfirmationPage = motReminder.subscribeToReminderAndConfirmEmail(RandomGenerator.generateDvlaVrm() , RandomGenerator.generateEmail());
 
         //Then the confirmation page is displayed confirming my active reminder subscription
-        assertEquals(subscriptionConfirmationPage.getHeaderTitle(), "You’ve signed up for an MOT reminder");
+        assertEquals(subscriptionConfirmationPage.getHeaderTitle(), "You've signed up for an MOT reminder");
     }
 
 

@@ -10,7 +10,7 @@ import uk.gov.dvsa.motr.ui.base.PageIdentityVerificationException;
 @GotoUrl("/unsubscribe/{0}")
 public class UnsubscribeErrorPage extends Page {
 
-    @FindBy(className = "banner__heading-large")
+    @FindBy(className = "heading-xlarge")
     private WebElement headerTitle;
 
     @FindBy(id = "error-message")

@@ -10,7 +10,7 @@ import uk.gov.dvsa.motr.ui.base.PageIdentityVerificationException;
 @GotoUrl("/confirm-email/{0}")
 public class SubscriptionConfirmationPage extends Page {
 
-    @FindBy(className = "transaction-header__title")
+    @FindBy(className = "bold-large")
     private WebElement headerTitle;
 
     @FindBy(id = "email")
@@ -39,13 +39,13 @@ public class SubscriptionConfirmationPage extends Page {
     @Override
     protected String getContentHeader() {
 
-        return "You’ve signed up for an MOT reminder";
+        return "You've signed up for an MOT reminder";
     }
 
     @Override
     protected String getPageTitle() {
 
-        return "You’ve signed up for an MOT reminder";
+        return "You've signed up for an MOT reminder";
     }
 
     public String getHeaderTitle() {
