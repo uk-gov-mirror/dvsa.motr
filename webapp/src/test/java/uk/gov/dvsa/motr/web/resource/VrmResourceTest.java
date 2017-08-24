@@ -120,7 +120,7 @@ public class VrmResourceTest {
         resource.vrmPagePost(VALID_REG_NUMBER, HONEY_POT);
 
         HashMap<String, Object> expectedContext = new HashMap<>();
-        expectedContext.put("message", "Check that you’ve typed in the correct registration number.<br/>" +
+        expectedContext.put("message", "Check that you've typed in the correct registration number.<br/>" +
                 "<br/>You can only sign up if the vehicle has a current MOT.");
         expectedContext.put("back_url", "/");
         expectedContext.put("vrm", VALID_REG_NUMBER);
@@ -143,7 +143,7 @@ public class VrmResourceTest {
         resource.vrmPagePost(VALID_REG_NUMBER, HONEY_POT);
 
         HashMap<String, Object> expectedContext = new HashMap<>();
-        expectedContext.put("message", "Check that you’ve typed in the correct registration number.<br/>" +
+        expectedContext.put("message", "Check that you've typed in the correct registration number.<br/>" +
                 "<br/>You can only sign up if the vehicle has a current MOT.");
         expectedContext.put("back_url", "/");
         expectedContext.put("vrm", VALID_REG_NUMBER);

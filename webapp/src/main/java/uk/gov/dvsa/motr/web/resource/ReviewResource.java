@@ -68,7 +68,8 @@ public class ReviewResource {
             viewModel.setColour(vehicle.getPrimaryColour(), vehicle.getSecondaryColour())
                     .setEmail(emailFromSession)
                     .setExpiryDate(vehicle.getMotExpiryDate())
-                    .setMakeModel(vehicle.getMake(), vehicle.getModel())
+                    .setMake(vehicle.getMake())
+                    .setModel(vehicle.getModel())
                     .setRegistration(regNumberFromSession)
                     .setYearOfManufacture(vehicle.getYearOfManufacture() == null ? null : vehicle.getYearOfManufacture().toString());
             map.put("isDvlaVehicle", vehicle.getMotIdentification().getDvlaId().isPresent());

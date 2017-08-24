@@ -15,6 +15,6 @@ public class EmailConfirmationPendingPage extends Page {
     @Override
     protected String getPageTitle() {
 
-        return "You’ve nearly finished – MOT reminders";
+        return "You've nearly finished – MOT reminders";
     }
 }

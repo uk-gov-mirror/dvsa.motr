@@ -12,7 +12,8 @@ public class ReviewViewModel {
 
     private String registration;
     private String email;
-    private String makeModel;
+    private String make;
+    private String model;
     private String colour;
     private String yearOfManufacture;
     private LocalDate expiryDate;
@@ -36,22 +37,6 @@ public class ReviewViewModel {
     public ReviewViewModel setEmail(String email) {
 
         this.email = email;
-        return this;
-    }
-
-    public String getMakeModel() {
-
-        return makeModel;
-    }
-
-    public ReviewViewModel setMakeModel(String make, String model) {
-
-        if (model == null || "".equals(model)) {
-            this.makeModel = make.toUpperCase();
-        } else {
-            String makeModel = make + " " + model;
-            this.makeModel = makeModel.toUpperCase();
-        }
         return this;
     }
 
@@ -118,4 +103,30 @@ public class ReviewViewModel {
         isDvlaVehicle = dvlaVehicle;
         return this;
     }
+
+    public String getMake() {
+
+        return make.toUpperCase();
+    }
+
+    public ReviewViewModel setMake(String make) {
+
+        this.make = make;
+        return this;
+    }
+
+    public String getModel() {
+
+        if (model == null || "".equals(model)) {
+            return UNKNOWN_STRING;
+        }
+        return model.toUpperCase();
+    }
+
+    public ReviewViewModel setModel(String model) {
+
+        this.model = model;
+        return this;
+    }
+
 }

@@ -1,21 +1,24 @@
 {{#partial "content" }}
-    <div class="grid-row">
-        <div class="column-two-thirds">
-            <header class="content-header">
-                <h1 class="content-header__title">
-                    Are you sure you want to unsubscribe?
-                </h1>
 
-                <p>You’ll stop getting MOT reminders at {{viewModel.email}} for {{viewModel.makeModel}}<span id="vrm">{{viewModel.registration}}</span>.</p>
-            </header>
+    <div class="grid-row">
+
+        <div class="column-two-thirds">
+
+            <h1 class="heading-xlarge">Are you sure you want to unsubscribe?</h1>
+
+            <p>You’ll stop getting MOT reminders at {{viewModel.email}} for {{viewModel.makeModel}} <span id="vrm">{{viewModel.registration}}</span>.</p>
 
             <form method="POST">
+
                 <nav class="content-navigation">
-                    <input id="cancel-button" type="submit" value="Unsubscribe" class="button-warning">
-                    <ul class="content-navigation__secondary"></ul>
+                    <input id="cancel-button" type="submit" value="Continue" class="button">
                 </nav>
+
             </form>
+
         </div>
+
     </div>
+
 {{/partial}}
-{{> master pageTitle="Are you sure you want to unsubscribe? – MOT reminders"}}
+{{> master pageTitle="Are you sure you want to unsubscribe? - MOT reminders"}}

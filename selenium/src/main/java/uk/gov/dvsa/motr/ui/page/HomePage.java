@@ -9,19 +9,22 @@ import uk.gov.dvsa.motr.ui.base.Page;
 @GotoUrl("/")
 public class HomePage extends Page {
 
+    @FindBy(className = "heading-xlarge")
+    protected WebElement title;
+
     @FindBy(id = "startButton")
     private WebElement startNowButton;
 
     @Override
     protected String getContentHeader() {
 
-        return "Get MOT reminders";
+        return "Get an annual MOT reminder";
     }
 
     @Override
     protected String getPageTitle() {
 
-        return "Get MOT reminders";
+        return "Get an annual MOT reminder";
     }
 
     public VrmPage clickStartNow() {
@@ -46,5 +49,11 @@ public class HomePage extends Page {
 
         privacyPolicyLink.click();
         return new PrivacyPage();
+    }
+
+    @Override
+    public final String getTitle() {
+
+        return title.getText();
     }
 }

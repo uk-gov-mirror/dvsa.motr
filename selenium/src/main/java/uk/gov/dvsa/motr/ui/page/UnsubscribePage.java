@@ -12,7 +12,6 @@ public class UnsubscribePage extends Page {
     @FindBy(id = "cancel-button")
     private WebElement unsubscribeButton;
 
-
     @Override
     protected String getContentHeader() {
 
@@ -22,7 +21,7 @@ public class UnsubscribePage extends Page {
     @Override
     protected String getPageTitle() {
 
-        return "Are you sure you want to unsubscribe? – MOT reminders";
+        return "Are you sure you want to unsubscribe? - MOT reminders";
     }
 
     public UnsubscribeConfirmationPage clickUnsubscribe() {
