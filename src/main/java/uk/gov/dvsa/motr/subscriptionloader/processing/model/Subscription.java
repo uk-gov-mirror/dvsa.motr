@@ -12,6 +12,20 @@ import java.time.LocalDate;
 
 public class Subscription {
 
+    public enum ContactType {
+        EMAIL("EMAIL"), MOBILE("MOBILE");
+
+        private String value;
+
+        ContactType(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
+
     @JsonProperty("id")
     private String id;
 
@@ -25,6 +39,9 @@ public class Subscription {
 
     @JsonProperty("email")
     private String email;
+
+    @JsonProperty("contactType")
+    private ContactType contactType;
 
     @JsonProperty("motTestNumber")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -83,6 +100,17 @@ public class Subscription {
         return this;
     }
 
+    public ContactType getContactType() {
+
+        return contactType;
+    }
+
+    public Subscription setContactType(ContactType contactType) {
+
+        this.contactType = contactType;
+        return this;
+    }
+
     public String getMotTestNumber() {
 
         return motTestNumber;
@@ -118,11 +146,13 @@ public class Subscription {
 
     @Override
     public String toString() {
+
         return "Subscription{" +
                 "id='" + id + '\'' +
                 ", motDueDate=" + motDueDate +
                 ", vrm='" + vrm + '\'' +
                 ", email='" + email + '\'' +
+                ", contactType='" + contactType.getValue() + '\'' +
                 ", motTestNumber='" + motTestNumber + '\'' +
                 ", dvlaId='" + dvlaId + '\'' +
                 ", loadedOnDate=" + loadedOnDate +

@@ -8,9 +8,6 @@ import com.amazonaws.services.dynamodbv2.document.QueryOutcome;
 import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
 import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import uk.gov.dvsa.motr.subscriptionloader.processing.model.Subscription;
 
 import java.time.LocalDate;
@@ -54,7 +51,6 @@ public class DynamoDbProducer implements SubscriptionProducer {
                 .withKeyConditionExpression(keyCondExpr)
                 .withValueMap(new ValueMap().withString(":due_date", date1DayBehindDueDate.format(dateFormatter)));
 
-
         ItemCollection<QueryOutcome> result2WeeksAhead = dueDateIndex.query(querySpec2WeeksAhead);
         ItemCollection<QueryOutcome> result1MonthAhead = dueDateIndex.query(querySpec1MonthAhead);
         ItemCollection<QueryOutcome> result1DayBehind = dueDateIndex.query(querySpec1DayBehind);
@@ -90,6 +86,7 @@ public class DynamoDbProducer implements SubscriptionProducer {
                             .setId(item.getString("id"))
                             .setVrm(item.getString("vrm"))
                             .setEmail(item.getString("email"))
+                            .setContactType(Subscription.ContactType.valueOf(item.getString("contact_type")))
                             .setMotTestNumber(item.getString("mot_test_number"))
                             .setMotDueDate(motDueDate);
                 }
@@ -98,6 +95,7 @@ public class DynamoDbProducer implements SubscriptionProducer {
                         .setId(item.getString("id"))
                         .setVrm(item.getString("vrm"))
                         .setEmail(item.getString("email"))
+                        .setContactType(Subscription.ContactType.valueOf(item.getString("contact_type")))
                         .setDvlaId(item.getString("dvla_id"))
                         .setMotDueDate(motDueDate);
             }

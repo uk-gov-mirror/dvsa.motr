@@ -26,6 +26,12 @@ public class ItemSuccess extends Event {
         return this;
     }
 
+    public ItemSuccess setContactType(String contactType) {
+
+        params.put("contact-type", contactType);
+        return this;
+    }
+
     public ItemSuccess setMotTestNumber(String motTestNumber) {
 
         params.put("mot-test-number", motTestNumber);

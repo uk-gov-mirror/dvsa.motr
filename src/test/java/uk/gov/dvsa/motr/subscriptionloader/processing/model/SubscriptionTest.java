@@ -14,6 +14,7 @@ public class SubscriptionTest {
     public static final String TEST_ID = "testId";
     public static final String TEST_VRM = "test_vrm";
     public static final String TEST_EMAIL = "test_email";
+    public static final Subscription.ContactType TEST_CONTACT_TYPE = Subscription.ContactType.EMAIL;
     public static final String TEST_MOT_TEST_NUMBER = "test_mot_test_number";
     public static final String TEST_DVLA_ID = "test_dvla_id";
     private Subscription subscription;
@@ -87,13 +88,14 @@ public class SubscriptionTest {
                 .setMotDueDate(now)
                 .setVrm(TEST_VRM)
                 .setEmail(TEST_EMAIL)
+                .setContactType(TEST_CONTACT_TYPE)
                 .setMotTestNumber(TEST_MOT_TEST_NUMBER)
                 .setLoadedOnDate(now);
 
         assertEquals("Subscription{id='testId', motDueDate=" +
                 now.toString() +
-                ", vrm='test_vrm', email='test_email', motTestNumber='test_mot_test_number', dvlaId='null', loadedOnDate=" +
-                now.toString() + "}", subscription.toString());
+                ", vrm='test_vrm', email='test_email', contactType='EMAIL', motTestNumber='test_mot_test_number', dvlaId='null', " +
+                "loadedOnDate=" + now.toString() + "}", subscription.toString());
     }
 
     @Test
@@ -104,12 +106,13 @@ public class SubscriptionTest {
                 .setMotDueDate(now)
                 .setVrm(TEST_VRM)
                 .setEmail(TEST_EMAIL)
+                .setContactType(TEST_CONTACT_TYPE)
                 .setDvlaId(TEST_DVLA_ID)
                 .setLoadedOnDate(now);
 
         assertEquals("Subscription{id='testId', motDueDate=" +
                 now.toString() +
-                ", vrm='test_vrm', email='test_email', motTestNumber='null', dvlaId='test_dvla_id', loadedOnDate=" +
+                ", vrm='test_vrm', email='test_email', contactType='EMAIL', motTestNumber='null', dvlaId='test_dvla_id', loadedOnDate=" +
                 now.toString() + "}", subscription.toString());
     }
 }

@@ -104,6 +104,7 @@ public class SubscriptionLoaderTests extends SubscriptionLoaderBase {
 
         assertEquals(subscriptionItem.getVrm(), subscription.getVrm());
         assertEquals(subscriptionItem.getEmail(), subscription.getEmail());
+        assertEquals(subscriptionItem.getContactType().getValue(), subscription.getContactType().getValue());
         assertEquals(subscriptionItem.getMotTestNumber(), subscription.getMotTestNumber());
     }
 
