@@ -19,6 +19,8 @@ public class SubscriptionItem implements DynamoDbFixtureTableItem {
 
     private String email = RandomDataUtil.email();
 
+    private String contactType = "EMAIL";
+
     private String motTestNumber = null;
 
     private String dvlaId = RandomDataUtil.motTestNumber();
@@ -54,7 +56,16 @@ public class SubscriptionItem implements DynamoDbFixtureTableItem {
         return this;
     }
 
-    public String motTestNumber() {
+    public String getContactType() {
+        return contactType;
+    }
+
+    public SubscriptionItem setContactType(String contactType) {
+        this.contactType = contactType;
+        return this;
+    }
+
+    public String getMotTestNumber() {
         return motTestNumber;
     }
 
@@ -85,6 +96,7 @@ public class SubscriptionItem implements DynamoDbFixtureTableItem {
         Item item = new Item().with("id", id)
                 .with("mot_due_date", motDueDate.format(DateTimeFormatter.ISO_DATE))
                 .with("vrm", vrm)
+                .with("contact_type", contactType)
                 .with("mot_due_date_md", motDueDate.format(DateTimeFormatter.ofPattern("MM-dd")))
                 .with("created_at", motDueDate.format(DateTimeFormatter.ISO_DATE))
                 .with("email", email);
