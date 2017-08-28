@@ -1,0 +1,3 @@
+MESSAGE CONTENT
+---------------------
+MOT reminders: 2 weeks until your MOT expires. Renew your MOT for ((vehicle_vrm)) by ((mot_expiry_date)). To unsubscribe reply STOP ((vehicle_vrm))
