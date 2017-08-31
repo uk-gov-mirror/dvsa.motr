@@ -8,12 +8,14 @@ import com.amazonaws.services.dynamodbv2.document.ItemCollection;
 import com.amazonaws.services.dynamodbv2.document.QueryOutcome;
 import com.amazonaws.services.dynamodbv2.document.spec.DeleteItemSpec;
 import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
+import com.google.common.collect.Sets;
 
 import uk.gov.dvsa.motr.persistence.entity.SubscriptionDbItem;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class SubscriptionRepository {
 
@@ -34,9 +36,10 @@ public class SubscriptionRepository {
      */
     public List<SubscriptionDbItem> findByEmails(List<String> emails) {
 
+        Set<String> emailsUnique = Sets.newHashSet(emails);
         List<SubscriptionDbItem> subscriptionDbItems = new ArrayList<>();
 
-        for (String email : emails) {
+        for (String email : emailsUnique) {
 
             ItemCollection<QueryOutcome> items = queryOutcomeItemCollection(email);
 

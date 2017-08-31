@@ -1,8 +1,8 @@
 package uk.gov.dvsa.motr.eventlog;
 
+import org.apache.log4j.MDC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 
 /**
  * Event log is responsible for recording and formatting strictly defined set of log event.

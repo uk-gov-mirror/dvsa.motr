@@ -1,5 +1,7 @@
 package uk.gov.dvsa.motr.service;
 
+import org.joda.time.DateTime;
+
 import uk.gov.service.notify.Notification;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
@@ -10,8 +12,10 @@ import java.util.List;
 
 public class EmailMessageStatusService {
 
-    private static final String EMAIL_MESSAGE_TYPE = "email";
-    private static final String PERMANENT_FAILURE_MESSAGE_STATUS = "permanent-failure";
+    public static final String PERMANENT_FAILURE_MESSAGE_STATUS = "permanent-failure";
+    public static final String TEMPORARY_FAILURE_MESSAGE_STATUS = "temporary-failure";
+    public static final String TECHNICAL_FAILURE_MESSAGE_STATUS = "technical-failure";
+    public static final String EMAIL_MESSAGE_TYPE = "email";
 
     private NotificationClient notificationClient;
 
@@ -20,13 +24,21 @@ public class EmailMessageStatusService {
         this.notificationClient = notificationClient;
     }
 
-    public List<String> getEmailAddressesAssociatedWithPermanentlyFailingNotifications() throws NotificationClientException {
+    /**
+     * @return a list of emails given a specified status
+     *
+     * @throws NotificationClientException upon an error in GOV.UK's NotificationClient.
+     */
+    public List<String> getEmailAddressesAssociatedWithNotifications(String status, DateTime notificationDateFilter)
+            throws NotificationClientException {
 
         List<String> emails = new ArrayList<>();
-        List<Notification> notifications = this.getPermanentlyFailingNotifications().getNotifications();
 
-        for (Notification notification : notifications) {
-            if (notification.getEmailAddress().isPresent()) {
+        for (Notification notification : this.getNotifications(status)) {
+
+            if (notification.getEmailAddress().isPresent()
+                    && notification.getCreatedAt().toLocalDate().equals(notificationDateFilter.minusDays(1).toLocalDate())) {
+
                 emails.add(notification.getEmailAddress().get());
             }
         }
@@ -35,16 +47,29 @@ public class EmailMessageStatusService {
     }
 
     /**
-     * @return a list of notifications matching our criteria (permanent-failure and email).
+     * @return a list of notifications
      *
      * @throws NotificationClientException upon an error in GOV.UK's NotificationClient.
      */
-    private NotificationList getPermanentlyFailingNotifications() throws NotificationClientException {
+    private List<Notification> getNotifications(String status) throws NotificationClientException {
 
-        return notificationClient.getNotifications(
-                PERMANENT_FAILURE_MESSAGE_STATUS,
-                EMAIL_MESSAGE_TYPE,
-                null,
-                null);
+        List<Notification> result = new ArrayList<>();
+        NotificationList page = null;
+
+        do {
+            String olderThanId = null;
+
+            if (page != null && page.getNextPageLink().isPresent()) {
+
+                olderThanId = page.getNotifications().get(page.getNotifications().size() - 1).getId().toString();
+            }
+
+            page = notificationClient.getNotifications(status, EMAIL_MESSAGE_TYPE, null, olderThanId);
+
+            result.addAll(page.getNotifications());
+
+        } while (page.getNextPageLink().isPresent() && page.getNotifications().size() == 250);
+
+        return result;
     }
 }

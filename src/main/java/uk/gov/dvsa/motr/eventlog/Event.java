@@ -5,9 +5,9 @@ import java.util.Map;
 
 public abstract class Event {
 
-    protected Map<String, String> params = new HashMap<>();
+    protected Map<String, Object> params = new HashMap<>();
 
-    Map<String, String> toMap() {
+    Map<String, Object> toMap() {
         return params;
     }
 
