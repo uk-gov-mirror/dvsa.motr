@@ -1,5 +1,6 @@
 package uk.gov.dvsa.motr.web.resource;
 
+import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.component.subscription.service.SmsConfirmationService;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 
@@ -16,16 +17,19 @@ import static uk.gov.dvsa.motr.web.resource.RedirectResponseBuilder.redirect;
 public class ResendSmsResource {
 
     private final MotrSession motrSession;
+    private UrlHelper urlHelper;
 
     private SmsConfirmationService smsConfirmationService;
 
     @Inject
     public ResendSmsResource(
             MotrSession motrSession,
-            SmsConfirmationService smsConfirmationService
+            SmsConfirmationService smsConfirmationService,
+            UrlHelper urlHelper
     ) {
         this.motrSession = motrSession;
         this.smsConfirmationService = smsConfirmationService;
+        this.urlHelper = urlHelper;
     }
 
     @GET
@@ -35,8 +39,19 @@ public class ResendSmsResource {
             return redirect("/");
         }
 
-        String redirectUri = smsConfirmationService.resendSms(motrSession.getPhoneNumberFromSession(),
+        String redirectUri;
+        boolean resendLimited = !smsConfirmationService.smsSendingNotRestrictedByRateLimiting(
+                motrSession.getVrmFromSession(),
+                motrSession.getPhoneNumberFromSession(),
                 motrSession.getConfirmationIdFromSession());
+
+        motrSession.setSmsConfirmResendLimited(resendLimited);
+        if (resendLimited) {
+            redirectUri = urlHelper.phoneConfirmationLink();
+        } else {
+            redirectUri = smsConfirmationService.resendSms(motrSession.getPhoneNumberFromSession(),
+                    motrSession.getConfirmationIdFromSession());
+        }
 
         return redirect(redirectUri);
     }

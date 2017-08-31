@@ -2,7 +2,6 @@ package uk.gov.dvsa.motr.web.resource;
 
 
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
-import uk.gov.dvsa.motr.web.helper.SystemVariableParam;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 
 import java.util.HashMap;
@@ -13,9 +12,6 @@ import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-
-
-import static uk.gov.dvsa.motr.web.system.SystemVariable.FEATURE_TOGGLE_SMS;
 
 @Singleton
 @Path("/")

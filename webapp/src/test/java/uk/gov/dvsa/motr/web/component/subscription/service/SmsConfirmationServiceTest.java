@@ -8,29 +8,30 @@ import uk.gov.dvsa.motr.notifications.service.NotifyService;
 import uk.gov.dvsa.motr.web.component.subscription.exception.InvalidConfirmationIdException;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.component.subscription.model.SmsConfirmation;
-import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
-import uk.gov.dvsa.motr.web.component.subscription.persistence.SmsConfirmationRepository;
+import uk.gov.dvsa.motr.web.component.subscription.persistence.DynamoDbSmsConfirmationRepository;
+import uk.gov.dvsa.motr.web.cookie.MotrSession;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
+
+import static uk.gov.dvsa.motr.web.component.subscription.service.SmsConfirmationService.Confirmation.CODE_NOT_VALID;
+import static uk.gov.dvsa.motr.web.component.subscription.service.SmsConfirmationService.Confirmation.CODE_NOT_VALID_MAX_ATTEMPTS_REACHED;
+import static uk.gov.dvsa.motr.web.component.subscription.service.SmsConfirmationService.Confirmation.CODE_VALID;
 
 public class SmsConfirmationServiceTest {
 
-    private final SmsConfirmationRepository smsConfirmationRepository = mock(SmsConfirmationRepository.class);
+    private DynamoDbSmsConfirmationRepository smsConfirmationRepository;
     private final NotifyService notifyService = mock(NotifyService.class);
     private final UrlHelper urlHelper = mock(UrlHelper.class);
+    private final MotrSession motrSession = mock(MotrSession.class);
 
     private static final String TEST_VRM = "TEST-REG";
     private static final String INCORRECT_TEST_VRM = "TEST-REG-123";
@@ -48,44 +49,27 @@ public class SmsConfirmationServiceTest {
     @Before
     public void setUp() {
 
+        smsConfirmationRepository = mock(DynamoDbSmsConfirmationRepository.class);
+
         this.smsConfirmationService = new SmsConfirmationService(
                 smsConfirmationRepository,
                 notifyService,
-                urlHelper
+                urlHelper,
+                motrSession
         );
 
         when(urlHelper.phoneConfirmationLink()).thenReturn(PHONE_CONFIRMATION_LINK);
     }
 
-    @Test(expected = RuntimeException.class)
-    public void whenDbSaveFailsConfirmationSmsIsNotSent() throws Exception {
-
-        doThrow(new RuntimeException()).when(smsConfirmationRepository).save(any(SmsConfirmation.class));
-
-        this.smsConfirmationService.createSmsConfirmation(TEST_VRM, MOBILE, CONFIRMATION_CODE, CONFIRMATION_ID);
-        verify(smsConfirmationRepository, times(1)).save(any(SmsConfirmation.class));
-        verifyZeroInteractions(notifyService);
-    }
-
     @Test
-    public void createSmsConfirmationCallsDbToSaveDetailsAndSendsNotification() throws Exception {
-
-        doNothing().when(notifyService).sendPhoneNumberConfirmationSms(MOBILE, CONFIRMATION_CODE);
-
-        this.smsConfirmationService.createSmsConfirmation(TEST_VRM, MOBILE, CONFIRMATION_CODE, CONFIRMATION_ID);
-
-        verify(smsConfirmationRepository, times(1)).save(any(SmsConfirmation.class));
-        verify(notifyService, times(1)).sendPhoneNumberConfirmationSms(MOBILE,CONFIRMATION_CODE);
-    }
-
-    @Test
-    public void handleSmsConfirmationCreationWillCreateSmsConfirmation() {
+    public void handleSmsConfirmationCreationWillCreateSmsConfirmation() throws InvalidConfirmationIdException {
 
         ArgumentCaptor<SmsConfirmation> smsConfirmationArgumentCaptor = ArgumentCaptor.forClass(SmsConfirmation.class);
+        when(smsConfirmationRepository.findByConfirmationId(CONFIRMATION_ID)).thenReturn(Optional.empty());
 
         String redirectUri = this.smsConfirmationService.handleSmsConfirmationCreation(TEST_VRM, MOBILE, CONFIRMATION_ID);
 
-        verify(smsConfirmationRepository, times(1)).save(smsConfirmationArgumentCaptor.capture());
+        verify(smsConfirmationRepository, times(1)).saveWithResendTimestampUpdate(smsConfirmationArgumentCaptor.capture());
         verify(notifyService, times(1)).sendPhoneNumberConfirmationSms(any(), any());
         assertEquals(smsConfirmationArgumentCaptor.getValue().getAttempts(), INITIAL_ATTEMPTS);
         assertEquals(smsConfirmationArgumentCaptor.getValue().getPhoneNumber(), MOBILE);
@@ -106,10 +90,10 @@ public class SmsConfirmationServiceTest {
 
         withExpectedSmsConfirmation(Optional.of(smsConfirmation));
 
-        boolean smsConfirmationCodeVerified = this.smsConfirmationService.verifySmsConfirmationCode(
-                TEST_VRM, MOBILE, CONFIRMATION_ID, CONFIRMATION_CODE);
+        SmsConfirmationService.Confirmation smsConfirmationCodeVerified =
+                this.smsConfirmationService.verifySmsConfirmationCode(TEST_VRM, MOBILE, CONFIRMATION_ID, CONFIRMATION_CODE);
 
-        assertTrue(smsConfirmationCodeVerified);
+        assertEquals(CODE_VALID.name(), smsConfirmationCodeVerified.name());
     }
 
     @Test(expected = InvalidConfirmationIdException.class)
@@ -131,10 +115,10 @@ public class SmsConfirmationServiceTest {
 
         withExpectedSmsConfirmation(Optional.of(smsConfirmation));
 
-        boolean smsConfirmationCodeVerified = this.smsConfirmationService.verifySmsConfirmationCode(
+        SmsConfirmationService.Confirmation smsConfirmationCodeVerified = this.smsConfirmationService.verifySmsConfirmationCode(
                 TEST_VRM, MOBILE, CONFIRMATION_ID, INCORRECT_CONFIRMATION_CODE);
 
-        assertFalse(smsConfirmationCodeVerified);
+        assertEquals(CODE_NOT_VALID, smsConfirmationCodeVerified);
     }
 
     @Test
@@ -148,10 +132,10 @@ public class SmsConfirmationServiceTest {
 
         withExpectedSmsConfirmation(Optional.of(smsConfirmation));
 
-        boolean smsConfirmationCodeVerified = this.smsConfirmationService.verifySmsConfirmationCode(
+        SmsConfirmationService.Confirmation smsConfirmationCodeVerified = this.smsConfirmationService.verifySmsConfirmationCode(
                 INCORRECT_TEST_VRM, MOBILE, CONFIRMATION_ID, CONFIRMATION_CODE);
 
-        assertFalse(smsConfirmationCodeVerified);
+        assertEquals(CODE_NOT_VALID, smsConfirmationCodeVerified);
     }
 
     @Test
@@ -165,10 +149,10 @@ public class SmsConfirmationServiceTest {
 
         withExpectedSmsConfirmation(Optional.of(smsConfirmation));
 
-        boolean smsConfirmationCodeVerified = this.smsConfirmationService.verifySmsConfirmationCode(
+        SmsConfirmationService.Confirmation smsConfirmationCodeVerified = this.smsConfirmationService.verifySmsConfirmationCode(
                 TEST_VRM, INCORRECT_MOBILE, CONFIRMATION_ID, CONFIRMATION_CODE);
 
-        assertFalse(smsConfirmationCodeVerified);
+        assertEquals(CODE_NOT_VALID, smsConfirmationCodeVerified);
     }
 
     @Test
@@ -191,6 +175,63 @@ public class SmsConfirmationServiceTest {
         withExpectedSmsConfirmation(Optional.empty());
 
         this.smsConfirmationService.resendSms(MOBILE, CONFIRMATION_ID);
+    }
+
+    @Test
+    public void whenThereIsAnExistingConfirmation_AndResendNotRestricted_NewConfirmationCreated() throws InvalidConfirmationIdException {
+
+        ArgumentCaptor<SmsConfirmation> smsConfirmationArgumentCaptor = ArgumentCaptor.forClass(SmsConfirmation.class);
+
+        SmsConfirmation existingConfirmation = new SmsConfirmation();
+        existingConfirmation.setResendAttempts(0);
+        existingConfirmation.setLatestResendAttempt(LocalDateTime.now());
+        existingConfirmation.setCode(CONFIRMATION_CODE);
+        existingConfirmation.setConfirmationId(CONFIRMATION_ID);
+        when(smsConfirmationRepository.findByConfirmationId(CONFIRMATION_ID)).thenReturn(Optional.of(existingConfirmation));
+
+        String redirectUri = this.smsConfirmationService.handleSmsConfirmationCreation(TEST_VRM, MOBILE, CONFIRMATION_ID);
+
+        verify(smsConfirmationRepository, times(1)).saveWithResendTimestampUpdate(smsConfirmationArgumentCaptor.capture());
+        verify(notifyService, times(1)).sendPhoneNumberConfirmationSms(any(), any());
+        assertEquals(smsConfirmationArgumentCaptor.getValue().getAttempts(), INITIAL_ATTEMPTS);
+        assertEquals(smsConfirmationArgumentCaptor.getValue().getConfirmationId(), CONFIRMATION_ID);
+        assertEquals(smsConfirmationArgumentCaptor.getValue().getResendAttempts(), INITIAL_RESEND_ATTEMPTS + 1);
+        assertEquals(PHONE_CONFIRMATION_LINK, redirectUri);
+    }
+
+    @Test
+    public void whenThereIsAnExistingConfirmation_AndResendIsRestricted_NewConfirmationIsNotCreated()
+            throws InvalidConfirmationIdException {
+
+        SmsConfirmation existingConfirmation = new SmsConfirmation();
+        existingConfirmation.setResendAttempts(4);
+        existingConfirmation.setLatestResendAttempt(LocalDateTime.now());
+        existingConfirmation.setCode(CONFIRMATION_CODE);
+        existingConfirmation.setConfirmationId(CONFIRMATION_ID);
+        when(smsConfirmationRepository.findByConfirmationId(CONFIRMATION_ID)).thenReturn(Optional.of(existingConfirmation));
+
+        this.smsConfirmationService.handleSmsConfirmationCreation(TEST_VRM, MOBILE, CONFIRMATION_ID);
+
+        verify(notifyService, times(0)).sendPhoneNumberConfirmationSms(any(), any());
+        verify(motrSession, times(1)).setSmsConfirmResendLimited(true);
+    }
+
+    @Test
+    public void whenCodeNotValidAndMaxAttemptsReached_thenCorrectResponseIsReturned() throws InvalidConfirmationIdException {
+
+        SmsConfirmation existingConfirmation = new SmsConfirmation();
+        existingConfirmation.setAttempts(2);
+        existingConfirmation.setLatestResendAttempt(LocalDateTime.now());
+        existingConfirmation.setCode(CONFIRMATION_CODE);
+        existingConfirmation.setConfirmationId(CONFIRMATION_ID);
+        existingConfirmation.setPhoneNumber(MOBILE);
+        existingConfirmation.setVrm(TEST_VRM);
+        when(smsConfirmationRepository.findByConfirmationId(CONFIRMATION_ID)).thenReturn(Optional.of(existingConfirmation));
+
+        SmsConfirmationService.Confirmation confirmation =
+                this.smsConfirmationService.verifySmsConfirmationCode(TEST_VRM, MOBILE, CONFIRMATION_ID, "XXXX");
+
+        assertEquals(CODE_NOT_VALID_MAX_ATTEMPTS_REACHED.name(), confirmation.name());
     }
 
     private void withExpectedSmsConfirmation(Optional<SmsConfirmation> smsConfirmation) {

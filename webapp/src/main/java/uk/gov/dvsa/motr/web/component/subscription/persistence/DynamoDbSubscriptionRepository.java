@@ -87,6 +87,17 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
         return Optional.of(mapItemToSubscription(item));
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int findByEmail(String email) {
+
+        ItemCollection<QueryOutcome> items = queryOutcomeItemCollection(email);
+
+        return items.getAccumulatedItemCount();
+    }
+
     @Override
     public void save(Subscription subscription) {
 
@@ -132,5 +143,12 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
         subscription.setMotIdentification(new MotIdentification(item.getString("mot_test_number"), item.getString("dvla_id")));
         subscription.setContactType(Subscription.ContactType.valueOf(item.getString("contact_type")));
         return subscription;
+    }
+
+    private ItemCollection<QueryOutcome> queryOutcomeItemCollection(String email) {
+
+        return dynamoDb
+                .getTable(tableName)
+                .query(new QuerySpec().withHashKey("email", email));
     }
 }

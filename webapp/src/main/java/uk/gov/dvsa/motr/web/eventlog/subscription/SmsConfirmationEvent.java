@@ -1,10 +1,6 @@
 package uk.gov.dvsa.motr.web.eventlog.subscription;
 
 import uk.gov.dvsa.motr.eventlog.Event;
-import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
-
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 public abstract class SmsConfirmationEvent extends Event {
 

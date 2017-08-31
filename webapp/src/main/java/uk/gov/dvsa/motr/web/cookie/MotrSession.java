@@ -32,6 +32,7 @@ public class MotrSession {
     private boolean allowedOnChannelSelectionPage;
     private boolean allowedOnPhoneNumberEntryPage;
     private boolean smsFeatureToggle;
+    private boolean smsConfirmResendLimited;
 
     public MotrSession(@SystemVariableParam(FEATURE_TOGGLE_SMS) Boolean featureToggleSms) {
 
@@ -196,6 +197,16 @@ public class MotrSession {
     public void setUnsubscribeConfirmationParams(UnsubscribeConfirmationParams unsubscribeConfirmationParams) {
 
         this.setAttribute(UNSUBSCRIBE_CONFIRMATION_PARAMS, unsubscribeConfirmationParams);
+    }
+
+    public boolean isSmsConfirmResendLimited() {
+
+        return smsConfirmResendLimited;
+    }
+
+    public void setSmsConfirmResendLimited(boolean smsConfirmResendLimited) {
+
+        this.smsConfirmResendLimited = smsConfirmResendLimited;
     }
 
     public boolean isSmsFeatureToggleOn() {

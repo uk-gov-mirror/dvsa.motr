@@ -3,6 +3,7 @@ package uk.gov.dvsa.motr.web.resource;
 import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.component.subscription.service.SmsConfirmationService;
+import uk.gov.dvsa.motr.web.component.subscription.service.SmsConfirmationService.Confirmation;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 import uk.gov.dvsa.motr.web.validator.SmsConfirmationCodeValidator;
@@ -45,8 +46,8 @@ public class SmsConfirmationCodeResource {
     public SmsConfirmationCodeResource(
             MotrSession motrSession,
             TemplateEngine renderer,
-            UrlHelper urlHelper,
-            SmsConfirmationService smsConfirmationService
+            SmsConfirmationService smsConfirmationService,
+            UrlHelper urlHelper
     ) {
         this.motrSession = motrSession;
         this.renderer = renderer;
@@ -68,6 +69,15 @@ public class SmsConfirmationCodeResource {
         modelMap.put("resendUrl", "resend");
         modelMap.put("viewModel", viewModel);
 
+        if (motrSession.isSmsConfirmResendLimited()) {
+            modelMap.put(MESSAGE_MODEL_KEY, SmsConfirmationCodeValidator.CODE_ALREADY_RESENT);
+            modelMap.put(MESSAGE_AT_FIELD_MODEL_KEY, false);
+            modelMap.put("showInLIne", false);
+            dataLayerHelper.putAttribute(ERROR_KEY, SmsConfirmationCodeValidator.CODE_ALREADY_RESENT);
+            modelMap.putAll(dataLayerHelper.formatAttributes());
+            dataLayerHelper.clear();
+        }
+
         return Response.ok(renderer.render(SMS_CONFIRMATION_CODE_TEMPLATE, modelMap)).build();
     }
 
@@ -79,26 +89,35 @@ public class SmsConfirmationCodeResource {
         }
 
         Validator validator = new SmsConfirmationCodeValidator();
+        boolean showInLine = true;
 
         if (validator.isValid(confirmationCode)) {
 
-            String phoneNumber = motrSession.getPhoneNumberFromSession();
-            String vrm = motrSession.getVrmFromSession();
             String confirmationId = motrSession.getConfirmationIdFromSession();
+            Confirmation codeValid = smsConfirmationService.verifySmsConfirmationCode(
+                    motrSession.getVrmFromSession(),
+                    motrSession.getPhoneNumberFromSession(),
+                    confirmationId,
+                    confirmationCode);
 
-            boolean confirmationCodeVerified = smsConfirmationService.verifySmsConfirmationCode(
-                    vrm, phoneNumber, confirmationId, confirmationCode);
-
-            if (confirmationCodeVerified) {
-                return redirect(urlHelper.confirmSubscriptionLink(confirmationId));
+            switch (codeValid) {
+                case CODE_NOT_VALID_MAX_ATTEMPTS_REACHED:
+                    validator.setMessage(SmsConfirmationCodeValidator.CODE_INCORRECT_3_TIMES);
+                    showInLine = false;
+                    break;
+                case CODE_NOT_VALID:
+                    validator.setMessage(SmsConfirmationCodeValidator.INVALID_CONFIRMATION_CODE_MESSAGE);
+                    validator.setMessageAtField(SmsConfirmationCodeValidator.INVALID_CONFIRMATION_CODE_MESSAGE_AT_FIELD);
+                    showInLine = true;
+                    break;
+                case CODE_VALID:
+                    return redirect(urlHelper.confirmSubscriptionLink(confirmationId));
+                default:
+                    break;
             }
-
-            validator.setMessage(SmsConfirmationCodeValidator.INVALID_CONFIRMATION_CODE_MESSAGE);
-            validator.setMessageAtField(SmsConfirmationCodeValidator.INVALID_CONFIRMATION_CODE_MESSAGE_AT_FIELD);
         }
 
         Map<String, Object> modelMap = new HashMap<>();
-
         modelMap.put(MESSAGE_MODEL_KEY, validator.getMessage());
         modelMap.put(MESSAGE_AT_FIELD_MODEL_KEY, validator.getMessageAtField());
         dataLayerHelper.putAttribute(ERROR_KEY, validator.getMessage());
@@ -109,6 +128,7 @@ public class SmsConfirmationCodeResource {
         modelMap.put(CONFIRMATION_CODE_MODEL_KEY, confirmationCode);
         modelMap.put("continue_button_text", "Continue");
         modelMap.put("resendUrl", "resend");
+        modelMap.put("showInLIne", showInLine);
         modelMap.putAll(dataLayerHelper.formatAttributes());
         dataLayerHelper.clear();
 

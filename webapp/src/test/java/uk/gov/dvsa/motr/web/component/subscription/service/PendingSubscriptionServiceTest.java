@@ -24,15 +24,12 @@ import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-
-import static uk.gov.dvsa.motr.web.component.subscription.service.RandomIdGenerator.generateId;
 
 import static java.util.Optional.empty;
 
@@ -167,6 +164,7 @@ public class PendingSubscriptionServiceTest {
 
         when(client.fetch(eq(TEST_VRM))).thenReturn(Optional.of(new VehicleDetails()));
         withExpectedSubscription(empty(), EMAIL);
+        when(pendingSubscriptionRepository.findByVrmAndContactDetails(TEST_VRM, EMAIL)).thenReturn(Optional.empty());
         LocalDate date = LocalDate.now();
         ArgumentCaptor<PendingSubscription> pendingSubscriptionArgumentCaptor = ArgumentCaptor.forClass(PendingSubscription.class);
 
@@ -188,6 +186,7 @@ public class PendingSubscriptionServiceTest {
         when(client.fetch(eq(TEST_VRM))).thenReturn(Optional.of(new VehicleDetails()));
         withExpectedSubscription(empty(), MOBILE);
         LocalDate date = LocalDate.now();
+        when(pendingSubscriptionRepository.findByVrmAndContactDetails(TEST_VRM, MOBILE)).thenReturn(Optional.empty());
         ArgumentCaptor<PendingSubscription> pendingSubscriptionArgumentCaptor = ArgumentCaptor.forClass(PendingSubscription.class);
 
         PendingSubscriptionServiceResponse pendingSubscriptionResponse = this.subscriptionService.handlePendingSubscriptionCreation(

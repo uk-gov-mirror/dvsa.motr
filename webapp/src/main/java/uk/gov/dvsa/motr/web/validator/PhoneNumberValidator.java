@@ -1,19 +1,39 @@
 package uk.gov.dvsa.motr.web.validator;
 
+import uk.gov.dvsa.motr.web.component.subscription.service.SubscriptionsValidationService;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.inject.Inject;
 
 public class PhoneNumberValidator {
 
     private static final String EMPTY_PHONE_NUMBER_MESSAGE = "Enter your mobile number";
     private static final String INVALID_PHONE_NUMBER_MESSAGE = "Enter a valid UK mobile number";
+    private static final String TOO_MANY_SUBSCRIPTIONS = "You can’t subscribe right now. You have already subscribed to two" +
+            " MOT reminders at this phone number";
 
     private String message;
+
+    private final SubscriptionsValidationService subscriptionsValidationService;
+
+    @Inject
+    public PhoneNumberValidator(SubscriptionsValidationService subscriptionsValidationService) {
+
+        this.subscriptionsValidationService = subscriptionsValidationService;
+    }
 
     public boolean isValid(String phoneNumber) {
 
         if (phoneNumber == null || phoneNumber.isEmpty()) {
             message = EMPTY_PHONE_NUMBER_MESSAGE;
+
+            return false;
+        }
+
+        if (!subscriptionsValidationService.hasMaxTwoSubscriptionsForPhoneNumber(phoneNumber)) {
+            message = TOO_MANY_SUBSCRIPTIONS;
 
             return false;
         }

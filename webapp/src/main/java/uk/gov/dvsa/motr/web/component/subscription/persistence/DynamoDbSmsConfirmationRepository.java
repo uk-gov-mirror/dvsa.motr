@@ -68,17 +68,31 @@ public class DynamoDbSmsConfirmationRepository implements SmsConfirmationReposit
     @Override
     public void save(SmsConfirmation smsConfirmation) {
 
-        Item item = new Item()
+        Item item = createConfirmationItem(smsConfirmation);
+        item.withString("latest_resend_attempt",
+                smsConfirmation.getLatestResendAttempt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+
+        dynamoDb.getTable(tableName).putItem(item);
+    }
+
+    @Override
+    public void saveWithResendTimestampUpdate(SmsConfirmation smsConfirmation) {
+
+        Item item = createConfirmationItem(smsConfirmation);
+        item.withString("latest_resend_attempt",
+                ZonedDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        dynamoDb.getTable(tableName).putItem(item);
+    }
+
+    private Item createConfirmationItem(SmsConfirmation smsConfirmation) {
+        return new Item()
                 .withString("id", smsConfirmation.getConfirmationId())
                 .withString("phone_number", smsConfirmation.getPhoneNumber())
                 .withString("vrm", smsConfirmation.getVrm())
                 .withString("code", smsConfirmation.getCode())
                 .withInt("attempts", smsConfirmation.getAttempts())
                 .withInt("resend_attempts", smsConfirmation.getResendAttempts())
-                .withString("latest_resend_attempt", ZonedDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
                 .withNumber("deletion_date", ZonedDateTime.now().plusMonths(MONTHS_TO_DELETION).toEpochSecond());
-
-        dynamoDb.getTable(tableName).putItem(item);
     }
 
     private SmsConfirmation mapItemToSmsConfirmation(Item item) {

@@ -55,20 +55,42 @@ public class PendingSubscriptionService {
         PendingSubscriptionServiceResponse pendingSubscriptionResponse = new PendingSubscriptionServiceResponse();
 
         if (subscription.isPresent()) {
-            updateSubscriptionMotDueDate(subscription.get(), motDueDate);
-
-            String redirectUri = (contactType == Subscription.ContactType.EMAIL
-                    ? urlHelper.emailConfirmedNthTimeLink() : urlHelper.phoneConfirmedNthTimeLink());
-
-            return pendingSubscriptionResponse.setRedirectUri(redirectUri);
+            return getRedirectUrlWhenSubscriptionAlreadyExisis(subscription.get(), motDueDate, contactType, pendingSubscriptionResponse);
         } else {
-            String confimrationId = generateId();
-            createPendingSubscription(vrm, contact, motDueDate, confimrationId, motIdentification, contactType);
-
-            return contactType == Subscription.ContactType.EMAIL
-                    ? pendingSubscriptionResponse.setRedirectUri(urlHelper.emailConfirmationPendingLink())
-                    : pendingSubscriptionResponse.setConfirmationId(confimrationId);
+            return getRedirectUrlWhenNewSubscription(vrm, contact, motDueDate, motIdentification,
+                    contactType, pendingSubscriptionResponse);
         }
+    }
+
+    private PendingSubscriptionServiceResponse getRedirectUrlWhenSubscriptionAlreadyExisis(
+            Subscription subscription, LocalDate motDueDate,
+            Subscription.ContactType contactType,
+            PendingSubscriptionServiceResponse pendingSubscriptionResponse) {
+
+        updateSubscriptionMotDueDate(subscription, motDueDate);
+
+        String redirectUri = (contactType == Subscription.ContactType.EMAIL
+                ? urlHelper.emailConfirmedNthTimeLink() : urlHelper.phoneConfirmedNthTimeLink());
+
+        return pendingSubscriptionResponse.setRedirectUri(redirectUri);
+    }
+
+    private PendingSubscriptionServiceResponse getRedirectUrlWhenNewSubscription(String vrm, String contact, LocalDate motDueDate,
+            MotIdentification motIdentification, Subscription.ContactType contactType,
+            PendingSubscriptionServiceResponse pendingSubscriptionResponse) {
+
+        String confimrationId;
+        Optional<PendingSubscription> pendingSubscription = pendingSubscriptionRepository.findByVrmAndContactDetails(vrm, contact);
+        if (pendingSubscription.isPresent()) {
+            confimrationId = pendingSubscription.get().getConfirmationId();
+        } else {
+            confimrationId = generateId();
+            createPendingSubscription(vrm, contact, motDueDate, confimrationId, motIdentification, contactType);
+        }
+
+        return contactType == Subscription.ContactType.EMAIL
+                ? pendingSubscriptionResponse.setRedirectUri(urlHelper.emailConfirmationPendingLink())
+                : pendingSubscriptionResponse.setConfirmationId(confimrationId);
     }
 
     /**

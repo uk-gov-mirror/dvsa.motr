@@ -13,6 +13,7 @@ import uk.gov.dvsa.motr.web.component.subscription.service.SmsConfirmationServic
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.cookie.SubscriptionConfirmationParams;
 import uk.gov.dvsa.motr.web.test.render.TemplateEngineStub;
+import uk.gov.dvsa.motr.web.validator.PhoneNumberValidator;
 import uk.gov.dvsa.motr.web.viewmodel.ReviewViewModel;
 
 import java.time.LocalDate;
@@ -48,11 +49,14 @@ public class ReviewResourceTest {
     private static final Subscription.ContactType CONTACT_TYPE_MOBILE = Subscription.ContactType.MOBILE;
 
     private MotrSession motrSession;
+    private PhoneNumberValidator phoneNumberValidator;
 
     private ReviewResource resource;
 
     @Before
     public void setUp() {
+
+        phoneNumberValidator = mock(PhoneNumberValidator.class);
 
         motrSession = mock(MotrSession.class);
 
@@ -60,6 +64,7 @@ public class ReviewResourceTest {
                 motrSession,
                 TEMPLATE_ENGINE_STUB,
                 PENDING_SUBSCRIPTION_SERVICE,
+                phoneNumberValidator,
                 PENDING_SMS_CONFIRMATION_SERVICE
         );
 
@@ -128,6 +133,7 @@ public class ReviewResourceTest {
         PendingSubscriptionServiceResponse pendingSubscriptionResponse = new PendingSubscriptionServiceResponse()
                 .setConfirmationId(CONFIRMATION_ID);
 
+        when(phoneNumberValidator.isValid(MOBILE)).thenReturn(true);
         when(motrSession.getVehicleDetailsFromSession()).thenReturn(vehicleDetails);
         when(motrSession.isUsingEmailChannel()).thenReturn(false);
         when(motrSession.isUsingSmsChannel()).thenReturn(true);

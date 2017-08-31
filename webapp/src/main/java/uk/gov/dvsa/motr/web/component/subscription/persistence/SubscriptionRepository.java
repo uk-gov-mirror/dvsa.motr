@@ -11,6 +11,15 @@ public interface SubscriptionRepository {
 
     Optional<Subscription> findByVrmAndEmail(String vrm, String email);
 
+    /**
+     * Will also find by phone number. The column storing both phone numbers
+     * and email addresses is simply called "email".
+     *
+     * @param email the email address (or phone number) to find by.
+     * @return a count of subscriptions matching the email parameter.
+     */
+    int findByEmail(String email);
+
     void save(Subscription subscription);
 
     void delete(Subscription subscription);
