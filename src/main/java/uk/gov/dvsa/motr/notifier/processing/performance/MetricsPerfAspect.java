@@ -54,7 +54,7 @@ public class MetricsPerfAspect {
         return response;
     }
 
-    @Around("execution(* uk.gov.dvsa.motr.notifier.notify.NotifyService.sendEmail(..))")
+    @Around("execution(* uk.gov.dvsa.motr.notifier.notify.NotifyEmailService.sendEmail(..))")
     public Object notifyServiceSendEmailCalls(ProceedingJoinPoint joinPoint) throws Throwable {
 
         Object response;

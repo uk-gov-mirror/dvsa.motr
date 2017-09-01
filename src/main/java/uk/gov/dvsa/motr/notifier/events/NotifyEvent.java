@@ -1,6 +1,7 @@
 package uk.gov.dvsa.motr.notifier.events;
 
 import uk.gov.dvsa.motr.eventlog.Event;
+import uk.gov.dvsa.motr.notifier.processing.model.SubscriptionQueueItem;
 
 import java.time.LocalDate;
 
@@ -9,6 +10,12 @@ public abstract class NotifyEvent extends Event {
     public NotifyEvent setEmail(String email) {
 
         params.put("email", email);
+        return this;
+    }
+
+    public NotifyEvent setContactType(SubscriptionQueueItem.ContactType contactType) {
+
+        params.put("contact-type", contactType.getValue());
         return this;
     }
 

@@ -10,6 +10,21 @@ import java.time.LocalDate;
 
 public class SubscriptionQueueItem {
 
+    public enum ContactType {
+
+        EMAIL("EMAIL"), MOBILE("MOBILE");
+
+        private String value;
+
+        ContactType(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
+
     @JsonProperty("id")
     private String id;
 
@@ -23,10 +38,8 @@ public class SubscriptionQueueItem {
     @JsonProperty("email")
     private String email;
 
-    // The NON_NULL is temporary. Should be an enum too
     @JsonProperty("contactType")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String contactType;
+    private ContactType contactType;
 
     @JsonProperty("motTestNumber")
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -71,20 +84,20 @@ public class SubscriptionQueueItem {
         return this;
     }
 
-    public String getEmail() {
+    public String getContactDetail() {
         return email;
     }
 
-    public SubscriptionQueueItem setEmail(String email) {
-        this.email = email;
+    public SubscriptionQueueItem setContactDetail(String contactDetail) {
+        this.email = contactDetail;
         return this;
     }
 
-    public String getContactType() {
-        return email;
+    public ContactType getContactType() {
+        return contactType;
     }
 
-    public SubscriptionQueueItem setContactType(String contactType) {
+    public SubscriptionQueueItem setContactType(ContactType contactType) {
         this.contactType = contactType;
         return this;
     }
@@ -148,6 +161,7 @@ public class SubscriptionQueueItem {
                 ", motDueDate=" + motDueDate +
                 ", vrm='" + vrm + '\'' +
                 ", motTestNumber='" + motTestNumber + '\'' +
+                ", contactType='" + contactType.getValue() + '\'' +
                 ", dvlaId='" + dvlaId + '\'' +
                 ", email='" + email + '\'' +
                 ", loadedOnDate=" + loadedOnDate +

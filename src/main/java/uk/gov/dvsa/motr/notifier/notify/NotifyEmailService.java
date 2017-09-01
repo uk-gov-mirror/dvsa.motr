@@ -13,16 +13,16 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
-public class NotifyService {
+public class NotifyEmailService {
 
-    private static final Logger logger = LoggerFactory.getLogger(NotifyService.class);
+    private static final Logger logger = LoggerFactory.getLogger(NotifyEmailService.class);
 
     private NotificationClient notificationClient;
     private String oneMonthNotificationTemplateId;
     private String twoWeekNotificationTemplateId;
     private String oneDayAfterNotificationTemplateId;
 
-    public NotifyService(NotificationClient notificationClient, String oneMonthNotificationTemplateId, String
+    public NotifyEmailService(NotificationClient notificationClient, String oneMonthNotificationTemplateId, String
             twoWeekNotificationTemplateId, String oneDayAfterNotificationTemplateId) {
 
         this.notificationClient = notificationClient;

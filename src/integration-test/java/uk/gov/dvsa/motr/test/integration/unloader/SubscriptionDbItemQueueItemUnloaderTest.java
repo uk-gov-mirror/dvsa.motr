@@ -20,6 +20,7 @@ import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import uk.gov.dvsa.motr.notifier.component.subscription.persistence.DynamoDbSubscriptionRepository;
 import uk.gov.dvsa.motr.notifier.component.subscription.persistence.SubscriptionDbItem;
 import uk.gov.dvsa.motr.notifier.handler.EventHandler;
+import uk.gov.dvsa.motr.notifier.processing.model.SubscriptionQueueItem;
 import uk.gov.dvsa.motr.notifier.processing.unloader.NotifierReport;
 import uk.gov.dvsa.motr.test.environmant.variables.TestEnvironmentVariables;
 import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.core.DynamoDbFixture;
@@ -76,11 +77,24 @@ public class SubscriptionDbItemQueueItemUnloaderTest {
     }
 
     @Test
-    public void whenAnItemIsInTheDb_TheLoaderAddsToQueue_ThenTheNotifierSuccessfullyProcessesIt()
+    public void whenAnEmailItemIsInTheDb_TheLoaderAddsToQueue_ThenTheNotifierSuccessfullyProcessesIt()
             throws IOException, InterruptedException, ExecutionException, NotificationClientException {
 
         subscriptionItem = new SubscriptionItem()
                 .setMotDueDate(MOCK_API_RANDOM_VEHICLE_DATE)
+                .setRandomMotTestNumber();
+
+        saveAndProcessSubscriptionItem(subscriptionItem);
+    }
+
+    @Test
+    public void whenAnSmsItemIsInTheDb_TheLoaderAddsToQueue_ThenTheNotifierSuccessfullyProcessesIt()
+            throws IOException, InterruptedException, ExecutionException, NotificationClientException {
+
+        subscriptionItem = new SubscriptionItem()
+                .setMotDueDate(MOCK_API_RANDOM_VEHICLE_DATE)
+                .setEmail("07000000000")
+                .setContactType(SubscriptionQueueItem.ContactType.MOBILE)
                 .setRandomMotTestNumber();
 
         saveAndProcessSubscriptionItem(subscriptionItem);
@@ -143,6 +157,7 @@ public class SubscriptionDbItemQueueItemUnloaderTest {
         assertEquals("XXXYYY", changedSubscriptionDbItem.getVrm());
         assertNotNull("created_at cannot be null when updating vrm", savedItem.getString("created_at"));
         assertNotNull("updated_at cannot be null when updating vrm", savedItem.getString("updated_at"));
+        assertNotNull("contact_type cannot be null when updating vrm", savedItem.getString("contact_type"));
     }
 
     @Test
