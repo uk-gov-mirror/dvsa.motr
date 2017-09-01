@@ -1,0 +1,141 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
+
+import java.util.concurrent.TimeUnit
+
+group 'uk.gov.dvsa.motr.smsreceiver'
+version null
+
+buildscript {
+    repositories {
+        maven {
+            url "https://maven.eveoh.nl/content/repositories/releases"
+        }
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
+apply plugin: 'idea'
+apply plugin: 'checkstyle'
+
+checkstyle {
+    configFile = getRootProject().file("dvsa_java_checks.xml")
+    toolVersion = "6.15"
+}
+
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    maven { url 'http://dl.bintray.com/gov-uk-notify/maven' }
+    maven { url 'https://jitpack.io' }
+}
+
+sourceSets {
+    integrationTest {
+        java {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+            srcDir file('src/integration-test/java')
+        }
+        resources.srcDir file('src/integration-test/resources')
+    }
+}
+
+configurations {
+    integrationTestCompile.extendsFrom testCompile
+    integrationTestRuntime.extendsFrom testRuntime
+}
+
+dependencies {
+    compile 'com.amazonaws:aws-lambda-java-core:1.1.0'
+    compile 'com.amazonaws:aws-lambda-java-events:1.1.0'
+    compile 'com.amazonaws:aws-lambda-java-log4j:1.0.0'
+    compile 'com.amazonaws:aws-java-sdk-dynamodb:1.11.84'
+    compile 'com.amazonaws:aws-java-sdk-lambda:1.11.98'
+    compile 'com.amazonaws:aws-java-sdk-sqs:1.11.86'
+    compile 'org.slf4j:slf4j-log4j12:1.7.21'
+    compile 'com.github.awslabs:aws-serverless-java-container:af1ec224af'
+    compile 'com.github.szhem:log4j-json-layout:b657ab3466'
+    compile 'com.google.inject:guice:4.1.0'
+    compile 'org.glassfish.jersey.media:jersey-media-json-jackson:2.25'
+    compile 'org.glassfish.jersey.connectors:jersey-apache-connector:2.20'
+    compile 'uk.gov.service.notify:notifications-java-client:3.0.0-RELEASE'
+    compile 'com.codahale.metrics:metrics-core:3.0.2'
+    compile 'org.apache.commons:commons-lang3:3.4'
+
+    testCompile 'com.tngtech.java:junit-dataprovider:1.12.0'
+    testCompile 'com.github.tomakehurst:wiremock:2.5.1'
+    testCompile 'com.github.stefanbirkner:system-rules:1.16.0'
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.mockito:mockito-all:1.9.5'
+    testCompile "org.powermock:powermock-mockito-release-full:1.6.1"
+    testCompile 'commons-io:commons-io:2.5'
+}
+
+task buildZip(type: Zip) {
+    from compileJava
+    from processResources
+    into('lib') {
+        from configurations.runtime
+    }
+}
+
+task adjustArchiveBaseName {
+    doLast {
+        try {
+            def revision = 'git rev-list --max-count=1 --timestamp HEAD'.execute().text.trim()
+            def commitHash = revision.split(' ').last()
+            def timestamp = revision ? new Date(TimeUnit.SECONDS.toMillis(revision.split(' ').first() as long)).format("yyyyMMddHHmmss") : null
+            def buildNumber = System.getenv("BUILD_NUMBER") ?: "LATEST"
+
+            if (timestamp && commitHash) {
+                archivesBaseName = "${rootProject.name}-${timestamp}-${commitHash}-${buildNumber}"
+            } else {
+                throw new GradleException('Unable to parse revision from Git')
+            }
+        } catch (e) {
+            throw new GradleException('Unable to parse revision from Git', e)
+
+        }
+    }
+}
+
+task integrationTest(type: Test) {
+
+    testClassesDir = sourceSets.integrationTest.output.classesDir
+    classpath = sourceSets.integrationTest.runtimeClasspath
+
+    systemProperties = (Map<String, String>) System.getProperties().findAll { it.key.startsWith("test.") }
+}
+
+// enhanced logging for test phases
+tasks.withType(Test) {
+    testLogging {
+        events = [TestLogEvent.PASSED,
+                  TestLogEvent.SKIPPED,
+                  TestLogEvent.FAILED,
+                  TestLogEvent.STANDARD_OUT]
+        showStandardStreams = true
+        exceptionFormat = TestExceptionFormat.FULL
+        showExceptions = true
+        showStackTraces = true
+        showCauses = true
+
+        afterSuite { desc, result ->
+            if (!desc.parent) { // will match the outermost suite
+                def output = "Results: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} successes, ${result.failedTestCount} failures, ${result.skippedTestCount} skipped)"
+                def startItem = '|  ', endItem = '  |'
+                def repeatLength = startItem.length() + output.length() + endItem.length()
+                println('\n' + ('-' * repeatLength) + '\n' + startItem + output + endItem + '\n' + ('-' * repeatLength))
+            }
+        }
+    }
+}
+
+jar.dependsOn('adjustArchiveBaseName')
+build.dependsOn buildZip
