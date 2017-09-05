@@ -20,6 +20,8 @@ import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -119,6 +121,36 @@ public class ReviewResourceTest {
         assertEquals(ReviewViewModel.class, TEMPLATE_ENGINE_STUB.getContext(Map.class).get("viewModel").getClass());
     }
 
+    @Test
+    public void whenNotDvlaVehicle_thenReviewPageShouldDisplayViewModelProperly() throws Exception {
+
+        VehicleDetails vehicleDetails = vehicleDetailsInSession();
+
+        when(MOTR_SESSION.isAllowedOnPage()).thenReturn(true);
+        when(MOTR_SESSION.getVehicleDetailsFromSession()).thenReturn(vehicleDetails);
+
+        assertEquals(200, resource.reviewPage().getStatus());
+        assertEquals("review", TEMPLATE_ENGINE_STUB.getTemplate());
+        assertFalse(((Boolean) TEMPLATE_ENGINE_STUB.getContext(Map.class).get("isDvlaVehicle")));
+        assertEquals(ReviewViewModel.class, TEMPLATE_ENGINE_STUB.getContext(Map.class).get("viewModel").getClass());
+    }
+
+    @Test
+    public void whenDvlaVehicle_thenReviewPageShouldDisplayViewModelProperly() throws Exception {
+
+        VehicleDetails vehicleDetails = vehicleDetailsInSession();
+        vehicleDetails.setMotTestNumber(null);
+        vehicleDetails.setDvlaId(TEST_DVLA_ID);
+
+        when(MOTR_SESSION.isAllowedOnPage()).thenReturn(true);
+        when(MOTR_SESSION.getVehicleDetailsFromSession()).thenReturn(vehicleDetails);
+
+        assertEquals(200, resource.reviewPage().getStatus());
+        assertEquals("review", TEMPLATE_ENGINE_STUB.getTemplate());
+        assertTrue(((Boolean) TEMPLATE_ENGINE_STUB.getContext(Map.class).get("isDvlaVehicle")));
+        assertEquals(ReviewViewModel.class, TEMPLATE_ENGINE_STUB.getContext(Map.class).get("viewModel").getClass());
+    }
+
     private VehicleDetails vehicleDetailsInSession() {
 
         VehicleDetails vehicleDetails = new VehicleDetails();
@@ -127,6 +159,7 @@ public class ReviewResourceTest {
         vehicleDetails.setYearOfManufacture(2000);
         vehicleDetails.setMotExpiryDate(LocalDate.now());
         vehicleDetails.setMotTestNumber(TEST_MOT_TEST_NUMBER);
+
         return vehicleDetails;
     }
 }

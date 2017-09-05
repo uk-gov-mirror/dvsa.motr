@@ -4,7 +4,7 @@
 
         <div class="column-two-thirds">
 
-            <h1 class="heading-large">Check your details</h1>
+            <h1 class="heading-xlarge">Check your details</h1>
 
             <p>Make sure the vehicle and your email address are correct.</p>
 
@@ -38,7 +38,11 @@
                 </div>
 
                 <div>
-                    <dt class="cya-question">MOT expiry date</dt>
+                    {{#if isDvlaVehicle}}
+                        <dt class="cya-question">MOT due date</dt>
+                    {{else}}
+                        <dt class="cya-question">MOT expiry date</dt>
+                    {{/if}}
                     <dd class="cya-answer">{{viewModel.expiryDate}}</dd>
                     <dd class="cya-change">&nbsp;</dd>
                 </div>
@@ -53,7 +57,7 @@
             <details>
                 <summary role="button"><span class="summary">Incorrect vehicle details?</span></summary>
                 <div class="panel panel-border-narrow">
-                <p>If you think any of the vehicle details are wrong, <a href="https://www.gov.uk/contact-dvsa" target="_blank">contact DVSA</a></p>
+                <p>If you think any of the vehicle details are wrong, <a href="https://www.gov.uk/contact-dvsa/y/mot-vehicle-tests-and-approval" target="_blank">contact DVSA</a></p>
                 </div>
             </details>
 
