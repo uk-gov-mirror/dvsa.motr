@@ -81,7 +81,7 @@ public class SubscriptionsReceiverTest  {
         SubscriptionQueueItem subscriptionQueueItem = new SubscriptionQueueItem()
                 .setMessageReceiptHandle("Test-receipt-handle")
                 .setVrm("test-vrm")
-                .setEmail("test@email.com")
+                .setContactDetail("test@email.com")
                 .setId("test-id")
                 .setMotTestNumber("test-mot-number-123")
                 .setMessageCorrelationId("test-correlation-id");

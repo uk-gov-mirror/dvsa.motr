@@ -34,7 +34,8 @@ public class ProcessSubscriptionDbItemQueueItemTaskTest {
                 .setMotDueDate(requestDate)
                 .setVrm("12345")
                 .setMotTestNumber("test-mot-number-123")
-                .setEmail("test@test.com");
+                .setContactDetail("test@test.com")
+                .setContactType(SubscriptionQueueItem.ContactType.EMAIL);
 
         processSubscriptionTask = new ProcessSubscriptionTask(
                 requestDate, subscriptionQueueItemToProcess, report, processSubscriptionService, queueItemRemover);

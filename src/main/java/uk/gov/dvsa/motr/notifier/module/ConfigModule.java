@@ -25,7 +25,8 @@ import uk.gov.dvsa.motr.executor.BlockingExecutor;
 import uk.gov.dvsa.motr.notifier.SystemVariable;
 import uk.gov.dvsa.motr.notifier.component.subscription.persistence.DynamoDbSubscriptionRepository;
 import uk.gov.dvsa.motr.notifier.component.subscription.persistence.SubscriptionRepository;
-import uk.gov.dvsa.motr.notifier.notify.NotifyService;
+import uk.gov.dvsa.motr.notifier.notify.NotifyEmailService;
+import uk.gov.dvsa.motr.notifier.notify.NotifySmsService;
 import uk.gov.dvsa.motr.notifier.processing.queue.QueueItemRemover;
 import uk.gov.dvsa.motr.notifier.processing.queue.SubscriptionsReceiver;
 import uk.gov.dvsa.motr.notifier.processing.service.ProcessSubscriptionService;
@@ -53,6 +54,9 @@ import static uk.gov.dvsa.motr.notifier.SystemVariable.ONE_DAY_AFTER_NOTIFICATIO
 import static uk.gov.dvsa.motr.notifier.SystemVariable.ONE_MONTH_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.REGION;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.REMAINING_TIME_THRESHOLD;
+import static uk.gov.dvsa.motr.notifier.SystemVariable.SMS_ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID;
+import static uk.gov.dvsa.motr.notifier.SystemVariable.SMS_ONE_MONTH_NOTIFICATION_TEMPLATE_ID;
+import static uk.gov.dvsa.motr.notifier.SystemVariable.SMS_TWO_WEEK_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.SUBSCRIPTIONS_QUEUE_URL;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.TWO_WEEK_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.VEHICLE_API_CLIENT_TIMEOUT;
@@ -65,6 +69,7 @@ public class ConfigModule extends AbstractModule {
     private static final int MAX_NUMBER_OF_MESSAGES = 10;
     private static final int POST_PROCESSING_DELAY_MS = 30000;
     private AmazonSQS sqsClient;
+    private NotificationClient client;
 
     @Override
     protected void configure() {
@@ -85,6 +90,8 @@ public class ConfigModule extends AbstractModule {
         Logger.getRootLogger().setLevel(toLevel(config.getValue(LOG_LEVEL)));
 
         sqsClient = AmazonSQSClientBuilder.defaultClient();
+
+        client = new NotificationClient(config.getValue(GOV_NOTIFY_API_TOKEN));
     }
 
     @Provides
@@ -142,10 +149,11 @@ public class ConfigModule extends AbstractModule {
     public ProcessSubscriptionService provideHandleSubscriptionService(
             VehicleDetailsClient client,
             SubscriptionRepository repository,
-            NotifyService notifyService,
+            NotifyEmailService notifyEmailService,
+            NotifySmsService notifySmsService,
             Config config) {
 
-        return new ProcessSubscriptionService(client, repository, notifyService, config.getValue(WEB_BASE_URL));
+        return new ProcessSubscriptionService(client, repository, notifyEmailService, notifySmsService, config.getValue(WEB_BASE_URL));
     }
 
     @Provides
@@ -155,15 +163,21 @@ public class ConfigModule extends AbstractModule {
     }
 
     @Provides
-    public NotifyService provideNotifyService(Config config) {
+    public NotifyEmailService provideNotifyEmailService(Config config) {
 
-        String apiKey = config.getValue(GOV_NOTIFY_API_TOKEN);
         String oneMonthTemplateId = config.getValue(ONE_MONTH_NOTIFICATION_TEMPLATE_ID);
         String twoWeekTemplateId = config.getValue(TWO_WEEK_NOTIFICATION_TEMPLATE_ID);
         String oneDayAfterTemplateId = config.getValue(ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID);
-        NotificationClient client = new NotificationClient(apiKey);
+        return new NotifyEmailService(client, oneMonthTemplateId, twoWeekTemplateId, oneDayAfterTemplateId);
+    }
 
-        return new NotifyService(client, oneMonthTemplateId, twoWeekTemplateId, oneDayAfterTemplateId);
+    @Provides
+    public NotifySmsService provideNotifySmsService(Config config) {
+
+        String oneMonthTemplateId = config.getValue(SMS_ONE_MONTH_NOTIFICATION_TEMPLATE_ID);
+        String twoWeekTemplateId = config.getValue(SMS_TWO_WEEK_NOTIFICATION_TEMPLATE_ID);
+        String oneDayAfterTemplateId = config.getValue(SMS_ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID);
+        return new NotifySmsService(client, oneMonthTemplateId, twoWeekTemplateId, oneDayAfterTemplateId);
     }
 
     @Provides

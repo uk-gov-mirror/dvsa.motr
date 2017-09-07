@@ -15,17 +15,17 @@ public class SubscriptionHandlerHelper {
         return !subscriptionMotDueDate.equals(vehicleDetailsMotExpiryDate);
     }
 
-    public static boolean oneMonthEmailRequired(LocalDate requestDate, LocalDate vehicleDetailsMotExpiryDate) {
+    public static boolean oneMonthNotificationRequired(LocalDate requestDate, LocalDate vehicleDetailsMotExpiryDate) {
 
         return requestDate.plusMonths(1).equals(vehicleDetailsMotExpiryDate);
     }
 
-    public static boolean twoWeekEmailRequired(LocalDate requestDate, LocalDate vehicleDetailsMotExpiryDate) {
+    public static boolean twoWeekNotificationRequired(LocalDate requestDate, LocalDate vehicleDetailsMotExpiryDate) {
 
         return requestDate.plusDays(14).equals(vehicleDetailsMotExpiryDate);
     }
 
-    public static boolean oneDayAfterEmailRequired(LocalDate requestDate, LocalDate vehicleDetailsMotExpiryDate) {
+    public static boolean oneDayAfterNotificationRequired(LocalDate requestDate, LocalDate vehicleDetailsMotExpiryDate) {
 
         return requestDate.minusDays(1).equals(vehicleDetailsMotExpiryDate);
     }

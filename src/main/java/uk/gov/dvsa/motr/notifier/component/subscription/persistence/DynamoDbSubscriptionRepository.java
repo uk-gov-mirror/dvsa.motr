@@ -108,7 +108,8 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
                     .withString("mot_due_date", originalItem.getString("mot_due_date"))
                     .withString("mot_due_date_md", originalItem.getString("mot_due_date_md"))
                     .withString("created_at", originalItem.getString("created_at"))
-                    .withString("updated_at", ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT));
+                    .withString("updated_at", ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT))
+                    .withString("contact_type", originalItem.getString("contact_type"));
 
             if (originalItem.isPresent("dvla_id")) {
                 item.withString("dvla_id", originalItem.getString("dvla_id"));

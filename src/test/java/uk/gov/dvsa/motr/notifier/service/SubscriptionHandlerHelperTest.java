@@ -9,9 +9,9 @@ import static junit.framework.Assert.assertTrue;
 
 import static uk.gov.dvsa.motr.notifier.processing.service.SubscriptionHandlerHelper.motDueDateUpdateRequired;
 import static uk.gov.dvsa.motr.notifier.processing.service.SubscriptionHandlerHelper.motTestNumberUpdateRequired;
-import static uk.gov.dvsa.motr.notifier.processing.service.SubscriptionHandlerHelper.oneDayAfterEmailRequired;
-import static uk.gov.dvsa.motr.notifier.processing.service.SubscriptionHandlerHelper.oneMonthEmailRequired;
-import static uk.gov.dvsa.motr.notifier.processing.service.SubscriptionHandlerHelper.twoWeekEmailRequired;
+import static uk.gov.dvsa.motr.notifier.processing.service.SubscriptionHandlerHelper.oneDayAfterNotificationRequired;
+import static uk.gov.dvsa.motr.notifier.processing.service.SubscriptionHandlerHelper.oneMonthNotificationRequired;
+import static uk.gov.dvsa.motr.notifier.processing.service.SubscriptionHandlerHelper.twoWeekNotificationRequired;
 
 public class SubscriptionHandlerHelperTest {
 
@@ -39,7 +39,7 @@ public class SubscriptionHandlerHelperTest {
         LocalDate subscriptionMotDueDate = LocalDate.of(2017, 10, 10);
         LocalDate vehicleDetailsMotExpiryDate = LocalDate.of(2017, 11, 10);
 
-        assertTrue(oneMonthEmailRequired(subscriptionMotDueDate, vehicleDetailsMotExpiryDate));
+        assertTrue(oneMonthNotificationRequired(subscriptionMotDueDate, vehicleDetailsMotExpiryDate));
     }
 
     @Test
@@ -47,7 +47,7 @@ public class SubscriptionHandlerHelperTest {
         LocalDate subscriptionMotDueDate = LocalDate.of(2017, 10, 10);
         LocalDate vehicleDetailsMotExpiryDate = LocalDate.of(2017, 10, 11);
 
-        assertFalse(oneMonthEmailRequired(subscriptionMotDueDate, vehicleDetailsMotExpiryDate));
+        assertFalse(oneMonthNotificationRequired(subscriptionMotDueDate, vehicleDetailsMotExpiryDate));
     }
 
     @Test
@@ -55,7 +55,7 @@ public class SubscriptionHandlerHelperTest {
         LocalDate subscriptionMotDueDate = LocalDate.of(2017, 10, 10);
         LocalDate vehicleDetailsMotExpiryDate = LocalDate.of(2017, 10, 24);
 
-        assertTrue(twoWeekEmailRequired(subscriptionMotDueDate, vehicleDetailsMotExpiryDate));
+        assertTrue(twoWeekNotificationRequired(subscriptionMotDueDate, vehicleDetailsMotExpiryDate));
     }
 
     @Test
@@ -63,7 +63,7 @@ public class SubscriptionHandlerHelperTest {
         LocalDate subscriptionMotDueDate = LocalDate.of(2017, 10, 10);
         LocalDate vehicleDetailsMotExpiryDate = LocalDate.of(2017, 10, 11);
 
-        assertFalse(twoWeekEmailRequired(subscriptionMotDueDate, vehicleDetailsMotExpiryDate));
+        assertFalse(twoWeekNotificationRequired(subscriptionMotDueDate, vehicleDetailsMotExpiryDate));
     }
 
     @Test
@@ -71,7 +71,7 @@ public class SubscriptionHandlerHelperTest {
         LocalDate subscriptionMotDueDate = LocalDate.of(2017, 10, 10);
         LocalDate vehicleDetailsMotExpiryDate = LocalDate.of(2017, 10, 9);
 
-        assertTrue(oneDayAfterEmailRequired(subscriptionMotDueDate, vehicleDetailsMotExpiryDate));
+        assertTrue(oneDayAfterNotificationRequired(subscriptionMotDueDate, vehicleDetailsMotExpiryDate));
     }
 
     @Test
@@ -79,7 +79,7 @@ public class SubscriptionHandlerHelperTest {
         LocalDate subscriptionMotDueDate = LocalDate.of(2017, 10, 10);
         LocalDate vehicleDetailsMotExpiryDate = LocalDate.of(2017, 10, 11);
 
-        assertFalse(oneDayAfterEmailRequired(subscriptionMotDueDate, vehicleDetailsMotExpiryDate));
+        assertFalse(oneDayAfterNotificationRequired(subscriptionMotDueDate, vehicleDetailsMotExpiryDate));
     }
 
     @Test

@@ -18,6 +18,9 @@ import static uk.gov.dvsa.motr.notifier.SystemVariable.ONE_DAY_AFTER_NOTIFICATIO
 import static uk.gov.dvsa.motr.notifier.SystemVariable.ONE_MONTH_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.REGION;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.REMAINING_TIME_THRESHOLD;
+import static uk.gov.dvsa.motr.notifier.SystemVariable.SMS_ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID;
+import static uk.gov.dvsa.motr.notifier.SystemVariable.SMS_ONE_MONTH_NOTIFICATION_TEMPLATE_ID;
+import static uk.gov.dvsa.motr.notifier.SystemVariable.SMS_TWO_WEEK_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.SUBSCRIPTIONS_QUEUE_URL;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.TWO_WEEK_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.VEHICLE_API_CLIENT_TIMEOUT;
@@ -38,6 +41,9 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
         set(ONE_MONTH_NOTIFICATION_TEMPLATE_ID, notifyOneMonthTemplateId());
         set(TWO_WEEK_NOTIFICATION_TEMPLATE_ID, notifyTwoWeekTemplateId());
         set(ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID, notifyOneDayAfterTemplateId());
+        set(SMS_ONE_MONTH_NOTIFICATION_TEMPLATE_ID, notifySmsOneMonthTemplateId());
+        set(SMS_TWO_WEEK_NOTIFICATION_TEMPLATE_ID, notifySmsTwoWeekTemplateId());
+        set(SMS_ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID, notifySmsOneDayAfterTemplateId());
         set(GOV_NOTIFY_API_TOKEN, govNotifyApiToken());
         set(WORKER_COUNT, "1");
         set(MESSAGE_RECEIVE_TIMEOUT, "10");
@@ -98,6 +104,21 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
     public static String notifyOneDayAfterTemplateId() {
 
         return lookupProperty("test.notify.template.one.day.after");
+    }
+
+    public static String notifySmsTwoWeekTemplateId() {
+
+        return lookupProperty("test.notify.template.sms.two.week");
+    }
+
+    public static String notifySmsOneMonthTemplateId() {
+
+        return lookupProperty("test.notify.template.sms.one.month");
+    }
+
+    public static String notifySmsOneDayAfterTemplateId() {
+
+        return lookupProperty("test.notify.template.sms.one.day.after");
     }
 
     private static String lookupProperty(String property) {
