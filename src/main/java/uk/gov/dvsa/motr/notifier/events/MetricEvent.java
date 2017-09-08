@@ -94,6 +94,48 @@ public class MetricEvent extends Event {
         return this;
     }
 
+    public MetricEvent setSendSms99thPercentile(double metric) {
+
+        params.put("ninety-ninth-percentile-send-sms-calls", String.valueOf(metric));
+        return this;
+    }
+
+    public MetricEvent setSendSms95thPercentile(double metric) {
+
+        params.put("ninety-fifth-percentile-send-sms", String.valueOf(metric));
+        return this;
+    }
+
+    public MetricEvent setSendSms75thPercentile(double metric) {
+
+        params.put("seventy-fifth-percentile-send-sms", String.valueOf(metric));
+        return this;
+    }
+
+    public MetricEvent setSendSmsMax(long metric) {
+
+        params.put("max-time-send-sms-call", String.valueOf(metric));
+        return this;
+    }
+
+    public MetricEvent setSendSmsMin(long metric) {
+
+        params.put("min-time-send-sms-call", String.valueOf(metric));
+        return this;
+    }
+
+    public MetricEvent setSendSmsStdDeviation(double metric) {
+
+        params.put("std-deviation-send-sms-call", String.valueOf(metric));
+        return this;
+    }
+
+    public MetricEvent setSendSmsCountOfCalls(long metric) {
+
+        params.put("count-of-send-sms-calls", String.valueOf(metric));
+        return this;
+    }
+
     public MetricEvent setSendEmail99thPercentile(double metric) {
 
         params.put("ninety-ninth-percentile-send-email-calls", String.valueOf(metric));

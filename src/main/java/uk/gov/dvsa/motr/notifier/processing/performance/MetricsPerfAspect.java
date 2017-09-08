@@ -21,6 +21,7 @@ public class MetricsPerfAspect {
     private Timer vehicleDetailsFetchByMotTestNumber = metricRegistry.timer("vehicleDetailsFetchByMotTestNumber");
     private Timer vehicleDetailsFetchByDvlaId = metricRegistry.timer("vehicleDetailsFetchByDvlaId");
     private Timer sendEmailTimer = metricRegistry.timer("notifyService_sendEmail");
+    private Timer sendSmsTimer = metricRegistry.timer("notifyService_sendSms");
     private Timer updateExpiryDateTimer = metricRegistry.timer("subscriptionRepository_updateExpiryDate");
     private Timer processItemTimer = metricRegistry.timer("process_single_item");
 
@@ -69,6 +70,21 @@ public class MetricsPerfAspect {
         return response;
     }
 
+    @Around("execution(* uk.gov.dvsa.motr.notifier.notify.NotifySmsService.sendSms(..))")
+    public Object notifyServiceSendSmsCalls(ProceedingJoinPoint joinPoint) throws Throwable {
+
+        Object response;
+
+        Timer.Context sendSmsContext = sendSmsTimer.time();
+        try {
+            response = joinPoint.proceed();
+        } finally {
+            sendSmsContext.stop();
+        }
+
+        return response;
+    }
+
     @Around("execution(* uk.gov.dvsa.motr.notifier.component.subscription.persistence.SubscriptionRepository.updateExpiryDate(..))")
     public Object subscriptionRepositoryUpdateExpiryDateCalls(ProceedingJoinPoint joinPoint) throws Throwable {
 
@@ -106,6 +122,7 @@ public class MetricsPerfAspect {
         vehicleDetailsFetchByMotTestNumber = metricRegistry.timer("vehicleDetailsFetchByMotTestNumber");
         vehicleDetailsFetchByDvlaId = metricRegistry.timer("vehicleDetailsFetchByDvlaId");
         sendEmailTimer = metricRegistry.timer("notifyService_sendEmail");
+        sendSmsTimer = metricRegistry.timer("notifyService_sendSms");
         updateExpiryDateTimer = metricRegistry.timer("subscriptionRepository_updateExpiryDate");
         processItemTimer = metricRegistry.timer("process_single_item");
     }
@@ -148,6 +165,13 @@ public class MetricsPerfAspect {
                     .setSendEmailMax(sendEmailTimer.getSnapshot().getMax())
                     .setSendEmailMin(sendEmailTimer.getSnapshot().getMin())
                     .setSendEmailStdDeviation(sendEmailTimer.getSnapshot().getStdDev())
+                    .setSendSmsCountOfCalls(sendSmsTimer.getCount())
+                    .setSendSms99thPercentile(sendSmsTimer.getSnapshot().get99thPercentile())
+                    .setSendSms95thPercentile(sendSmsTimer.getSnapshot().get95thPercentile())
+                    .setSendSms75thPercentile(sendSmsTimer.getSnapshot().get75thPercentile())
+                    .setSendSmsMax(sendSmsTimer.getSnapshot().getMax())
+                    .setSendSmsMin(sendSmsTimer.getSnapshot().getMin())
+                    .setSendSmsStdDeviation(sendSmsTimer.getSnapshot().getStdDev())
                     .setExpiryDateUpdateCountOfCalls(updateExpiryDateTimer.getCount())
                     .setExpiryDateUpdate99thPercentile(updateExpiryDateTimer.getSnapshot().get99thPercentile())
                     .setExpiryDateUpdate95thPercentile(updateExpiryDateTimer.getSnapshot().get95thPercentile())
