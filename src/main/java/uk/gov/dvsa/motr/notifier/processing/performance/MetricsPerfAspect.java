@@ -136,6 +136,7 @@ public class MetricsPerfAspect {
             response = (NotifierReport)joinPoint.proceed();
             response.setVehicleDetailsTimerFetchByMotTestNumber(vehicleDetailsFetchByMotTestNumber);
             response.setSendEmailTimer(sendEmailTimer);
+            response.setSendSmsTimer(sendSmsTimer);
             response.setUpdateExpiryDateTimer(updateExpiryDateTimer);
             response.setProcessItemTimer(processItemTimer);
             response.setVehicleDetailsTimerFetchByDvlaId(vehicleDetailsFetchByDvlaId);

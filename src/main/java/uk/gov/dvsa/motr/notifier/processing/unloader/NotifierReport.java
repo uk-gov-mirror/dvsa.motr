@@ -19,6 +19,8 @@ public class NotifierReport {
 
     private Timer sendEmailTimer;
 
+    private Timer sendSmsTimer;
+
     private Timer updateExpiryDateTimer;
 
     private Timer processItemTimer;
@@ -79,6 +81,16 @@ public class NotifierReport {
 
     public void setSendEmailTimer(Timer sendEmailTimer) {
         this.sendEmailTimer = sendEmailTimer;
+    }
+
+    public MetricsTimerWrapper getSendSmsTimer() {
+
+        return new MetricsTimerWrapper(sendSmsTimer);
+    }
+
+    public void setSendSmsTimer(Timer sendSmsTimer) {
+
+        this.sendSmsTimer = sendSmsTimer;
     }
 
     public MetricsTimerWrapper getUpdateExpiryDateTimer() {
