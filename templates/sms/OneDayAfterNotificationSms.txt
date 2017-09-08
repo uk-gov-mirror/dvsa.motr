@@ -1,0 +1,3 @@
+MESSAGE CONTENT
+---------------------
+MOT reminders: Your MOT for ((vehicle_vrm)) ran out yesterday! If you drive without an MOT you risk a fine of up to £1000. To unsubscribe reply STOP ((vehicle_vrm))
