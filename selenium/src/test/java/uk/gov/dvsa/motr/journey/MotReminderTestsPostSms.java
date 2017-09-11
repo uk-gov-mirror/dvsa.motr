@@ -123,7 +123,7 @@ public class MotReminderTestsPostSms extends BaseTest {
 
         //Given I am a vehicle owner on the MOTR start page
         //When I enter the vehicle vrm and my email address
-        ReviewPage reviewPage = motReminder.enterReminderDetailsSmsToggleOn(RandomGenerator.generateVrm(), RandomGenerator.generateEmail());
+        ReviewPage reviewPage = motReminder.enterReminderDetailsSmsToggleOnUsingEmailChannel(RandomGenerator.generateVrm(), RandomGenerator.generateEmail());
 
         //And I update my email address
         EmailPage emailPageFromReview = reviewPage.clickChangeEmail();
@@ -140,7 +140,7 @@ public class MotReminderTestsPostSms extends BaseTest {
 
         //Given I am a vehicle owner on the MOTR start page
         //When I enter the vehicle vrm and my email address
-        ReviewPage reviewPage = motReminder.enterReminderDetailsSmsToggleOn(RandomGenerator.generateVrm(), RandomGenerator.generateEmail());
+        ReviewPage reviewPage = motReminder.enterReminderDetailsSmsToggleOnUsingEmailChannel(RandomGenerator.generateVrm(), RandomGenerator.generateEmail());
 
         //And I update my vehicle vrm
         VrmPage vrmPageFromReview = reviewPage.clickChangeVrm();

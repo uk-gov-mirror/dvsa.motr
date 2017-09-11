@@ -30,7 +30,7 @@ public class MotReminder {
         return emailPage.enterEmailAddress(email);
     }
 
-    public ReviewPage enterReminderDetailsSmsToggleOn(String vrm, String email) {
+    public ReviewPage enterReminderDetailsSmsToggleOnUsingEmailChannel(String vrm, String email) {
         HomePage page = PageNavigator.goTo(HomePage.class);
         VrmPage vrmPage = page.clickStartNow();
         ChannelSelectionPage channelSelectionPage = vrmPage.enterVrmSmsToggleOn(vrm);
@@ -88,7 +88,7 @@ public class MotReminder {
 
     public EmailConfirmationPendingPage enterAndConfirmPendingReminderDetailsPostSms(String vrm, String email) {
 
-        return enterReminderDetailsSmsToggleOn(vrm, email).confirmSubscriptionDetailsOnEmailChannel();
+        return enterReminderDetailsSmsToggleOnUsingEmailChannel(vrm, email).confirmSubscriptionDetailsOnEmailChannel();
     }
 
 
@@ -117,7 +117,7 @@ public class MotReminder {
 
     public SubscriptionConfirmationPage enterAndConfirmPendingReminderDetailsSecondTimePostSms(String vrm, String email) {
 
-        return enterReminderDetailsSmsToggleOn(vrm, email).confirmSubscriptionDetailsNthTime();
+        return enterReminderDetailsSmsToggleOnUsingEmailChannel(vrm, email).confirmSubscriptionDetailsNthTime();
     }
 
     public UnsubscribeConfirmationPage unsubscribeFromReminder(String vrm, String email) {
