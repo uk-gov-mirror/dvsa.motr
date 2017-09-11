@@ -91,7 +91,6 @@ public class MotReminder {
         return enterReminderDetailsSmsToggleOnUsingEmailChannel(vrm, email).confirmSubscriptionDetailsOnEmailChannel();
     }
 
-
     public SubscriptionConfirmationPage subscribeToReminderAndConfirmMobileNumber(String vrm, String mobileNumber) {
 
         ReviewPage reviewPage = enterReminderDetailsUsingMobileChannel(vrm, mobileNumber);

@@ -22,17 +22,21 @@ import static org.mockito.Mockito.when;
 public class NotifyServiceTest {
 
     private NotifyService service;
+
     private static final NotificationClient CLIENT = mock(NotificationClient.class);
+    private static final String MOT_TEST_NUMBER = "12345";
+    private static final String PHONE_NUMBER = "07912345678";
+    private static final String CONFIRMATION_CODE = "123456";
+    private static final String VRM = "ABC123";
 
     private String email = "test@test.com";
     private String templateId = "180";
     private String emailConfirmationTemplateId = "180";
-    private String smsSubscriptionConfirmationTemplateId = "180";
-    private String smsConfirmationTemplateId = "180";
+    private String smsSubscriptionConfirmationTemplateId = "SMS-SUBSCRIPTION-CONFIRMATION-TEMPLATE";
+    private String smsConfirmationTemplateId = "SMS-CONFIRMATION-TEMPLATE";
     private String vehicleDetails = "TEST-MAKE TEST-MODEL, TEST-REG";
     private LocalDate motExpiryDate = LocalDate.of(2017, 1, 1);
     private String unsubscribeLink = "https://gov.uk";
-    private static final String MOT_TEST_NUMBER = "12345";
 
     @Before
     public void setUp() {
@@ -62,6 +66,39 @@ public class NotifyServiceTest {
         when(CLIENT.sendEmail(any(), any(), any(), any())).thenThrow(NotificationClientException.class);
 
         this.service.sendSubscriptionConfirmationEmail(email, vehicleDetails, motExpiryDate, unsubscribeLink, motIdentificationStub());
+    }
+
+    @Test
+    public void sendPhoneNumberConfirmationSmsIsSentWithCorrectDetails() throws NotificationClientException {
+
+        this.service.sendPhoneNumberConfirmationSms(PHONE_NUMBER, CONFIRMATION_CODE);
+
+        Map<String, String> personalisation = new HashMap<>();
+        personalisation.put("confirmation_code", CONFIRMATION_CODE);
+
+        verify(CLIENT, times(1)).sendSms(
+                smsConfirmationTemplateId,
+                PHONE_NUMBER,
+                personalisation,
+                ""
+        );
+    }
+
+    @Test
+    public void sendSubscriptionConfirmationSmsIsSentWithCorrectDetails() throws NotificationClientException {
+
+        this.service.sendSubscriptionConfirmationSms(PHONE_NUMBER, VRM, motExpiryDate);
+
+        Map<String, String> personalisation = new HashMap<>();
+        personalisation.put("vehicle_vrm", VRM);
+        personalisation.put("mot_expiry_date", DateFormatter.asDisplayDate(motExpiryDate));
+
+        verify(CLIENT, times(1)).sendSms(
+                smsSubscriptionConfirmationTemplateId,
+                PHONE_NUMBER,
+                personalisation,
+                ""
+        );
     }
 
     private Map<String, String> stubPersonalisationMap(String vehicleDetails, LocalDate expiryDate, String link) {
