@@ -42,6 +42,7 @@ public class ReviewResourceTest {
     private static final String EMAIL = "test@test.com";
     private static final String MOBILE = "07912345678";
     private static final String CONFIRMATION_ID = "ABC123";
+    private static final String TEST_DVLA_ID = "3456789";
     private static final String TEST_MOT_TEST_NUMBER = "123456";
     private static final String EMAIL_CONFIRMATION_PENDING_URI = "email-confirmation-pending";
     private static final String PHONE_CONFIRMATION_URI = "confirm-phone";
@@ -183,8 +184,8 @@ public class ReviewResourceTest {
 
         VehicleDetails vehicleDetails = vehicleDetailsInSession();
 
-        when(MOTR_SESSION.isAllowedOnPage()).thenReturn(true);
-        when(MOTR_SESSION.getVehicleDetailsFromSession()).thenReturn(vehicleDetails);
+        when(motrSession.isAllowedOnReviewPage()).thenReturn(true);
+        when(motrSession.getVehicleDetailsFromSession()).thenReturn(vehicleDetails);
 
         assertEquals(200, resource.reviewPage().getStatus());
         assertEquals("review", TEMPLATE_ENGINE_STUB.getTemplate());
@@ -199,8 +200,8 @@ public class ReviewResourceTest {
         vehicleDetails.setMotTestNumber(null);
         vehicleDetails.setDvlaId(TEST_DVLA_ID);
 
-        when(MOTR_SESSION.isAllowedOnPage()).thenReturn(true);
-        when(MOTR_SESSION.getVehicleDetailsFromSession()).thenReturn(vehicleDetails);
+        when(motrSession.isAllowedOnReviewPage()).thenReturn(true);
+        when(motrSession.getVehicleDetailsFromSession()).thenReturn(vehicleDetails);
 
         assertEquals(200, resource.reviewPage().getStatus());
         assertEquals("review", TEMPLATE_ENGINE_STUB.getTemplate());
