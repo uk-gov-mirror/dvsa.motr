@@ -19,8 +19,10 @@ import uk.gov.dvsa.motr.web.helper.SystemVariableParam;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -87,6 +89,22 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
         return Optional.of(mapItemToSubscription(item));
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int findByEmail(String email) {
+
+        List<Subscription> subscriptions = new ArrayList<>();
+        ItemCollection<QueryOutcome> items = queryOutcomeItemCollection(email);
+
+        for (Item item : items) {
+            subscriptions.add(mapItemToSubscription(item));
+        }
+
+        return subscriptions.size();
+    }
+
     @Override
     public void save(Subscription subscription) {
 
@@ -132,5 +150,12 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
         subscription.setMotIdentification(new MotIdentification(item.getString("mot_test_number"), item.getString("dvla_id")));
         subscription.setContactType(Subscription.ContactType.valueOf(item.getString("contact_type")));
         return subscription;
+    }
+
+    private ItemCollection<QueryOutcome> queryOutcomeItemCollection(String email) {
+
+        return dynamoDb
+                .getTable(tableName)
+                .query(new QuerySpec().withHashKey("email", email));
     }
 }

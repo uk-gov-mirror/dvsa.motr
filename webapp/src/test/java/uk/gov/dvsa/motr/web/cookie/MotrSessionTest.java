@@ -11,14 +11,20 @@ import static org.junit.Assert.assertTrue;
 
 public class MotrSessionTest {
 
+    private static final String CONFIRMATION_ID = "123ABC";
     private static final String VRM = "VRZ";
     private static final String EMAIL = "test@test.com";
+    private static final String PHONE_NUMBER = "07801987627";
+    private static final String CHANNEL = "email";
+    private static final String EMAIL_CHANNEL = "email";
+    private static final String TEXT_CHANNEL = "text";
+
     private MotrSession motrSession;
 
     @Before
     public void setUp() {
 
-        motrSession = new MotrSession();
+        motrSession = new MotrSession(true);
     }
 
     @Test
@@ -26,30 +32,39 @@ public class MotrSessionTest {
 
         motrSession.setEmail(EMAIL);
         motrSession.setVrm(VRM);
-        boolean actual = motrSession.isAllowedOnPage();
+        boolean actual = motrSession.isAllowedOnReviewPage();
         assertTrue(actual);
     }
 
     @Test
-    public void isAllowedOnPageReturnsFalseWhenNoEmailSessionEntered() {
+    public void isAllowedOnPageReturnsFalseWhenNoEmailAndNoPhoneNumberSessionEntered() {
 
         motrSession.setVrm(VRM);
-        boolean actual = motrSession.isAllowedOnPage();
+        boolean actual = motrSession.isAllowedOnReviewPage();
         assertFalse(actual);
+    }
+
+    @Test
+    public void isAllowedOnPageReturnsTrueWhenNoEmailAndPhoneNumberIsSet() {
+
+        motrSession.setVrm(VRM);
+        motrSession.setPhoneNumber(PHONE_NUMBER);
+        boolean actual = motrSession.isAllowedOnReviewPage();
+        assertTrue(actual);
     }
 
     @Test
     public void isAllowedOnPageReturnsFalseWhenNoVrmSessionEntered() {
 
         motrSession.setEmail(EMAIL);
-        boolean actual = motrSession.isAllowedOnPage();
+        boolean actual = motrSession.isAllowedOnReviewPage();
         assertFalse(actual);
     }
 
     @Test
     public void isAllowedOnPageReturnsFalseWhenNoSessionEntered() {
 
-        boolean actual = motrSession.isAllowedOnPage();
+        boolean actual = motrSession.isAllowedOnReviewPage();
         assertFalse(actual);
     }
 
@@ -65,6 +80,60 @@ public class MotrSessionTest {
 
         motrSession.setVrm(VRM);
         boolean actual = motrSession.isAllowedOnEmailPage();
+        assertTrue(actual);
+    }
+
+    @Test
+    public void isAllowedOnSmsConfirmationCodePageReturnsFalseWhenNoSessionEntered() {
+
+        boolean actual = motrSession.isAllowedOnSmsConfirmationCodePage();
+        assertFalse(actual);
+    }
+
+    @Test
+    public void isAllowedOnSmsConfirmationCodePageReturnsTrueWhenVrmAndPhoneNumberExistsInSession() {
+
+        motrSession.setVrm(VRM);
+        motrSession.setPhoneNumber(PHONE_NUMBER);
+        boolean actual = motrSession.isAllowedOnSmsConfirmationCodePage();
+        assertTrue(actual);
+    }
+
+    @Test
+    public void isAllowedToPostOnSmsConfirmationCodePageReturnsFalseWhenConfirmationIdDoesNotExistInSession() {
+
+        motrSession.setVrm(VRM);
+        motrSession.setPhoneNumber(PHONE_NUMBER);
+        boolean actual = motrSession.isAllowedToPostOnSmsConfirmationCodePage();
+        assertFalse(actual);
+    }
+
+    @Test
+    public void isAllowedToPostOnSmsConfirmationCodePageReturnsTrueWhenVrmAndPhoneNumberAndConfirmationIdExistsInSession() {
+
+        motrSession.setVrm(VRM);
+        motrSession.setPhoneNumber(PHONE_NUMBER);
+        motrSession.setConfirmationId(CONFIRMATION_ID);
+        boolean actual = motrSession.isAllowedToPostOnSmsConfirmationCodePage();
+        assertTrue(actual);
+    }
+
+    @Test
+    public void isAllowedToResendSmsConfirmationCodeReturnsFalseWhenConfirmationIdDoesNotExistInSession() {
+
+        motrSession.setVrm(VRM);
+        motrSession.setPhoneNumber(PHONE_NUMBER);
+        boolean actual = motrSession.isAllowedToResendSmsConfirmationCode();
+        assertFalse(actual);
+    }
+
+    @Test
+    public void isAllowedToResendSmsConfirmationCodeReturnsTrueWhenConfirmationIdExistsInSession() {
+
+        motrSession.setVrm(VRM);
+        motrSession.setPhoneNumber(PHONE_NUMBER);
+        motrSession.setConfirmationId(CONFIRMATION_ID);
+        boolean actual = motrSession.isAllowedToResendSmsConfirmationCode();
         assertTrue(actual);
     }
 
@@ -92,6 +161,30 @@ public class MotrSessionTest {
     }
 
     @Test
+    public void getConfirmationIdFromSessionReturnsConfirmationIdWhenInSession() {
+
+        motrSession.setConfirmationId(CONFIRMATION_ID);
+        String actual = motrSession.getConfirmationIdFromSession();
+        assertEquals(CONFIRMATION_ID, actual);
+    }
+
+    @Test
+    public void getPhoneNumberFromSessionReturnsPhoneNumberWhenInSession() {
+
+        motrSession.setPhoneNumber(PHONE_NUMBER);
+        String actual = motrSession.getPhoneNumberFromSession();
+        assertEquals(PHONE_NUMBER, actual);
+    }
+
+    @Test
+    public void getChannelFromSessionReturnsChannelWhenInSession() {
+
+        motrSession.setChannel(CHANNEL);
+        String actual = motrSession.getChannelFromSession();
+        assertEquals(CHANNEL, actual);
+    }
+
+    @Test
     public void visitingFromReviewPageReturnsFalseWhenNotSet() {
 
         boolean actual = motrSession.visitingFromReviewPage();
@@ -107,10 +200,67 @@ public class MotrSessionTest {
     }
 
     @Test
+    public void visitingFromContactEntryPageReturnsFalseWhenNotSet() {
+
+        boolean actual = motrSession.visitingFromContactEntryPage();
+        assertFalse(actual);
+    }
+
+    @Test
+    public void visitingFromContactEntryPageReturnsTrueWhenSet() {
+
+        motrSession.setVisitingFromContactEntry(true);
+        boolean actual = motrSession.visitingFromContactEntryPage();
+        assertTrue(actual);
+    }
+
+    @Test
     public void getEmailFromSessionReturnsEmptyStringWhenNoEmailInSession() {
 
         String actual = motrSession.getEmailFromSession();
         assertEquals("", actual);
+    }
+
+    @Test
+    public void getPhoneNumberFromSessionReturnsEmptyStringWhenNoEmailInSession() {
+
+        String actual = motrSession.getPhoneNumberFromSession();
+        assertEquals("", actual);
+    }
+
+    @Test
+    public void getChannelFromSessionReturnsEmptyStringWhenNoEmailInSession() {
+
+        String actual = motrSession.getChannelFromSession();
+        assertEquals("", actual);
+    }
+
+    @Test
+    public void isUsingEmailChannelReturnsTrueWhenUsingEmailChannel() {
+
+        motrSession.setChannel(EMAIL_CHANNEL);
+        assertTrue(motrSession.isUsingEmailChannel());
+    }
+
+    @Test
+    public void isUsingSmsChannelReturnsFalseWhenUsingEmailChannel() {
+
+        motrSession.setChannel(EMAIL_CHANNEL);
+        assertFalse(motrSession.isUsingSmsChannel());
+    }
+
+    @Test
+    public void isUsingSmsChannelReturnsTrueWhenUsingTextChannel() {
+
+        motrSession.setChannel(TEXT_CHANNEL);
+        assertTrue(motrSession.isUsingSmsChannel());
+    }
+
+    @Test
+    public void isUsingEmailChannelReturnsFalseWhenUsingSmsChannel() {
+
+        motrSession.setChannel(TEXT_CHANNEL);
+        assertFalse(motrSession.isUsingEmailChannel());
     }
 
     @Test
@@ -122,5 +272,50 @@ public class MotrSessionTest {
         motrSession.setVehicleDetails(vehicleDetails);
         VehicleDetails actual = motrSession.getVehicleDetailsFromSession();
         assertEquals("TEST-MAKE", actual.getMake());
+    }
+
+    @Test
+    public void isAllowedOnChannelSelectionPageReturnsFalseWithEmptyVrmAndFeatureToggleOn() {
+
+        assertFalse(motrSession.isAllowedOnChannelSelectionPage());
+    }
+
+    @Test
+    public void isAllowedOnChannelSelectionPageReturnsTrueWithToggleOnAndVrm() {
+
+        motrSession.setVrm(VRM);
+
+        assertTrue(motrSession.isAllowedOnChannelSelectionPage());
+    }
+
+    @Test
+    public void isAllowedOnChannelSelectionPageReturnsFalseWithEmptyVrmAndFeatureToggleOff() {
+
+        motrSession = new MotrSession(false);
+
+        assertFalse(motrSession.isAllowedOnChannelSelectionPage());
+    }
+
+    @Test
+    public void isAllowedOnChannelSelectionPageReturnsFalseWithVrmAndFeatureToggleOff() {
+
+        motrSession = new MotrSession(false);
+        motrSession.setVrm(VRM);
+
+        assertFalse(motrSession.isAllowedOnChannelSelectionPage());
+    }
+
+    @Test
+    public void getSmsFeatureToggleValueReturnsTrueWithToggleOn() {
+
+        assertTrue(motrSession.isSmsFeatureToggleOn());
+    }
+
+    @Test
+    public void getSmsFeatureToggleValueReturnsFalseWithToggleOff() {
+
+        motrSession = new MotrSession(false);
+
+        assertFalse(motrSession.isSmsFeatureToggleOn());
     }
 }

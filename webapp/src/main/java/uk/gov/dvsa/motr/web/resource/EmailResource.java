@@ -52,10 +52,16 @@ public class EmailResource {
             return redirect("/");
         }
 
+        if (!motrSession.visitingFromReviewPage()) {
+            motrSession.setVisitingFromContactEntry(true);
+        }
+
         String email = this.motrSession.getEmailFromSession();
 
         Map<String, Object> modelMap = new HashMap<>();
-        updateMapBasedOnReviewFlow(modelMap);
+        ReviewFlowUpdater.updateMapBasedOnReviewFlow(modelMap,
+                motrSession.visitingFromContactEntryPage(),
+                motrSession.visitingFromReviewPage());
 
         modelMap.put(EMAIL_MODEL_KEY, email);
 
@@ -67,36 +73,30 @@ public class EmailResource {
 
         EmailValidator emailValidator = new EmailValidator();
 
+        if (!motrSession.visitingFromReviewPage()) {
+            motrSession.setVisitingFromContactEntry(true);
+        }
+
         if (emailValidator.isValid(email)) {
+            this.motrSession.setChannel("email");
             this.motrSession.setEmail(email);
 
             //TODO Dynamo DB check and redirection to review page when it's ready
             return redirect("review");
         }
 
-        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> modelMap = new HashMap<>();
 
-        map.put(MESSAGE_MODEL_KEY, emailValidator.getMessage());
+        modelMap.put(MESSAGE_MODEL_KEY, emailValidator.getMessage());
         dataLayerHelper.putAttribute(ERROR_KEY, emailValidator.getMessage());
-        updateMapBasedOnReviewFlow(map);
+        ReviewFlowUpdater.updateMapBasedOnReviewFlow(modelMap,
+                motrSession.visitingFromContactEntryPage(),
+                motrSession.visitingFromReviewPage());
 
-        map.put(EMAIL_MODEL_KEY, email);
-        map.putAll(dataLayerHelper.formatAttributes());
+        modelMap.put(EMAIL_MODEL_KEY, email);
+        modelMap.putAll(dataLayerHelper.formatAttributes());
         dataLayerHelper.clear();
 
-        return Response.status(200).entity(renderer.render(EMAIL_TEMPLATE_NAME, map)).build();
-    }
-
-    private void updateMapBasedOnReviewFlow(Map<String, Object> modelMap) {
-
-        if (this.motrSession.visitingFromReviewPage()) {
-            modelMap.put("continue_button_text", "Save and return to review");
-            modelMap.put("back_button_text", "Back");
-            modelMap.put("back_url", "review");
-        } else {
-            modelMap.put("continue_button_text", "Continue");
-            modelMap.put("back_button_text", "Back");
-            modelMap.put("back_url", "vrm");
-        }
+        return Response.ok(renderer.render(EMAIL_TEMPLATE_NAME, modelMap)).build();
     }
 }

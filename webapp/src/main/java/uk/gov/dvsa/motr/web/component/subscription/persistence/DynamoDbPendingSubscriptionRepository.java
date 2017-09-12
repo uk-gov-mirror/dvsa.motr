@@ -8,6 +8,7 @@ import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.ItemCollection;
 import com.amazonaws.services.dynamodbv2.document.PrimaryKey;
 import com.amazonaws.services.dynamodbv2.document.QueryOutcome;
+import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
 import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 
@@ -71,12 +72,33 @@ public class DynamoDbPendingSubscriptionRepository implements PendingSubscriptio
     }
 
     @Override
+    public Optional<PendingSubscription> findByVrmAndContactDetails(String vrm, String contactDetails) {
+
+        QuerySpec query = new QuerySpec()
+                .withKeyConditionExpression("vrm = :vrm AND email = :contact")
+                .withValueMap(new ValueMap().withString(":vrm", vrm).withString(":contact", contactDetails));
+
+        Table table = dynamoDb.getTable(tableName);
+
+        ItemCollection<QueryOutcome> items = table.query(query);
+        Iterator<Item> resultIterator = items.iterator();
+
+        if (!resultIterator.hasNext()) {
+            return Optional.empty();
+        }
+
+        Item item = resultIterator.next();
+
+        return Optional.of(mapItemToPendingSubscription(item));
+    }
+
+    @Override
     public void save(PendingSubscription subscription) {
 
         Item item = new Item()
                 .withString("id", subscription.getConfirmationId())
                 .withString("vrm", subscription.getVrm())
-                .withString("email", subscription.getEmail())
+                .withString("email", subscription.getContact())
                 .withString("mot_due_date", subscription.getMotDueDate().format(DateTimeFormatter.ISO_LOCAL_DATE))
                 .withString("mot_due_date_md", subscription.getMotDueDate().format(DateTimeFormatter.ofPattern("MM-dd")))
                 .withString("created_at", ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT))
@@ -93,7 +115,7 @@ public class DynamoDbPendingSubscriptionRepository implements PendingSubscriptio
     @Override
     public void delete(PendingSubscription subscription) {
 
-        PrimaryKey key = new PrimaryKey("vrm", subscription.getVrm(), "email", subscription.getEmail());
+        PrimaryKey key = new PrimaryKey("vrm", subscription.getVrm(), "email", subscription.getContact());
         Map<String, Object> expressionAttributeValues = new HashMap<>();
         expressionAttributeValues.put(":id", subscription.getConfirmationId());
 
@@ -110,7 +132,7 @@ public class DynamoDbPendingSubscriptionRepository implements PendingSubscriptio
         PendingSubscription subscription = new PendingSubscription();
         subscription.setConfirmationId(item.getString("id"));
         subscription.setVrm(item.getString("vrm"));
-        subscription.setEmail(item.getString("email"));
+        subscription.setContact(item.getString("email"));
         subscription.setMotDueDate(LocalDate.parse(item.getString("mot_due_date")));
         subscription.setMotIdentification(new MotIdentification(item.getString("mot_test_number"), item.getString("dvla_id")));
         subscription.setContactType(Subscription.ContactType.valueOf(item.getString("contact_type")));
