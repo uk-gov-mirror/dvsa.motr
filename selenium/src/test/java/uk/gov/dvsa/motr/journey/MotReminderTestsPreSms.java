@@ -22,7 +22,7 @@ import static org.testng.Assert.assertTrue;
 
 public class MotReminderTestsPreSms extends BaseTest {
 
-    @Test(dataProvider = "dataProviderCreateMotReminderForMyVehicle",
+    @Test(dataProvider = "dataProviderCreateEmailMotReminderForMyVehicle",
             description = "Owner of a vehicle with a mot is able to set up a MOT reminder with their VRM and email and unsubscribe from it",
             groups = {"PreSms"})
     public void createMotReminderForMyVehicleThenUnsubscribe(String vrm, String email) throws IOException, InterruptedException {
@@ -43,7 +43,7 @@ public class MotReminderTestsPreSms extends BaseTest {
         assertTrue(unsubscribeConfirmed.isSurveyLinkDisplayed());
     }
 
-    @Test(dataProvider = "dataProviderCreateMotReminderForMyVehicle",
+    @Test(dataProvider = "dataProviderCreateEmailMotReminderForMyVehicle",
             description = "After confirming the reminder the user can click the link to go back to the start page",
             groups = {"PreSms"})
     public void afterConfirmationOfReminderUserCanGoToStartPageToSignUpAgain(String vrm, String email) throws Exception {
@@ -58,7 +58,7 @@ public class MotReminderTestsPreSms extends BaseTest {
         HomePage homePage = confirmationPage.clickSignUpForAnotherReminder();
     }
 
-    @Test(dataProvider = "dataProviderCreateMotReminderForMyVehicle",
+    @Test(dataProvider = "dataProviderCreateEmailMotReminderForMyVehicle",
             description = "Reminder subscriber with an active subscription creates another subscription with the same VRM and email" +
                     " does not need to confirm their email again",
             groups = {"PreSms"})
@@ -73,7 +73,7 @@ public class MotReminderTestsPreSms extends BaseTest {
         motReminder.enterAndConfirmPendingReminderDetailsSecondTime(vrm, email);
     }
 
-    @Test(dataProvider = "dataProviderCreateMotReminderForMyVehicle",
+    @Test(dataProvider = "dataProviderCreateEmailMotReminderForMyVehicle",
             description = "Reminder subscriber with multiple pending subscriptions is directed to the confirm email error page when " +
                     "selecting an old confirm email link",
             groups = {"PreSms"})
@@ -97,7 +97,7 @@ public class MotReminderTestsPreSms extends BaseTest {
         motReminder.navigateToEmailConfirmationPage(newConfirmationId);
     }
 
-    @Test(dataProvider = "dataProviderCreateMotReminderForMyVehicle",
+    @Test(dataProvider = "dataProviderCreateEmailMotReminderForMyVehicle",
             description = "A user who has previously unsubscribed from reminders will be displayed the unsubscribe error page",
             groups = {"PreSms"})
     public void reminderThatHasBeenUnsubscribedDisplaysErrorPage(String vrm, String email) {

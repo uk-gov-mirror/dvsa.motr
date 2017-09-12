@@ -13,6 +13,8 @@ import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.model.SmsConfirmationI
 import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.model.SmsConfirmationTable;
 import uk.gov.dvsa.motr.web.component.subscription.model.SmsConfirmation;
 
+import java.time.LocalDateTime;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -64,7 +66,8 @@ public class DynamoDbSmsConfirmationRepositoryTest {
                 .setVrm(expectedSmsConfirmationItem.getVrm())
                 .setAttempts(expectedSmsConfirmationItem.getAttempts())
                 .setPhoneNumber(expectedSmsConfirmationItem.getPhoneNumber())
-                .setResendAttempts(expectedSmsConfirmationItem.getResendAttempts());
+                .setResendAttempts(expectedSmsConfirmationItem.getResendAttempts())
+                .setLatestResendAttempt(LocalDateTime.now());;
 
         repo.save(smsConfirmation);
 
@@ -91,7 +94,8 @@ public class DynamoDbSmsConfirmationRepositoryTest {
                 .setVrm(expectedSmsConfirmationItem.getVrm())
                 .setAttempts(expectedSmsConfirmationItem.getAttempts())
                 .setPhoneNumber(expectedSmsConfirmationItem.getPhoneNumber())
-                .setResendAttempts(expectedSmsConfirmationItem.getResendAttempts());
+                .setResendAttempts(expectedSmsConfirmationItem.getResendAttempts())
+                .setLatestResendAttempt(LocalDateTime.now());
 
         repo.save(smsConfirmation);
 
