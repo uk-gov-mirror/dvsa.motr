@@ -81,7 +81,7 @@ public class PendingSubscriptionService {
 
         String confimrationId;
         Optional<PendingSubscription> pendingSubscription = pendingSubscriptionRepository.findByVrmAndContactDetails(vrm, contact);
-        if (pendingSubscription.isPresent()) {
+        if (pendingSubscription.isPresent() && contactType == Subscription.ContactType.MOBILE) {
             confimrationId = pendingSubscription.get().getConfirmationId();
         } else {
             confimrationId = generateId();

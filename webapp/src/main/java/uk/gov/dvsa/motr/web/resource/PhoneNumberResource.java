@@ -28,6 +28,7 @@ public class PhoneNumberResource {
     private static final String PHONE_NUMBER_TEMPLATE = "phone-number";
     private static final String PHONE_NUMBER_MODEL_KEY = "phoneNumber";
     private static final String MESSAGE_MODEL_KEY = "message";
+    private static final String MESSAGE_AT_FIELD_MODEL_KEY = "messageAtField";
 
     private final TemplateEngine renderer;
     private final MotrSession motrSession;
@@ -83,6 +84,7 @@ public class PhoneNumberResource {
         Map<String, Object> modelMap = new HashMap<>();
 
         modelMap.put(MESSAGE_MODEL_KEY, validator.getMessage());
+        modelMap.put(MESSAGE_AT_FIELD_MODEL_KEY, validator.getMessageAtField());
         dataLayerHelper.putAttribute(ERROR_KEY, validator.getMessage());
         ReviewFlowUpdater.updateMapBasedOnReviewFlow(modelMap,
                 motrSession.visitingFromContactEntryPage(),

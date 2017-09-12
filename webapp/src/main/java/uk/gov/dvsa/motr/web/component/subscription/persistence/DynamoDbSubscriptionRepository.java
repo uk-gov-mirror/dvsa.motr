@@ -19,8 +19,10 @@ import uk.gov.dvsa.motr.web.helper.SystemVariableParam;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -93,9 +95,14 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
     @Override
     public int findByEmail(String email) {
 
+        List<Subscription> subscriptions = new ArrayList<>();
         ItemCollection<QueryOutcome> items = queryOutcomeItemCollection(email);
 
-        return items.getAccumulatedItemCount();
+        for (Item item : items) {
+            subscriptions.add(mapItemToSubscription(item));
+        }
+
+        return subscriptions.size();
     }
 
     @Override

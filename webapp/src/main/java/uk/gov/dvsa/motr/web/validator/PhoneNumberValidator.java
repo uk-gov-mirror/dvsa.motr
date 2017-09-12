@@ -12,9 +12,12 @@ public class PhoneNumberValidator {
     private static final String EMPTY_PHONE_NUMBER_MESSAGE = "Enter your mobile number";
     private static final String INVALID_PHONE_NUMBER_MESSAGE = "Enter a valid UK mobile number";
     private static final String TOO_MANY_SUBSCRIPTIONS = "You can’t subscribe right now. You have already subscribed to two" +
-            " MOT reminders at this phone number";
+            " MOT reminders for this phone number <br/>" +
+            "<br/> You may unsubscribe from one of the reminders or use a different mobile phone number.";
+    private static final String TOO_MANY_SUBSCRIPTIONS_AT_FIELD = "Use a different mobile phone number";
 
     private String message;
+    private String messageAtField;
 
     private final SubscriptionsValidationService subscriptionsValidationService;
 
@@ -28,12 +31,14 @@ public class PhoneNumberValidator {
 
         if (phoneNumber == null || phoneNumber.isEmpty()) {
             message = EMPTY_PHONE_NUMBER_MESSAGE;
+            messageAtField = "";
 
             return false;
         }
 
         if (!subscriptionsValidationService.hasMaxTwoSubscriptionsForPhoneNumber(phoneNumber)) {
             message = TOO_MANY_SUBSCRIPTIONS;
+            messageAtField = TOO_MANY_SUBSCRIPTIONS_AT_FIELD;
 
             return false;
         }
@@ -44,6 +49,16 @@ public class PhoneNumberValidator {
     public String getMessage() {
 
         return message;
+    }
+
+    public String getMessageAtField() {
+
+        return messageAtField;
+    }
+
+    public void setMessageAtField(String messageAtField) {
+
+        this.messageAtField = messageAtField;
     }
 
     private boolean validate(String phoneNumber) {
