@@ -22,6 +22,9 @@ public class NotifyEmailServiceTest {
     private static final String REG = "TEST-REG";
     private static final String UNSUBSCRIBE_LINK = "http://gov.uk";
     private static final LocalDate EXPIRY_DATE = LocalDate.of(2017, 10, 10);
+    private static final String PRESERVATION_STATEMENT_PREFIX =
+            "You can get your MOT test done from tomorrow to keep the same expiry date ";
+    private static final String PRESERVATION_STATEMENT_SUFFIX = " for next year.";
 
     private NotificationClient notificationClient = mock(NotificationClient.class);
     private String oneMonthNotificationTemplateId = "TEMPLATE-ONE-MONTH";
@@ -41,10 +44,16 @@ public class NotifyEmailServiceTest {
 
         notifyEmailService.sendOneMonthNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK, "");
 
+        StringBuilder preservationStatementSb = new StringBuilder(128)
+                .append(PRESERVATION_STATEMENT_PREFIX)
+                .append(DateFormatterForEmailDisplay.asFormattedForEmailDateWithoutYear(EXPIRY_DATE))
+                .append(PRESERVATION_STATEMENT_SUFFIX);
+
         Map<String, String> personalisation = stubGenericPersonalisation();
         personalisation.put("mot_expiry_date", DateFormatterForEmailDisplay.asFormattedForEmailDate(EXPIRY_DATE));
         personalisation.put("is_due_or_expires", "expires");
         personalisation.put("due_or_expiry", "expiry");
+        personalisation.put("preservation_statement", preservationStatementSb.toString());
 
         verify(notificationClient, times(1)).sendEmail(
                 oneMonthNotificationTemplateId,
@@ -63,6 +72,7 @@ public class NotifyEmailServiceTest {
         personalisation.put("mot_expiry_date", DateFormatterForEmailDisplay.asFormattedForEmailDate(EXPIRY_DATE));
         personalisation.put("is_due_or_expires", "is due");
         personalisation.put("due_or_expiry", "due");
+        personalisation.put("preservation_statement", "");
 
         verify(notificationClient, times(1)).sendEmail(
                 oneMonthNotificationTemplateId,

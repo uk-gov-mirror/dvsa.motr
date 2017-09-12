@@ -16,4 +16,10 @@ public class DateFormatterForEmailDisplayTest {
         LocalDate date = LocalDate.of(2017, 7, 10);
         assertEquals("10 July 2017", DateFormatterForEmailDisplay.asFormattedForEmailDate(date));
     }
+
+    @Test
+    public void dateWithoutYearIsReturnedInTheCorrectFormat() {
+        LocalDate date = LocalDate.of(2017, 7, 10);
+        assertEquals("10 July", DateFormatterForEmailDisplay.asFormattedForEmailDateWithoutYear(date));
+    }
 }
