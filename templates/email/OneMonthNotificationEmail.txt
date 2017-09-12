@@ -6,6 +6,8 @@ MESSAGE CONTENT
 ---------------------
 ^#The MOT for ((vehicle_details)) ((is_due_or_expires)) on ((mot_expiry_ date))
 
+((preservation_statement))
+
 You can get a vehicle MOT tested up to a month (minus a day) before its ((due_or_expiry)) date and keep the same date for next year.
 
 #Is your vehicle safe?
