@@ -1,3 +1,3 @@
 MESSAGE CONTENT
 ---------------------
-MOT reminders: The MOT for ((vehicle_vrm)) is due by ((mot_expiry_date)). Book a test at an approved MOT garage. To unsubscribe reply STOP ((vehicle_vrm))
+The MOT for ((vehicle_vrm)) is due by ((mot_expiry_date)). Book a test at an approved MOT garage. To unsubscribe reply STOP ((vehicle_vrm))
