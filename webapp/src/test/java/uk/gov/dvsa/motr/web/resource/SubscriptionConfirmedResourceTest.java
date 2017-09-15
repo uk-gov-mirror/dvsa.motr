@@ -37,7 +37,7 @@ public class SubscriptionConfirmedResourceTest {
     private static final String TEST_NUMBER = "12345";
     private static final String DVLA_ID = "54321";
     private static final String MOT_TEST_NUMBER = "12345";
-    private static final String REPLY_PHONE_NUMBER = "07491163040";
+    private static final String REPLY_PHONE_NUMBER = "07491163045";
 
     public static final LocalDate DATE = LocalDate.now();
     private TemplateEngineStub engine = new TemplateEngineStub();
