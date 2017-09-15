@@ -32,7 +32,7 @@ import static java.util.Collections.emptyMap;
 @Produces("text/html")
 public class SubscriptionConfirmedResource {
 
-    private static final String REPLY_PHONE_NUMBER = "07491163040";
+    private static final String REPLY_PHONE_NUMBER = "07491163045";
 
     private final TemplateEngine renderer;
     private final DataLayerHelper dataLayerHelper;
