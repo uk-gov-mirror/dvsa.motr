@@ -11,7 +11,7 @@ import uk.gov.dvsa.motr.event.NotificationClientErrorEvent;
 import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.module.ConfigModule;
 import uk.gov.dvsa.motr.report.BouncingEmailCleanerReport;
-import uk.gov.dvsa.motr.service.UnsubscribeBouncingEmailAddressService;
+import uk.gov.dvsa.motr.service.UnsubscribeBouncingContactDetailsService;
 import uk.gov.service.notify.NotificationClientException;
 
 import javax.ws.rs.ServerErrorException;
@@ -30,7 +30,7 @@ public class MotrBouncingEmailCleanerHandler {
         Injector injector = Guice.createInjector(new ConfigModule());
 
         try {
-            return injector.getInstance(UnsubscribeBouncingEmailAddressService.class).run(request.getTimeAsDateTime());
+            return injector.getInstance(UnsubscribeBouncingContactDetailsService.class).run(request.getTimeAsDateTime());
         } catch (NotificationClientException e) {
             EventLogger.logErrorEvent(new NotificationClientErrorEvent(), e);
             throw new ServerErrorException(500);

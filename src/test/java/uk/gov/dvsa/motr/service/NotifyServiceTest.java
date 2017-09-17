@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import uk.gov.dvsa.motr.report.StatusReport;
+import uk.gov.service.notify.Notification;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
@@ -12,10 +13,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class NotifyServiceTest {
 
@@ -37,17 +40,21 @@ public class NotifyServiceTest {
     @Test
     public void testSendingOfStatusReportEmail() throws NotificationClientException {
 
-        HashMap<String, List<String>> emails = new HashMap<>();
-        emails.put(EmailMessageStatusService.PERMANENT_FAILURE_MESSAGE_STATUS, Arrays.asList(PERMANENT_FAILURE_EMAIL_ADDRESS));
-        emails.put(EmailMessageStatusService.TEMPORARY_FAILURE_MESSAGE_STATUS, Arrays.asList(TEMPORARY_FAILURE_EMAIL_ADDRESS));
-        emails.put(EmailMessageStatusService.TECHNICAL_FAILURE_MESSAGE_STATUS, Arrays.asList(TECHNICAL_FAILURE_EMAIL_ADDRESS));
+        HashMap<String, List<Notification>> notifications = new HashMap<>();
+        Notification notification = mock(Notification.class);
+        when(notification.getNotificationType()).thenReturn(NotificationStatusService.NOTIFICATION_TYPE_EMAIL);
+        when(notification.getEmailAddress()).thenReturn(Optional.of("email@email.com"));
 
-        StatusReport statusReport = new StatusReport(emails, DateTime.now());
+        notifications.put(NotificationStatusService.PERMANENT_FAILURE, Arrays.asList(notification));
+        notifications.put(NotificationStatusService.TEMPORARY_FAILURE, Arrays.asList(notification));
+        notifications.put(NotificationStatusService.TECHNICAL_FAILURE, Arrays.asList(notification));
+
+        StatusReport statusReport = new StatusReport(notifications, DateTime.now());
 
         Map<String, String> statistics = new HashMap<>();
-        statistics.put("temporary_failures", Integer.toString(statusReport.getTemporaryFailedNotifications()));
-        statistics.put("technical_failures", Integer.toString(statusReport.getTechnicalFailedNotifications()));
-        statistics.put("permanent_failures", Integer.toString(statusReport.getPermanentlyFailedNotifications()));
+        statistics.put("temporary_failures", Integer.toString(statusReport.getTemporaryFailedNotifications()) + "(email) 0(SMS) ");
+        statistics.put("technical_failures", Integer.toString(statusReport.getTechnicalFailedNotifications()) + "(email) 0(SMS) ");
+        statistics.put("permanent_failures", Integer.toString(statusReport.getPermanentlyFailedNotifications()) + "(email) 0(SMS) ");
         statistics.put("date", statusReport.getDate().minusDays(1).toLocalDate().toString());
 
         notifyService.sendStatusEmail(STATUS_REPORT_EMAIL_ADDRESS, statusReport);

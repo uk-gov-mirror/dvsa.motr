@@ -23,9 +23,18 @@ public class NotifyService {
     public SendEmailResponse sendStatusEmail(String emailAddress, StatusReport statusReport) throws NotificationClientException {
 
         Map<String, String> statistics = new HashMap<>();
-        statistics.put("temporary_failures", Integer.toString(statusReport.getTemporaryFailedNotifications()));
-        statistics.put("technical_failures", Integer.toString(statusReport.getTechnicalFailedNotifications()));
-        statistics.put("permanent_failures", Integer.toString(statusReport.getPermanentlyFailedNotifications()));
+        statistics.put("temporary_failures",
+                Integer.toString(statusReport.getTemporaryFailedNotifications()) + "(email) " +
+                Integer.toString(statusReport.getSmsTemporaryFailedNotifications()) + "(SMS) "
+        );
+        statistics.put("technical_failures",
+                Integer.toString(statusReport.getTechnicalFailedNotifications()) + "(email) " +
+                Integer.toString(statusReport.getSmsTechnicalFailedNotifications()) + "(SMS) "
+        );
+        statistics.put("permanent_failures",
+                Integer.toString(statusReport.getPermanentlyFailedNotifications()) + "(email) " +
+                Integer.toString(statusReport.getSmsPermanentlyFailedNotifications()) + "(SMS) "
+        );
         statistics.put("date", statusReport.getDate().minusDays(1).toLocalDate().toString());
 
         return notificationClient.sendEmail(this.statusReportEmailTemplateId, emailAddress, statistics, "");

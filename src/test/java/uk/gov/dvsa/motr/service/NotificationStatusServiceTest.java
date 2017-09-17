@@ -21,9 +21,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class EmailMessageStatusServiceTest {
+public class NotificationStatusServiceTest {
 
-    private static final String EMAIL_MESSAGE_TYPE = "email";
+    private static final String MESSAGE_TYPE = null;
     private static final String TEST_PERMANENT_EMAIL = "test@permanent.org";
     private static final String TEST_TEMPORARY_EMAIL = "test@temporary.org";
     private static final String TEST_TECHNICAL_EMAIL = "test@technical.org";
@@ -31,13 +31,13 @@ public class EmailMessageStatusServiceTest {
     private NotificationClient notificationClient = mock(NotificationClient.class);
     private NotificationList notificationList = mock(NotificationList.class);
     private List<Notification> listOfNotifications;
-    private Notification notificationOfPermanentFailures = mock(Notification.class);
-    private Notification notificationOfTemporaryFailures = mock(Notification.class);
-    private Notification notificationOfTechnicalFailures = mock(Notification.class);
+    private Notification notificationOfPermanentFailure = mock(Notification.class);
+    private Notification notificationOfTemporaryFailure = mock(Notification.class);
+    private Notification notificationOfTechnicalFailure = mock(Notification.class);
 
-    private EmailMessageStatusService emailMessageStatusService;
+    private NotificationStatusService notificationStatusService;
     private DateTime dateFilter;
-    private List<String> result;
+    private List<Notification> result;
 
     @Before
     public void setUp() throws NotificationClientException {
@@ -45,41 +45,45 @@ public class EmailMessageStatusServiceTest {
         dateFilter = DateTime.now();
         System.out.print(dateFilter.toLocalDate());
 
-        when(notificationOfPermanentFailures.getEmailAddress()).thenReturn(Optional.of(TEST_PERMANENT_EMAIL));
-        when(notificationOfTemporaryFailures.getEmailAddress()).thenReturn(Optional.of(TEST_TEMPORARY_EMAIL));
-        when(notificationOfTechnicalFailures.getEmailAddress()).thenReturn(Optional.of(TEST_TECHNICAL_EMAIL));
+        when(notificationOfPermanentFailure.getNotificationType()).thenReturn(NotificationStatusService.NOTIFICATION_TYPE_EMAIL);
+        when(notificationOfTemporaryFailure.getNotificationType()).thenReturn(NotificationStatusService.NOTIFICATION_TYPE_EMAIL);
+        when(notificationOfTechnicalFailure.getNotificationType()).thenReturn(NotificationStatusService.NOTIFICATION_TYPE_EMAIL);
 
-        when(notificationOfPermanentFailures.getCreatedAt()).thenReturn(dateFilter.minusDays(1));
-        when(notificationOfTemporaryFailures.getCreatedAt()).thenReturn(dateFilter.minusDays(1));
-        when(notificationOfTechnicalFailures.getCreatedAt()).thenReturn(dateFilter.minusDays(1));
+        when(notificationOfPermanentFailure.getEmailAddress()).thenReturn(Optional.of(TEST_PERMANENT_EMAIL));
+        when(notificationOfTemporaryFailure.getEmailAddress()).thenReturn(Optional.of(TEST_TEMPORARY_EMAIL));
+        when(notificationOfTechnicalFailure.getEmailAddress()).thenReturn(Optional.of(TEST_TECHNICAL_EMAIL));
 
-        when(notificationOfPermanentFailures.getStatus()).thenReturn(EmailMessageStatusService.PERMANENT_FAILURE_MESSAGE_STATUS);
-        when(notificationOfTemporaryFailures.getStatus()).thenReturn(EmailMessageStatusService.TEMPORARY_FAILURE_MESSAGE_STATUS);
-        when(notificationOfTechnicalFailures.getStatus()).thenReturn(EmailMessageStatusService.TECHNICAL_FAILURE_MESSAGE_STATUS);
+        when(notificationOfPermanentFailure.getCreatedAt()).thenReturn(dateFilter.minusDays(1));
+        when(notificationOfTemporaryFailure.getCreatedAt()).thenReturn(dateFilter.minusDays(1));
+        when(notificationOfTechnicalFailure.getCreatedAt()).thenReturn(dateFilter.minusDays(1));
+
+        when(notificationOfPermanentFailure.getStatus()).thenReturn(NotificationStatusService.PERMANENT_FAILURE);
+        when(notificationOfTemporaryFailure.getStatus()).thenReturn(NotificationStatusService.TEMPORARY_FAILURE);
+        when(notificationOfTechnicalFailure.getStatus()).thenReturn(NotificationStatusService.TECHNICAL_FAILURE);
 
         when(notificationList.getNextPageLink()).thenReturn(Optional.ofNullable(null));
 
-        emailMessageStatusService = new EmailMessageStatusService(notificationClient);
+        notificationStatusService = new NotificationStatusService(notificationClient);
     }
 
     @Test
     public void testGetPermanentlyFailingNotifications() throws NotificationClientException {
 
         listOfNotifications = Arrays.asList(
-                notificationOfPermanentFailures, notificationOfPermanentFailures, notificationOfPermanentFailures
+                notificationOfPermanentFailure, notificationOfPermanentFailure, notificationOfPermanentFailure
         );
 
         when(notificationClient.getNotifications(any(), any(), any(), any())).thenReturn(notificationList);
         when(notificationList.getNotifications()).thenReturn(listOfNotifications);
 
-        result = emailMessageStatusService.getEmailAddressesAssociatedWithNotifications(
-                EmailMessageStatusService.PERMANENT_FAILURE_MESSAGE_STATUS, dateFilter);
+        result = notificationStatusService.getFilteredNotifications(
+                NotificationStatusService.PERMANENT_FAILURE, dateFilter);
 
         assertEquals("size is not equal to 3", 3, result.size());
 
         verify(notificationClient, times(1)).getNotifications(
-                EmailMessageStatusService.PERMANENT_FAILURE_MESSAGE_STATUS,
-                EMAIL_MESSAGE_TYPE,
+                NotificationStatusService.PERMANENT_FAILURE,
+                MESSAGE_TYPE,
                 null,
                 null
         );
@@ -89,20 +93,20 @@ public class EmailMessageStatusServiceTest {
     public void testGetTemporaryFailingNotifications() throws NotificationClientException {
 
         listOfNotifications = Arrays.asList(
-                notificationOfTemporaryFailures, notificationOfTemporaryFailures
+                notificationOfTemporaryFailure, notificationOfTemporaryFailure
         );
 
         when(notificationClient.getNotifications(any(), any(), any(), any())).thenReturn(notificationList);
         when(notificationList.getNotifications()).thenReturn(listOfNotifications);
 
-        result = emailMessageStatusService.getEmailAddressesAssociatedWithNotifications(
-                EmailMessageStatusService.TEMPORARY_FAILURE_MESSAGE_STATUS, dateFilter);
+        result = notificationStatusService.getFilteredNotifications(
+                NotificationStatusService.TEMPORARY_FAILURE, dateFilter);
 
         assertEquals("size is not equal to 2", 2, result.size());
 
         verify(notificationClient, times(1)).getNotifications(
-                EmailMessageStatusService.TEMPORARY_FAILURE_MESSAGE_STATUS,
-                EMAIL_MESSAGE_TYPE,
+                NotificationStatusService.TEMPORARY_FAILURE,
+                MESSAGE_TYPE,
                 null,
                 null
         );
@@ -116,14 +120,14 @@ public class EmailMessageStatusServiceTest {
         when(notificationClient.getNotifications(any(), any(), any(), any())).thenReturn(notificationList);
         when(notificationList.getNotifications()).thenReturn(listOfNotifications);
 
-        result = emailMessageStatusService.getEmailAddressesAssociatedWithNotifications(
-                EmailMessageStatusService.TECHNICAL_FAILURE_MESSAGE_STATUS, dateFilter);
+        result = notificationStatusService.getFilteredNotifications(
+                NotificationStatusService.TECHNICAL_FAILURE, dateFilter);
 
         assertEquals("size is not equal to 0", 0, result.size());
 
         verify(notificationClient, times(1)).getNotifications(
-                EmailMessageStatusService.TECHNICAL_FAILURE_MESSAGE_STATUS,
-                EMAIL_MESSAGE_TYPE,
+                NotificationStatusService.TECHNICAL_FAILURE,
+                MESSAGE_TYPE,
                 null,
                 null
         );
@@ -137,7 +141,7 @@ public class EmailMessageStatusServiceTest {
         listOfNotifications = new ArrayList<>();
 
         for (int i = 0; i < 400; i++) {
-            listOfNotifications.add(notificationOfPermanentFailures);
+            listOfNotifications.add(notificationOfPermanentFailure);
         }
 
         when(notificationClient.getNotifications(any(), any(), any(), any())).thenReturn(notificationList);
@@ -148,14 +152,14 @@ public class EmailMessageStatusServiceTest {
                 listOfNotifications.subList(250,400)
         );
 
-        result = emailMessageStatusService.getEmailAddressesAssociatedWithNotifications(
-                EmailMessageStatusService.PERMANENT_FAILURE_MESSAGE_STATUS, dateFilter);
+        result = notificationStatusService.getFilteredNotifications(
+                NotificationStatusService.PERMANENT_FAILURE, dateFilter);
 
         assertEquals("size is not equal to 400", 400, result.size());
 
         verify(notificationClient, times(2)).getNotifications(
-                EmailMessageStatusService.PERMANENT_FAILURE_MESSAGE_STATUS,
-                EMAIL_MESSAGE_TYPE,
+                NotificationStatusService.PERMANENT_FAILURE,
+                MESSAGE_TYPE,
                 null,
                 null
         );
