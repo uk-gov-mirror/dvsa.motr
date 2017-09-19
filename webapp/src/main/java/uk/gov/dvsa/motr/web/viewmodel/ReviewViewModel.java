@@ -1,5 +1,7 @@
 package uk.gov.dvsa.motr.web.viewmodel;
 
+import com.amazonaws.util.StringUtils;
+
 import uk.gov.dvsa.motr.web.formatting.DateFormatter;
 
 import java.time.LocalDate;
@@ -8,13 +10,14 @@ public class ReviewViewModel {
 
     private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(ReviewViewModel.class);
 
-    private static String UNKNOWN_STRING = "Unknown";
+    private static String UNKNOWN_STRING = "UNKNOWN";
 
     private String registration;
     private String contact;
     private String contactType;
     private String make;
     private String model;
+    private String makeInfull;
     private String colour;
     private String yearOfManufacture;
     private LocalDate expiryDate;
@@ -118,7 +121,14 @@ public class ReviewViewModel {
 
     public String getMake() {
 
-        return make.toUpperCase();
+        if (useMakeInFull()) {
+            return makeInfull.toUpperCase();
+        }
+        if (!StringUtils.isNullOrEmpty(make)) {
+            return make.toUpperCase();
+        }
+
+        return UNKNOWN_STRING;
     }
 
     public ReviewViewModel setMake(String make) {
@@ -129,16 +139,42 @@ public class ReviewViewModel {
 
     public String getModel() {
 
-        if (model == null || "".equals(model)) {
-            return UNKNOWN_STRING;
+        if (useMakeInFull()) {
+            return "";
         }
-        return model.toUpperCase();
+
+        if (!StringUtils.isNullOrEmpty(model)) {
+            return model.toUpperCase();
+        }
+        return UNKNOWN_STRING;
     }
 
     public ReviewViewModel setModel(String model) {
 
         this.model = model;
         return this;
+    }
+
+    public String getMakeInfull() {
+
+        return makeInfull.toUpperCase();
+    }
+
+    public ReviewViewModel setMakeInFull(String makeInFull) {
+
+        this.makeInfull = makeInFull;
+        return this;
+    }
+
+    private boolean useMakeInFull() {
+
+        if (
+                (StringUtils.isNullOrEmpty(make) || make.equalsIgnoreCase(UNKNOWN_STRING))
+                && (StringUtils.isNullOrEmpty(model) || model.equalsIgnoreCase(UNKNOWN_STRING))
+                && !StringUtils.isNullOrEmpty(makeInfull)) {
+            return true;
+        }
+        return false;
     }
 
 }
