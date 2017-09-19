@@ -52,7 +52,6 @@ public class NotifyEmailServiceTest {
         Map<String, String> personalisation = stubGenericPersonalisation();
         personalisation.put("mot_expiry_date", DateFormatterForEmailDisplay.asFormattedForEmailDate(EXPIRY_DATE));
         personalisation.put("is_due_or_expires", "expires");
-        personalisation.put("due_or_expiry", "expiry");
         personalisation.put("preservation_statement", preservationStatementSb.toString());
 
         verify(notificationClient, times(1)).sendEmail(
@@ -71,7 +70,6 @@ public class NotifyEmailServiceTest {
         Map<String, String> personalisation = stubGenericPersonalisation();
         personalisation.put("mot_expiry_date", DateFormatterForEmailDisplay.asFormattedForEmailDate(EXPIRY_DATE));
         personalisation.put("is_due_or_expires", "is due");
-        personalisation.put("due_or_expiry", "due");
         personalisation.put("preservation_statement", "");
 
         verify(notificationClient, times(1)).sendEmail(
