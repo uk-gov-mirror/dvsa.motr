@@ -8,7 +8,7 @@ MESSAGE CONTENT
 
 Book in for a test now at an approved MOT test centre. Find out about getting your MOT at https://www.gov.uk/getting-an-mot
 
-#DVSA (Driver and Vehicle Standards Agency)
+DVSA (Driver and Vehicle Standards Agency)
 
-Unsubscribe from MOT reminders: 
+Unsubscribe from MOT reminders:
 ((unsubscribe_link))

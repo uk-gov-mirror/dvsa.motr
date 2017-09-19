@@ -8,4 +8,4 @@ Click to activate your MOT reminder:
 
 ((confirmation_link))
 
-#DVSA (Driver and Vehicle Standards Agency)
+DVSA (Driver and Vehicle Standards Agency)

@@ -14,7 +14,7 @@ You can get a vehicle MOT tested up to a month (minus a day) before its ((due_or
 
 Check if a vehicle or part has been recalled because of a safety fault at https://www.gov.uk/check-if-a-vehicle-has-been-recalled
 
-#DVSA (Driver and Vehicle Standards Agency)
+DVSA (Driver and Vehicle Standards Agency)
 
-Unsubscribe from MOT reminders: 
+Unsubscribe from MOT reminders:
 ((unsubscribe_link))
