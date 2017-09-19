@@ -234,6 +234,43 @@ public class SmsConfirmationServiceTest {
         assertEquals(CODE_NOT_VALID_MAX_ATTEMPTS_REACHED.name(), confirmation.name());
     }
 
+    @Test
+    public void whenCodeIsValidButMaxAttemptsPreviouslyReached_thenCodeNotValidMaxAttemptsReachedResponseIsReturned()
+            throws InvalidConfirmationIdException {
+
+        SmsConfirmation existingConfirmation = new SmsConfirmation();
+        existingConfirmation.setAttempts(3);
+        existingConfirmation.setLatestResendAttempt(LocalDateTime.now());
+        existingConfirmation.setCode(CONFIRMATION_CODE);
+        existingConfirmation.setConfirmationId(CONFIRMATION_ID);
+        existingConfirmation.setPhoneNumber(MOBILE);
+        existingConfirmation.setVrm(TEST_VRM);
+        when(smsConfirmationRepository.findByConfirmationId(CONFIRMATION_ID)).thenReturn(Optional.of(existingConfirmation));
+
+        SmsConfirmationService.Confirmation confirmation =
+                this.smsConfirmationService.verifySmsConfirmationCode(TEST_VRM, MOBILE, CONFIRMATION_ID, CONFIRMATION_CODE);
+
+        assertEquals(CODE_NOT_VALID_MAX_ATTEMPTS_REACHED, confirmation);
+    }
+
+    @Test
+    public void whenCodeIsValidAndMaxAttemptsNotReached_thenCodeValidResponseIsReturned() throws InvalidConfirmationIdException {
+
+        SmsConfirmation existingConfirmation = new SmsConfirmation();
+        existingConfirmation.setAttempts(2);
+        existingConfirmation.setLatestResendAttempt(LocalDateTime.now());
+        existingConfirmation.setCode(CONFIRMATION_CODE);
+        existingConfirmation.setConfirmationId(CONFIRMATION_ID);
+        existingConfirmation.setPhoneNumber(MOBILE);
+        existingConfirmation.setVrm(TEST_VRM);
+        when(smsConfirmationRepository.findByConfirmationId(CONFIRMATION_ID)).thenReturn(Optional.of(existingConfirmation));
+
+        SmsConfirmationService.Confirmation confirmation =
+                this.smsConfirmationService.verifySmsConfirmationCode(TEST_VRM, MOBILE, CONFIRMATION_ID, CONFIRMATION_CODE);
+
+        assertEquals(CODE_VALID, confirmation);
+    }
+
     private void withExpectedSmsConfirmation(Optional<SmsConfirmation> smsConfirmation) {
 
         when(smsConfirmationRepository.findByConfirmationId(CONFIRMATION_ID)).thenReturn(smsConfirmation);
