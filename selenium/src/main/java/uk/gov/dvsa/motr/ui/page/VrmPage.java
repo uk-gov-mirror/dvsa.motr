@@ -17,13 +17,13 @@ public class VrmPage extends Page {
     @Override
     protected String getContentHeader() {
 
-        return "What is the vehicle's registration number?";
+        return "What is the vehicle’s registration number?";
     }
 
     @Override
     protected String getPageTitle() {
 
-        return "What is the vehicle's registration number? – MOT reminders";
+        return "What is the vehicle’s registration number? – MOT reminders";
     }
 
     public EmailPage enterVrm(String vrm){
