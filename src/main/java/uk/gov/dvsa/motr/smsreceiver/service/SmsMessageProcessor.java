@@ -66,6 +66,7 @@ public class SmsMessageProcessor {
             if (!smsMessageValidator.messageHasSufficientDetails(smsMessage)) {
                 String errorMessage = String.format(ERROR_MESSAGE, messageBody);
                 EventLogger.logEvent(new UnableToProcessMessageEvent().setReason(errorMessage));
+                return;
             }
 
             String vrm = messageExtractor.getVrmFromMesageBody(messageBody).replaceAll("\\s+", "").toUpperCase();
