@@ -11,10 +11,13 @@ import com.amazonaws.services.dynamodbv2.document.QueryOutcome;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
 import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
+import com.amazonaws.services.dynamodbv2.model.AmazonDynamoDBException;
 
+import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.web.component.subscription.model.PendingSubscription;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
+import uk.gov.dvsa.motr.web.eventlog.subscription.PendingSubscriptionDeletionFailedEvent;
 import uk.gov.dvsa.motr.web.helper.SystemVariableParam;
 
 import java.time.LocalDate;
@@ -119,12 +122,22 @@ public class DynamoDbPendingSubscriptionRepository implements PendingSubscriptio
         Map<String, Object> expressionAttributeValues = new HashMap<>();
         expressionAttributeValues.put(":id", subscription.getConfirmationId());
 
-        dynamoDb.getTable(tableName).deleteItem(
-                key,
-                "id = :id",
-                null,
-                expressionAttributeValues
-        );
+        try {
+            dynamoDb.getTable(tableName).deleteItem(
+                    key,
+                    "id = :id",
+                    null,
+                    expressionAttributeValues
+            );
+        } catch (AmazonDynamoDBException e) {
+            EventLogger.logEvent(new PendingSubscriptionDeletionFailedEvent()
+                    .setConfirmationId(subscription.getConfirmationId())
+                    .setVrm(subscription.getVrm())
+                    .setContact(subscription.getContact())
+                    .setMessage(e.getMessage())
+                    .setErrorMessage(e.getErrorMessage()));
+            throw e;
+        }
     }
 
     private PendingSubscription mapItemToPendingSubscription(Item item) {
