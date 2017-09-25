@@ -79,6 +79,7 @@ public class VrmResourceTest {
         assertEquals("vrm", templateEngine.getTemplate());
 
         HashMap<String, Object> expectedContext = new HashMap<>();
+        expectedContext.put("inputFieldId", "reg-number-input");
         expectedContext.put("message", VrmValidator.REGISTRATION_CAN_ONLY_CONTAIN_LETTERS_NUMBERS_AND_HYPHENS_MESSAGE);
         expectedContext.put("back_url", "/");
         expectedContext.put("vrm", INVALID_REG_NUMBER);
@@ -101,6 +102,7 @@ public class VrmResourceTest {
         assertEquals("vrm", templateEngine.getTemplate());
 
         HashMap<String, Object> expectedContext = new HashMap<>();
+        expectedContext.put("inputFieldId", "reg-number-input");
         expectedContext.put("back_url", "/");
         expectedContext.put("vrm", SYSTEM_ERROR_VRM);
         expectedContext.put("continue_button_text", "Continue");
@@ -120,6 +122,7 @@ public class VrmResourceTest {
         resource.vrmPagePost(VALID_REG_NUMBER, HONEY_POT);
 
         HashMap<String, Object> expectedContext = new HashMap<>();
+        expectedContext.put("inputFieldId", "reg-number-input");
         expectedContext.put("message", "Check that you've typed in the correct registration number.<br/>" +
                 "<br/>You can only sign up if the vehicle has a current MOT.");
         expectedContext.put("back_url", "/");
@@ -143,6 +146,7 @@ public class VrmResourceTest {
         resource.vrmPagePost(VALID_REG_NUMBER, HONEY_POT);
 
         HashMap<String, Object> expectedContext = new HashMap<>();
+        expectedContext.put("inputFieldId", "reg-number-input");
         expectedContext.put("message", "Check that you've typed in the correct registration number.<br/>" +
                 "<br/>You can only sign up if the vehicle has a current MOT.");
         expectedContext.put("back_url", "/");

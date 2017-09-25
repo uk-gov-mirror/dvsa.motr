@@ -28,6 +28,8 @@ public class EmailResource {
     private static final String EMAIL_MODEL_KEY = "email";
     private static final String EMAIL_TEMPLATE_NAME = "email";
     private static final String MESSAGE_MODEL_KEY = "message";
+    private static final String INPUT_FIELD_ID = "email-input";
+    private static final String INPUT_FIELD_ID_MODEL_KEY = "inputFieldId";
 
     private final TemplateEngine renderer;
     private final MotrSession motrSession;
@@ -94,6 +96,7 @@ public class EmailResource {
                 motrSession.visitingFromReviewPage());
 
         modelMap.put(EMAIL_MODEL_KEY, email);
+        modelMap.put(INPUT_FIELD_ID_MODEL_KEY, INPUT_FIELD_ID);
         modelMap.putAll(dataLayerHelper.formatAttributes());
         dataLayerHelper.clear();
 

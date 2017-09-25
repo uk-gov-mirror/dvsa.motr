@@ -16,9 +16,9 @@
                 {{> partial/system-error }}
             {{/showSystemError}}
 
-            <form method="POST" autocomplete="off" novalidate="">
+            <form method="POST" autocomplete="off" novalidate="" action="confirm-phone">
 
-                <div class="form-group {{#showInLine}}{{#message}}form-group-error{{/message}}{{/showInLine}}">
+                <div class="form-group {{#showInLine}}{{#message}}form-group-error{{/message}}{{/showInLine}}" id="confirm-code-input">
                     <label for="confirmationCode" class="form-label">
                         Code from text message
                         {{#showInLine}}

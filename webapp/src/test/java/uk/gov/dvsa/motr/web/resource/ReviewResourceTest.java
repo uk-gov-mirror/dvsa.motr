@@ -214,6 +214,7 @@ public class ReviewResourceTest {
         VehicleDetails vehicleDetails = new VehicleDetails();
         vehicleDetails.setMake("make");
         vehicleDetails.setModel("model");
+        vehicleDetails.setMakeInFull("makeInFull");
         vehicleDetails.setYearOfManufacture(2000);
         vehicleDetails.setMotExpiryDate(LocalDate.now());
         vehicleDetails.setMotTestNumber(TEST_MOT_TEST_NUMBER);

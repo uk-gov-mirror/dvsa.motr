@@ -29,6 +29,8 @@ public class PhoneNumberResource {
     private static final String PHONE_NUMBER_MODEL_KEY = "phoneNumber";
     private static final String MESSAGE_MODEL_KEY = "message";
     private static final String MESSAGE_AT_FIELD_MODEL_KEY = "messageAtField";
+    private static final String INPUT_FIELD_ID = "phone-number-input";
+    private static final String INPUT_FIELD_ID_MODEL_KEY = "inputFieldId";
 
     private final TemplateEngine renderer;
     private final MotrSession motrSession;
@@ -91,6 +93,7 @@ public class PhoneNumberResource {
                 motrSession.visitingFromReviewPage());
 
         modelMap.put(PHONE_NUMBER_MODEL_KEY, phoneNumber);
+        modelMap.put(INPUT_FIELD_ID_MODEL_KEY, INPUT_FIELD_ID);
         modelMap.putAll(dataLayerHelper.formatAttributes());
         dataLayerHelper.clear();
 
