@@ -10,40 +10,39 @@ import uk.gov.service.notify.NotificationList;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EmailMessageStatusService {
+public class NotificationStatusService {
 
-    public static final String PERMANENT_FAILURE_MESSAGE_STATUS = "permanent-failure";
-    public static final String TEMPORARY_FAILURE_MESSAGE_STATUS = "temporary-failure";
-    public static final String TECHNICAL_FAILURE_MESSAGE_STATUS = "technical-failure";
-    public static final String EMAIL_MESSAGE_TYPE = "email";
+    public static final String PERMANENT_FAILURE = "permanent-failure";
+    public static final String TEMPORARY_FAILURE = "temporary-failure";
+    public static final String TECHNICAL_FAILURE = "technical-failure";
+    public static final String NOTIFICATION_TYPE_EMAIL = "email";
+    public static final String NOTIFICATION_TYPE_SMS = "sms";
+    public static final String NOTIFICATION_TYPE_ALL = null;
+
+
 
     private NotificationClient notificationClient;
 
-    public EmailMessageStatusService(NotificationClient notificationClient) {
+    public NotificationStatusService(NotificationClient notificationClient) {
 
         this.notificationClient = notificationClient;
     }
 
-    /**
-     * @return a list of emails given a specified status
-     *
-     * @throws NotificationClientException upon an error in GOV.UK's NotificationClient.
-     */
-    public List<String> getEmailAddressesAssociatedWithNotifications(String status, DateTime notificationDateFilter)
+    public List<Notification> getFilteredNotifications(String status, DateTime notificationDateFilter)
             throws NotificationClientException {
 
-        List<String> emails = new ArrayList<>();
+        List<Notification> notifications = new ArrayList<>();
 
-        for (Notification notification : this.getNotifications(status)) {
+        for (Notification notification : this.getNotifications(status, NOTIFICATION_TYPE_ALL)) {
 
-            if (notification.getEmailAddress().isPresent()
+            String notificationType = notification.getNotificationType();
+            if ((notificationType.equals(NOTIFICATION_TYPE_EMAIL) || notificationType.equals(NOTIFICATION_TYPE_SMS))
                     && notification.getCreatedAt().toLocalDate().equals(notificationDateFilter.minusDays(1).toLocalDate())) {
 
-                emails.add(notification.getEmailAddress().get());
+                notifications.add(notification);
             }
         }
-
-        return emails;
+        return notifications;
     }
 
     /**
@@ -51,7 +50,7 @@ public class EmailMessageStatusService {
      *
      * @throws NotificationClientException upon an error in GOV.UK's NotificationClient.
      */
-    private List<Notification> getNotifications(String status) throws NotificationClientException {
+    private List<Notification> getNotifications(String status, String notifcationType) throws NotificationClientException {
 
         List<Notification> result = new ArrayList<>();
         NotificationList page = null;
@@ -64,7 +63,7 @@ public class EmailMessageStatusService {
                 olderThanId = page.getNotifications().get(page.getNotifications().size() - 1).getId().toString();
             }
 
-            page = notificationClient.getNotifications(status, EMAIL_MESSAGE_TYPE, null, olderThanId);
+            page = notificationClient.getNotifications(status, notifcationType, null, olderThanId);
 
             result.addAll(page.getNotifications());
 

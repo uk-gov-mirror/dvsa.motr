@@ -15,10 +15,10 @@ import uk.gov.dvsa.motr.encryption.AwsKmsDecryptor;
 import uk.gov.dvsa.motr.encryption.Decryptor;
 import uk.gov.dvsa.motr.persistence.repository.CancelledSubscriptionRepository;
 import uk.gov.dvsa.motr.persistence.repository.SubscriptionRepository;
-import uk.gov.dvsa.motr.service.EmailMessageStatusService;
+import uk.gov.dvsa.motr.service.NotificationStatusService;
 import uk.gov.dvsa.motr.service.NotifyService;
 import uk.gov.dvsa.motr.service.SendStatusReportService;
-import uk.gov.dvsa.motr.service.UnsubscribeBouncingEmailAddressService;
+import uk.gov.dvsa.motr.service.UnsubscribeBouncingContactDetailsService;
 import uk.gov.service.notify.NotificationClient;
 
 import java.util.Arrays;
@@ -59,12 +59,12 @@ public class ConfigModule extends AbstractModule {
     }
 
     @Provides
-    public EmailMessageStatusService provideEmailMessageStatusService(Config config) {
+    public NotificationStatusService provideEmailMessageStatusService(Config config) {
 
         String apiKey = config.getValue(SystemVariable.GOV_NOTIFY_API_TOKEN);
         NotificationClient client = new NotificationClient(apiKey);
 
-        return new EmailMessageStatusService(client);
+        return new NotificationStatusService(client);
     }
 
     @Provides
@@ -80,15 +80,15 @@ public class ConfigModule extends AbstractModule {
     }
 
     @Provides
-    public UnsubscribeBouncingEmailAddressService provideUnsubscribeBouncingEmailAddressService(
+    public UnsubscribeBouncingContactDetailsService provideUnsubscribeBouncingEmailAddressService(
             SubscriptionRepository subscriptionRepository,
             CancelledSubscriptionRepository cancelledSubscriptionRepository,
-            EmailMessageStatusService emailMessageStatusService,
+            NotificationStatusService notificationStatusService,
             Config config) {
 
-        return new UnsubscribeBouncingEmailAddressService(subscriptionRepository,
+        return new UnsubscribeBouncingContactDetailsService(subscriptionRepository,
                 cancelledSubscriptionRepository,
-                emailMessageStatusService, provideSendStatusReportService(config));
+                notificationStatusService, provideSendStatusReportService(config));
     }
 
     @Provides

@@ -8,58 +8,64 @@ import uk.gov.dvsa.motr.persistence.entity.SubscriptionDbItem;
 import uk.gov.dvsa.motr.persistence.repository.CancelledSubscriptionRepository;
 import uk.gov.dvsa.motr.persistence.repository.SubscriptionRepository;
 import uk.gov.dvsa.motr.report.BouncingEmailCleanerReport;
+import uk.gov.service.notify.Notification;
 import uk.gov.service.notify.NotificationClientException;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class UnsubscribeBouncingEmailAddressServiceTest {
+public class UnsubscribeBouncingContactDetailsServiceTest {
 
     private SubscriptionRepository subscriptionRepository = mock(SubscriptionRepository.class);
     private CancelledSubscriptionRepository cancelledSubscriptionRepository = mock(CancelledSubscriptionRepository.class);
-    private EmailMessageStatusService emailMessageStatusService = mock(EmailMessageStatusService.class);
+    private NotificationStatusService notificationStatusService = mock(NotificationStatusService.class);
     private SubscriptionDbItem subscriptionDbItem = mock(SubscriptionDbItem.class);
     private SendStatusReportService sendStatusReportService = mock(SendStatusReportService.class);
-
-    private List<String> emailList;
     private DateTime dateFilter;
 
-    private UnsubscribeBouncingEmailAddressService unsubscribeBouncingEmailAddressService;
+    private UnsubscribeBouncingContactDetailsService unsubscribeBouncingContactDetailsService;
 
     @Before
     public void setUp() throws NotificationClientException {
-        unsubscribeBouncingEmailAddressService = new UnsubscribeBouncingEmailAddressService(
+
+        unsubscribeBouncingContactDetailsService = new UnsubscribeBouncingContactDetailsService(
                 subscriptionRepository,
                 cancelledSubscriptionRepository,
-                emailMessageStatusService,
+                notificationStatusService,
                 sendStatusReportService
         );
 
-        emailList = Arrays.asList("test@example.org", "test2@example.org", "test3@example.org");
+        Notification notification = mock(Notification.class);
+        when(notification.getEmailAddress()).thenReturn(Optional.of("email@email.com"));
+        when(notification.getNotificationType()).thenReturn(NotificationStatusService.NOTIFICATION_TYPE_EMAIL);
+
+        List<Notification> notifications = Arrays.asList(notification, notification, notification);
+
         dateFilter = DateTime.now();
 
         List<SubscriptionDbItem> subscriptionDbItemList = Arrays.asList(subscriptionDbItem, subscriptionDbItem, subscriptionDbItem);
-        when(emailMessageStatusService.getEmailAddressesAssociatedWithNotifications(
-                EmailMessageStatusService.PERMANENT_FAILURE_MESSAGE_STATUS, dateFilter)).thenReturn(emailList);
-        when(subscriptionRepository.findByEmails(emailList)).thenReturn(subscriptionDbItemList);
+
+        when(notificationStatusService.getFilteredNotifications(any(), eq(dateFilter))).thenReturn(notifications);
+
+        when(subscriptionRepository.findByEmails(any())).thenReturn(subscriptionDbItemList);
     }
 
     @Test
     public void testUnsubscribeBouncingEmailAddresses() throws NotificationClientException {
 
-        BouncingEmailCleanerReport result = unsubscribeBouncingEmailAddressService.run(dateFilter);
+        BouncingEmailCleanerReport result = unsubscribeBouncingContactDetailsService.run(dateFilter);
 
-        verify(subscriptionRepository, times(
-                emailList.size())).deleteRecord(any());
-        verify(cancelledSubscriptionRepository, times(
-                emailList.size())).cancelSubscription(subscriptionDbItem);
+        verify(subscriptionRepository, times(3)).deleteRecord(any());
+        verify(cancelledSubscriptionRepository, times(3)).cancelSubscription(subscriptionDbItem);
 
         assertEquals(3, result.getNumberOfSubscriptionsSuccessfullyCancelled());
     }

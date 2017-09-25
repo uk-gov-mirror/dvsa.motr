@@ -72,7 +72,7 @@ public class PerfAspect {
         return response;
     }
 
-    @Around("execution(* uk.gov.dvsa.motr.service.UnsubscribeBouncingEmailAddressService.run(..))")
+    @Around("execution(* uk.gov.dvsa.motr.service.UnsubscribeBouncingContactDetailsService.run(..))")
     public Object runMetrics(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
 
         BouncingEmailCleanerReport response;
