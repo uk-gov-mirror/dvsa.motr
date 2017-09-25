@@ -43,7 +43,6 @@ public class NotifyEmailService {
 
         if (!StringUtils.isNullOrEmpty(dvlaId)) {
             personalisation.put("is_due_or_expires", "is due");
-            personalisation.put("due_or_expiry", "due");
             personalisation.put("preservation_statement", "");
         } else {
             StringBuilder preservationStatementSb = new StringBuilder(128)
@@ -52,7 +51,6 @@ public class NotifyEmailService {
                     .append(PRESERVATION_STATEMENT_SUFFIX);
 
             personalisation.put("is_due_or_expires", "expires");
-            personalisation.put("due_or_expiry", "expiry");
             personalisation.put("preservation_statement", preservationStatementSb.toString());
         }
 
