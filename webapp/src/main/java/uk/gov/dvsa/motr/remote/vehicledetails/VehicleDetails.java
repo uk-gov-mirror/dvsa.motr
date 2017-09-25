@@ -17,6 +17,9 @@ public class VehicleDetails implements Serializable {
     @JsonProperty("model")
     private String model;
 
+    @JsonProperty("makeInFull")
+    private String makeInFull;
+
     @JsonProperty("primaryColour")
     private String primaryColour;
 
@@ -60,6 +63,16 @@ public class VehicleDetails implements Serializable {
     public void setModel(String model) {
 
         this.model = model;
+    }
+
+    public void setMakeInFull(String makeInFull) {
+
+        this.makeInFull = makeInFull;
+    }
+
+    public String getMakeInFull() {
+
+        return this.makeInFull;
     }
 
     public String getPrimaryColour() {
@@ -148,6 +161,7 @@ public class VehicleDetails implements Serializable {
                 ", motExpiryDate=" + motExpiryDate +
                 ", motTestNumber='" + motTestNumber + '\'' +
                 ", dvlaId='" + dvlaId + '\'' +
+                ", makeInFull='" + makeInFull + '\'' +
                 '}';
     }
 }
