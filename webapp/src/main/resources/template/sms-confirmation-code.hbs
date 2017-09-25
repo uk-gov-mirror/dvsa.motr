@@ -4,10 +4,6 @@
 
         <div class="column-two-thirds">
 
-            <h1 class="heading-xlarge">One more step</h1>
-
-            <p>We sent you a text message with a 6-digit code. Enter the code below to activate your reminder.</p>
-
             {{#message}}
                 {{> partial/error-message }}
             {{/message}}
@@ -15,6 +11,10 @@
             {{#showSystemError}}
                 {{> partial/system-error }}
             {{/showSystemError}}
+
+            <h1 class="heading-large">One more step</h1>
+
+            <p>We sent you a text message with a 6-digit code. Enter the code below to activate your reminder.</p>
 
             <form method="POST" autocomplete="off" novalidate="" action="confirm-phone">
 
