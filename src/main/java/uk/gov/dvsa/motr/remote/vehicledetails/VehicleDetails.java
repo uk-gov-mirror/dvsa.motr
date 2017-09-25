@@ -16,6 +16,9 @@ public class VehicleDetails {
     @JsonProperty("model")
     private String model;
 
+    @JsonProperty("makeInFull")
+    private String makeInFull;
+
     @JsonProperty("primaryColour")
     private String primaryColour;
 
@@ -61,6 +64,15 @@ public class VehicleDetails {
 
         this.model = model;
         return this;
+    }
+
+    public void setMakeInFull(String makeInFull) {
+
+        this.makeInFull = makeInFull;
+    }
+
+    public String getMakeInFull() {
+        return this.makeInFull;
     }
 
     public String getPrimaryColour() {
@@ -142,7 +154,6 @@ public class VehicleDetails {
 
     @Override
     public String toString() {
-
         return "VehicleDetails{" +
                 "make='" + make + '\'' +
                 ", model='" + model + '\'' +
@@ -153,6 +164,7 @@ public class VehicleDetails {
                 ", motExpiryDate=" + motExpiryDate +
                 ", motTestNumber='" + motTestNumber + '\'' +
                 ", dvlaId='" + dvlaId + '\'' +
+                ", makeInFull='" + makeInFull + '\'' +
                 '}';
     }
 }
