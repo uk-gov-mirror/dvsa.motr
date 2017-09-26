@@ -34,6 +34,8 @@ public class SmsConfirmationCodeResource {
     private static final String CONFIRMATION_CODE_MODEL_KEY = "confirmationCode";
     private static final String MESSAGE_MODEL_KEY = "message";
     private static final String MESSAGE_AT_FIELD_MODEL_KEY = "messageAtField";
+    private static final String INPUT_FIELD_ID = "confirm-code-input";
+    private static final String INPUT_FIELD_ID_MODEL_KEY = "inputFieldId";
 
     private final TemplateEngine renderer;
     private final MotrSession motrSession;
@@ -73,6 +75,7 @@ public class SmsConfirmationCodeResource {
             modelMap.put(MESSAGE_MODEL_KEY, SmsConfirmationCodeValidator.CODE_ALREADY_RESENT);
             modelMap.put(MESSAGE_AT_FIELD_MODEL_KEY, false);
             modelMap.put("showInLIne", false);
+            modelMap.put(INPUT_FIELD_ID_MODEL_KEY, INPUT_FIELD_ID);
             dataLayerHelper.putAttribute(ERROR_KEY, SmsConfirmationCodeValidator.CODE_ALREADY_RESENT);
             modelMap.putAll(dataLayerHelper.formatAttributes());
             dataLayerHelper.clear();
@@ -128,7 +131,8 @@ public class SmsConfirmationCodeResource {
         modelMap.put(CONFIRMATION_CODE_MODEL_KEY, confirmationCode);
         modelMap.put("continue_button_text", "Continue");
         modelMap.put("resendUrl", "resend");
-        modelMap.put("showInLIne", showInLine);
+        modelMap.put("showInLine", showInLine);
+        modelMap.put(INPUT_FIELD_ID_MODEL_KEY, INPUT_FIELD_ID);
         modelMap.putAll(dataLayerHelper.formatAttributes());
         dataLayerHelper.clear();
 

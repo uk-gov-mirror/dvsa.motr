@@ -42,6 +42,8 @@ public class VrmResource {
     private static final String SHOW_INLINE_KEY = "showInLine";
     private static final String VRM_TEMPLATE_NAME = "vrm";
     private static final String SHOW_SYSTEM_ERROR = "showSystemError";
+    private static final String INPUT_FIELD_ID = "reg-number-input";
+    private static final String INPUT_FIELD_ID_MODEL_KEY = "inputFieldId";
 
     private final TemplateEngine renderer;
     private final VehicleDetailsClient client;
@@ -123,6 +125,7 @@ public class VrmResource {
         }
 
         modelMap.put(VRM_MODEL_KEY, vrm);
+        modelMap.put(INPUT_FIELD_ID_MODEL_KEY, INPUT_FIELD_ID);
         modelMap.putAll(dataLayerHelper.formatAttributes());
         dataLayerHelper.clear();
 

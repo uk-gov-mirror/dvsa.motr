@@ -27,8 +27,9 @@ import static uk.gov.dvsa.motr.web.resource.RedirectResponseBuilder.redirect;
 public class ChannelSelectionResource {
 
     private static final String CHANNEL_SELECTION_TEMPLATE = "channel-selection";
-    private static final String CHANNEL_SELECTION = "channel-selection";
     private static final String MESSAGE_MODEL_KEY = "message";
+    private static final String INPUT_FIELD_ID = "channel-selection-input";
+    private static final String INPUT_FIELD_ID_MODEL_KEY = "inputFieldId";
 
     private final TemplateEngine renderer;
     private final MotrSession motrSession;
@@ -89,6 +90,7 @@ public class ChannelSelectionResource {
         modelMap.put("continue_button_text", "Continue");
         modelMap.put("back_button_text", "Back");
         modelMap.put("back_url", "vrm");
+        modelMap.put(INPUT_FIELD_ID_MODEL_KEY, INPUT_FIELD_ID);
 
         modelMap.putAll(dataLayerHelper.formatAttributes());
         dataLayerHelper.clear();

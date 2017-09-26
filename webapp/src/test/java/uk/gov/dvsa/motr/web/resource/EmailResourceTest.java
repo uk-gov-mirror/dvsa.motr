@@ -57,6 +57,7 @@ public class EmailResourceTest {
     public void onPostWithInvalidEmailFormatMessageWillBePassedToView() throws Exception {
 
         HashMap<String, String> expectedContext = new HashMap<>();
+        expectedContext.put("inputFieldId", "email-input");
         expectedContext.put("message", EmailValidator.EMAIL_INVALID_MESSAGE);
         expectedContext.put("back_url", "vrm");
         expectedContext.put("email", "invalidEmail");
@@ -74,6 +75,7 @@ public class EmailResourceTest {
     public void onPostWithEmptyEmailFormatMessageWillBePassedToView() throws Exception {
 
         HashMap<String, String> expectedContext = new HashMap<>();
+        expectedContext.put("inputFieldId", "email-input");
         expectedContext.put("message", EmailValidator.EMAIL_EMPTY_MESSAGE);
         expectedContext.put("back_url", "vrm");
         expectedContext.put("email", "");
