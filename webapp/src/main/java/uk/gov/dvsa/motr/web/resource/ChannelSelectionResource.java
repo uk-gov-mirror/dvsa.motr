@@ -50,7 +50,7 @@ public class ChannelSelectionResource {
     public Response channelSelectionPageGet() throws Exception {
 
         if (!motrSession.isAllowedOnChannelSelectionPage()) {
-            return redirect("/");
+            return redirect(HomepageResource.HOMEPAGE_URL);
         }
 
         Map<String, Object> modelMap = new HashMap<>();

@@ -36,7 +36,7 @@ public class ResendSmsResource {
     public Response resendSmsResourceGet() throws Exception {
 
         if (!motrSession.isAllowedToResendSmsConfirmationCode()) {
-            return redirect("/");
+            return redirect(HomepageResource.HOMEPAGE_URL);
         }
 
         String redirectUri;

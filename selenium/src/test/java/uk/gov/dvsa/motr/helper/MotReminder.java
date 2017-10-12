@@ -5,7 +5,6 @@ import uk.gov.dvsa.motr.ui.page.ChannelSelectionPage;
 import uk.gov.dvsa.motr.ui.page.CookiesPage;
 import uk.gov.dvsa.motr.ui.page.EmailConfirmationPendingPage;
 import uk.gov.dvsa.motr.ui.page.EmailPage;
-import uk.gov.dvsa.motr.ui.page.HomePage;
 import uk.gov.dvsa.motr.ui.page.PhoneConfirmPage;
 import uk.gov.dvsa.motr.ui.page.PhoneNumberEntryPage;
 import uk.gov.dvsa.motr.ui.page.PrivacyPage;
@@ -24,35 +23,37 @@ public class MotReminder {
     public DynamoDbSmsConfirmationHelper smsConfirmationHelper = new DynamoDbSmsConfirmationHelper();
 
     public ReviewPage enterReminderDetails(String vrm, String email) {
-        HomePage page = PageNavigator.goTo(HomePage.class);
-        VrmPage vrmPage = page.clickStartNow();
+
+        VrmPage vrmPage = PageNavigator.goTo(VrmPage.class);
         EmailPage emailPage = vrmPage.enterVrm(vrm);
         return emailPage.enterEmailAddress(email);
     }
 
     public ReviewPage enterReminderDetailsSmsToggleOnUsingEmailChannel(String vrm, String email) {
-        HomePage page = PageNavigator.goTo(HomePage.class);
-        VrmPage vrmPage = page.clickStartNow();
+
+        VrmPage vrmPage = PageNavigator.goTo(VrmPage.class);
         ChannelSelectionPage channelSelectionPage = vrmPage.enterVrmSmsToggleOn(vrm);
         EmailPage emailPage = channelSelectionPage.selectEmailChannel();
         return emailPage.enterEmailAddress(email);
     }
 
     public ReviewPage enterReminderDetailsUsingMobileChannel(String vrm, String mobileNumber) {
-        HomePage page = PageNavigator.goTo(HomePage.class);
-        VrmPage vrmPage = page.clickStartNow();
+
+        VrmPage vrmPage = PageNavigator.goTo(VrmPage.class);
         ChannelSelectionPage channelSelectionPage = vrmPage.enterVrmSmsToggleOn(vrm);
         PhoneNumberEntryPage phoneNumberEntryPage = channelSelectionPage.selectPhoneChannel();
         return phoneNumberEntryPage.enterPhoneNumber(mobileNumber);
     }
 
     public CookiesPage clickCookiesLink() {
-        HomePage page = PageNavigator.goTo(HomePage.class);
+
+        VrmPage page = PageNavigator.goTo(VrmPage.class);
         return page.clickCookiesLink();
     }
 
     public TermsAndConditionsPage clickTermsAndConditionsLink() {
-        HomePage page = PageNavigator.goTo(HomePage.class);
+
+        VrmPage page = PageNavigator.goTo(VrmPage.class);
         return page.clickTermsAndConditionsLink();
     }
 
@@ -141,7 +142,8 @@ public class MotReminder {
     }
 
     public PrivacyPage clickPrivacyPolicyLink() {
-        HomePage page = PageNavigator.goTo(HomePage.class);
+
+        VrmPage page = PageNavigator.goTo(VrmPage.class);
         return page.clickPrivacyPolicyLink();
     }
 }

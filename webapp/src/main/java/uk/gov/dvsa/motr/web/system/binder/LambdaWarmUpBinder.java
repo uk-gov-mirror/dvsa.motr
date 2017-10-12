@@ -74,7 +74,6 @@ public class LambdaWarmUpBinder extends AbstractBinder {
                 // only subscription journey templates !
 
                 engine.precompile("master");
-                engine.precompile("home");
                 engine.precompile("vrm");
                 engine.precompile("email");
                 engine.precompile("review");

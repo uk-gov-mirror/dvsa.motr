@@ -7,7 +7,6 @@ import uk.gov.dvsa.motr.base.BaseTest;
 import uk.gov.dvsa.motr.helper.RandomGenerator;
 import uk.gov.dvsa.motr.ui.page.EmailConfirmationPendingPage;
 import uk.gov.dvsa.motr.ui.page.EmailPage;
-import uk.gov.dvsa.motr.ui.page.HomePage;
 import uk.gov.dvsa.motr.ui.page.ReviewPage;
 import uk.gov.dvsa.motr.ui.page.SubscriptionConfirmationPage;
 import uk.gov.dvsa.motr.ui.page.UnsubscribeConfirmationPage;
@@ -41,21 +40,6 @@ public class MotReminderTestsPreSms extends BaseTest {
 
         //And I am shown a link to complete the unsubscribe survey
         assertTrue(unsubscribeConfirmed.isSurveyLinkDisplayed());
-    }
-
-    @Test(dataProvider = "dataProviderCreateEmailMotReminderForMyVehicle",
-            description = "After confirming the reminder the user can click the link to go back to the start page",
-            groups = {"PreSms"})
-    public void afterConfirmationOfReminderUserCanGoToStartPageToSignUpAgain(String vrm, String email) throws Exception {
-
-        //Given I am a vehicle owner on the MOTR start page
-        //When I enter the vehicle vrm and my email address
-        //And I confirm my email address
-        SubscriptionConfirmationPage confirmationPage = motReminder.subscribeToReminderAndConfirmEmail(vrm, email);
-
-        //When I click sign up for another reminder
-        //Then I am sent to the start page
-        HomePage homePage = confirmationPage.clickSignUpForAnotherReminder();
     }
 
     @Test(dataProvider = "dataProviderCreateEmailMotReminderForMyVehicle",

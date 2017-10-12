@@ -10,7 +10,16 @@ class RedirectResponseBuilder {
     static Response redirect(String uri) {
 
         try {
-            return Response.status(302).location(new URI(uri)).build();
+            return Response.status(Response.Status.FOUND).location(new URI(uri)).build();
+        } catch (URISyntaxException syntaxException) {
+            throw new RuntimeException(syntaxException);
+        }
+    }
+
+    static Response redirect(String uri, Response.Status redirectType) {
+
+        try {
+            return Response.status(redirectType).location(new URI(uri)).build();
         } catch (URISyntaxException syntaxException) {
             throw new RuntimeException(syntaxException);
         }
