@@ -77,7 +77,7 @@ public class UnsubscribeResource {
         Subscription removedSubscription = unsubscribeService.unsubscribe(unsubscribeId);
 
         UnsubscribeConfirmationParams params = new UnsubscribeConfirmationParams();
-        params.setContact(removedSubscription.getEmail());
+        params.setContact(removedSubscription.getContactDetail().getValue());
         params.setExpiryDate(removedSubscription.getMotDueDate().toString());
         params.setRegistration(removedSubscription.getVrm());
 
@@ -91,7 +91,7 @@ public class UnsubscribeResource {
         VehicleDetails vehicleDetails = VehicleDetailsService.getVehicleDetails(subscription.getVrm(), client);
 
         return new UnsubscribeViewModel()
-                .setEmail(subscription.getEmail())
+                .setEmail(subscription.getContactDetail().getValue())
                 .setExpiryDate(subscription.getMotDueDate())
                 .setRegistration(subscription.getVrm())
                 .setMakeModel(MakeModelFormatter.getMakeModelDisplayStringFromVehicleDetails(vehicleDetails, ", "));

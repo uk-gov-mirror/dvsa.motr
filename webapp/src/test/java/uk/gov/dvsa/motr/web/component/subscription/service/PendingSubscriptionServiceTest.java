@@ -9,6 +9,7 @@ import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
+import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
 import uk.gov.dvsa.motr.web.component.subscription.model.PendingSubscription;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.persistence.PendingSubscriptionRepository;
@@ -42,7 +43,7 @@ public class PendingSubscriptionServiceTest {
     private final VehicleDetailsClient client = mock(VehicleDetailsClient.class);
 
     private static final String TEST_VRM = "TEST-REG";
-    private static final String EMAIL = "TEST@TEST.com";
+    private static final String EMAIL = "test@test.com";
     private static final String MOBILE = "07912345678";
     private static final String CONFIRMATION_ID = "Asd";
     private static final String CONFIRMATION_LINK = "CONFIRMATION_LINK";
@@ -53,6 +54,8 @@ public class PendingSubscriptionServiceTest {
     private static final String TEST_DVLA_ID = "3456789";
     private static final Subscription.ContactType CONTACT_TYPE_EMAIL = Subscription.ContactType.EMAIL;
     private static final Subscription.ContactType CONTACT_TYPE_MOBILE = Subscription.ContactType.MOBILE;
+    private static final ContactDetail CONTACT_EMAIL = new ContactDetail(EMAIL, CONTACT_TYPE_EMAIL);
+    private static final ContactDetail CONTACT_MOBILE = new ContactDetail(MOBILE, CONTACT_TYPE_MOBILE);
 
     private PendingSubscriptionService subscriptionService;
 
@@ -128,12 +131,16 @@ public class PendingSubscriptionServiceTest {
     @Test
     public void handleSubscriptionWithExistingSubscriptionWillUpdateMotExpiryDate() throws Exception {
 
-        withExpectedSubscription(Optional.of(new Subscription()), EMAIL);
+        String originalEmail = EMAIL;
+        String newEmailWithDifferentCase = originalEmail.toUpperCase();
+
+        withExpectedSubscription(Optional.of(new Subscription()), originalEmail);
         LocalDate date = LocalDate.now();
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
 
+        ContactDetail contactDetail = new ContactDetail(newEmailWithDifferentCase, CONTACT_TYPE_EMAIL);
         PendingSubscriptionServiceResponse pendingSubscriptionResponse = this.subscriptionService.handlePendingSubscriptionCreation(
-                TEST_VRM, EMAIL, date, new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID), CONTACT_TYPE_EMAIL);
+                TEST_VRM, contactDetail, date, new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID));
 
         verify(subscriptionRepository, times(1)).save(subscriptionArgumentCaptor.capture());
         assertEquals(subscriptionArgumentCaptor.getValue().getMotDueDate(), date);
@@ -150,7 +157,7 @@ public class PendingSubscriptionServiceTest {
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
 
         PendingSubscriptionServiceResponse pendingSubscriptionResponse = this.subscriptionService.handlePendingSubscriptionCreation(
-                TEST_VRM, MOBILE, date, new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID), CONTACT_TYPE_MOBILE);
+                TEST_VRM, CONTACT_MOBILE, date, new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID));
 
         verify(subscriptionRepository, times(1)).save(subscriptionArgumentCaptor.capture());
         assertEquals(subscriptionArgumentCaptor.getValue().getMotDueDate(), date);
@@ -169,12 +176,12 @@ public class PendingSubscriptionServiceTest {
         ArgumentCaptor<PendingSubscription> pendingSubscriptionArgumentCaptor = ArgumentCaptor.forClass(PendingSubscription.class);
 
         PendingSubscriptionServiceResponse pendingSubscriptionResponse = this.subscriptionService.handlePendingSubscriptionCreation(
-                TEST_VRM, EMAIL, date, new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID), CONTACT_TYPE_EMAIL);
+                TEST_VRM, CONTACT_EMAIL, date, new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID));
 
         verify(pendingSubscriptionRepository, times(1)).save(pendingSubscriptionArgumentCaptor.capture());
         verify(notifyService, times(1)).sendEmailAddressConfirmationEmail(any(), any(), any());
         assertEquals(pendingSubscriptionArgumentCaptor.getValue().getMotDueDate(), date);
-        assertEquals(pendingSubscriptionArgumentCaptor.getValue().getContact(), EMAIL);
+        assertEquals(pendingSubscriptionArgumentCaptor.getValue().getContactDetail().getValue(), EMAIL);
         assertEquals(pendingSubscriptionArgumentCaptor.getValue().getVrm(), TEST_VRM);
         assertEquals(CONFIRMATION_PENDING_LINK, pendingSubscriptionResponse.getRedirectUri());
         assertNull(pendingSubscriptionResponse.getConfirmationId());
@@ -190,12 +197,12 @@ public class PendingSubscriptionServiceTest {
         ArgumentCaptor<PendingSubscription> pendingSubscriptionArgumentCaptor = ArgumentCaptor.forClass(PendingSubscription.class);
 
         PendingSubscriptionServiceResponse pendingSubscriptionResponse = this.subscriptionService.handlePendingSubscriptionCreation(
-                TEST_VRM, MOBILE, date, new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID), CONTACT_TYPE_MOBILE);
+                TEST_VRM, CONTACT_MOBILE, date, new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID));
 
         verifyZeroInteractions(notifyService);
         verify(pendingSubscriptionRepository, times(1)).save(pendingSubscriptionArgumentCaptor.capture());
         assertEquals(pendingSubscriptionArgumentCaptor.getValue().getMotDueDate(), date);
-        assertEquals(pendingSubscriptionArgumentCaptor.getValue().getContact(), MOBILE);
+        assertEquals(pendingSubscriptionArgumentCaptor.getValue().getContactDetail().getValue(), MOBILE);
         assertEquals(pendingSubscriptionArgumentCaptor.getValue().getVrm(), TEST_VRM);
         assertNotNull(pendingSubscriptionResponse.getConfirmationId());
         assertNull(pendingSubscriptionResponse.getRedirectUri());

@@ -10,7 +10,7 @@ public class PendingSubscription {
 
     private String vrm;
 
-    private String contact;
+    private ContactDetail contactDetail;
 
     private LocalDate motDueDate;
 
@@ -19,8 +19,6 @@ public class PendingSubscription {
     private String dvlaId;
 
     private String motTestNumber;
-
-    private Subscription.ContactType contactType;
 
     public String getConfirmationId() {
         return confirmationId;
@@ -37,15 +35,6 @@ public class PendingSubscription {
 
     public PendingSubscription setVrm(String vrm) {
         this.vrm = vrm;
-        return this;
-    }
-
-    public String getContact() {
-        return contact;
-    }
-
-    public PendingSubscription setContact(String contact) {
-        this.contact = contact;
         return this;
     }
 
@@ -77,12 +66,12 @@ public class PendingSubscription {
         this.motIdentification = new MotIdentification(motTestNumber, this.dvlaId);
     }
 
-    public PendingSubscription setContactType(Subscription.ContactType contactType) {
-        this.contactType = contactType;
-        return this;
+    public ContactDetail getContactDetail() {
+        return contactDetail;
     }
 
-    public Subscription.ContactType getContactType() {
-        return this.contactType;
+    public PendingSubscription setContactDetail(ContactDetail contactDetail) {
+        this.contactDetail = contactDetail;
+        return this;
     }
 }

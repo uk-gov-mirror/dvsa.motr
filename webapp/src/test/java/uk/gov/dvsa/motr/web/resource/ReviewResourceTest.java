@@ -6,6 +6,7 @@ import org.mockito.ArgumentCaptor;
 
 import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
+import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.response.PendingSubscriptionServiceResponse;
 import uk.gov.dvsa.motr.web.component.subscription.service.PendingSubscriptionService;
@@ -48,6 +49,8 @@ public class ReviewResourceTest {
     private static final String PHONE_CONFIRMATION_URI = "confirm-phone";
     private static final Subscription.ContactType CONTACT_TYPE_EMAIL = Subscription.ContactType.EMAIL;
     private static final Subscription.ContactType CONTACT_TYPE_MOBILE = Subscription.ContactType.MOBILE;
+    private static final ContactDetail CONTACT_EMAIL = new ContactDetail(EMAIL, CONTACT_TYPE_EMAIL);
+    private static final ContactDetail CONTACT_MOBILE = new ContactDetail(MOBILE, CONTACT_TYPE_MOBILE);
 
     private MotrSession motrSession;
     private PhoneNumberValidator phoneNumberValidator;
@@ -107,15 +110,15 @@ public class ReviewResourceTest {
 
         when(motrSession.getVehicleDetailsFromSession()).thenReturn(vehicleDetails);
         when(motrSession.isUsingEmailChannel()).thenReturn(true);
-        when(PENDING_SUBSCRIPTION_SERVICE.handlePendingSubscriptionCreation(any(), any(), any(), any(), any()))
+        when(PENDING_SUBSCRIPTION_SERVICE.handlePendingSubscriptionCreation(any(), any(), any(), any()))
                 .thenReturn(pendingSubscriptionResponse);
         doNothing().when(PENDING_SUBSCRIPTION_SERVICE).createPendingSubscription(
                 VRM, EMAIL, now, "randomID", expectedMotIdentification, CONTACT_TYPE_EMAIL);
 
         Response response = resource.confirmationPagePost();
 
-        verify(PENDING_SUBSCRIPTION_SERVICE, times(1)).handlePendingSubscriptionCreation(eq(VRM), eq(EMAIL), eq(now),
-                any(MotIdentification.class), eq(CONTACT_TYPE_EMAIL));
+        verify(PENDING_SUBSCRIPTION_SERVICE, times(1)).handlePendingSubscriptionCreation(eq(VRM), eq(CONTACT_EMAIL), eq(now),
+                any(MotIdentification.class));
         verify(motrSession, times(1)).setSubscriptionConfirmationParams(paramsArgumentCaptor.capture());
         assertEquals(302, response.getStatus());
         assertEquals(EMAIL_CONFIRMATION_PENDING_URI, response.getLocation().toString());
@@ -138,7 +141,7 @@ public class ReviewResourceTest {
         when(motrSession.getVehicleDetailsFromSession()).thenReturn(vehicleDetails);
         when(motrSession.isUsingEmailChannel()).thenReturn(false);
         when(motrSession.isUsingSmsChannel()).thenReturn(true);
-        when(PENDING_SUBSCRIPTION_SERVICE.handlePendingSubscriptionCreation(any(), any(), any(), any(), any()))
+        when(PENDING_SUBSCRIPTION_SERVICE.handlePendingSubscriptionCreation(any(), any(), any(), any()))
                 .thenReturn(pendingSubscriptionResponse);
         when(PENDING_SMS_CONFIRMATION_SERVICE.handleSmsConfirmationCreation(VRM, MOBILE, pendingSubscriptionResponse.getConfirmationId()))
                 .thenReturn(PHONE_CONFIRMATION_URI);
@@ -147,8 +150,8 @@ public class ReviewResourceTest {
 
         Response response = resource.confirmationPagePost();
 
-        verify(PENDING_SUBSCRIPTION_SERVICE, times(1)).handlePendingSubscriptionCreation(eq(VRM), eq(MOBILE), eq(now),
-                any(MotIdentification.class), eq(CONTACT_TYPE_MOBILE));
+        verify(PENDING_SUBSCRIPTION_SERVICE, times(1)).handlePendingSubscriptionCreation(eq(VRM), eq(CONTACT_MOBILE), eq(now),
+                any(MotIdentification.class));
         verify(PENDING_SMS_CONFIRMATION_SERVICE, times(1)).handleSmsConfirmationCreation(eq(VRM), eq(MOBILE), eq(CONFIRMATION_ID));
         verify(motrSession, times(1)).setSubscriptionConfirmationParams(paramsArgumentCaptor.capture());
         verify(motrSession, times(1)).setConfirmationId(pendingSubscriptionResponse.getConfirmationId());

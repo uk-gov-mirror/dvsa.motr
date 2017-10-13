@@ -7,7 +7,7 @@ public class CancelledSubscription {
 
     private String vrm;
 
-    private String email;
+    private ContactDetail contactDetail;
 
     private MotIdentification motIdentification;
 
@@ -31,8 +31,13 @@ public class CancelledSubscription {
         return this;
     }
 
-    public String getEmail() {
-        return email;
+    public ContactDetail getContactDetail() {
+        return contactDetail;
+    }
+
+    public CancelledSubscription setContactDetail(ContactDetail contactDetail) {
+        this.contactDetail = contactDetail;
+        return this;
     }
 
     public String getReasonForCancellation() {
@@ -41,11 +46,6 @@ public class CancelledSubscription {
 
     public CancelledSubscription setReasonForCancellation(String reasonForCancellation) {
         this.reasonForCancellation = reasonForCancellation;
-        return this;
-    }
-
-    public CancelledSubscription setEmail(String email) {
-        this.email = email;
         return this;
     }
 

@@ -13,6 +13,7 @@ import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
 import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 
 import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
+import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.helper.SystemVariableParam;
 
@@ -111,11 +112,11 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
         Item item = new Item()
                 .withString("id", subscription.getUnsubscribeId())
                 .withString("vrm", subscription.getVrm())
-                .withString("email", subscription.getEmail())
+                .withString("email", subscription.getContactDetail().getValue())
                 .withString("mot_due_date", subscription.getMotDueDate().format(DateTimeFormatter.ISO_LOCAL_DATE))
                 .withString("mot_due_date_md", subscription.getMotDueDate().format(DateTimeFormatter.ofPattern("MM-dd")))
                 .withString("created_at", ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT))
-                .withString("contact_type", subscription.getContactType().getValue());
+                .withString("contact_type", subscription.getContactDetail().getContactType().getValue());
 
         if (subscription.getMotIdentification().getMotTestNumber().isPresent()) {
             item.withString("mot_test_number", subscription.getMotIdentification().getMotTestNumber().get());
@@ -128,7 +129,7 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
 
     @Override
     public void delete(Subscription subscription) {
-        PrimaryKey key = new PrimaryKey("vrm", subscription.getVrm(), "email", subscription.getEmail());
+        PrimaryKey key = new PrimaryKey("vrm", subscription.getVrm(), "email", subscription.getContactDetail().getValue());
         Map<String, Object> expressionAttributeValues = new HashMap<>();
         expressionAttributeValues.put(":id", subscription.getUnsubscribeId());
 
@@ -142,13 +143,17 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
 
     private Subscription mapItemToSubscription(Item item) {
 
+        ContactDetail contactDetail = new ContactDetail(
+                item.getString("email"),
+                Subscription.ContactType.valueOf(item.getString("contact_type"))
+        );
+
         Subscription subscription = new Subscription();
         subscription.setUnsubscribeId(item.getString("id"));
         subscription.setVrm(item.getString("vrm"));
-        subscription.setEmail(item.getString("email"));
         subscription.setMotDueDate(LocalDate.parse(item.getString("mot_due_date")));
         subscription.setMotIdentification(new MotIdentification(item.getString("mot_test_number"), item.getString("dvla_id")));
-        subscription.setContactType(Subscription.ContactType.valueOf(item.getString("contact_type")));
+        subscription.setContactDetail(contactDetail);
         return subscription;
     }
 

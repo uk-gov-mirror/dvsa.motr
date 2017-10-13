@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
+import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.service.UnsubscribeService;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
@@ -110,7 +111,7 @@ public class UnsubscribeResourceTest {
 
         return new Subscription()
                 .setUnsubscribeId(UNSUBSCRIBE_ID)
-                .setEmail("test@this-is-a-test-123")
+                .setContactDetail(new ContactDetail("test@this-is-a-test-123", Subscription.ContactType.EMAIL))
                 .setMotDueDate(LocalDate.of(2015, 7, 10))
                 .setVrm("TEST-VRM");
     }

@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import uk.gov.dvsa.motr.web.component.subscription.model.CancelledSubscription;
+import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.persistence.CancelledSubscriptionRepository;
 import uk.gov.dvsa.motr.web.component.subscription.persistence.SubscriptionRepository;
@@ -74,7 +75,7 @@ public class UnsubscribeServiceTest {
         return new Subscription()
                 .setUnsubscribeId(UNSUBSCRIBE_ID)
                 .setMotDueDate(DATE)
-                .setEmail(EMAIL)
+                .setContactDetail(new ContactDetail(EMAIL, Subscription.ContactType.EMAIL))
                 .setVrm(VRM);
     }
 }

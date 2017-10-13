@@ -68,7 +68,7 @@ public class SubscriptionConfirmedResource {
             params.setRegistration(subscription.getVrm());
             params.setDvlaId(motIdentification.getDvlaId().orElse(""));
             params.setMotTestNumber(motIdentification.getMotTestNumber().orElse(""));
-            params.setContactType(subscription.getContactType().getValue());
+            params.setContactType(subscription.getContactDetail().getContactType().getValue());
             motrSession.setSubscriptionConfirmationParams(params);
 
             return RedirectResponseBuilder.redirect(urlHelper.subscriptionConfirmedFirstTimeLink());

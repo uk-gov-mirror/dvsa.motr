@@ -3,6 +3,7 @@ package uk.gov.dvsa.motr.web.component.subscription.persistence;
 import org.junit.Test;
 
 import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
+import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 
 import java.time.LocalDate;
@@ -21,13 +22,14 @@ public class SubscriptionTest {
         LocalDate testDate = LocalDate.now();
         String motTestNumber = "123456";
         String dvlaId = "3456789";
+        ContactDetail contactDetail = new ContactDetail("my@email.com", Subscription.ContactType.EMAIL);
         Subscription subscription = new Subscription();
-        subscription.setUnsubscribeId(testId).setVrm("VCS1234").setEmail("my@email.com").setMotDueDate(testDate);
+        subscription.setUnsubscribeId(testId).setVrm("VCS1234").setContactDetail(contactDetail).setMotDueDate(testDate);
         subscription.setMotIdentification(new MotIdentification(motTestNumber, null));
 
         assertEquals(testId, subscription.getUnsubscribeId());
         assertEquals("VCS1234", subscription.getVrm());
-        assertEquals("my@email.com", subscription.getEmail());
+        assertEquals("my@email.com", subscription.getContactDetail().getValue());
         assertEquals(testDate, subscription.getMotDueDate());
         assertTrue(subscription.getMotIdentification().getMotTestNumber().isPresent());
         assertFalse(subscription.getMotIdentification().getDvlaId().isPresent());

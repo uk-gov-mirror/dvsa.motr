@@ -8,6 +8,7 @@ import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.web.component.subscription.exception.InvalidConfirmationIdException;
 import uk.gov.dvsa.motr.web.component.subscription.exception.SubscriptionAlreadyExistsException;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
+import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.service.SubscriptionConfirmationService;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
@@ -213,10 +214,9 @@ public class SubscriptionConfirmedResourceTest {
         MotIdentification motIdentification = new MotIdentification(motTestNumber, dvlaId);
         Subscription subscription = new Subscription()
                 .setUnsubscribeId(UNSUBSCRIBE_ID)
-                .setEmail(EMAIL)
+                .setContactDetail(new ContactDetail(EMAIL, Subscription.ContactType.EMAIL))
                 .setVrm(VRM)
                 .setMotDueDate(DATE)
-                .setContactType(Subscription.ContactType.EMAIL)
                 .setMotIdentification(motIdentification);
         when(pendingSubscriptionActivatorService.confirmSubscription(CONFIRMATION_ID)).thenReturn(subscription);
     }
