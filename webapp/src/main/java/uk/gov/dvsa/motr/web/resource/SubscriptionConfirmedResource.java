@@ -2,6 +2,7 @@ package uk.gov.dvsa.motr.web.resource;
 
 import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
+import uk.gov.dvsa.motr.web.analytics.SmartSurveyHelper;
 import uk.gov.dvsa.motr.web.component.subscription.exception.InvalidConfirmationIdException;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
@@ -21,11 +22,13 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
+import static uk.gov.dvsa.motr.web.analytics.DataLayerHelper.CONTACT_TYPE;
 import static uk.gov.dvsa.motr.web.analytics.DataLayerHelper.DLVA_ID_KEY;
 import static uk.gov.dvsa.motr.web.analytics.DataLayerHelper.MOT_TEST_NUMBER_KEY;
 import static uk.gov.dvsa.motr.web.analytics.DataLayerHelper.VRM_KEY;
 
 import static java.util.Collections.emptyMap;
+
 
 @Singleton
 @Path("/confirm-subscription")
@@ -36,9 +39,12 @@ public class SubscriptionConfirmedResource {
 
     private final TemplateEngine renderer;
     private final DataLayerHelper dataLayerHelper;
+    private final SmartSurveyHelper smartSurveyHelperSatisfaction;
+    private final SmartSurveyHelper smartSurveyHelperFeedback;
     private SubscriptionConfirmationService subscriptionConfirmationService;
     private MotrSession motrSession;
     private UrlHelper urlHelper;
+
 
     @Inject
     public SubscriptionConfirmedResource(
@@ -53,6 +59,14 @@ public class SubscriptionConfirmedResource {
         this.motrSession = motrSession;
         this.urlHelper = urlHelper;
         this.dataLayerHelper = new DataLayerHelper();
+        this.smartSurveyHelperSatisfaction = new SmartSurveyHelper(
+                "http://www.smartsurvey.co.uk/s/YN642/",
+                "smartSurveySatisfaction"
+        );
+        this.smartSurveyHelperFeedback = new SmartSurveyHelper(
+                "http://www.smartsurvey.co.uk/s/MKVXI/",
+                "smartSurveyFeedback"
+        );
     }
 
     @GET
@@ -99,6 +113,9 @@ public class SubscriptionConfirmedResource {
 
         if (null != subscription) {
             dataLayerHelper.putAttribute(VRM_KEY, subscription.getRegistration());
+            dataLayerHelper.putAttribute(CONTACT_TYPE, subscription.getContactType());
+            smartSurveyHelperFeedback.putAttribute(SmartSurveyHelper.CONTACT_TYPE, subscription.getContactType());
+            smartSurveyHelperSatisfaction.putAttribute(SmartSurveyHelper.CONTACT_TYPE, subscription.getContactType());
 
             if (subscription.getContactType().equals(Subscription.ContactType.MOBILE.getValue())) {
                 modelMap.put("usingSms", true);
@@ -120,7 +137,11 @@ public class SubscriptionConfirmedResource {
     private Map<String, Object> buildMap(Map<String, Object> map) {
 
         map.putAll(dataLayerHelper.formatAttributes());
+        map.putAll(smartSurveyHelperFeedback.formatAttributes());
+        map.putAll(smartSurveyHelperSatisfaction.formatAttributes());
         dataLayerHelper.clear();
+        smartSurveyHelperFeedback.clear();
+        smartSurveyHelperSatisfaction.clear();
 
         return map;
     }

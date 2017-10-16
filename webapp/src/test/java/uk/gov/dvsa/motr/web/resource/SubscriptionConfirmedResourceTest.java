@@ -121,7 +121,7 @@ public class SubscriptionConfirmedResourceTest {
 
         resource.confirmSubscriptionFirstTimeGet();
 
-        assertEquals("{\"vrm\":\"vrm\",\"dvla-id\":\"54321\"}", getDataLayer());
+        assertEquals("{\"vrm\":\"vrm\",\"dvla-id\":\"54321\",\"contact-type\":\"EMAIL\"}", getDataLayer());
     }
 
     @Test
@@ -135,7 +135,7 @@ public class SubscriptionConfirmedResourceTest {
 
         resource.confirmSubscriptionFirstTimeGet();
 
-        assertEquals("{\"vrm\":\"vrm\",\"mot-test-number\":\"12345\"}", getDataLayer());
+        assertEquals("{\"vrm\":\"vrm\",\"mot-test-number\":\"12345\",\"contact-type\":\"EMAIL\"}", getDataLayer());
     }
 
     @Test
@@ -154,7 +154,7 @@ public class SubscriptionConfirmedResourceTest {
 
         resource.confirmSubscriptionFirstTimeGet();
 
-        assertEquals("{\"vrm\":\"vrm\",\"mot-test-number\":\"12345\"}", getDataLayer());
+        assertEquals("{\"vrm\":\"vrm\",\"mot-test-number\":\"12345\",\"contact-type\":\"MOBILE\"}", getDataLayer());
         assertEquals(expectedMap.get("usingSms"), engine.getContext(Map.class).get("usingSms"));
         assertEquals(expectedMap.get("replyNumber"), engine.getContext(Map.class).get("replyNumber"));
         assertEquals(expectedMap.get("registration"), engine.getContext(Map.class).get("registration"));
@@ -205,7 +205,7 @@ public class SubscriptionConfirmedResourceTest {
 
     private void verifyDataLayer(String dataLayer) {
 
-        assertEquals("{\"vrm\":\"vrm\",\"mot-test-number\":\"12345\"}", dataLayer);
+        assertEquals("{\"vrm\":\"vrm\",\"mot-test-number\":\"12345\",\"contact-type\":\"EMAIL\"}", dataLayer);
     }
 
     private void mockSubscription(String motTestNumber, String dvlaId) throws InvalidConfirmationIdException {
