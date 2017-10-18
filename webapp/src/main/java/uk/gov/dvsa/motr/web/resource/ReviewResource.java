@@ -62,7 +62,7 @@ public class ReviewResource {
     public Response reviewPage() throws Exception {
 
         if (!this.motrSession.isAllowedOnReviewPage()) {
-            return redirect("/");
+            return redirect(HomepageResource.HOMEPAGE_URL);
         }
 
         Map<String, Object> map = new HashMap<>();

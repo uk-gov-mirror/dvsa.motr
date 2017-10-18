@@ -165,7 +165,7 @@ public class VrmResource {
         } else {
             modelMap.put("continue_button_text", "Continue");
             modelMap.put("back_button_text", "Back");
-            modelMap.put("back_url", "/");
+            modelMap.put("back_url", HomepageResource.HOMEPAGE_URL);
         }
     }
 

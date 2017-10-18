@@ -81,7 +81,7 @@ public class VrmResourceTest {
         HashMap<String, Object> expectedContext = new HashMap<>();
         expectedContext.put("inputFieldId", "reg-number-input");
         expectedContext.put("message", VrmValidator.REGISTRATION_CAN_ONLY_CONTAIN_LETTERS_NUMBERS_AND_HYPHENS_MESSAGE);
-        expectedContext.put("back_url", "/");
+        expectedContext.put("back_url", HomepageResource.HOMEPAGE_URL);
         expectedContext.put("vrm", INVALID_REG_NUMBER);
         expectedContext.put("continue_button_text", "Continue");
         expectedContext.put("showInLine", "true");
@@ -103,7 +103,7 @@ public class VrmResourceTest {
 
         HashMap<String, Object> expectedContext = new HashMap<>();
         expectedContext.put("inputFieldId", "reg-number-input");
-        expectedContext.put("back_url", "/");
+        expectedContext.put("back_url", HomepageResource.HOMEPAGE_URL);
         expectedContext.put("vrm", SYSTEM_ERROR_VRM);
         expectedContext.put("continue_button_text", "Continue");
         expectedContext.put("showInLine", "true");
@@ -125,7 +125,7 @@ public class VrmResourceTest {
         expectedContext.put("inputFieldId", "reg-number-input");
         expectedContext.put("message", "Check that you've typed in the correct registration number.<br/>" +
                 "<br/>You can only sign up if the vehicle has a current MOT.");
-        expectedContext.put("back_url", "/");
+        expectedContext.put("back_url", HomepageResource.HOMEPAGE_URL);
         expectedContext.put("vrm", VALID_REG_NUMBER);
         expectedContext.put("continue_button_text", "Continue");
         expectedContext.put("showSystemError", false);
@@ -149,7 +149,7 @@ public class VrmResourceTest {
         expectedContext.put("inputFieldId", "reg-number-input");
         expectedContext.put("message", "Check that you've typed in the correct registration number.<br/>" +
                 "<br/>You can only sign up if the vehicle has a current MOT.");
-        expectedContext.put("back_url", "/");
+        expectedContext.put("back_url", HomepageResource.HOMEPAGE_URL);
         expectedContext.put("vrm", VALID_REG_NUMBER);
         expectedContext.put("continue_button_text", "Continue");
         expectedContext.put("showInLine", "false");

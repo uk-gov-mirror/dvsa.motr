@@ -62,7 +62,7 @@ public class SmsConfirmationCodeResource {
     public Response smsConfirmationCodePageGet() throws Exception {
 
         if (!motrSession.isAllowedOnSmsConfirmationCodePage()) {
-            return redirect("/");
+            return redirect(HomepageResource.HOMEPAGE_URL);
         }
 
         SmsConfirmationCodeViewModel viewModel = new SmsConfirmationCodeViewModel().setPhoneNumber(motrSession.getPhoneNumberFromSession());
@@ -88,7 +88,7 @@ public class SmsConfirmationCodeResource {
     public Response smsConfirmationCodePagePost(@FormParam("confirmationCode") String confirmationCode) throws Exception {
 
         if (!motrSession.isAllowedToPostOnSmsConfirmationCodePage()) {
-            return redirect("/");
+            return redirect(HomepageResource.HOMEPAGE_URL);
         }
 
         Validator validator = new SmsConfirmationCodeValidator();

@@ -54,7 +54,7 @@ public class PhoneNumberResource {
     public Response phoneNumberPageGet() throws Exception {
 
         if (!motrSession.isAllowedOnPhoneNumberEntryPage()) {
-            return redirect("/");
+            return redirect(HomepageResource.HOMEPAGE_URL);
         }
 
         if (!motrSession.visitingFromReviewPage()) {

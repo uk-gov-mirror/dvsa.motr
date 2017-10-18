@@ -47,4 +47,22 @@ public class VrmPage extends Page {
         continueButton.click();
         return new ReviewPage();
     }
+
+    public CookiesPage clickCookiesLink() {
+
+        cookiesLink.click();
+        return new CookiesPage();
+    }
+
+    public TermsAndConditionsPage clickTermsAndConditionsLink(){
+
+        termsAndConditionsLink.click();
+        return new TermsAndConditionsPage();
+    }
+
+    public PrivacyPage clickPrivacyPolicyLink(){
+
+        privacyPolicyLink.click();
+        return new PrivacyPage();
+    }
 }

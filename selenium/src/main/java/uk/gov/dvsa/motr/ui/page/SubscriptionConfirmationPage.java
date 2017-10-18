@@ -52,10 +52,4 @@ public class SubscriptionConfirmationPage extends Page {
 
         return headerTitle.getText();
     }
-
-    public HomePage clickSignUpForAnotherReminder() {
-
-        signupForAnotherReminderLink.click();
-        return new HomePage();
-    }
 }

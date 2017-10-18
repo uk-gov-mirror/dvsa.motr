@@ -51,7 +51,7 @@ public class EmailResource {
     public Response emailPage() throws Exception {
 
         if (!this.motrSession.isAllowedOnEmailPage()) {
-            return redirect("/");
+            return redirect(HomepageResource.HOMEPAGE_URL);
         }
 
         if (!motrSession.visitingFromReviewPage()) {
