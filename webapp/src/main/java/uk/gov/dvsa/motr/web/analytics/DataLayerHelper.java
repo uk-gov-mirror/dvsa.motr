@@ -13,6 +13,7 @@ public class DataLayerHelper {
     public static final String UNSUBSCRIBE_FAILURE_KEY = "unsubscribe-failure";
     public static final String DLVA_ID_KEY = "dvla-id";
     public static final String MOT_TEST_NUMBER_KEY = "mot-test-number";
+    public static final String CONTACT_TYPE = "contact-type";
 
     private Map<String, String> attributes;
 
