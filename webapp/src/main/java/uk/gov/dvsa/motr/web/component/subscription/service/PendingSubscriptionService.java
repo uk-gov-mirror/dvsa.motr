@@ -7,6 +7,7 @@ import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsService;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
+import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
 import uk.gov.dvsa.motr.web.component.subscription.model.PendingSubscription;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.persistence.PendingSubscriptionRepository;
@@ -48,8 +49,13 @@ public class PendingSubscriptionService {
     }
 
     public PendingSubscriptionServiceResponse handlePendingSubscriptionCreation(
-            String vrm, String contact, LocalDate motDueDate,
-            MotIdentification motIdentification, Subscription.ContactType contactType) {
+            String vrm,
+            ContactDetail contactDetail,
+            LocalDate motDueDate,
+            MotIdentification motIdentification) {
+
+        String contact = contactDetail.getValue();
+        Subscription.ContactType contactType = contactDetail.getContactType();
 
         Optional<Subscription> subscription = subscriptionRepository.findByVrmAndEmail(vrm, contact);
         PendingSubscriptionServiceResponse pendingSubscriptionResponse = new PendingSubscriptionServiceResponse();
@@ -108,11 +114,10 @@ public class PendingSubscriptionService {
 
         PendingSubscription pendingSubscription = new PendingSubscription()
                 .setConfirmationId(confirmationId)
-                .setContact(contact)
+                .setContactDetail(new ContactDetail(contact, contactType))
                 .setVrm(vrm)
                 .setMotDueDate(motDueDate)
-                .setMotIdentification(motIdentification)
-                .setContactType(contactType);
+                .setMotIdentification(motIdentification);
 
         try {
             pendingSubscriptionRepository.save(pendingSubscription);

@@ -15,6 +15,7 @@ import com.amazonaws.services.dynamodbv2.model.AmazonDynamoDBException;
 
 import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
+import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
 import uk.gov.dvsa.motr.web.component.subscription.model.PendingSubscription;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.eventlog.subscription.PendingSubscriptionDeletionFailedEvent;
@@ -101,12 +102,12 @@ public class DynamoDbPendingSubscriptionRepository implements PendingSubscriptio
         Item item = new Item()
                 .withString("id", subscription.getConfirmationId())
                 .withString("vrm", subscription.getVrm())
-                .withString("email", subscription.getContact())
+                .withString("email", subscription.getContactDetail().getValue())
                 .withString("mot_due_date", subscription.getMotDueDate().format(DateTimeFormatter.ISO_LOCAL_DATE))
                 .withString("mot_due_date_md", subscription.getMotDueDate().format(DateTimeFormatter.ofPattern("MM-dd")))
                 .withString("created_at", ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT))
                 .withNumber("deletion_date", ZonedDateTime.now().plusMonths(MONTHS_TO_DELETION).toEpochSecond())
-                .withString("contact_type", subscription.getContactType().getValue());
+                .withString("contact_type", subscription.getContactDetail().getContactType().getValue());
 
         subscription.getMotIdentification().getMotTestNumber()
                 .ifPresent(motTestNumber -> item.withString("mot_test_number", motTestNumber));
@@ -118,7 +119,7 @@ public class DynamoDbPendingSubscriptionRepository implements PendingSubscriptio
     @Override
     public void delete(PendingSubscription subscription) {
 
-        PrimaryKey key = new PrimaryKey("vrm", subscription.getVrm(), "email", subscription.getContact());
+        PrimaryKey key = new PrimaryKey("vrm", subscription.getVrm(), "email", subscription.getContactDetail().getValue());
         Map<String, Object> expressionAttributeValues = new HashMap<>();
         expressionAttributeValues.put(":id", subscription.getConfirmationId());
 
@@ -133,7 +134,7 @@ public class DynamoDbPendingSubscriptionRepository implements PendingSubscriptio
             EventLogger.logEvent(new PendingSubscriptionDeletionFailedEvent()
                     .setConfirmationId(subscription.getConfirmationId())
                     .setVrm(subscription.getVrm())
-                    .setContact(subscription.getContact())
+                    .setContact(subscription.getContactDetail().getValue())
                     .setMessage(e.getMessage())
                     .setErrorMessage(e.getErrorMessage()));
             throw e;
@@ -142,13 +143,15 @@ public class DynamoDbPendingSubscriptionRepository implements PendingSubscriptio
 
     private PendingSubscription mapItemToPendingSubscription(Item item) {
 
+        ContactDetail contactDetail =
+                new ContactDetail(item.getString("email"), Subscription.ContactType.valueOf(item.getString("contact_type")));
+
         PendingSubscription subscription = new PendingSubscription();
         subscription.setConfirmationId(item.getString("id"));
         subscription.setVrm(item.getString("vrm"));
-        subscription.setContact(item.getString("email"));
+        subscription.setContactDetail(contactDetail);
         subscription.setMotDueDate(LocalDate.parse(item.getString("mot_due_date")));
         subscription.setMotIdentification(new MotIdentification(item.getString("mot_test_number"), item.getString("dvla_id")));
-        subscription.setContactType(Subscription.ContactType.valueOf(item.getString("contact_type")));
         return subscription;
     }
 }

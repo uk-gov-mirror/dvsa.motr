@@ -9,6 +9,7 @@ import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.web.component.subscription.exception.InvalidConfirmationIdException;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
+import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
 import uk.gov.dvsa.motr.web.component.subscription.model.PendingSubscription;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.persistence.PendingSubscriptionRepository;
@@ -42,7 +43,7 @@ public class SubscriptionConfirmationServiceTest {
     private static final String MOBILE = "07912345678";
     private static final String MOT_TEST_NUMBER = "12345";
     private static final LocalDate DATE = LocalDate.now();
-    private static final Subscription.ContactType CONTACT_TYPE = Subscription.ContactType.EMAIL;
+    private static final Subscription.ContactType CONTACT_TYPE_EMAIL = Subscription.ContactType.EMAIL;
     private static final Subscription.ContactType CONTACT_TYPE_MOBILE = Subscription.ContactType.MOBILE;
 
     private SubscriptionConfirmationService subscriptionService;
@@ -71,7 +72,7 @@ public class SubscriptionConfirmationServiceTest {
         verify(subscriptionRepository, times(1)).save(any(Subscription.class));
         verify(pendingSubscriptionRepository, times(1)).delete(pendingSubscription);
         verify(notifyService, times(1)).sendSubscriptionConfirmationEmail(
-                eq(pendingSubscription.getContact()),
+                eq(pendingSubscription.getContactDetail().getValue()),
                 eq(pendingSubscription.getVrm()),
                 eq(pendingSubscription.getMotDueDate()),
                 anyString(),
@@ -122,9 +123,8 @@ public class SubscriptionConfirmationServiceTest {
         return new PendingSubscription()
                 .setConfirmationId(CONFIRMATION_ID)
                 .setMotDueDate(DATE)
-                .setContact(EMAIL)
-                .setVrm(VRM)
-                .setContactType(CONTACT_TYPE);
+                .setContactDetail(new ContactDetail(EMAIL, CONTACT_TYPE_EMAIL))
+                .setVrm(VRM);
     }
 
     private PendingSubscription pendingSubscriptionMobileStub() {
@@ -132,9 +132,8 @@ public class SubscriptionConfirmationServiceTest {
         return new PendingSubscription()
                 .setConfirmationId(CONFIRMATION_ID)
                 .setMotDueDate(DATE)
-                .setContact(MOBILE)
-                .setVrm(VRM)
-                .setContactType(CONTACT_TYPE_MOBILE);
+                .setContactDetail(new ContactDetail(MOBILE, CONTACT_TYPE_MOBILE))
+                .setVrm(VRM);
     }
 
     private MotIdentification motIdentificationStub() {

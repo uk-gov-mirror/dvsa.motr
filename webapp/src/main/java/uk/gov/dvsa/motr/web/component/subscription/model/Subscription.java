@@ -25,13 +25,11 @@ public class Subscription {
 
     private String vrm;
 
-    private String email;
+    private ContactDetail contactDetail;
 
     private LocalDate motDueDate;
 
     private MotIdentification motIdentification;
-
-    private ContactType contactType;
 
     public String getUnsubscribeId() {
         return unsubscribeId;
@@ -48,15 +46,6 @@ public class Subscription {
 
     public Subscription setVrm(String vrm) {
         this.vrm = vrm;
-        return this;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public Subscription setEmail(String email) {
-        this.email = email;
         return this;
     }
 
@@ -78,12 +67,12 @@ public class Subscription {
         return this;
     }
 
-    public Subscription setContactType(ContactType contactType) {
-        this.contactType = contactType;
-        return this;
+    public ContactDetail getContactDetail() {
+        return contactDetail;
     }
 
-    public ContactType getContactType() {
-        return this.contactType;
+    public Subscription setContactDetail(ContactDetail contactDetail) {
+        this.contactDetail = contactDetail;
+        return this;
     }
 }
