@@ -10,7 +10,7 @@ import java.util.Map;
 import javax.ws.rs.core.UriBuilder;
 
 public class SmartSurveyHelper {
-    public static final String CONTACT_TYPE = "contact-type";
+    public static final String CONTACT_TYPE = "contact_type";
 
     private Map<String, String> attributes;
     private String templateVariable;
