@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import uk.gov.dvsa.motr.subscriptionloader.processing.dispatcher.DispatchResult;
 import uk.gov.dvsa.motr.subscriptionloader.processing.dispatcher.Dispatcher;
+import uk.gov.dvsa.motr.subscriptionloader.processing.model.ContactDetail;
 import uk.gov.dvsa.motr.subscriptionloader.processing.model.Subscription;
 import uk.gov.dvsa.motr.subscriptionloader.processing.producer.SubscriptionProducer;
 
@@ -58,8 +59,7 @@ public class DefaultLoaderTest {
         when(this.producer.getIterator(any(), any(), any())).thenReturn(mockIterator);
 
         Subscription mockSubscription = new Subscription()
-                .setEmail("email@email.com")
-                .setContactType(Subscription.ContactType.EMAIL)
+                .setContactDetail(new ContactDetail("email@email.com", Subscription.ContactType.EMAIL))
                 .setId("someId")
                 .setMotDueDate(LocalDate.now())
                 .setVrm("aaa").setMotTestNumber("123456");
@@ -83,8 +83,12 @@ public class DefaultLoaderTest {
         Iterator mockIterator = createIteratorWithHasNextSequence(true, true, false);
         when(this.producer.getIterator(any(), any(), any())).thenReturn(mockIterator);
 
-        Subscription mockSubscription = new Subscription().setEmail("email@email.com").setContactType(Subscription.ContactType.EMAIL)
-                .setId("someId").setMotDueDate(LocalDate.now()).setVrm("aaa").setDvlaId("123456");
+        Subscription mockSubscription = new Subscription()
+                .setContactDetail(new ContactDetail("email@email.com", Subscription.ContactType.EMAIL))
+                .setId("someId")
+                .setMotDueDate(LocalDate.now())
+                .setVrm("aaa")
+                .setDvlaId("123456");
         when(mockIterator.next()).thenReturn(mockSubscription);
 
         when(this.dispatcher.dispatch(any())).thenReturn(

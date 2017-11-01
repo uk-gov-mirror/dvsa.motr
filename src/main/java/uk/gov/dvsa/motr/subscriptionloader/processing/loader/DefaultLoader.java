@@ -118,8 +118,8 @@ public class DefaultLoader implements Loader {
                         report.incrementDvlaVehiclesProcessed();
                         EventLogger.logEvent(new ItemSuccess()
                                 .setVrm(subscription.getVrm())
-                                .setEmail(subscription.getEmail())
-                                .setContactType(subscription.getContactType().getValue())
+                                .setEmail(subscription.getContactDetail().getValue())
+                                .setContactType(subscription.getContactDetail().getContactType().getValue())
                                 .setDvlaId(subscription.getDvlaId())
                                 .setDueDate(subscription.getMotDueDate())
                                 .setId(subscription.getId())
@@ -128,8 +128,8 @@ public class DefaultLoader implements Loader {
                         report.incrementNonDvlaVehiclesProcessed();
                         EventLogger.logEvent(new ItemSuccess()
                                 .setVrm(subscription.getVrm())
-                                .setEmail(subscription.getEmail())
-                                .setContactType(subscription.getContactType().getValue())
+                                .setEmail(subscription.getContactDetail().getValue())
+                                .setContactType(subscription.getContactDetail().getContactType().getValue())
                                 .setMotTestNumber(subscription.getMotTestNumber())
                                 .setDueDate(subscription.getMotDueDate())
                                 .setId(subscription.getId())

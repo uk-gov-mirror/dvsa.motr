@@ -1,7 +1,9 @@
 package uk.gov.dvsa.motr.subscriptionloader.processing.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -10,6 +12,7 @@ import uk.gov.dvsa.motr.subscriptionloader.serialisation.LocalDateSerialiser;
 
 import java.time.LocalDate;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Subscription {
 
     public enum ContactType {
@@ -37,11 +40,8 @@ public class Subscription {
     @JsonProperty("vrm")
     private String vrm;
 
-    @JsonProperty("email")
-    private String email;
-
-    @JsonProperty("contactType")
-    private ContactType contactType;
+    @JsonUnwrapped
+    private ContactDetail contactDetail;
 
     @JsonProperty("motTestNumber")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -89,25 +89,14 @@ public class Subscription {
         return this;
     }
 
-    public String getEmail() {
+    public ContactDetail getContactDetail() {
 
-        return email;
+        return contactDetail;
     }
 
-    public Subscription setEmail(String email) {
+    public Subscription setContactDetail(ContactDetail contactDetail) {
 
-        this.email = email;
-        return this;
-    }
-
-    public ContactType getContactType() {
-
-        return contactType;
-    }
-
-    public Subscription setContactType(ContactType contactType) {
-
-        this.contactType = contactType;
+        this.contactDetail = contactDetail;
         return this;
     }
 
@@ -151,8 +140,8 @@ public class Subscription {
                 "id='" + id + '\'' +
                 ", motDueDate=" + motDueDate +
                 ", vrm='" + vrm + '\'' +
-                ", email='" + email + '\'' +
-                ", contactType='" + contactType.getValue() + '\'' +
+                ", email='" + contactDetail.getValue() + '\'' +
+                ", contactType='" + contactDetail.getContactType().getValue() + '\'' +
                 ", motTestNumber='" + motTestNumber + '\'' +
                 ", dvlaId='" + dvlaId + '\'' +
                 ", loadedOnDate=" + loadedOnDate +

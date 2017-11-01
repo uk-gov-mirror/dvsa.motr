@@ -103,8 +103,8 @@ public class SubscriptionLoaderTests extends SubscriptionLoaderBase {
     private void assertSubscriptionIsAddedToQueue(Subscription subscription) {
 
         assertEquals(subscriptionItem.getVrm(), subscription.getVrm());
-        assertEquals(subscriptionItem.getEmail(), subscription.getEmail());
-        assertEquals(subscriptionItem.getContactType().getValue(), subscription.getContactType().getValue());
+        assertEquals(subscriptionItem.getEmail(), subscription.getContactDetail().getValue());
+        assertEquals(subscriptionItem.getContactType().getValue(), subscription.getContactDetail().getContactType().getValue());
         assertEquals(subscriptionItem.getMotTestNumber(), subscription.getMotTestNumber());
     }
 
