@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.Test;
 
+import uk.gov.dvsa.motr.notifier.processing.model.ContactDetail;
 import uk.gov.dvsa.motr.notifier.processing.model.SubscriptionQueueItem;
 
 import java.util.HashMap;
@@ -81,7 +82,7 @@ public class SubscriptionsReceiverTest  {
         SubscriptionQueueItem subscriptionQueueItem = new SubscriptionQueueItem()
                 .setMessageReceiptHandle("Test-receipt-handle")
                 .setVrm("test-vrm")
-                .setContactDetail("test@email.com")
+                .setContactDetail(new ContactDetail("test@email.com", SubscriptionQueueItem.ContactType.EMAIL))
                 .setId("test-id")
                 .setMotTestNumber("test-mot-number-123")
                 .setMessageCorrelationId("test-correlation-id");

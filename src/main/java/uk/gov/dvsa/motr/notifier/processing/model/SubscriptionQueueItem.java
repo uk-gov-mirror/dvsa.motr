@@ -1,13 +1,16 @@
 package uk.gov.dvsa.motr.notifier.processing.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import uk.gov.dvsa.motr.serialisation.LocalDateDeserialiser;
 
 import java.time.LocalDate;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class SubscriptionQueueItem {
 
     public enum ContactType {
@@ -35,11 +38,8 @@ public class SubscriptionQueueItem {
     @JsonProperty("vrm")
     private String vrm;
 
-    @JsonProperty("email")
-    private String email;
-
-    @JsonProperty("contactType")
-    private ContactType contactType;
+    @JsonUnwrapped
+    private ContactDetail contactDetail;
 
     @JsonProperty("motTestNumber")
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -84,21 +84,12 @@ public class SubscriptionQueueItem {
         return this;
     }
 
-    public String getContactDetail() {
-        return email;
+    public ContactDetail getContactDetail() {
+        return contactDetail;
     }
 
-    public SubscriptionQueueItem setContactDetail(String contactDetail) {
-        this.email = contactDetail;
-        return this;
-    }
-
-    public ContactType getContactType() {
-        return contactType;
-    }
-
-    public SubscriptionQueueItem setContactType(ContactType contactType) {
-        this.contactType = contactType;
+    public SubscriptionQueueItem setContactDetail(ContactDetail contactDetail) {
+        this.contactDetail = contactDetail;
         return this;
     }
 
@@ -161,9 +152,9 @@ public class SubscriptionQueueItem {
                 ", motDueDate=" + motDueDate +
                 ", vrm='" + vrm + '\'' +
                 ", motTestNumber='" + motTestNumber + '\'' +
-                ", contactType='" + contactType.getValue() + '\'' +
+                ", contactType='" + contactDetail.getContactType().getValue() + '\'' +
                 ", dvlaId='" + dvlaId + '\'' +
-                ", email='" + email + '\'' +
+                ", email='" + contactDetail.getValue() + '\'' +
                 ", loadedOnDate=" + loadedOnDate +
                 ", messageReceiptHandle='" + messageReceiptHandle + '\'' +
                 ", messageCorrelationId='" + messageCorrelationId + '\'' +

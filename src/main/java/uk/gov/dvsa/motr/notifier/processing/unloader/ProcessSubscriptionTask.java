@@ -59,7 +59,7 @@ public class ProcessSubscriptionTask implements Runnable {
         } catch (RemoveSubscriptionFromQueueException e) {
 
             SubscriptionQueueItemRemovalFailedEvent event = new SubscriptionQueueItemRemovalFailedEvent()
-                    .setEmail(subscriptionQueueItemToProcess.getContactDetail())
+                    .setEmail(subscriptionQueueItemToProcess.getContactDetail().getValue())
                     .setVrm(subscriptionQueueItemToProcess.getVrm())
                     .setExpiryDate(subscriptionQueueItemToProcess.getMotDueDate());
 
@@ -76,7 +76,7 @@ public class ProcessSubscriptionTask implements Runnable {
         } catch (VehicleDetailsClientException | VehicleNotFoundException e) {
 
             VehicleDetailsRetrievalFailedEvent event = new VehicleDetailsRetrievalFailedEvent()
-                    .setEmail(subscriptionQueueItemToProcess.getContactDetail())
+                    .setEmail(subscriptionQueueItemToProcess.getContactDetail().getValue())
                     .setVrm(subscriptionQueueItemToProcess.getVrm())
                     .setExpiryDate(subscriptionQueueItemToProcess.getMotDueDate());
 
@@ -93,8 +93,8 @@ public class ProcessSubscriptionTask implements Runnable {
         } catch (NotificationClientException e) {
 
             NotifyEvent event = new NotifyReminderFailedEvent()
-                    .setEmail(subscriptionQueueItemToProcess.getContactDetail())
-                    .setContactType(subscriptionQueueItemToProcess.getContactType())
+                    .setEmail(subscriptionQueueItemToProcess.getContactDetail().getValue())
+                    .setContactType(subscriptionQueueItemToProcess.getContactDetail().getContactType())
                     .setVrm(subscriptionQueueItemToProcess.getVrm())
                     .setExpiryDate(subscriptionQueueItemToProcess.getMotDueDate());
 
