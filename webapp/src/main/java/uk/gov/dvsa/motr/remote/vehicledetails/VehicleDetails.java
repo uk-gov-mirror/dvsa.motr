@@ -1,5 +1,6 @@
 package uk.gov.dvsa.motr.remote.vehicledetails;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -9,6 +10,7 @@ import uk.gov.dvsa.motr.web.serialisation.LocalDateDeserialiser;
 import java.io.Serializable;
 import java.time.LocalDate;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class VehicleDetails implements Serializable {
 
     @JsonProperty("make")
