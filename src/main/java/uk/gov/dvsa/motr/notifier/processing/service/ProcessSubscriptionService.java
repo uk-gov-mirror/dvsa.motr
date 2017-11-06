@@ -66,7 +66,7 @@ public class ProcessSubscriptionService {
         VehicleDetails vehicleDetails = getVehicleDetails(subscriptionQueueItem);
 
         String vrm = subscriptionQueueItem.getVrm();
-        String email = subscriptionQueueItem.getContactDetail();
+        String email = subscriptionQueueItem.getContactDetail().getValue();
         LocalDate subscriptionMotDueDate = subscriptionQueueItem.getMotDueDate();
         String subscriptionMotTestNumber = subscriptionQueueItem.getMotTestNumber();
         String subscriptionDvlaId = subscriptionQueueItem.getDvlaId();
@@ -85,9 +85,10 @@ public class ProcessSubscriptionService {
             subscriptionRepository.updateExpiryDate(vrm, email, vehicleMotExpiryDate);
         }
 
-        if (subscriptionQueueItem.getContactType() == SubscriptionQueueItem.ContactType.EMAIL) {
+        SubscriptionQueueItem.ContactType contactType = subscriptionQueueItem.getContactDetail().getContactType();
+        if (contactType == SubscriptionQueueItem.ContactType.EMAIL) {
             sendEmailNotfications(subscriptionQueueItem, requestDate);
-        } else if (subscriptionQueueItem.getContactType() == SubscriptionQueueItem.ContactType.MOBILE) {
+        } else if (contactType == SubscriptionQueueItem.ContactType.MOBILE) {
             sendSmsNotifications(subscriptionQueueItem, requestDate);
         }
 
@@ -115,7 +116,7 @@ public class ProcessSubscriptionService {
             throws NotificationClientException, VehicleDetailsClientException, VehicleNotFoundException {
 
         VehicleDetails vehicleDetails = getVehicleDetails(subscriptionQueueItem);
-        String email = subscriptionQueueItem.getContactDetail();
+        String email = subscriptionQueueItem.getContactDetail().getValue();
         String subscriptionId = subscriptionQueueItem.getId();
         LocalDate vehicleMotExpiryDate = vehicleDetails.getMotExpiryDate();
         String vrm = vehicleDetails.getRegNumber();
@@ -177,7 +178,7 @@ public class ProcessSubscriptionService {
         VehicleDetails vehicleDetails = getVehicleDetails(subscriptionQueueItem);
         String vrm = vehicleDetails.getRegNumber();
         LocalDate vehicleMotExpiryDate = vehicleDetails.getMotExpiryDate();
-        String phoneNumber = subscriptionQueueItem.getContactDetail();
+        String phoneNumber = subscriptionQueueItem.getContactDetail().getValue();
 
         if (oneMonthNotificationRequired(requestDate, vehicleMotExpiryDate)) {
 

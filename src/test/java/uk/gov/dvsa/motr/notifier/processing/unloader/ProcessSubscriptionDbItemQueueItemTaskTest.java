@@ -3,6 +3,7 @@ package uk.gov.dvsa.motr.notifier.processing.unloader;
 import org.junit.Before;
 import org.junit.Test;
 
+import uk.gov.dvsa.motr.notifier.processing.model.ContactDetail;
 import uk.gov.dvsa.motr.notifier.processing.model.SubscriptionQueueItem;
 import uk.gov.dvsa.motr.notifier.processing.queue.QueueItemRemover;
 import uk.gov.dvsa.motr.notifier.processing.service.ProcessSubscriptionService;
@@ -34,8 +35,7 @@ public class ProcessSubscriptionDbItemQueueItemTaskTest {
                 .setMotDueDate(requestDate)
                 .setVrm("12345")
                 .setMotTestNumber("test-mot-number-123")
-                .setContactDetail("test@test.com")
-                .setContactType(SubscriptionQueueItem.ContactType.EMAIL);
+                .setContactDetail(new ContactDetail("test@test.com", SubscriptionQueueItem.ContactType.EMAIL));
 
         processSubscriptionTask = new ProcessSubscriptionTask(
                 requestDate, subscriptionQueueItemToProcess, report, processSubscriptionService, queueItemRemover);

@@ -6,6 +6,7 @@ import org.junit.Test;
 import uk.gov.dvsa.motr.notifier.component.subscription.persistence.SubscriptionRepository;
 import uk.gov.dvsa.motr.notifier.notify.NotifyEmailService;
 import uk.gov.dvsa.motr.notifier.notify.NotifySmsService;
+import uk.gov.dvsa.motr.notifier.processing.model.ContactDetail;
 import uk.gov.dvsa.motr.notifier.processing.model.SubscriptionQueueItem;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
@@ -397,10 +398,9 @@ public class ProcessSubscriptionDbItemQueueItemServiceTest {
         return new SubscriptionQueueItem()
                 .setId(SUBSCRIPTION_ID)
                 .setMessageReceiptHandle("Test-receipt-handle")
-                .setContactDetail("test@this-is-a-test-123")
+                .setContactDetail(new ContactDetail("test@this-is-a-test-123", SubscriptionQueueItem.ContactType.EMAIL))
                 .setMotDueDate(motDueDate)
-                .setVrm(TEST_VRM)
-                .setContactType(SubscriptionQueueItem.ContactType.EMAIL);
+                .setVrm(TEST_VRM);
     }
 
     private SubscriptionQueueItem smsSubscriptionStub(LocalDate motDueDate) {
@@ -408,10 +408,9 @@ public class ProcessSubscriptionDbItemQueueItemServiceTest {
         return new SubscriptionQueueItem()
                 .setId(SUBSCRIPTION_ID)
                 .setMessageReceiptHandle("Test-receipt-handle")
-                .setContactDetail(TEST_PHONE_NUMBER)
+                .setContactDetail(new ContactDetail(TEST_PHONE_NUMBER, SubscriptionQueueItem.ContactType.MOBILE))
                 .setMotDueDate(motDueDate)
-                .setVrm(TEST_VRM)
-                .setContactType(SubscriptionQueueItem.ContactType.MOBILE);
+                .setVrm(TEST_VRM);
     }
 
     private VehicleDetails vehicleDetailsStub(LocalDate expiryDate) {
