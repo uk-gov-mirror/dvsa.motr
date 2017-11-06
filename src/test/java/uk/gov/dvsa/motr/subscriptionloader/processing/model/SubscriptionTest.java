@@ -1,13 +1,18 @@
 package uk.gov.dvsa.motr.subscriptionloader.processing.model;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.time.LocalDate;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 public class SubscriptionTest {
 
@@ -56,9 +61,9 @@ public class SubscriptionTest {
     @Test
     public void testSetAndGetEmail() {
 
-        Subscription returnedSub = this.subscription.setEmail(TEST_EMAIL);
+        Subscription returnedSub = this.subscription.setContactDetail(new ContactDetail(TEST_EMAIL, TEST_CONTACT_TYPE));
 
-        assertEquals(TEST_EMAIL, this.subscription.getEmail());
+        assertEquals(TEST_EMAIL, this.subscription.getContactDetail().getValue());
         assertThat(returnedSub, instanceOf(Subscription.class));
     }
 
@@ -87,8 +92,7 @@ public class SubscriptionTest {
         Subscription subscription = this.subscription.setId(TEST_ID)
                 .setMotDueDate(now)
                 .setVrm(TEST_VRM)
-                .setEmail(TEST_EMAIL)
-                .setContactType(TEST_CONTACT_TYPE)
+                .setContactDetail(new ContactDetail(TEST_EMAIL, TEST_CONTACT_TYPE))
                 .setMotTestNumber(TEST_MOT_TEST_NUMBER)
                 .setLoadedOnDate(now);
 
@@ -105,8 +109,7 @@ public class SubscriptionTest {
         Subscription subscription = this.subscription.setId(TEST_ID)
                 .setMotDueDate(now)
                 .setVrm(TEST_VRM)
-                .setEmail(TEST_EMAIL)
-                .setContactType(TEST_CONTACT_TYPE)
+                .setContactDetail(new ContactDetail(TEST_EMAIL, TEST_CONTACT_TYPE))
                 .setDvlaId(TEST_DVLA_ID)
                 .setLoadedOnDate(now);
 
@@ -114,5 +117,27 @@ public class SubscriptionTest {
                 now.toString() +
                 ", vrm='test_vrm', email='test_email', contactType='EMAIL', motTestNumber='null', dvlaId='test_dvla_id', loadedOnDate=" +
                 now.toString() + "}", subscription.toString());
+    }
+
+    @Test
+    public void testSerialisationIsSuccessful() throws IOException {
+
+        LocalDate now = LocalDate.now();
+        Subscription subscription = this.subscription.setId(TEST_ID)
+                .setMotDueDate(now)
+                .setVrm(TEST_VRM)
+                .setContactDetail(new ContactDetail(TEST_EMAIL, TEST_CONTACT_TYPE))
+                .setDvlaId(TEST_DVLA_ID)
+                .setLoadedOnDate(now);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        String serialised = objectMapper.writeValueAsString(subscription);
+        Subscription deserialised = objectMapper.readValue(serialised, Subscription.class);
+
+        assertEquals(subscription.toString(), deserialised.toString());
+        assertEquals(TEST_VRM, deserialised.getVrm());
+        assertEquals(TEST_EMAIL, deserialised.getContactDetail().getValue());
+        assertEquals(TEST_CONTACT_TYPE, deserialised.getContactDetail().getContactType());
     }
 }

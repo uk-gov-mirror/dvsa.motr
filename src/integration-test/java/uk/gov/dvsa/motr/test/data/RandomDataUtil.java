@@ -25,8 +25,8 @@ public class RandomDataUtil {
 
     private static String email() {
 
-        return UUID.randomUUID().toString().replaceAll("[-]", "") +
-                "@" + UUID.randomUUID().toString().replaceAll("[-]", "") + ".com";
+        return (UUID.randomUUID().toString().replaceAll("[-]", "") +
+                "@" + UUID.randomUUID().toString().replaceAll("[-]", "") + ".com").toLowerCase();
     }
 
     private static String mobile() {
