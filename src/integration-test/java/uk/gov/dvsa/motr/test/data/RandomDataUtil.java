@@ -31,7 +31,7 @@ public class RandomDataUtil {
 
     private static String mobile() {
 
-        return random(11, false, false);
+        return random(11, false, true);
     }
 
     public static String vrm() {
