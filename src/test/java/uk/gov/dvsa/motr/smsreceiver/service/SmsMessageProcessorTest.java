@@ -18,8 +18,10 @@ import uk.gov.dvsa.motr.smsreceiver.events.InvalidVrmSentEvent;
 import uk.gov.dvsa.motr.smsreceiver.events.UnableToProcessMessageEvent;
 import uk.gov.dvsa.motr.smsreceiver.events.UserAlreadyUnsubscribedEvent;
 import uk.gov.dvsa.motr.smsreceiver.model.Message;
+import uk.gov.dvsa.motr.smsreceiver.notify.NotifySmsService;
 import uk.gov.dvsa.motr.smsreceiver.subscription.model.Subscription;
 import uk.gov.dvsa.motr.smsreceiver.subscription.persistence.SubscriptionRepository;
+import uk.gov.service.notify.NotificationClientException;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -28,11 +30,14 @@ import java.util.Optional;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.isA;
+
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
+
 import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 
 @SuppressWarnings("unchecked")
@@ -45,11 +50,12 @@ public class SmsMessageProcessorTest {
     private static final String TEST_TOKEN = "Bearer asdqwerty";
     private static final String BAD_TEST_TOKEN = "Bearer imabadbadtoken";
 
-    private SubscriptionRepository subscriptionRepository = mock(SubscriptionRepository .class);
+    private SubscriptionRepository subscriptionRepository = mock(SubscriptionRepository.class);
     private CancelledSubscriptionHelper cancelledSubscriptionHelper = mock(CancelledSubscriptionHelper.class);
     private VrmValidator vrmValidator = mock(VrmValidator.class);
     private SmsMessageProcessor smsMessageProcessor;
     private SmsMessageValidator smsMessageValidator = mock(SmsMessageValidator.class);
+    private NotifySmsService notifySmsService = mock(NotifySmsService.class);
 
     @Before
     public void setup() {
@@ -60,7 +66,7 @@ public class SmsMessageProcessorTest {
 
     @Test
     public void whenMessageIsWellFormed_AndThereIsAMatchingSubscriptionToCancel_ThenSubscriptionSuccessfullyCancelled()
-            throws IOException, InvalidNotifyCredentialsException {
+            throws IOException, InvalidNotifyCredentialsException, NotificationClientException {
 
         Subscription subscription = buildTestSubscription(TEST_VRM, MOBILE_NUMBER);
 
@@ -75,22 +81,24 @@ public class SmsMessageProcessorTest {
 
         verify(cancelledSubscriptionHelper, times(1)).createANewCancelledSubscriptionEntry(subscription);
         verify(subscriptionRepository, times(1)).delete(subscription);
+        verify(notifySmsService, times(1)).sendUnsubscriptionConfirmationSms(MOBILE_NUMBER, TEST_VRM);
     }
 
     @Test
     public void whenThereAreInsufficentDetailsInTheTextMessage_ThenAnExceptionIsThrown()
-            throws IOException, InvalidNotifyCredentialsException {
+            throws IOException, InvalidNotifyCredentialsException, NotificationClientException {
 
         smsMessageProcessor = initialiseProcessor();
         smsMessageProcessor.run(buildTestRequest("SOMETHING INSUFFICIENT"));
 
         verifyStatic(times(1));
         EventLogger.logEvent(isA(UnableToProcessMessageEvent.class));
+        verifyZeroInteractions(notifySmsService);
     }
 
     @Test
     public void whenTheMessageDoesntHaveAValidVrm_ThenAnErrorEventIsLogged()
-            throws IOException, InvalidNotifyCredentialsException {
+            throws IOException, InvalidNotifyCredentialsException, NotificationClientException {
 
         when(smsMessageValidator.messageHasSufficientDetails(any())).thenReturn(true);
         when(vrmValidator.isValid(TEST_VRM)).thenReturn(false);
@@ -99,11 +107,12 @@ public class SmsMessageProcessorTest {
 
         verifyStatic(times(1));
         EventLogger.logEvent(isA(InvalidVrmSentEvent.class));
+        verifyZeroInteractions(notifySmsService);
     }
 
     @Test
     public void whenNoSubscriptionIsFound_ButCancelledSubscriptionIsPresent_ThenUserAlreadyUnsubscribedEventIsLogged()
-            throws IOException, InvalidNotifyCredentialsException {
+            throws IOException, InvalidNotifyCredentialsException, NotificationClientException {
 
         when(smsMessageValidator.messageHasSufficientDetails(any())).thenReturn(true);
         when(vrmValidator.isValid(TEST_VRM)).thenReturn(true);
@@ -114,11 +123,12 @@ public class SmsMessageProcessorTest {
 
         verifyStatic(times(1));
         EventLogger.logEvent(isA(UserAlreadyUnsubscribedEvent.class));
+        verifyZeroInteractions(notifySmsService);
     }
 
     @Test
     public void whenNoSubscriptionIsFound_AndNoCancelledSubscriptionIsPresent_ThenFailedToFindSubscriptionEventIsLogged()
-            throws IOException, InvalidNotifyCredentialsException {
+            throws IOException, InvalidNotifyCredentialsException, NotificationClientException {
 
         when(smsMessageValidator.messageHasSufficientDetails(any())).thenReturn(true);
         when(vrmValidator.isValid(TEST_VRM)).thenReturn(true);
@@ -129,11 +139,12 @@ public class SmsMessageProcessorTest {
 
         verifyStatic(times(1));
         EventLogger.logEvent(isA(FailedToFindSubscriptionEvent.class));
+        verifyZeroInteractions(notifySmsService);
     }
 
     @Test
     public void testBearerTokenIsVerified()
-            throws IOException, InvalidNotifyCredentialsException {
+            throws IOException, InvalidNotifyCredentialsException, NotificationClientException {
 
         smsMessageProcessor = initialiseProcessorWithBadToken();
         smsMessageProcessor.run(buildTestRequest("STOP" + TEST_VRM));
@@ -171,13 +182,13 @@ public class SmsMessageProcessorTest {
 
     private SmsMessageProcessor initialiseProcessorWithBadToken() {
 
-        return new SmsMessageProcessor(subscriptionRepository, smsMessageValidator,
-                cancelledSubscriptionHelper, BAD_TEST_TOKEN, vrmValidator, new MessageExtractor());
+        return new SmsMessageProcessor(subscriptionRepository, smsMessageValidator, cancelledSubscriptionHelper, BAD_TEST_TOKEN,
+                vrmValidator, new MessageExtractor(), notifySmsService);
     }
 
     private SmsMessageProcessor initialiseProcessor() {
 
-        return new SmsMessageProcessor(subscriptionRepository, smsMessageValidator,
-                cancelledSubscriptionHelper, TEST_TOKEN, vrmValidator, new MessageExtractor());
+        return new SmsMessageProcessor(subscriptionRepository, smsMessageValidator, cancelledSubscriptionHelper, TEST_TOKEN,
+                vrmValidator, new MessageExtractor(), notifySmsService);
     }
 }

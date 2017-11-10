@@ -13,6 +13,7 @@ import uk.gov.dvsa.motr.smsreceiver.config.EncryptionAwareConfig;
 import uk.gov.dvsa.motr.smsreceiver.config.EnvironmentVariableConfig;
 import uk.gov.dvsa.motr.smsreceiver.encryption.AwsKmsDecryptor;
 import uk.gov.dvsa.motr.smsreceiver.encryption.Decryptor;
+import uk.gov.dvsa.motr.smsreceiver.notify.NotifySmsService;
 import uk.gov.dvsa.motr.smsreceiver.service.CancelledSubscriptionHelper;
 import uk.gov.dvsa.motr.smsreceiver.service.MessageExtractor;
 import uk.gov.dvsa.motr.smsreceiver.service.SmsMessageValidator;
@@ -21,6 +22,8 @@ import uk.gov.dvsa.motr.smsreceiver.subscription.persistence.CancelledSubscripti
 import uk.gov.dvsa.motr.smsreceiver.subscription.persistence.DynamoDbCancelledSubscriptionRepository;
 import uk.gov.dvsa.motr.smsreceiver.subscription.persistence.DynamoDbSubscriptionRepository;
 import uk.gov.dvsa.motr.smsreceiver.subscription.persistence.SubscriptionRepository;
+import uk.gov.dvsa.motr.smsreceiver.system.SystemVariable;
+import uk.gov.service.notify.NotificationClient;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -32,9 +35,11 @@ import static org.apache.log4j.Level.toLevel;
 
 import static uk.gov.dvsa.motr.smsreceiver.system.SystemVariable.DB_TABLE_CANCELLED_SUBSCRIPTION;
 import static uk.gov.dvsa.motr.smsreceiver.system.SystemVariable.DB_TABLE_SUBSCRIPTION;
+import static uk.gov.dvsa.motr.smsreceiver.system.SystemVariable.GOV_NOTIFY_API_TOKEN;
 import static uk.gov.dvsa.motr.smsreceiver.system.SystemVariable.LOG_LEVEL;
 import static uk.gov.dvsa.motr.smsreceiver.system.SystemVariable.NOTIFY_BEARER_TOKEN;
 import static uk.gov.dvsa.motr.smsreceiver.system.SystemVariable.REGION;
+import static uk.gov.dvsa.motr.smsreceiver.system.SystemVariable.SMS_UNSUBSCRIPTION_CONFIRMATION_TEMPLATE_ID;
 
 public class ConfigModule extends AbstractModule {
 
@@ -105,10 +110,20 @@ public class ConfigModule extends AbstractModule {
         return config.getValue(NOTIFY_BEARER_TOKEN);
     }
 
+    @Provides
+    public NotifySmsService provideNotifySmsService(Config config) {
+
+        NotificationClient notificationClient = new NotificationClient(config.getValue(GOV_NOTIFY_API_TOKEN));
+        String smsUnsubscriptionConfirmationTemplateId = config.getValue(SMS_UNSUBSCRIPTION_CONFIRMATION_TEMPLATE_ID);
+
+        return new NotifySmsService(notificationClient, smsUnsubscriptionConfirmationTemplateId);
+    }
+
     private static Set<ConfigKey> secretVariables() {
 
         Set<ConfigKey> secretVariables = new HashSet<>();
-        secretVariables.add(NOTIFY_BEARER_TOKEN);
+        secretVariables.add(SystemVariable.GOV_NOTIFY_API_TOKEN);
+        secretVariables.add(SystemVariable.NOTIFY_BEARER_TOKEN);
         return secretVariables;
     }
 }
