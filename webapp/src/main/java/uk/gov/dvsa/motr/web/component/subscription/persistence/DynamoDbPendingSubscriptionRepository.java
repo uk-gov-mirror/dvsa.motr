@@ -12,12 +12,14 @@ import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
 import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 import com.amazonaws.services.dynamodbv2.model.AmazonDynamoDBException;
+import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException;
 
 import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
 import uk.gov.dvsa.motr.web.component.subscription.model.PendingSubscription;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
+import uk.gov.dvsa.motr.web.eventlog.subscription.PendingSubscriptionAlreadyDeletedEvent;
 import uk.gov.dvsa.motr.web.eventlog.subscription.PendingSubscriptionDeletionFailedEvent;
 import uk.gov.dvsa.motr.web.helper.SystemVariableParam;
 
@@ -130,15 +132,38 @@ public class DynamoDbPendingSubscriptionRepository implements PendingSubscriptio
                     null,
                     expressionAttributeValues
             );
+        } catch (ConditionalCheckFailedException e) {
+            logPendingSubscriptionAlreadyDeletedEvent(e, subscription);
         } catch (AmazonDynamoDBException e) {
-            EventLogger.logEvent(new PendingSubscriptionDeletionFailedEvent()
-                    .setConfirmationId(subscription.getConfirmationId())
-                    .setVrm(subscription.getVrm())
-                    .setContact(subscription.getContactDetail().getValue())
-                    .setMessage(e.getMessage())
-                    .setErrorMessage(e.getErrorMessage()));
+            logPendingSubscriptionDeletionFailedEvent(e, subscription);
             throw e;
         }
+    }
+
+    private void logPendingSubscriptionAlreadyDeletedEvent(
+            ConditionalCheckFailedException exception,
+            PendingSubscription subscription) {
+
+        EventLogger.logEvent(new PendingSubscriptionAlreadyDeletedEvent()
+                .setConfirmationId(subscription.getConfirmationId())
+                .setVrm(subscription.getVrm())
+                .setContact(subscription.getContactDetail().getValue())
+                .setMessage(exception.getMessage())
+                .setErrorMessage(exception.getErrorMessage())
+        );
+    }
+
+    private void logPendingSubscriptionDeletionFailedEvent(
+            AmazonDynamoDBException exception,
+            PendingSubscription subscription) {
+
+        EventLogger.logEvent(new PendingSubscriptionDeletionFailedEvent()
+                .setConfirmationId(subscription.getConfirmationId())
+                .setVrm(subscription.getVrm())
+                .setContact(subscription.getContactDetail().getValue())
+                .setMessage(exception.getMessage())
+                .setErrorMessage(exception.getErrorMessage())
+        );
     }
 
     private PendingSubscription mapItemToPendingSubscription(Item item) {
