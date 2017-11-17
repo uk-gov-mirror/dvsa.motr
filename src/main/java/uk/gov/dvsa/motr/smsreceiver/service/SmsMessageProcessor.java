@@ -4,16 +4,17 @@ import com.amazonaws.serverless.proxy.internal.model.AwsProxyRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.exception.InvalidNotifyCredentialsException;
+
 import uk.gov.dvsa.motr.smsreceiver.events.FailedToFindSubscriptionEvent;
 import uk.gov.dvsa.motr.smsreceiver.events.InvalidVrmSentEvent;
+import uk.gov.dvsa.motr.smsreceiver.events.SmsUnsubscribedConfirmationEvent;
 import uk.gov.dvsa.motr.smsreceiver.events.UnableToProcessMessageEvent;
 import uk.gov.dvsa.motr.smsreceiver.events.UserAlreadyUnsubscribedEvent;
 import uk.gov.dvsa.motr.smsreceiver.model.Message;
+import uk.gov.dvsa.motr.smsreceiver.notify.NotifySmsService;
 import uk.gov.dvsa.motr.smsreceiver.subscription.model.Subscription;
 import uk.gov.dvsa.motr.smsreceiver.subscription.persistence.SubscriptionRepository;
 
@@ -24,10 +25,8 @@ import javax.inject.Inject;
 
 public class SmsMessageProcessor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SmsMessageProcessor.class);
     private static final String ERROR_MESSAGE = "There is insufficient information in the received sms message to proceed with " +
             "processing for message with message body %s";
-    private static final String REASON_FOR_CANCELLATION_USER_CANCELLED = "User cancelled";
     private static final String AUTHORISATION_HEADER = "Authorization";
     private static final String BEARER_TOKEN = "Bearer ";
 
@@ -37,21 +36,25 @@ public class SmsMessageProcessor {
     private String token;
     private VrmValidator vrmValidator;
     private MessageExtractor messageExtractor;
+    private NotifySmsService notifySmsService;
 
     @Inject
-    public SmsMessageProcessor(SubscriptionRepository subscriptionRepository,
+    public SmsMessageProcessor(
+            SubscriptionRepository subscriptionRepository,
             SmsMessageValidator smsMessageValidator,
             CancelledSubscriptionHelper cancelledSubscriptionHelper,
             String token,
             VrmValidator vrmValidator,
-            MessageExtractor messageExtractor) {
-
+            MessageExtractor messageExtractor,
+            NotifySmsService notifySmsService
+    ) {
         this.subscriptionRepository = subscriptionRepository;
         this.smsMessageValidator = smsMessageValidator;
         this.cancelledSubscriptionHelper = cancelledSubscriptionHelper;
         this.token = token;
         this.vrmValidator = vrmValidator;
         this.messageExtractor = messageExtractor;
+        this.notifySmsService = notifySmsService;
     }
 
     public void run(AwsProxyRequest request) {
@@ -82,6 +85,8 @@ public class SmsMessageProcessor {
                 Subscription subscriptionToProcess = subscription.get();
                 cancelledSubscriptionHelper.createANewCancelledSubscriptionEntry(subscriptionToProcess);
                 subscriptionRepository.delete(subscriptionToProcess);
+                notifySmsService.sendUnsubscriptionConfirmationSms(mobileNumber, vrm);
+                EventLogger.logEvent(new SmsUnsubscribedConfirmationEvent().setVrm(vrm));
             } else if (cancelledSubscriptionHelper.foundMatchingCancelledSubscription(vrm, mobileNumber)) {
                 EventLogger.logEvent(new UserAlreadyUnsubscribedEvent().setVrm(vrm));
             } else {
