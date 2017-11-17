@@ -28,7 +28,7 @@ import static uk.gov.dvsa.motr.web.system.SystemVariable.REGION;
 @Singleton
 public class DynamoDbSmsConfirmationRepository implements SmsConfirmationRepository {
 
-    private static final int MONTHS_TO_DELETION = 1;
+    private static final int HOURS_TO_DELETION = 24;
 
     private DynamoDB dynamoDb;
     private String tableName;
@@ -92,7 +92,7 @@ public class DynamoDbSmsConfirmationRepository implements SmsConfirmationReposit
                 .withString("code", smsConfirmation.getCode())
                 .withInt("attempts", smsConfirmation.getAttempts())
                 .withInt("resend_attempts", smsConfirmation.getResendAttempts())
-                .withNumber("deletion_date", ZonedDateTime.now().plusMonths(MONTHS_TO_DELETION).toEpochSecond());
+                .withNumber("deletion_date", ZonedDateTime.now().plusHours(HOURS_TO_DELETION).toEpochSecond());
     }
 
     private SmsConfirmation mapItemToSmsConfirmation(Item item) {
