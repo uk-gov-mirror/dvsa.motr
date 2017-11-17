@@ -7,7 +7,6 @@ import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsService;
 import uk.gov.dvsa.motr.web.component.subscription.exception.InvalidConfirmationIdException;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
-import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
 import uk.gov.dvsa.motr.web.component.subscription.model.PendingSubscription;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.persistence.PendingSubscriptionRepository;
