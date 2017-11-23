@@ -14,13 +14,13 @@
 
             <h1 class="heading-large">One more step</h1>
 
-            <p>We sent you a text message with a 6-digit code. Enter the code below to activate your reminder.</p>
+            <p>We sent you a text message with a 6-digit activation code, which expires in 24h. Enter the code on this page to activate your reminder.</p>
 
             <form method="POST" autocomplete="off" novalidate="" action="confirm-phone">
 
                 <div class="form-group {{#showInLine}}{{#message}}form-group-error{{/message}}{{/showInLine}}" id="confirm-code-input">
                     <label for="confirmationCode" class="form-label">
-                        Code from text message
+                        Your activation code
                         {{#showInLine}}
                             {{#messageAtField}}<span class="error-message">{{ messageAtField }}</span>{{/messageAtField}}
                         {{/showInLine}}
