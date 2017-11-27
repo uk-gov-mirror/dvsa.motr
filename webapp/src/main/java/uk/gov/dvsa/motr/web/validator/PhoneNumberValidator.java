@@ -31,6 +31,12 @@ public class PhoneNumberValidator {
 
     public boolean isValid(String phoneNumber) {
 
+        return hasPhoneNumberBeenEntered(phoneNumber) && isPhoneNumberAValidUkNumber(phoneNumber)
+                && hasPhoneNumberGotMaxTwoSubscriptions(phoneNumber);
+    }
+
+    private boolean hasPhoneNumberBeenEntered(String phoneNumber) {
+
         if (phoneNumber == null || phoneNumber.isEmpty()) {
             message = EMPTY_PHONE_NUMBER_MESSAGE;
             messageAtField = EMPTY_PHONE_NUMBER_MESSAGE;
@@ -38,29 +44,13 @@ public class PhoneNumberValidator {
             return false;
         }
 
-        if (!subscriptionsValidationService.hasMaxTwoSubscriptionsForPhoneNumber(phoneNumber)) {
-            message = TOO_MANY_SUBSCRIPTIONS;
-            messageAtField = TOO_MANY_SUBSCRIPTIONS_AT_FIELD;
-
-            return false;
-        }
-
-        return validate(phoneNumber);
+        return true;
     }
 
-    public String getMessage() {
+    private boolean isPhoneNumberAValidUkNumber(String phoneNumber) {
 
-        return message;
-    }
-
-    public String getMessageAtField() {
-
-        return messageAtField;
-    }
-    
-    private boolean validate(String phoneNumber) {
-
-        Pattern validationRegex = Pattern.compile("07\\d{9}");
+        Pattern validationRegex = Pattern.compile("^(\\(?07\\d{3}\\)?|\\+447\\d{3}|447\\d{3}|00447\\d{3}|\\(44\\)7\\d{3}|" +
+                "\\(\\+44\\)7\\d{3})\\d{6}$");
 
         Matcher matcher = validationRegex.matcher(phoneNumber);
 
@@ -72,5 +62,26 @@ public class PhoneNumberValidator {
         }
 
         return true;
+    }
+
+    private boolean hasPhoneNumberGotMaxTwoSubscriptions(String phoneNumber) {
+        if (!subscriptionsValidationService.hasMaxTwoSubscriptionsForPhoneNumber(phoneNumber)) {
+            message = TOO_MANY_SUBSCRIPTIONS;
+            messageAtField = TOO_MANY_SUBSCRIPTIONS_AT_FIELD;
+
+            return false;
+        }
+
+        return true;
+    }
+
+    public String getMessage() {
+
+        return message;
+    }
+
+    public String getMessageAtField() {
+
+        return messageAtField;
     }
 }

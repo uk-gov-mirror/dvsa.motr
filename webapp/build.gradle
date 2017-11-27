@@ -76,6 +76,8 @@ dependencies {
     compile 'uk.gov.service.notify:notifications-java-client:3.0.0-RELEASE'
     compile 'commons-codec:commons-codec:1.10'
 
+    compile 'com.googlecode.libphonenumber:libphonenumber:8.8.6'
+
     testCompile 'com.tngtech.java:junit-dataprovider:1.12.0'
     testCompile 'com.github.tomakehurst:wiremock:2.5.1'
     testCompile 'com.github.stefanbirkner:system-rules:1.16.0'

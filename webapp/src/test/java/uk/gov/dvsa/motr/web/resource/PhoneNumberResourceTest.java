@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
+import uk.gov.dvsa.motr.web.formatting.PhoneNumberFormatter;
 import uk.gov.dvsa.motr.web.test.render.TemplateEngineStub;
 import uk.gov.dvsa.motr.web.validator.PhoneNumberValidator;
 
@@ -22,6 +23,7 @@ public class PhoneNumberResourceTest {
     private TemplateEngineStub engine;
     private PhoneNumberResource resource;
     private PhoneNumberValidator validator;
+    private PhoneNumberFormatter formatter;
 
     @Before
     public void setup() {
@@ -29,7 +31,8 @@ public class PhoneNumberResourceTest {
         validator = mock(PhoneNumberValidator.class);
         motrSession = mock(MotrSession.class);
         engine = new TemplateEngineStub();
-        resource = new PhoneNumberResource(motrSession, engine, validator);
+        formatter = mock(PhoneNumberFormatter.class);
+        resource = new PhoneNumberResource(motrSession, engine, validator, formatter);
         when(motrSession.getPhoneNumberFromSession()).thenReturn(PHONE_NUMBER);
     }
 
@@ -45,6 +48,7 @@ public class PhoneNumberResourceTest {
     @Test
     public void onPostWithValid_ThenRedirectedToReviewPage() throws Exception {
 
+        when(formatter.normalizeUkPhoneNumber(PHONE_NUMBER)).thenReturn(PHONE_NUMBER);
         when(validator.isValid(PHONE_NUMBER)).thenReturn(true);
         Response response = resource.phoneNumberPagePost(PHONE_NUMBER);
 

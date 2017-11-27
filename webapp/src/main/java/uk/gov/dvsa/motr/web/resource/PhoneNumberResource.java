@@ -2,6 +2,7 @@ package uk.gov.dvsa.motr.web.resource;
 
 import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
+import uk.gov.dvsa.motr.web.formatting.PhoneNumberFormatter;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 import uk.gov.dvsa.motr.web.validator.PhoneNumberValidator;
 
@@ -35,6 +36,7 @@ public class PhoneNumberResource {
     private final TemplateEngine renderer;
     private final MotrSession motrSession;
     private PhoneNumberValidator validator;
+    private PhoneNumberFormatter formatter;
 
     private DataLayerHelper dataLayerHelper;
 
@@ -42,12 +44,14 @@ public class PhoneNumberResource {
     public PhoneNumberResource(
             MotrSession motrSession,
             TemplateEngine renderer,
-            PhoneNumberValidator validator
+            PhoneNumberValidator validator,
+            PhoneNumberFormatter formatter
     ) {
         this.motrSession = motrSession;
         this.renderer = renderer;
         this.dataLayerHelper = new DataLayerHelper();
         this.validator = validator;
+        this.formatter = formatter;
     }
 
     @GET
@@ -61,13 +65,14 @@ public class PhoneNumberResource {
             motrSession.setVisitingFromContactEntry(true);
         }
 
-        String phoneNumber = motrSession.getPhoneNumberFromSession();
-
         Map<String, Object> modelMap = new HashMap<>();
-        ReviewFlowUpdater.updateMapBasedOnReviewFlow(modelMap,
+        ReviewFlowUpdater.updateMapBasedOnReviewFlow(
+                modelMap,
                 motrSession.visitingFromContactEntryPage(),
-                motrSession.visitingFromReviewPage());
+                motrSession.visitingFromReviewPage()
+        );
 
+        String phoneNumber = motrSession.getUnnormalizedPhoneNumberFromSession();
         modelMap.put(PHONE_NUMBER_MODEL_KEY, phoneNumber);
 
         return Response.ok(renderer.render(PHONE_NUMBER_TEMPLATE, modelMap)).build();
@@ -76,9 +81,12 @@ public class PhoneNumberResource {
     @POST
     public Response phoneNumberPagePost(@FormParam("phoneNumber") String phoneNumber) throws Exception {
 
-        if (validator.isValid(phoneNumber)) {
+        String normalizedUkPhoneNumber = this.formatter.normalizeUkPhoneNumber(phoneNumber);
+
+        if (validator.isValid(normalizedUkPhoneNumber)) {
             motrSession.setChannel("text");
-            motrSession.setPhoneNumber(phoneNumber);
+            motrSession.setPhoneNumber(normalizedUkPhoneNumber);
+            motrSession.setUnnormalizedPhoneNumber(phoneNumber);
 
             return redirect("review");
         }

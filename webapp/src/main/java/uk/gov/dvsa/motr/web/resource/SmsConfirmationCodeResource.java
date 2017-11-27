@@ -65,7 +65,9 @@ public class SmsConfirmationCodeResource {
             return redirect(HomepageResource.HOMEPAGE_URL);
         }
 
-        SmsConfirmationCodeViewModel viewModel = new SmsConfirmationCodeViewModel().setPhoneNumber(motrSession.getPhoneNumberFromSession());
+        SmsConfirmationCodeViewModel viewModel = new SmsConfirmationCodeViewModel().setPhoneNumber(
+                motrSession.getUnnormalizedPhoneNumberFromSession()
+        );
         Map<String, Object> modelMap = new HashMap<>();
         modelMap.put("continue_button_text", "Continue");
         modelMap.put("resendUrl", "resend");
