@@ -36,7 +36,6 @@ public class PhoneNumberResource {
     private final TemplateEngine renderer;
     private final MotrSession motrSession;
     private PhoneNumberValidator validator;
-    private PhoneNumberFormatter formatter;
 
     private DataLayerHelper dataLayerHelper;
 
@@ -44,14 +43,12 @@ public class PhoneNumberResource {
     public PhoneNumberResource(
             MotrSession motrSession,
             TemplateEngine renderer,
-            PhoneNumberValidator validator,
-            PhoneNumberFormatter formatter
+            PhoneNumberValidator validator
     ) {
         this.motrSession = motrSession;
         this.renderer = renderer;
         this.dataLayerHelper = new DataLayerHelper();
         this.validator = validator;
-        this.formatter = formatter;
     }
 
     @GET
@@ -81,9 +78,11 @@ public class PhoneNumberResource {
     @POST
     public Response phoneNumberPagePost(@FormParam("phoneNumber") String phoneNumber) throws Exception {
 
-        String normalizedUkPhoneNumber = this.formatter.normalizeUkPhoneNumber(phoneNumber);
+        phoneNumber = PhoneNumberFormatter.trimWhitespace(phoneNumber);
 
-        if (validator.isValid(normalizedUkPhoneNumber)) {
+        if (validator.isValid(phoneNumber)) {
+            String normalizedUkPhoneNumber = PhoneNumberFormatter.normalizeUkPhoneNumber(phoneNumber);
+
             motrSession.setChannel("text");
             motrSession.setPhoneNumber(normalizedUkPhoneNumber);
             motrSession.setUnnormalizedPhoneNumber(phoneNumber);

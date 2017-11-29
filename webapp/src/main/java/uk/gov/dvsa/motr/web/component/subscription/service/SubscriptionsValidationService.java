@@ -1,6 +1,7 @@
 package uk.gov.dvsa.motr.web.component.subscription.service;
 
 import uk.gov.dvsa.motr.web.component.subscription.persistence.SubscriptionRepository;
+import uk.gov.dvsa.motr.web.formatting.PhoneNumberFormatter;
 
 import javax.inject.Inject;
 
@@ -16,7 +17,9 @@ public class SubscriptionsValidationService {
 
     public boolean hasMaxTwoSubscriptionsForPhoneNumber(String number) {
 
-        int count = subscriptionRepository.findByEmail(number);
+        String normalizedUkPhoneNumber = PhoneNumberFormatter.normalizeUkPhoneNumber(number);
+
+        int count = subscriptionRepository.findByEmail(normalizedUkPhoneNumber);
 
         return count < 2;
     }

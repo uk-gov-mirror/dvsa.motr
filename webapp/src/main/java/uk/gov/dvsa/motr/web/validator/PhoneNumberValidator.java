@@ -49,8 +49,12 @@ public class PhoneNumberValidator {
 
     private boolean isPhoneNumberAValidUkNumber(String phoneNumber) {
 
-        Pattern validationRegex = Pattern.compile("^(\\(?07\\d{3}\\)?|\\+447\\d{3}|447\\d{3}|00447\\d{3}|\\(44\\)7\\d{3}|" +
-                "\\(\\+44\\)7\\d{3})\\d{6}$");
+        Pattern validationRegex = Pattern.compile(
+                "^(\\(?07\\d{3}\\)?|" +
+                "\\+447\\d{3}|447\\d{3}|" +
+                "00447\\d{3}|\\(44\\)7\\d{3}|" +
+                "\\(\\+44\\)7\\d{3})\\d{3}\\d{3}$"
+        );
 
         Matcher matcher = validationRegex.matcher(phoneNumber);
 
@@ -65,6 +69,7 @@ public class PhoneNumberValidator {
     }
 
     private boolean hasPhoneNumberGotMaxTwoSubscriptions(String phoneNumber) {
+
         if (!subscriptionsValidationService.hasMaxTwoSubscriptionsForPhoneNumber(phoneNumber)) {
             message = TOO_MANY_SUBSCRIPTIONS;
             messageAtField = TOO_MANY_SUBSCRIPTIONS_AT_FIELD;

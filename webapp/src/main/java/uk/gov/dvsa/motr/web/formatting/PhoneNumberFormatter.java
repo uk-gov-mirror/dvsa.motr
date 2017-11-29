@@ -4,29 +4,32 @@ import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 
-import uk.gov.dvsa.motr.eventlog.EventLogger;
-import uk.gov.dvsa.motr.web.eventlog.subscription.PhoneNumberParseFailedEvent;
-
 public class PhoneNumberFormatter {
+
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(PhoneNumberFormatter.class);
 
     private static final String GB_REGION_CODE = "GB";
 
-    private PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.getInstance();
+    private static PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.getInstance();
 
-    public String normalizeUkPhoneNumber(String phoneNumber) {
+    public static String normalizeUkPhoneNumber(String phoneNumber) {
 
-        PhoneNumber ukNumberProto = null;
+        PhoneNumber ukNumberProto;
 
         try {
             ukNumberProto = phoneNumberUtil.parse(phoneNumber, GB_REGION_CODE);
+
+            if (ukNumberProto != null) {
+                return trimWhitespace(phoneNumberUtil.format(ukNumberProto, PhoneNumberUtil.PhoneNumberFormat.NATIONAL));
+            }
         } catch (NumberParseException exception) {
-            EventLogger.logErrorEvent(new PhoneNumberParseFailedEvent().setPhoneNumber(phoneNumber), exception);
+            logger.debug("There was a problem when trying to parse the phone number entered: " + exception.toString());
         }
 
-        return trimWhitespace(phoneNumberUtil.format(ukNumberProto, PhoneNumberUtil.PhoneNumberFormat.NATIONAL));
+        return null;
     }
 
-    private String trimWhitespace(String phoneNumber) {
+    public static String trimWhitespace(String phoneNumber) {
 
         return phoneNumber.replaceAll("\\s+","");
     }
