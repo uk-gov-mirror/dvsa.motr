@@ -12,7 +12,7 @@ public class SmsConfirmationCodeValidator implements Validator {
             "<br/>Enter 6 digits you received in text message";
     public static final String INVALID_CONFIRMATION_CODE_MESSAGE_AT_FIELD = "Enter 6 digits from text message";
 
-    public static final String CODE_INCORRECT_3_TIMES = "You can't subscribe now. <br/>" +
+    public static final String CODE_INCORRECT_3_TIMES = "You can’t subscribe now. <br/>" +
             "Code was entered incorrectly 3 times. <br/>" +
             "<br/>Come back later and try to subscribe again.";
 
