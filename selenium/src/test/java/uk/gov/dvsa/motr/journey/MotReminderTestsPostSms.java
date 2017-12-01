@@ -23,6 +23,8 @@ import static org.testng.Assert.assertTrue;
 
 public class MotReminderTestsPostSms extends BaseTest {
 
+    public static final String CONFIRMATION_PAGE_TITLE = "You’ve signed up for an MOT reminder";
+
     @Test(dataProvider = "dataProviderCreateEmailMotReminderForMyVehicle",
             description = "Owner of a vehicle with a mot is able to set up an email MOT reminder with their VRM and email and unsubscribe from it",
             groups = {"PostSms"})
@@ -38,7 +40,7 @@ public class MotReminderTestsPostSms extends BaseTest {
         UnsubscribeConfirmationPage unsubscribeConfirmed = motReminder.unsubscribeFromReminder(vrm, email);
 
         //Then my MOT reminder subscription has been cancelled
-        assertEquals(unsubscribeConfirmed.getBannerTitle(), "You've unsubscribed");
+        assertEquals(unsubscribeConfirmed.getBannerTitle(), "You’ve unsubscribed");
 
         //And I am shown a link to complete the unsubscribe survey
         assertTrue(unsubscribeConfirmed.isSurveyLinkDisplayed());
@@ -98,7 +100,7 @@ public class MotReminderTestsPostSms extends BaseTest {
         UnsubscribeErrorPage errorPage = motReminder.navigateToUnsubscribeExpectingErrorPage(subscriptionId);
 
         //Then I receive a error message informing me that I have already unsubscribed
-        assertEquals(errorPage.getErrorMessageText(), "You've already unsubscribed or the link hasn't worked.");
+        assertEquals(errorPage.getErrorMessageText(), "You’ve already unsubscribed or the link hasn’t worked.");
     }
 
     @Test(description = "Owner of a vehicle with a mot can change their email when creating an MOT email reminder",
@@ -147,7 +149,7 @@ public class MotReminderTestsPostSms extends BaseTest {
                         RandomGenerator.generateDvlaVrm(), RandomGenerator.generateEmail());
 
         //Then the confirmation page is displayed confirming my active reminder subscription
-        assertEquals(subscriptionConfirmationPage.getHeaderTitle(), "You've signed up for an MOT reminder");
+        assertEquals(subscriptionConfirmationPage.getHeaderTitle(), CONFIRMATION_PAGE_TITLE);
     }
 
     @Test(description = "Owner of a vehicle with a mot is able to set up a MOT reminder with their VRM and mobile number",
@@ -162,7 +164,7 @@ public class MotReminderTestsPostSms extends BaseTest {
                 motReminder.subscribeToReminderAndConfirmMobileNumber(vrm, mobileNumber);
 
         //Then the confirmation page is displayed confirming my active reminder subscription
-        assertEquals(subscriptionConfirmationPage.getHeaderTitle(), "You've signed up for an MOT reminder");
+        assertEquals(subscriptionConfirmationPage.getHeaderTitle(), CONFIRMATION_PAGE_TITLE);
     }
 
     @Test(description = "Owner of a new vehicle with a mot is able to set up a MOT reminder with their VRM and mobile number",
@@ -177,7 +179,7 @@ public class MotReminderTestsPostSms extends BaseTest {
                         RandomGenerator.generateDvlaVrm(), RandomGenerator.generateMobileNumber());
 
         //Then the confirmation page is displayed confirming my active reminder subscription
-        assertEquals(subscriptionConfirmationPage.getHeaderTitle(), "You've signed up for an MOT reminder");
+        assertEquals(subscriptionConfirmationPage.getHeaderTitle(), CONFIRMATION_PAGE_TITLE);
     }
 
     @Test(description = "Owner of a vehicle with a mot can change their mobile number when creating MOT reminder",
@@ -200,7 +202,7 @@ public class MotReminderTestsPostSms extends BaseTest {
                 phoneConfirmPage.enterConfirmationCode(motReminder.smsConfirmationCode(vrm, newMobileNumber));
 
         //Then my mot reminder is set up successfully with the updated mobile number
-        assertEquals(subscriptionConfirmationPage.getHeaderTitle(), "You've signed up for an MOT reminder");
+        assertEquals(subscriptionConfirmationPage.getHeaderTitle(), CONFIRMATION_PAGE_TITLE);
     }
 
     @Test(description = "Reminder subscriber with one active SMS subscription creates another subscription with the same VRM and " +
@@ -217,7 +219,7 @@ public class MotReminderTestsPostSms extends BaseTest {
                 motReminder.enterAndConfirmReminderDetailsSecondTimeOnMobileChannel(vrm, mobileNumber);
 
         // Then I do not need to confirm my mobile number again and am taken directly to the subscription confirmed page
-        assertEquals(subscriptionConfirmationPage.getHeaderTitle(), "You've signed up for an MOT reminder");
+        assertEquals(subscriptionConfirmationPage.getHeaderTitle(), CONFIRMATION_PAGE_TITLE);
     }
 
     @DataProvider(name = "dataProviderCreateEmailMotReminderForMyVehicle")

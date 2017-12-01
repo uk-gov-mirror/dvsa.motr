@@ -35,7 +35,7 @@ import static uk.gov.dvsa.motr.web.resource.RedirectResponseBuilder.redirect;
 public class VrmResource {
 
     private static final String VRM_MODEL_KEY = "vrm";
-    private static final String VEHICLE_NOT_FOUND_MESSAGE = "Check that you've typed in the correct registration number.<br/>" +
+    private static final String VEHICLE_NOT_FOUND_MESSAGE = "Check that you’ve typed in the correct registration number.<br/>" +
             "<br/>You can only sign up if the vehicle has a current MOT.";
 
     private static final String MESSAGE_KEY = "message";

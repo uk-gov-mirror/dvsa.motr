@@ -32,13 +32,13 @@ public class UnsubscribeConfirmationPage extends Page {
     @Override
     protected String getContentHeader() {
 
-        return "You've unsubscribed";
+        return "You’ve unsubscribed";
     }
 
     @Override
     protected String getPageTitle() {
 
-        return "You've unsubscribed - MOT reminders";
+        return "You’ve unsubscribed - MOT reminders";
     }
 
     public String getBannerTitle() {

@@ -5,13 +5,13 @@
         <div class="column-two-thirds">
 
             <div class="govuk-box-highlight">
-                <h1 class="bold-large">You've signed up for an MOT reminder</h1>
+                <h1 class="bold-large">You’ve signed up for an MOT reminder</h1>
                 <p>You’ll get {{#if usingSms}}a text message{{else}}an email{{/if}} one month before your MOT is due.</p>
             </div>
 
             <h2 class="heading-medium">What happens next?</h2>
-            <p>We've sent you a confirmation {{#if usingSms}}text message{{else}}email{{/if}}.</p>
-            <p>You'll get an annual reminder a month before your MOT is due, and again 2 weeks later if you don't have your MOT yet.</p>
+            <p>We’ve sent you a confirmation {{#if usingSms}}text message{{else}}email{{/if}}.</p>
+            <p>You’ll get an annual reminder a month before your MOT is due, and again 2 weeks later if you don’t have your MOT yet.</p>
             <h2 class="heading-medium">Unsubscribing from MOT reminders</h2>
             {{#if usingSms}}
                 <p>If you want to unsubscribe at any time, text <strong>STOP {{registration}}</strong> to {{replyNumber}}.</p>
@@ -40,4 +40,4 @@
     </div>
 
 {{/partial}}
-{{> master pageTitle="You've signed up for an MOT reminder"}}
+{{> master pageTitle="You’ve signed up for an MOT reminder"}}
