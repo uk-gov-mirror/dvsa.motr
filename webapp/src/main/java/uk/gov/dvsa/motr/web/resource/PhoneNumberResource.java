@@ -2,6 +2,7 @@ package uk.gov.dvsa.motr.web.resource;
 
 import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
+import uk.gov.dvsa.motr.web.formatting.PhoneNumberFormatter;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 import uk.gov.dvsa.motr.web.validator.PhoneNumberValidator;
 
@@ -61,13 +62,14 @@ public class PhoneNumberResource {
             motrSession.setVisitingFromContactEntry(true);
         }
 
-        String phoneNumber = motrSession.getPhoneNumberFromSession();
-
         Map<String, Object> modelMap = new HashMap<>();
-        ReviewFlowUpdater.updateMapBasedOnReviewFlow(modelMap,
+        ReviewFlowUpdater.updateMapBasedOnReviewFlow(
+                modelMap,
                 motrSession.visitingFromContactEntryPage(),
-                motrSession.visitingFromReviewPage());
+                motrSession.visitingFromReviewPage()
+        );
 
+        String phoneNumber = motrSession.getUnnormalizedPhoneNumberFromSession();
         modelMap.put(PHONE_NUMBER_MODEL_KEY, phoneNumber);
 
         return Response.ok(renderer.render(PHONE_NUMBER_TEMPLATE, modelMap)).build();
@@ -76,9 +78,14 @@ public class PhoneNumberResource {
     @POST
     public Response phoneNumberPagePost(@FormParam("phoneNumber") String phoneNumber) throws Exception {
 
+        phoneNumber = PhoneNumberFormatter.trimWhitespace(phoneNumber);
+
         if (validator.isValid(phoneNumber)) {
+            String normalizedUkPhoneNumber = PhoneNumberFormatter.normalizeUkPhoneNumber(phoneNumber);
+
             motrSession.setChannel("text");
-            motrSession.setPhoneNumber(phoneNumber);
+            motrSession.setPhoneNumber(normalizedUkPhoneNumber);
+            motrSession.setUnnormalizedPhoneNumber(phoneNumber);
 
             return redirect("review");
         }

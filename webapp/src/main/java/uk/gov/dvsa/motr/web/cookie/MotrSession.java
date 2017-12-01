@@ -17,6 +17,7 @@ public class MotrSession {
     private static final String EMAIL_COOKIE_ID = "email";
     private static final String CONFIRMATION_ID_COOKIE_ID = "confirmationId";
     private static final String PHONE_NUMBER_COOKIE_ID = "phoneNumber";
+    private static final String UNNORMALIZED_PHONE_NUMBER_COOKIE_ID = "unnormalizedPhoneNumber";
     private static final String CHANNEL_COOKIE_ID = "channel";
     private static final String VEHICLE_DETAILS_ID = "vehicleDetails";
     private static final String VISITING_FROM_REVIEW_COOKIE_ID = "visitingFromReview";
@@ -69,6 +70,12 @@ public class MotrSession {
 
         Object phoneNumberFromSession = getAttribute(PHONE_NUMBER_COOKIE_ID);
         return phoneNumberFromSession == null ? "" : phoneNumberFromSession.toString();
+    }
+
+    public String getUnnormalizedPhoneNumberFromSession() {
+
+        Object unnormalizedPhoneNumberFromSession = getAttribute(UNNORMALIZED_PHONE_NUMBER_COOKIE_ID);
+        return unnormalizedPhoneNumberFromSession == null ? "" : unnormalizedPhoneNumberFromSession.toString();
     }
 
     public String getChannelFromSession() {
@@ -172,6 +179,11 @@ public class MotrSession {
     public void setPhoneNumber(String phoneNumberValue) {
 
         this.setAttribute(PHONE_NUMBER_COOKIE_ID, phoneNumberValue);
+    }
+
+    public void setUnnormalizedPhoneNumber(String unnormalizedPhoneNumberValue) {
+
+        this.setAttribute(UNNORMALIZED_PHONE_NUMBER_COOKIE_ID, unnormalizedPhoneNumberValue);
     }
 
     public void setVrm(String vrmValue) {

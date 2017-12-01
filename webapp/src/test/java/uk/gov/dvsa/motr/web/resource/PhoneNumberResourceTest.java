@@ -1,9 +1,15 @@
 package uk.gov.dvsa.motr.web.resource;
 
+import com.tngtech.java.junit.dataprovider.DataProvider;
+import com.tngtech.java.junit.dataprovider.DataProviderRunner;
+import com.tngtech.java.junit.dataprovider.UseDataProvider;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
+import uk.gov.dvsa.motr.web.formatting.PhoneNumberFormatter;
 import uk.gov.dvsa.motr.web.test.render.TemplateEngineStub;
 import uk.gov.dvsa.motr.web.validator.PhoneNumberValidator;
 
@@ -13,10 +19,8 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@RunWith(DataProviderRunner.class)
 public class PhoneNumberResourceTest {
-
-    private static final String PHONE_NUMBER = "07801856718";
-    private static final String PHONE_NUMBER_INVALID = "0780185671";
 
     private MotrSession motrSession;
     private TemplateEngineStub engine;
@@ -30,7 +34,6 @@ public class PhoneNumberResourceTest {
         motrSession = mock(MotrSession.class);
         engine = new TemplateEngineStub();
         resource = new PhoneNumberResource(motrSession, engine, validator);
-        when(motrSession.getPhoneNumberFromSession()).thenReturn(PHONE_NUMBER);
     }
 
     @Test
@@ -43,21 +46,55 @@ public class PhoneNumberResourceTest {
     }
 
     @Test
-    public void onPostWithValid_ThenRedirectedToReviewPage() throws Exception {
+    @UseDataProvider("dataProviderValidPhoneNumber")
+    public void onPostWithValid_ThenRedirectedToReviewPage(String phoneNumber) throws Exception {
 
-        when(validator.isValid(PHONE_NUMBER)).thenReturn(true);
-        Response response = resource.phoneNumberPagePost(PHONE_NUMBER);
+        when(validator.isValid(PhoneNumberFormatter.trimWhitespace(phoneNumber))).thenReturn(true);
+        Response response = resource.phoneNumberPagePost(phoneNumber);
 
         assertEquals(302, response.getStatus());
     }
 
-    @Test
-    public void onPostWithInValid_ThenNotRedirectedToReviewPage() throws Exception {
+    @DataProvider
+    public static Object[][] dataProviderValidPhoneNumber() {
 
-        when(validator.isValid(PHONE_NUMBER_INVALID)).thenReturn(false);
-        Response response = resource.phoneNumberPagePost(PHONE_NUMBER_INVALID);
+        return new Object[][] {
+                { "07123456789" },
+                { "+44 7123456789" },
+                { "44 7123456789" },
+                { "0044 7123456789" },
+                { "(44)7123 456 789" },
+                { "(+44)7123 456 789" },
+        };
+    }
+
+    @Test
+    @UseDataProvider("dataProviderInvalidPhoneNumber")
+    public void onPostWithInValid_ThenNotRedirectedToReviewPage(String phoneNumber) throws Exception {
+
+        when(validator.isValid(PhoneNumberFormatter.trimWhitespace(phoneNumber))).thenReturn(false);
+        Response response = resource.phoneNumberPagePost(phoneNumber);
 
         assertEquals(200, response.getStatus());
         assertEquals("phone-number", engine.getTemplate());
+    }
+
+    @DataProvider
+    public static Object[][] dataProviderInvalidPhoneNumber() {
+
+        return new Object[][] {
+                { "712345678910" },
+                { "+44 (0)7123 456 789 10" },
+                { "004471234567" },
+                { "0712345678" },
+                { "+44 8081 570364" },
+                { "020 7946 0991" },
+                { " " },
+                { "07123 ☟☜⬇⬆☞☝" },
+                { "ALPHANUM3R1C" },
+                { "07123 456789..." },
+                { "071a234b5678c" },
+                { "07 12.34.56 78" },
+        };
     }
 }

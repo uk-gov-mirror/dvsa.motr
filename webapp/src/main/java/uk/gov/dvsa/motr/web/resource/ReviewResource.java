@@ -80,7 +80,7 @@ public class ReviewResource {
             map.put("correctContactType", "email address");
             map.put("changeContactId", "change-email-link");
         } else if (motrSession.isUsingSmsChannel()) {
-            contactFromSession = this.motrSession.getPhoneNumberFromSession();
+            contactFromSession = this.motrSession.getUnnormalizedPhoneNumberFromSession();
             contactTypeFromSession = "Mobile number";
             map.put("changeContactUrl", "/phone-number");
             map.put("correctContactType", "mobile number");

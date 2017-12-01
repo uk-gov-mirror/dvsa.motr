@@ -20,7 +20,6 @@ import static org.mockito.Mockito.when;
 @RunWith(DataProviderRunner.class)
 public class PhoneNumberValidatorTest {
 
-    private static final String EMPTY_PHONE_NUMBER_MESSAGE = "Enter your mobile number";
     private static final String INVALID_PHONE_NUMBER_MESSAGE_HEADING = "The number you entered is not a UK mobile phone " +
             "number";
     private static final String INVALID_PHONE_NUMBER_MESSAGE_FIELD = "Enter a valid UK mobile phone number";
