@@ -1,0 +1,96 @@
+{{#partial "content" }}
+
+    <div class="grid-row u-space-b30">
+
+        <div class="column-two-thirds">
+
+            <h1 class="heading-xlarge">Check your details</h1>
+
+            <p>Make sure the vehicle and your {{correctContactType}} are correct.</p>
+
+            <h2 class="heading-medium">Vehicle details</h2>
+
+            <dl class="govuk-check-your-answers cya-questions-short cya-questions-short--switch-bold">
+                <div>
+                    <dt class="cya-question">Registration number</dt>
+                    <dd class="cya-answer">{{viewModel.registration}}</dd>
+                    <dd class="cya-change"><a id="change-registration-link" href="{{url this "/vrm"}}">Change<span class="visuallyhidden"> vehicle registration</span></a></dd>
+                </div>
+                <div>
+                    <dt class="cya-question">Make</dt>
+                    <dd class="cya-answer">{{viewModel.make}}</dd>
+                    <dd class="cya-change">&nbsp;</dd>
+                </div>
+                <div>
+                    <dt class="cya-question">Model</dt>
+                    <dd class="cya-answer">{{viewModel.model}}</dd>
+                    <dd class="cya-change">&nbsp;</dd>
+                </div>
+                <div>
+                    <dt class="cya-question">Colour</dt>
+                    <dd class="cya-answer">{{viewModel.colour}}</dd>
+                    <dd class="cya-change">&nbsp;</dd>
+                </div>
+                <div>
+                    <dt class="cya-question">Year of manufacture</dt>
+                    <dd class="cya-answer">{{viewModel.yearOfManufacture}}</dd>
+                    <dd class="cya-change">&nbsp;</dd>
+                </div>
+
+                <div>
+                    {{#if isDvlaVehicle}}
+                        <dt class="cya-question">MOT due date</dt>
+                    {{else}}
+                        <dt class="cya-question">MOT expiry date</dt>
+                    {{/if}}
+                    <dd class="cya-answer">{{viewModel.expiryDate}}</dd>
+                    <dd class="cya-change">&nbsp;</dd>
+                </div>
+            </dl>
+
+        </div>
+    </div>
+
+     <div class="grid-row">
+        <div class="column-two-thirds">
+
+            <details>
+                <summary role="button"><span class="summary">Incorrect vehicle details?</span></summary>
+                <div class="panel panel-border-narrow">
+                <p>If you think any of the vehicle details are wrong, <a href="https://www.gov.uk/contact-dvsa/y/mot-vehicle-tests-and-approval" target="_blank">contact DVSA</a></p>
+                </div>
+            </details>
+
+        </div>
+     </div>
+
+     <div class="grid-row u-space-b30">
+        <div class="column-two-thirds">
+
+            <h2 class="heading-medium">Your details</h2>
+
+            <dl class="govuk-check-your-answers cya-questions-short cya-questions-short--switch-bold">
+                <div>
+                    <dt class="cya-question">{{viewModel.contactType}}</dt>
+                    <dd class="cya-answer">{{viewModel.contact}}</dd>
+                    <dd class="cya-change"><a id={{changeContactId}} href={{url this changeContactUrl}}>Change<span class="visuallyhidden"> {{viewModel.contactType}}</span></a></dd>
+                </div>
+            </dl>
+
+
+        </div>
+     </div>
+
+     <div class="grid-row">
+        <div class="column-two-thirds">
+
+            <form method="POST">
+                <div class="form-group">
+                    <input id="continue-button" type="submit" value="Continue" class="button">
+                </div>
+            </form>
+
+        </div>
+     </div>
+{{/partial}}
+{{> master pageTitle="Check your details – MOT reminders"}}
