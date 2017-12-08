@@ -1,0 +1,43 @@
+{{#partial "content" }}
+
+    <div class="grid-row">
+
+        <div class="column-two-thirds">
+
+            <a href="{{{url this back_url}}}" class="link-back">{{back_button_text}}</a>
+
+            <h1 class="heading-xlarge">What is the vehicle's registration number?</h1>
+
+            {{#message}}
+                {{> partial/error-message }}
+            {{/message}}
+
+            {{#showSystemError}}
+                {{> partial/system-error }}
+            {{/showSystemError}}
+
+            <form method="POST" autocomplete="off" novalidate="">
+
+                <div class="form-group {{#message}}form-group-error{{/message}}">
+                    <label for="regNumber" class="form-label">
+                        Registration number (number plate)
+                        {{#showInLine}}<span class="error-message">{{ message }}</span>{{/showInLine}}
+                        <span class="form-hint">For example, CU57ABC</span>
+                    </label>
+
+                    <input class="form-control" id="regNumber" name="regNumber" type="text" style="text-transform: uppercase;" value="{{vrm}}">
+                    <input class="visuallyhidden" tabindex="-1" id="honey" name="honey" title="This field should be left blank" type="text" value="">
+                </div>
+
+                <div class="form-group">
+                    <input type="submit" value="{{continue_button_text}}" id="continue" class="button">
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+{{/partial}}
+{{> master pageTitle="What is the vehicle's registration number? – MOT reminders"}}
