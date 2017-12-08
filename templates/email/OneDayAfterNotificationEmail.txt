@@ -1,0 +1,16 @@
+MESSAGE SUBJECT
+---------------------
+The MOT for ((vehicle_details)) ((was_due_or_expired)) yesterday
+
+MESSAGE CONTENT
+---------------------
+^#The MOT for ((vehicle_details)) ((was_due_or_expired)) yesterday
+
+It’s illegal to drive without a valid MOT - you can be fined up to £1000.
+
+Book in now at an approved MOT test centre. Find out about getting your MOT at https://www.gov.uk/getting-an-mot
+
+#DVSA (Driver and Vehicle Standards Agency)
+
+Unsubscribe from MOT reminders: 
+((unsubscribe_link))
