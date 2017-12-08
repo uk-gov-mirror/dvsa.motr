@@ -1,0 +1,119 @@
+package uk.gov.dvsa.motr.notifier.processing.unloader;
+
+import uk.gov.dvsa.motr.eventlog.EventLogger;
+import uk.gov.dvsa.motr.notifier.events.NotifyEvent;
+import uk.gov.dvsa.motr.notifier.events.NotifyReminderFailedEvent;
+import uk.gov.dvsa.motr.notifier.events.SubscriptionProcessingFailedEvent;
+import uk.gov.dvsa.motr.notifier.events.SubscriptionQueueItemRemovalFailedEvent;
+import uk.gov.dvsa.motr.notifier.events.SuccessfulSubscriptionProcessedEvent;
+import uk.gov.dvsa.motr.notifier.events.VehicleDetailsRetrievalFailedEvent;
+import uk.gov.dvsa.motr.notifier.processing.model.SubscriptionQueueItem;
+import uk.gov.dvsa.motr.notifier.processing.queue.QueueItemRemover;
+import uk.gov.dvsa.motr.notifier.processing.queue.RemoveSubscriptionFromQueueException;
+import uk.gov.dvsa.motr.notifier.processing.service.ProcessSubscriptionService;
+import uk.gov.dvsa.motr.notifier.processing.service.VehicleNotFoundException;
+import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClientException;
+import uk.gov.service.notify.NotificationClientException;
+
+import java.time.LocalDate;
+
+public class ProcessSubscriptionTask implements Runnable {
+
+    private LocalDate requestDate;
+    private SubscriptionQueueItem subscriptionQueueItemToProcess;
+    private NotifierReport report;
+    private ProcessSubscriptionService processSubscriptionService;
+    private QueueItemRemover queueItemRemover;
+
+    public ProcessSubscriptionTask(
+            LocalDate requestDate,
+            SubscriptionQueueItem subscriptionQueueItemToProcess,
+            NotifierReport report,
+            ProcessSubscriptionService processSubscriptionService,
+            QueueItemRemover queueItemRemover) {
+
+        this.requestDate = requestDate;
+        this.subscriptionQueueItemToProcess = subscriptionQueueItemToProcess;
+        this.report = report;
+        this.processSubscriptionService = processSubscriptionService;
+        this.queueItemRemover = queueItemRemover;
+    }
+
+    @Override
+    public void run() {
+
+        Long startedProcessingTime = System.currentTimeMillis();
+
+        try {
+
+            processSubscriptionService.processSubscription(subscriptionQueueItemToProcess, requestDate);
+
+            queueItemRemover.removeProcessedQueueItem(subscriptionQueueItemToProcess);
+
+            EventLogger.logEvent(new SuccessfulSubscriptionProcessedEvent()
+                    .setMessageProcessTimeProcessed(System.currentTimeMillis() - startedProcessingTime)
+                    .setMessageBody(subscriptionQueueItemToProcess.toString()));
+
+            report.incrementSuccessfullyProcessed();
+
+        } catch (RemoveSubscriptionFromQueueException e) {
+
+            SubscriptionQueueItemRemovalFailedEvent event = new SubscriptionQueueItemRemovalFailedEvent()
+                    .setEmail(subscriptionQueueItemToProcess.getContactDetail())
+                    .setVrm(subscriptionQueueItemToProcess.getVrm())
+                    .setExpiryDate(subscriptionQueueItemToProcess.getMotDueDate());
+
+            if (subscriptionQueueItemToProcess.getMotTestNumber() == null) {
+                event.setDvlaId(subscriptionQueueItemToProcess.getDvlaId());
+            } else {
+                event.setMotTestNumber(subscriptionQueueItemToProcess.getMotTestNumber());
+            }
+
+            EventLogger.logErrorEvent(event, e);
+
+            report.incrementFailedToProcess();
+
+        } catch (VehicleDetailsClientException | VehicleNotFoundException e) {
+
+            VehicleDetailsRetrievalFailedEvent event = new VehicleDetailsRetrievalFailedEvent()
+                    .setEmail(subscriptionQueueItemToProcess.getContactDetail())
+                    .setVrm(subscriptionQueueItemToProcess.getVrm())
+                    .setExpiryDate(subscriptionQueueItemToProcess.getMotDueDate());
+
+            if (subscriptionQueueItemToProcess.getMotTestNumber() == null) {
+                event.setDvlaId(subscriptionQueueItemToProcess.getDvlaId());
+            } else {
+                event.setMotTestNumber(subscriptionQueueItemToProcess.getMotTestNumber());
+            }
+
+            EventLogger.logErrorEvent(event, e);
+
+            report.incrementFailedToProcess();
+
+        } catch (NotificationClientException e) {
+
+            NotifyEvent event = new NotifyReminderFailedEvent()
+                    .setEmail(subscriptionQueueItemToProcess.getContactDetail())
+                    .setContactType(subscriptionQueueItemToProcess.getContactType())
+                    .setVrm(subscriptionQueueItemToProcess.getVrm())
+                    .setExpiryDate(subscriptionQueueItemToProcess.getMotDueDate());
+
+            if (subscriptionQueueItemToProcess.getMotTestNumber() == null) {
+                event.setDvlaId(subscriptionQueueItemToProcess.getDvlaId());
+            } else {
+                event.setMotTestNumber(subscriptionQueueItemToProcess.getMotTestNumber());
+            }
+
+            EventLogger.logErrorEvent(event, e);
+
+            report.incrementFailedToProcess();
+
+        } catch (Exception e) {
+            EventLogger.logErrorEvent(new SubscriptionProcessingFailedEvent()
+                    .setMessageBody(subscriptionQueueItemToProcess.toString())
+                    .setMessageProcessTimeProcessed(System.currentTimeMillis() - startedProcessingTime), e);
+
+            report.incrementFailedToProcess();
+        }
+    }
+}
