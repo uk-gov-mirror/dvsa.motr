@@ -1,0 +1,11 @@
+# Compiled files
+**/*.tfstate
+**/*.tfplan
+**/*.tfstate.backup
+**/.terraform
+**/.terraform/*
+# OSX
+**/.DS_Store
+**/.AppleDouble
+**/.LSOverride
+*.idea/
