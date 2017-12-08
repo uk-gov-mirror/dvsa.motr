@@ -1,0 +1,18 @@
+MESSAGE SUBJECT
+---------------------
+The MOT for ((registration_number)) expires in a month
+
+MESSAGE CONTENT
+---------------------
+^#The MOT for ((registration_number)) expires on ((mot_expiry_ date))
+
+You can get a vehicle MOT tested up to a month (minus a day) before its expiry date and keep the same date for next year.
+
+#Is your vehicle safe?
+
+Check if a vehicle or part has been recalled because of a safety fault at https://www.gov.uk/check-if-a-vehicle-has-been-recalled
+
+#DVSA (Driver and Vehicle Standards Agency)
+
+Unsubscribe from MOT reminders: 
+((unsubscribe_link))

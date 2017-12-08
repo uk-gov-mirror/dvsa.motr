@@ -1,0 +1,13 @@
+MESSAGE SUBJECT
+---------------------
+Confirm your email address for MOT reminders
+
+MESSAGE CONTENT
+---------------------
+You’ve nearly finished signing up for MOT reminders.
+
+Click to confirm your email address:
+
+((confirmation_link))
+
+#DVSA (Driver and Vehicle Standards Agency)
