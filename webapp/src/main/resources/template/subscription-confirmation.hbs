@@ -1,0 +1,43 @@
+{{#partial "content" }}
+
+    <div class="grid-row">
+
+        <div class="column-two-thirds">
+
+            <div class="govuk-box-highlight">
+                <h1 class="bold-large">You’ve signed up for an MOT reminder</h1>
+                <p>You’ll get {{#if usingSms}}a text message{{else}}an email{{/if}} one month before your MOT is due.</p>
+            </div>
+
+            <h2 class="heading-medium">What happens next?</h2>
+            <p>We’ve sent you a confirmation {{#if usingSms}}text message{{else}}email{{/if}}.</p>
+            <p>You’ll get an annual reminder a month before your MOT is due, and again 2 weeks later if you don’t have your MOT yet.</p>
+            <h2 class="heading-medium">Unsubscribing from MOT reminders</h2>
+            {{#if usingSms}}
+                <p>If you want to unsubscribe at any time, text <strong>STOP {{registration}}</strong> to {{replyNumber}}.</p>
+
+                <p>Your mobile phone company will charge you a standard network fee for sending a text message to unsubscribe from the MOT reminders service.</p>
+            {{else}}
+                <p>If you want to unsubscribe at any time, click the link in the confirmation email or reminder email.</p>
+            {{/if}}
+            <p>
+                <a href="{{smartSurveySatisfaction}}" id="satisfaction-survey" target="_blank">What did you think of this service?</a> (takes 30 seconds)
+            </p>
+
+            <nav class="content-navigation">
+                <ul class="content-navigation__secondary">
+                    <li>
+                        <a href="{{url this "/"}}" id="sign-up-for-another-reminder">Sign up for another MOT reminder</a>
+                    </li>
+                    <li>
+                        <a href="https://www.gov.uk/" id="continue-to-gov-uk">Continue to GOV.UK</a>
+                    </li>
+                </ul>
+            </nav>
+
+        </div>
+
+    </div>
+
+{{/partial}}
+{{> master pageTitle="You’ve signed up for an MOT reminder"}}

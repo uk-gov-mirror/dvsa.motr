@@ -1,0 +1,43 @@
+{{#partial "content" }}
+
+    <div class="grid-row">
+
+        <div class="column-two-thirds">
+
+            <a href="{{back_url}}" class="link-back">{{back_button_text}}</a>
+
+            {{#message}}
+                {{> partial/error-message }}
+            {{/message}}
+
+            {{#showSystemError}}
+                {{> partial/system-error }}
+            {{/showSystemError}}
+
+            <h1 class="heading-large">What is your mobile number?</h1>
+
+            <form method="POST" autocomplete="off" novalidate="" action="phone-number">
+
+                <div class="form-group {{#message}}form-group-error{{/message}}" id="phone-number-input">
+                    <label for="phoneNumber" class="form-label">
+                        Mobile phone number
+                        <span class="form-hint">Your reminder will be sent here</span>
+                        {{#messageAtField}}<span class="error-message">{{ messageAtField }}</span>{{/messageAtField}}
+                    </label>
+
+                    <input type="text" id="phoneNumber" name="phoneNumber" class="form-control" value="{{phoneNumber}}">
+
+                </div>
+
+                <div class="form-group">
+                    <input type="submit" value="{{continue_button_text}}" class="button" id="continue">
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+{{/partial}}
+{{> master pageTitle="What is your mobile number? – MOT reminders"}}
