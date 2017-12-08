@@ -1,0 +1,3 @@
+MESSAGE CONTENT
+---------------------
+MOT reminders: Your MOT reminder activation code is: ((confirmation_code)). The code expires after 24h.
