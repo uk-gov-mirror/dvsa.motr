@@ -1,0 +1,21 @@
+{{#partial "content" }}
+    <header class="content-header">
+        <h1 class="content-header__title">
+            Are you sure you want to unsubscribe?
+        </h1>
+    </header>
+    <div class="text">
+        <p>If you continue you’ll stop receiving email reminders at<strong> {{viewModel.email}}</strong> for:</p>
+        <ul>
+            <li><strong>Vehicle registration:</strong> {{viewModel.registration}}</li>
+            <li><strong>MOT expiry date:</strong> {{viewModel.expiryDate}}</li>
+        </ul>
+    </div>
+    <form method="POST">
+        <nav class="content-navigation">
+            <input id="cancel-button" type="submit" value="Unsubscribe" class="button-warning">
+            <ul class="content-navigation__secondary"></ul>
+        </nav>
+    </form>
+{{/partial}}
+{{> master pageTitle="Are you sure you want to unsubscribe? – MOT reminders"}}
