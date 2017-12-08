@@ -1,0 +1,14 @@
+MESSAGE SUBJECT
+---------------------
+The MOT for ((vehicle_details)) ((is_due_or_expires)) in 2 weeks
+
+MESSAGE CONTENT
+---------------------
+^#The MOT for ((vehicle_details)) ((is_due_or_expires)) on ((mot_expiry_ date))
+
+Book in for a test now at an approved MOT test centre. Find out about getting your MOT at https://www.gov.uk/getting-an-mot
+
+DVSA (Driver and Vehicle Standards Agency)
+
+Unsubscribe from MOT reminders:
+((unsubscribe_link))
