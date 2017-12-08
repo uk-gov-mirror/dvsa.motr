@@ -1,0 +1,75 @@
+{{#partial "content" }}
+    <header class="content-header">
+        <h1 class="content-header__title">
+            Check your details
+        </h1>
+    </header>
+    <div class="text">
+        <p>Make sure the vehicle and your email address are correct.</p>
+    </div>
+    <div class="banner banner--info" style="margin-bottom:0;">
+        <span class="banner__heading-large u-align-left">
+            {{viewModel.makeModel}}
+        </span>
+        <table class="c-transaction-details c-transaction-details--three">
+            <tbody>
+                <tr class="c-transaction-details__item c-transaction-details__item--first">
+                    <th class="c-transaction-details__key">Year of manufacture</th>
+                    <td class="c-transaction-details__value">{{viewModel.yearOfManufacture}}</td>
+                </tr>
+                <tr class="c-transaction-details__item">
+                    <th class="c-transaction-details__key">Colour</th>
+                    <td class="c-transaction-details__value">{{viewModel.colour}}</td>
+                </tr>
+                <tr class="c-transaction-details__item c-transaction-details__item--last">
+                    <th class="c-transaction-details__key">MOT {{#if isDvlaVehicle}}due {{else}}expiry{{/if}} date</th>
+                    <td class="c-transaction-details__value">{{viewModel.expiryDate}}</td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+    <table class="key-value-list" style="margin-top:0;">
+        <tbody>
+            <tr>
+                <th scope="row" class="key-value-list__key">
+                    Registration number
+                </th>
+                <td class="key-value-list__value">
+                    {{viewModel.registration}}
+                </td>
+                <td class="key-value-list__item-action">
+                    <a id="change-registration-link" href="{{url this "/vrm"}}">Change<span class="visuallyhidden"> vehicle registration</span></a>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row" class="key-value-list__key">
+                    Email address
+                </th>
+                <td class="key-value-list__value">
+                    {{viewModel.email}}
+                </td>
+                <td class="key-value-list__item-action">
+                    <a id="change-email-link" href={{url this "/email"}}>Change<span class="visuallyhidden"> email address</span></a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="u-space-t30">
+        <details>
+            <summary aria-controls="details-content-0" tabindex="0" aria-expanded="false">
+                <span class="summary">Incorrect vehicle details?</span>
+            </summary>
+            <div class="panel-indent" id="details-content-0" aria-hidden="true">
+                <div class="text">
+                    <p>If you think the MOT {{due_or_expiry}} date or any of the vehicle details are wrong, <a href="https://www.gov.uk/contact-dvsa" target="_blank">contact DVSA</a></p>
+                </div>
+            </div>
+        </details>
+    </div>
+    <form method="POST">
+        <nav class="content-navigation">
+            <input id="continue-button" type="submit" value="Continue" class="button">
+        </nav>
+    </form>
+{{/partial}}
+{{> master pageTitle="Check your details – MOT reminders"}}
