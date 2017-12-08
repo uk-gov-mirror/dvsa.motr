@@ -1,0 +1,20 @@
+{{#partial "content" }}
+    <div class="banner banner--confirmation" style="margin-top: 30px;">
+        <span class="banner__heading-large">You’ve unsubscribed</span>
+    </div>
+    <p>You won’t receive any more MOT reminders at <strong>{{viewModel.email}}</strong> for:</p>
+    <div class="text">
+        <ul>
+            <li><strong>Vehicle registration:</strong> {{viewModel.registration}}</li>
+            <li><strong>MOT expiry date:</strong> {{viewModel.expiryDate}}</li>
+        </ul>
+    </div>
+    <nav class="content-navigation">
+        <ul class="content-navigation__secondary">
+            <li>
+                <a href="{{{url this "/"}}}">Sign up for another MOT reminder</a>
+            </li>
+        </ul>
+    </nav>
+{{/partial}}
+{{> master pageTitle="You’ve unsubscribed – MOT reminders"}}
