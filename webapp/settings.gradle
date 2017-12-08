@@ -1,0 +1,3 @@
+rootProject.name = 'motr-web'
+include 'selenium'
+
