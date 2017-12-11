@@ -1,6 +1,6 @@
 package uk.gov.dvsa.motr.web.cookie;
 
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.web.helper.SystemVariableParam;
 
 import java.util.HashMap;
@@ -10,6 +10,10 @@ import javax.inject.Singleton;
 
 import static uk.gov.dvsa.motr.web.system.SystemVariable.FEATURE_TOGGLE_SMS;
 
+/**
+ * Singleton session object that will be used across different Lambda container invocations from different users.
+ * Ensure that properties set during runtime are reset in the {@code clear()} method.
+ */
 @Singleton
 public class MotrSession {
 
@@ -27,12 +31,14 @@ public class MotrSession {
     private static final String EMAIL_CHANNEL = "email";
     private static final String TEXT_CHANNEL = "text";
 
-    private Map<String, Object> attributes;
-
-    private boolean shouldClearCookies;
+    // Set when session singleton is instantiated (container creation).
     private boolean allowedOnChannelSelectionPage;
     private boolean allowedOnPhoneNumberEntryPage;
     private boolean smsFeatureToggle;
+
+    // Set during runtime for each container invocation.
+    private Map<String, Object> attributes;
+    private boolean shouldClearCookies;
     private boolean smsConfirmResendLimited;
 
     public MotrSession(@SystemVariableParam(FEATURE_TOGGLE_SMS) Boolean featureToggleSms) {
@@ -250,12 +256,19 @@ public class MotrSession {
 
         this.attributes.clear();
         shouldClearCookies = false;
+        smsConfirmResendLimited = false;
     }
 
     @Override
     public String toString() {
+
         return "MotrSession{" +
                 "attributes=" + attributes +
+                ", shouldClearCookies=" + shouldClearCookies +
+                ", allowedOnChannelSelectionPage=" + allowedOnChannelSelectionPage +
+                ", allowedOnPhoneNumberEntryPage=" + allowedOnPhoneNumberEntryPage +
+                ", smsFeatureToggle=" + smsFeatureToggle +
+                ", smsConfirmResendLimited=" + smsConfirmResendLimited +
                 '}';
     }
 }

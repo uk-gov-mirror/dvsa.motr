@@ -3,7 +3,7 @@ package uk.gov.dvsa.motr.notifications.service;
 import org.junit.Before;
 import org.junit.Test;
 
-import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
+import uk.gov.dvsa.motr.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.web.formatting.DateFormatter;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;

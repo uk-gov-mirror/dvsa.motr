@@ -18,7 +18,7 @@ import static java.util.Collections.singletonList;
 public class InjectingBaseUrlRedirectFilter implements ContainerResponseFilter {
 
     private static final String HEADER_LOCATION = "Location";
-    private String baseUrl;
+    private final String baseUrl;
 
     public InjectingBaseUrlRedirectFilter(@SystemVariableParam(BASE_URL) String baseUrl) {
 

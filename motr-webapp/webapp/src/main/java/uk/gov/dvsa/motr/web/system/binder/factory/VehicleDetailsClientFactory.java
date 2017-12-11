@@ -3,7 +3,7 @@ package uk.gov.dvsa.motr.web.system.binder.factory;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.web.helper.SystemVariableParam;
 
 import javax.inject.Inject;
@@ -15,10 +15,10 @@ import static uk.gov.dvsa.motr.web.system.SystemVariable.MOT_TEST_REMINDER_INFO_
 
 public class VehicleDetailsClientFactory implements BaseFactory<VehicleDetailsClient> {
 
-    private String readTimeout;
-    private String connectTimeout;
-    private String uri;
-    private String apiKey;
+    private final String readTimeout;
+    private final String connectTimeout;
+    private final String uri;
+    private final String apiKey;
 
     @Inject
     public VehicleDetailsClientFactory(
@@ -42,6 +42,7 @@ public class VehicleDetailsClientFactory implements BaseFactory<VehicleDetailsCl
 
         return new VehicleDetailsClient(new ClientConfig()
                 .property(ClientProperties.CONNECT_TIMEOUT, connectTimeoutInMs)
-                .property(ClientProperties.READ_TIMEOUT, readTimeoutInMs), this.uri, apiKey);
+                .property(ClientProperties.READ_TIMEOUT, readTimeoutInMs), apiKey)
+            .withByRegNumberUri(this.uri);
     }
 }

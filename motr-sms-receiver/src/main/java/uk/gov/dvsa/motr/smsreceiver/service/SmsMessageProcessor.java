@@ -7,7 +7,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.exception.InvalidNotifyCredentialsException;
-
 import uk.gov.dvsa.motr.smsreceiver.events.FailedToFindSubscriptionEvent;
 import uk.gov.dvsa.motr.smsreceiver.events.InvalidVrmSentEvent;
 import uk.gov.dvsa.motr.smsreceiver.events.SmsUnsubscribedConfirmationEvent;

@@ -20,8 +20,8 @@ public class DynamoDbCancelledSubscriptionRepository implements CancelledSubscri
 
     private static final int HOURS_TO_DELETION = 24;
 
-    private DynamoDB dynamoDb;
-    private String tableName;
+    private final DynamoDB dynamoDb;
+    private final String tableName;
 
     @Inject
     public DynamoDbCancelledSubscriptionRepository(

@@ -18,7 +18,7 @@ public abstract class Page {
 
     @FindBy(tagName = "h1")
     protected WebElement title;
-    
+
     @FindBy(id = "cookiesLink")
     protected WebElement cookiesLink;
 
@@ -45,9 +45,9 @@ public abstract class Page {
 
         if (!getTitle().contains(getContentHeader()) || !this.driver.getTitle().equals(getPageTitle())) {
 
-            throw new PageIdentityVerificationException("Page identity verification failed: "
-                    + String.format("\n Expected: %s page, \n Found: %s page, "
-                    + "\n with expected page title of: %s \n and actual page title of: %s",
+            throw new PageIdentityVerificationException("Page identity verification failed: " +
+                    String.format("\n Expected: %s page, \n Found: %s page, \n with expected page " +
+                                    "title of: %s \n and actual page title of: %s",
                     getContentHeader(), getTitle(), getPageTitle(), this.driver.getTitle())
             );
         }
@@ -59,6 +59,7 @@ public abstract class Page {
 
     @Override
     public final String toString() {
+
         return "Page: " + getTitle();
     }
 

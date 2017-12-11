@@ -33,8 +33,7 @@ public class ChannelSelectionResource {
 
     private final TemplateEngine renderer;
     private final MotrSession motrSession;
-
-    private DataLayerHelper dataLayerHelper;
+    private final DataLayerHelper dataLayerHelper;
 
     @Inject
     public ChannelSelectionResource(

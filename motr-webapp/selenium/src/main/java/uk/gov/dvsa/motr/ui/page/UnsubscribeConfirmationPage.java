@@ -21,9 +21,9 @@ public class UnsubscribeConfirmationPage extends Page {
 
         if (!getBannerTitle().contains(getContentHeader()) || !this.driver.getTitle().equals(getPageTitle())) {
 
-            throw new PageIdentityVerificationException("Page identity verification failed: "
-                    + String.format("\n Expected: %s page, \n Found: %s page"
-                    + "\n with expected page title of: %s \n and actual page title of: %s",
+            throw new PageIdentityVerificationException("Page identity verification failed: " +
+                    String.format("\n Expected: %s page, \n Found: %s page" +
+                                    "\n with expected page title of: %s \n and actual page title of: %s",
                     getContentHeader(), getBannerTitle(), getPageTitle(), this.driver.getTitle())
             );
         }

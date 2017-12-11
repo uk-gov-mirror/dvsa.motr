@@ -19,12 +19,70 @@ import java.net.URL;
 public class DriverFactory {
 
     /**
+     * Returns an instance of a locally running browser
+     *
+     * @return a Selenium web driver as configured in the Configurator
+     */
+    private static BaseAppDriver getLocalBrowser(Configurator configurator) {
+
+        BaseAppDriver driver;
+
+        //Set Desired Capabilities
+        DesiredCapabilities capability;
+
+        //Set Browser version
+        String browserVersion = configurator.getBrowserVersion();
+
+        //Javascript status
+        Boolean javascriptEnabled = configurator.getJavascriptStatus();
+
+        switch (configurator.getBrowser()) {
+            case FIREFOX: {
+                capability = DesiredCapabilities.firefox();
+                FirefoxProfile profile = new FirefoxProfile();
+                // TODO: Remove the disabling of the redirect prompt when the mock payment gateway is fixed
+                profile.setPreference("network.http.prompt-temp-redirect", false);
+                profile.setPreference("javascript.enabled", javascriptEnabled);
+
+                capability.setVersion(browserVersion);
+                capability.setJavascriptEnabled(javascriptEnabled);
+                Logger.info("Javascript is enabled: " + String
+                        .valueOf(capability.isJavascriptEnabled()));
+                capability.setCapability(FirefoxDriver.PROFILE, profile);
+                driver = MotBrowserFactory.createMotDriver(new FirefoxDriver(profile));
+                break;
+            }
+            case CHROME: {
+                System.setProperty("webdriver.chrome.driver", configurator.getChromeDriverPath());
+
+                capability = DesiredCapabilities.chrome();
+                capability.setJavascriptEnabled(javascriptEnabled);
+                driver = MotBrowserFactory.createMotDriver(new ChromeDriver(capability));
+                break;
+            }
+            case SAFARI: {
+                capability = DesiredCapabilities.safari();
+                capability.setJavascriptEnabled(javascriptEnabled);
+                driver = MotBrowserFactory.createMotDriver(new SafariDriver(capability));
+                break;
+            }
+            default: {
+                driver = MotBrowserFactory.createMotDriver(new FirefoxDriver());
+                break;
+            }
+        }
+
+        return driver;
+    }
+
+    /**
      * Fetches an instance of the web driver as configured in the Configurator
      *
      * @param configurator Configurator to be used
      * @return a Selenium web driver as configured in the Configurator
      */
     public BaseAppDriver getDriver(Configurator configurator) {
+
         switch (configurator.getGridStatus()) {
             case SELENIUM:
                 return getSeleniumGridWebDriver(configurator);
@@ -35,8 +93,8 @@ public class DriverFactory {
         }
     }
 
-    private DesiredCapabilities setCapabilityIfNonNull(DesiredCapabilities capabilities, String key,
-                                                       Object value) {
+    private DesiredCapabilities setCapabilityIfNonNull(DesiredCapabilities capabilities, String key, Object value) {
+
         if (value != null) {
             capabilities.setCapability(key, value);
         }
@@ -80,9 +138,10 @@ public class DriverFactory {
                 }
                 case IE: {
                     capability.setCapability(
-                            InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS,
-                            true);
+                            InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS,true);
                     break;
+                }
+                default: {
                 }
             }
         }
@@ -100,7 +159,6 @@ public class DriverFactory {
      * Returns an instance of a remote browser to run in Grid configuration
      *
      * @return RemoteWebDriver as configured in the Configurator
-     * @throws MalformedURLException
      */
     private BaseAppDriver getSeleniumGridWebDriver(Configurator configurator) {
         //Set Desired Capabilities
@@ -178,61 +236,5 @@ public class DriverFactory {
 
         //Return null on exception
         return null;
-    }
-
-    /**
-     * Returns an instance of a locally running browser
-     *
-     * @return a Selenium web driver as configured in the Configurator
-     */
-    private static BaseAppDriver getLocalBrowser(Configurator configurator) {
-        BaseAppDriver driver;
-
-        //Set Desired Capabilities
-        DesiredCapabilities capability;
-
-        //Set Browser version
-        String browserVersion = configurator.getBrowserVersion();
-
-        //Javascript status
-        Boolean javascriptEnabled = configurator.getJavascriptStatus();
-
-        switch (configurator.getBrowser()) {
-            case FIREFOX: {
-                capability = DesiredCapabilities.firefox();
-                FirefoxProfile profile = new FirefoxProfile();
-                // TODO: Remove the disabling of the redirect prompt when the mock payment gateway is fixed
-                profile.setPreference("network.http.prompt-temp-redirect", false);
-                profile.setPreference("javascript.enabled", javascriptEnabled);
-
-                capability.setVersion(browserVersion);
-                capability.setJavascriptEnabled(javascriptEnabled);
-                Logger.info("Javascript is enabled: " + String
-                        .valueOf(capability.isJavascriptEnabled()));
-                capability.setCapability(FirefoxDriver.PROFILE, profile);
-                driver = MotBrowserFactory.createMotDriver(new FirefoxDriver(profile));
-                break;
-            }
-            case CHROME: {
-                System.setProperty("webdriver.chrome.driver", configurator.getChromeDriverPath());
-
-                capability = DesiredCapabilities.chrome();
-                capability.setJavascriptEnabled(javascriptEnabled);
-                driver = MotBrowserFactory.createMotDriver(new ChromeDriver(capability));
-                break;
-            }
-            case SAFARI: {
-                capability = DesiredCapabilities.safari();
-                capability.setJavascriptEnabled(javascriptEnabled);
-                driver = MotBrowserFactory.createMotDriver(new SafariDriver(capability));
-                break;
-            }
-            default: {
-                driver = MotBrowserFactory.createMotDriver(new FirefoxDriver());
-                break;
-            }
-        }
-
-        return driver;
     }
 }

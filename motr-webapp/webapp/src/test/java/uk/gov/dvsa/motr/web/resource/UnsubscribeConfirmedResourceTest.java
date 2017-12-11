@@ -3,8 +3,8 @@ package uk.gov.dvsa.motr.web.resource;
 import org.junit.Before;
 import org.junit.Test;
 
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.cookie.UnsubscribeConfirmationParams;
 import uk.gov.dvsa.motr.web.test.render.TemplateEngineStub;
@@ -59,7 +59,7 @@ public class UnsubscribeConfirmedResourceTest {
     @Test
     public void unsubscribeConfirmedDisplaysPage() throws Exception {
 
-        when(client.fetch(eq("TEST-VRM"))).thenReturn(Optional.of(new VehicleDetails()));
+        when(client.fetchByVrm(eq("TEST-VRM"))).thenReturn(Optional.of(new VehicleDetails()));
         resource.unsubscribeConfirmed();
 
         assertEquals(UnsubscribeViewModel.class, TEMPLATE_ENGINE_STUB.getContext(Map.class).get("viewModel").getClass());

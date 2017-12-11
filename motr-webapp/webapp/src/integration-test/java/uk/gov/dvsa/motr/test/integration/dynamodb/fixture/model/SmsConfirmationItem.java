@@ -4,9 +4,7 @@ import com.amazonaws.services.dynamodbv2.document.Item;
 
 import uk.gov.dvsa.motr.test.data.RandomDataUtil;
 import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.core.DynamoDbFixtureTableItem;
-import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;

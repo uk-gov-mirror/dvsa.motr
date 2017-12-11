@@ -3,6 +3,10 @@ package uk.gov.dvsa.motr.remote.vehicledetails;
 import org.junit.Before;
 import org.junit.Test;
 
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClientException;
+
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
@@ -25,7 +29,7 @@ public class VehicleDetailsServiceTest {
 
         String testVrm = "ABCDEF";
 
-        when(vehicleDetailsClientMock.fetch(testVrm)).thenReturn(getMockVehicleDetails());
+        when(vehicleDetailsClientMock.fetchByVrm(testVrm)).thenReturn(getMockVehicleDetails());
 
         VehicleDetails vehicleDetails = VehicleDetailsService.getVehicleDetails(testVrm, vehicleDetailsClientMock);
 
@@ -39,7 +43,7 @@ public class VehicleDetailsServiceTest {
 
         String testVrm = "ABCDEF";
 
-        when(vehicleDetailsClientMock.fetch(testVrm)).thenThrow(new VehicleDetailsClientException(""));
+        when(vehicleDetailsClientMock.fetchByVrm(testVrm)).thenThrow(new VehicleDetailsClientException(""));
 
         VehicleDetails vehicleDetails = VehicleDetailsService.getVehicleDetails(testVrm, vehicleDetailsClientMock);
 

@@ -12,7 +12,7 @@ import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
 import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 
-import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
+import uk.gov.dvsa.motr.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.helper.SystemVariableParam;
@@ -36,8 +36,8 @@ import static uk.gov.dvsa.motr.web.system.SystemVariable.REGION;
 @Singleton
 public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
 
-    private DynamoDB dynamoDb;
-    private String tableName;
+    private final DynamoDB dynamoDb;
+    private final String tableName;
 
     @Inject
     public DynamoDbSubscriptionRepository(

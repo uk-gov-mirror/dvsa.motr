@@ -23,10 +23,10 @@ import static java.lang.String.format;
 
 public class DynamoDbSmsConfirmationHelper {
 
+    private final AmazonDynamoDB client;
     private String smsConfirmTable;
     private String pendingTable;
     private DynamoDB dynamoDb;
-    private final AmazonDynamoDB client;
 
     public DynamoDbSmsConfirmationHelper() {
 

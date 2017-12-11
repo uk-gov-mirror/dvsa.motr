@@ -19,9 +19,9 @@ import uk.gov.dvsa.motr.notifier.notify.NotifyEmailService;
 import uk.gov.dvsa.motr.notifier.notify.NotifySmsService;
 import uk.gov.dvsa.motr.notifier.processing.formatting.MakeModelFormatter;
 import uk.gov.dvsa.motr.notifier.processing.model.SubscriptionQueueItem;
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClientException;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClientException;
 import uk.gov.service.notify.NotificationClientException;
 
 import java.time.LocalDate;

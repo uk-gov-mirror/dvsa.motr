@@ -9,10 +9,14 @@ import uk.gov.dvsa.motr.ui.base.Page;
 @GotoUrl("/review")
 public class ReviewPage extends Page {
 
-    @FindBy(id = "change-registration-link") private WebElement changeRegistrationLink;
-    @FindBy(id = "change-email-link") private WebElement changeEmailLink;
-    @FindBy(id = "change-mobile-link") private WebElement changeMobileLink;
-    @FindBy(id = "continue-button") private WebElement continueButton;
+    @FindBy(id = "change-registration-link")
+    private WebElement changeRegistrationLink;
+    @FindBy(id = "change-email-link")
+    private WebElement changeEmailLink;
+    @FindBy(id = "change-mobile-link")
+    private WebElement changeMobileLink;
+    @FindBy(id = "continue-button")
+    private WebElement continueButton;
 
     @Override
     protected String getContentHeader() {

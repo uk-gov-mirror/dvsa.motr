@@ -2,7 +2,7 @@ package uk.gov.dvsa.motr.web.helper;
 
 import org.junit.Test;
 
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.web.formatting.MakeModelFormatter;
 
 import static org.junit.Assert.assertEquals;

@@ -1,6 +1,6 @@
 package uk.gov.dvsa.motr.web.component.subscription.model;
 
-import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
+import uk.gov.dvsa.motr.vehicledetails.MotIdentification;
 
 import java.time.LocalDate;
 

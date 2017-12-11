@@ -12,7 +12,7 @@ import uk.gov.dvsa.motr.notifier.processing.queue.QueueItemRemover;
 import uk.gov.dvsa.motr.notifier.processing.queue.RemoveSubscriptionFromQueueException;
 import uk.gov.dvsa.motr.notifier.processing.service.ProcessSubscriptionService;
 import uk.gov.dvsa.motr.notifier.processing.service.VehicleNotFoundException;
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClientException;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClientException;
 import uk.gov.service.notify.NotificationClientException;
 
 import java.time.LocalDate;

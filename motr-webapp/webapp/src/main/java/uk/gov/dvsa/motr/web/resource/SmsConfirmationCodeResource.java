@@ -39,10 +39,9 @@ public class SmsConfirmationCodeResource {
 
     private final TemplateEngine renderer;
     private final MotrSession motrSession;
-
-    private DataLayerHelper dataLayerHelper;
-    private SmsConfirmationService smsConfirmationService;
-    private UrlHelper urlHelper;
+    private final DataLayerHelper dataLayerHelper;
+    private final SmsConfirmationService smsConfirmationService;
+    private final UrlHelper urlHelper;
 
     @Inject
     public SmsConfirmationCodeResource(

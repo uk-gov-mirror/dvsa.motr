@@ -3,7 +3,7 @@ package uk.gov.dvsa.motr.web.validator;
 import java.time.LocalDate;
 
 public class MotDueDateValidator {
-    private LocalDate now;
+    private final LocalDate now;
 
     public MotDueDateValidator(LocalDate now) {
 

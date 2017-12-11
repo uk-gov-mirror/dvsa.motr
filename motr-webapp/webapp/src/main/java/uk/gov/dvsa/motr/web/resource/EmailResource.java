@@ -33,14 +33,10 @@ public class EmailResource {
 
     private final TemplateEngine renderer;
     private final MotrSession motrSession;
-
-    private DataLayerHelper dataLayerHelper;
+    private final DataLayerHelper dataLayerHelper;
 
     @Inject
-    public EmailResource(
-            MotrSession motrSession,
-            TemplateEngine renderer
-    ) {
+    public EmailResource(MotrSession motrSession, TemplateEngine renderer) {
 
         this.motrSession = motrSession;
         this.renderer = renderer;

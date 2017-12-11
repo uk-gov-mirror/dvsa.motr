@@ -2,8 +2,8 @@ package uk.gov.dvsa.motr.smsreceiver.system.binder;
 
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 
-import uk.gov.dvsa.motr.smsreceiver.config.Config;
-import uk.gov.dvsa.motr.smsreceiver.encryption.Decryptor;
+import uk.gov.dvsa.motr.config.Config;
+import uk.gov.dvsa.motr.encryption.Decryptor;
 import uk.gov.dvsa.motr.smsreceiver.system.binder.factory.AwsKmsDecryptorFactory;
 import uk.gov.dvsa.motr.smsreceiver.system.binder.factory.MotrConfigFactory;
 

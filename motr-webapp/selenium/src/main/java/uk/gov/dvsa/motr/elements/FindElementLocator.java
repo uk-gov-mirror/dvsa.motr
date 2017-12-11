@@ -9,12 +9,14 @@ public class FindElementLocator implements Locator {
     private By by;
 
     public FindElementLocator(SearchContext searchContext, By by) {
+
         this.searchContext = searchContext;
         this.by = by;
     }
 
     @Override
     public WebElement locate() {
+
         return searchContext.findElement(by);
     }
 }

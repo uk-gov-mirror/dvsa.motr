@@ -10,11 +10,13 @@ public class DvsaElementLocatorFactory implements ElementLocatorFactory {
     private final SearchContext searchContext;
 
     public DvsaElementLocatorFactory(SearchContext searchContext) {
+
         this.searchContext = searchContext;
     }
 
     @Override
     public ElementLocator createLocator(Field field) {
+
         return new DvsaElementLocator(searchContext, field);
     }
 }

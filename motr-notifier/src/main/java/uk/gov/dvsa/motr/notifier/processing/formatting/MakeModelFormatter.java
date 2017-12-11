@@ -2,7 +2,7 @@ package uk.gov.dvsa.motr.notifier.processing.formatting;
 
 import com.amazonaws.util.StringUtils;
 
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 
 public class MakeModelFormatter {
 

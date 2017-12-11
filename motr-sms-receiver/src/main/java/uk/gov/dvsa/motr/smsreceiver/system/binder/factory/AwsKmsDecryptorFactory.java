@@ -1,8 +1,8 @@
 package uk.gov.dvsa.motr.smsreceiver.system.binder.factory;
 
-import uk.gov.dvsa.motr.smsreceiver.config.Config;
-import uk.gov.dvsa.motr.smsreceiver.encryption.AwsKmsDecryptor;
-import uk.gov.dvsa.motr.smsreceiver.encryption.Decryptor;
+import uk.gov.dvsa.motr.config.Config;
+import uk.gov.dvsa.motr.encryption.AwsKmsDecryptor;
+import uk.gov.dvsa.motr.encryption.Decryptor;
 
 import javax.inject.Inject;
 

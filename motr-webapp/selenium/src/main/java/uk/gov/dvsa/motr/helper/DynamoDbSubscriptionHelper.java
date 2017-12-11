@@ -21,10 +21,10 @@ import java.util.Iterator;
 import static java.lang.String.format;
 
 public class DynamoDbSubscriptionHelper {
+    private final AmazonDynamoDB client;
     private String tableName;
     private String tablePendingName;
     private DynamoDB dynamoDb;
-    private final AmazonDynamoDB client;
 
     public DynamoDbSubscriptionHelper() {
 

@@ -1,7 +1,7 @@
 package uk.gov.dvsa.motr.web.system.binder.factory;
 
+import uk.gov.dvsa.motr.config.Config;
 import uk.gov.dvsa.motr.notifications.service.NotifyService;
-import uk.gov.dvsa.motr.web.config.Config;
 import uk.gov.service.notify.NotificationClient;
 
 import javax.inject.Inject;

@@ -19,10 +19,21 @@ import java.util.Date;
 @Listeners(TestExecutionListener.class)
 public abstract class BaseTest {
 
+    private static final SimpleDateFormat screenshotDateFormat = new SimpleDateFormat("yyyyMMdd-HHmmss");
     protected MotReminder motReminder = new MotReminder();
     protected BaseAppDriver driver = null;
-    private final static SimpleDateFormat screenshotDateFormat =
-            new SimpleDateFormat("yyyyMMdd-HHmmss");
+
+    private static String buildScreenShotPath(ITestResult result) {
+
+        String dir = Configurator.getErrorScreenshotPath() + "/" + Configurator.getBuildNumber();
+
+        return String.format("%s/%s.%s_%s.png",
+                dir,
+                result.getTestClass().getName().replace("uk.gov.dvsa.motr", ""),
+                result.getName(),
+                screenshotDateFormat.format(new Date())
+        );
+    }
 
     @BeforeMethod(alwaysRun = true)
     public void setupBaseTest() {
@@ -33,6 +44,7 @@ public abstract class BaseTest {
 
     @AfterMethod(alwaysRun = true)
     public void tearDown(ITestResult result) {
+
         if (result.isSuccess()) {
             if (null != driver) {
                 driver.manage().deleteAllCookies();
@@ -52,17 +64,5 @@ public abstract class BaseTest {
             }
             driver = null;
         }
-    }
-
-    private static String buildScreenShotPath(ITestResult result) {
-
-        String dir = Configurator.getErrorScreenshotPath() + "/" + Configurator.getBuildNumber();
-
-        return String.format("%s/%s.%s_%s.png",
-                dir,
-                result.getTestClass().getName().replace("uk.gov.dvsa.motr", ""),
-                result.getName(),
-                screenshotDateFormat.format(new Date())
-        );
     }
 }

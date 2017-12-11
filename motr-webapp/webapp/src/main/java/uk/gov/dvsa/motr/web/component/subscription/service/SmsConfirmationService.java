@@ -35,10 +35,10 @@ public class SmsConfirmationService {
     private static final int MAX_RESEND_ATTEMPTS_BEFORE_RATE_LIMIT = 1;
     private static final int MIN_TIME_SECONDS_BETWEEN_RESENDS = 600;
 
-    private SmsConfirmationRepository smsConfirmationRepository;
-    private NotifyService notifyService;
-    private UrlHelper urlHelper;
-    private MotrSession motrSession;
+    private final SmsConfirmationRepository smsConfirmationRepository;
+    private final NotifyService notifyService;
+    private final UrlHelper urlHelper;
+    private final MotrSession motrSession;
 
     @Inject
     public SmsConfirmationService(

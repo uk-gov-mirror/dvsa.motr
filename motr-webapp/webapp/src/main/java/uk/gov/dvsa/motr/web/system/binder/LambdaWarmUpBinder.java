@@ -4,8 +4,8 @@ import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.dvsa.motr.config.Config;
 import uk.gov.dvsa.motr.web.component.subscription.persistence.SubscriptionRepository;
-import uk.gov.dvsa.motr.web.config.Config;
 import uk.gov.dvsa.motr.web.performance.warmup.DefaultLambdaWarmUp;
 import uk.gov.dvsa.motr.web.performance.warmup.LambdaWarmUp;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;

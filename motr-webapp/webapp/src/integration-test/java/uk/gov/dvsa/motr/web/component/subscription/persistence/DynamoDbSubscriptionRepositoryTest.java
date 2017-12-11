@@ -8,11 +8,11 @@ import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 import org.junit.Before;
 import org.junit.Test;
 
-import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.test.data.RandomDataUtil;
 import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.core.DynamoDbFixture;
 import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.model.SubscriptionItem;
 import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.model.SubscriptionTable;
+import uk.gov.dvsa.motr.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 

@@ -17,9 +17,6 @@ import uk.gov.dvsa.motr.config.CachedConfig;
 import uk.gov.dvsa.motr.config.Config;
 import uk.gov.dvsa.motr.config.EnvironmentVariableConfig;
 import uk.gov.dvsa.motr.subscriptionloader.processing.dispatcher.Dispatcher;
-import uk.gov.dvsa.motr.subscriptionloader.processing.loader.DefaultLoader;
-import uk.gov.dvsa.motr.subscriptionloader.processing.loader.Loader;
-import uk.gov.dvsa.motr.subscriptionloader.processing.loader.PurgingLoader;
 import uk.gov.dvsa.motr.subscriptionloader.processing.producer.DynamoDbProducer;
 import uk.gov.dvsa.motr.subscriptionloader.processing.producer.SubscriptionProducer;
 
@@ -27,7 +24,6 @@ import static org.apache.log4j.Level.toLevel;
 
 import static uk.gov.dvsa.motr.subscriptionloader.SystemVariable.INFLIGHT_BATCHES;
 import static uk.gov.dvsa.motr.subscriptionloader.SystemVariable.LOG_LEVEL;
-import static uk.gov.dvsa.motr.subscriptionloader.SystemVariable.POST_PURGE_DELAY;
 import static uk.gov.dvsa.motr.subscriptionloader.SystemVariable.QUEUE_URL;
 import static uk.gov.dvsa.motr.subscriptionloader.SystemVariable.REGION;
 import static uk.gov.dvsa.motr.subscriptionloader.SystemVariable.TABLE_NAME;

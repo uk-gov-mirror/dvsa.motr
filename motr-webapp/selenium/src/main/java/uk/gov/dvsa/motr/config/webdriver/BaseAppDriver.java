@@ -14,26 +14,32 @@ public abstract class BaseAppDriver implements AppDriver {
     private String baseUrl = "";
 
     public BaseAppDriver(RemoteWebDriver remoteWebDriver) {
+
         this.remoteWebDriver = remoteWebDriver;
     }
 
     public void setBaseUrl(String baseUrl) {
+
         this.baseUrl = baseUrl;
     }
 
     public void loadBaseUrl() {
+
         remoteWebDriver.get(baseUrl);
     }
 
     public void navigateToPath(String path) {
+
         remoteWebDriver.get((baseUrl + path).replaceAll("(?<!(http:|https:))//", "/"));
     }
 
     public String getPageSource() {
+
         return this.remoteWebDriver.getPageSource();
     }
 
     public void takeScreenShot(String destinationPath) {
+
         try {
             File scrFile = remoteWebDriver.getScreenshotAs(OutputType.FILE);
             File screenshotFile = new File(destinationPath);

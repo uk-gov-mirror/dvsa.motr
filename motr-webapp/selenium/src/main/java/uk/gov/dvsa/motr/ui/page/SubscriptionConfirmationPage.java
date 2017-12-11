@@ -30,8 +30,8 @@ public class SubscriptionConfirmationPage extends Page {
 
         if (!getHeaderTitle().contains(getContentHeader()) || !this.driver.getTitle().equals(getPageTitle())) {
 
-            throw new PageIdentityVerificationException("Page identity verification failed: "
-                    + String.format("\n Expected: %s page, \n Found: %s page", getContentHeader(), getHeaderTitle())
+            throw new PageIdentityVerificationException("Page identity verification failed: " +
+                    String.format("\n Expected: %s page, \n Found: %s page", getContentHeader(), getHeaderTitle())
             );
         }
     }

@@ -1,8 +1,8 @@
 package uk.gov.dvsa.motr.web.resource;
 
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsService;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.service.UnsubscribeService;
@@ -32,10 +32,10 @@ import static uk.gov.dvsa.motr.web.resource.RedirectResponseBuilder.redirect;
 @Produces("text/html")
 public class UnsubscribeResource {
 
-    private UnsubscribeService unsubscribeService;
-    private TemplateEngine renderer;
-    private MotrSession motrSession;
-    private VehicleDetailsClient client;
+    private final UnsubscribeService unsubscribeService;
+    private final TemplateEngine renderer;
+    private final MotrSession motrSession;
+    private final VehicleDetailsClient client;
 
     @Inject
     public UnsubscribeResource(

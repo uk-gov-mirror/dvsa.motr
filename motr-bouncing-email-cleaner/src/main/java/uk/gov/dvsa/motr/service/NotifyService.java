@@ -5,7 +5,6 @@ import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 import uk.gov.service.notify.SendEmailResponse;
 
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
