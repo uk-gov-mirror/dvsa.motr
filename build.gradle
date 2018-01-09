@@ -1,0 +1,189 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
+
+import java.util.concurrent.TimeUnit
+
+buildscript {
+    repositories {
+        maven { url 'https://plugins.gradle.org/m2/' }
+    }
+
+    dependencies {
+        classpath 'gradle.plugin.aspectj:gradle-aspectj:0.1.6'
+        classpath 'io.spring.gradle:dependency-management-plugin:1.0.4.RELEASE'
+    }
+}
+
+allprojects {
+    apply plugin: 'io.spring.dependency-management'
+
+    ext {
+        // AWS Maven 'Bill of Materials' (BOM) version.
+        awsSdkBomVersion = '1.11.251'
+
+        // Lambda support libs.
+        // See: https://github.com/aws/aws-lambda-java-libs
+        lambdaJavaCoreVersion = '1.1.0'
+        lambdaJavaEventsVersion = '2.0.1'
+        lambdaJavaLog4jVersion = '1.0.0'
+
+        // Dependencies.
+        aspectjVersion = '1.8.12'
+        awsServerlessContainerVersion = '0.8'
+        handlebarsVersion = '4.0.6'
+        govNotifyClientVersion = '3.8.0-RELEASE'
+        guiceVersion = '4.1.0'
+        dwMetricsVersion = '3.2.5'
+        jerseyMediaVersion = '2.25'
+        jerseyConnectorsVersion = '2.20'
+        libPhoneNumberVersion = '8.8.6'
+        commonsLangVersion = '3.4'
+        log4jJsonLayoutVersion = 'b657ab3466'
+        logstashLog4jJsonLayout = '1.7'
+        slf4jVersion = '1.7.21'
+
+        // Test dependencies.
+        junitVersion = '4.12'
+        junit4DataProviderVersion = '2.0'
+        mockitoVersion = '1.9.5'
+        powerMockVersion = '1.6.1'
+        wiremockVersion = '2.12.0'
+        systemRulesVersion = '1.16.0'
+        commonsIoVersion = '2.5'
+        seleniumVersion = '2.53.1'
+        orgTestingVersion = '6.10'
+        uncommonsReportingVersion = '1.1.4'
+    }
+}
+
+subprojects {
+    version null
+
+    apply plugin: 'aspectj.gradle'
+    apply plugin: 'java'
+    apply plugin: 'maven'
+    apply plugin: 'maven-publish'
+    apply plugin: 'idea'
+    apply plugin: 'eclipse'
+    apply plugin: 'checkstyle'
+
+    [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+    sourceCompatibility = 1.8
+
+    repositories {
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+        maven { url 'https://dl.bintray.com/gov-uk-notify/maven' }
+    }
+
+    dependencyManagement {
+        imports {
+            // See: https://aws.amazon.com/blogs/developer/managing-dependencies-with-aws-sdk-for-java-bill-of-materials-module-bom/
+            mavenBom "com.amazonaws:aws-java-sdk-bom:${awsSdkBomVersion}"
+        }
+    }
+
+    // Common dependencies.
+    dependencies {
+        if (project.name != 'motr-common') {
+            compile project(':motr-common')
+        }
+
+        compile "com.amazonaws:aws-lambda-java-core:${lambdaJavaCoreVersion}"
+        compile "com.amazonaws:aws-lambda-java-events:${lambdaJavaEventsVersion}"
+        compile "com.amazonaws:aws-lambda-java-log4j:${lambdaJavaLog4jVersion}"
+        compile "org.slf4j:slf4j-log4j12:${slf4jVersion}"
+
+        testCompile "com.tngtech.junit.dataprovider:junit4-dataprovider:${junit4DataProviderVersion}"
+        testCompile "com.github.tomakehurst:wiremock:${wiremockVersion}"
+        testCompile "com.github.stefanbirkner:system-rules:${systemRulesVersion}"
+        testCompile "junit:junit:${junitVersion}"
+        testCompile "org.mockito:mockito-all:${mockitoVersion}"
+        testCompile "commons-io:commons-io:${commonsIoVersion}"
+    }
+
+    sourceSets {
+        integrationTest {
+            java {
+                compileClasspath += main.output + test.output
+                runtimeClasspath += main.output + test.output
+                srcDir file('src/integration-test/java')
+            }
+            resources.srcDir file('src/integration-test/resources')
+        }
+    }
+
+    configurations {
+        integrationTestCompile.extendsFrom testCompile
+        integrationTestRuntime.extendsFrom testRuntime
+    }
+
+    checkstyle {
+        configFile = getRootProject().file("dvsa_java_checks.xml")
+        toolVersion = "6.15"
+    }
+        
+    task buildZip(type: Zip) {
+        from compileJava
+        from processResources
+        into('lib') {
+            from configurations.runtime
+        }
+    }
+
+    task adjustArchiveBaseName {
+        doLast {
+            try {
+                def revision = "git log -n 1 --format=%at-%H ${projectDir}".execute().text.trim()
+                def commitHash = revision.split('-').last()
+                def timestamp = revision ? new Date(TimeUnit.SECONDS.toMillis(revision.split('-').first() as long)).format("yyyyMMddHHmmss") : null
+                def buildNumber = System.getenv("BUILD_NUMBER") ?: "LATEST"
+
+                if (timestamp && commitHash) {
+                    archivesBaseName = "${project.name}-${timestamp}-${commitHash}-${buildNumber}"
+                } else {
+                    throw new GradleException('Unable to parse revision from Git')
+                }
+            } catch (e) {
+                throw new GradleException('Unable to parse revision from Git', e)
+            }
+        }
+    } 
+    
+    task integrationTest(type: Test) {
+        testClassesDirs = sourceSets.integrationTest.output.classesDirs
+        classpath = sourceSets.integrationTest.runtimeClasspath
+
+        systemProperties = (Map<String, String>) System.getProperties().findAll { it.key.startsWith("test.") }
+    }
+
+    // enhanced logging for test phases
+    tasks.withType(Test) {
+        testLogging {
+            events = [TestLogEvent.PASSED,
+                                TestLogEvent.SKIPPED,
+                                TestLogEvent.FAILED,
+                                TestLogEvent.STANDARD_OUT]
+            showStandardStreams = true
+            exceptionFormat = TestExceptionFormat.FULL
+            showExceptions = true
+            showStackTraces = true
+            showCauses = true
+
+            afterSuite { desc, result ->
+                if (!desc.parent) { // will match the outermost suite
+                    def output = "Results: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} successes, ${result.failedTestCount} failures, ${result.skippedTestCount} skipped)"
+                    def startItem = '|    ', endItem = '    |'
+                    def repeatLength = startItem.length() + output.length() + endItem.length()
+                    println('\n' + ('-' * repeatLength) + '\n' + startItem + output + endItem + '\n' + ('-' * repeatLength))
+                }
+            }
+        }
+    }
+
+    task showAllDependencies(type: DependencyReportTask) {}
+
+    jar.dependsOn adjustArchiveBaseName
+    build.dependsOn buildZip
+}

@@ -5,7 +5,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import uk.gov.dvsa.motr.report.StatusReport;
-
 import uk.gov.service.notify.Notification;
 import uk.gov.service.notify.NotificationClientException;
 

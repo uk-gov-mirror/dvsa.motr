@@ -1,7 +1,7 @@
 package uk.gov.dvsa.motr.notifications.service;
 
 import uk.gov.dvsa.motr.eventlog.EventLogger;
-import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
+import uk.gov.dvsa.motr.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.web.eventlog.subscription.NotifyClientFailedEvent;
 import uk.gov.dvsa.motr.web.formatting.DateFormatter;
 import uk.gov.service.notify.NotificationClient;
@@ -18,11 +18,11 @@ import static uk.gov.dvsa.motr.web.eventlog.subscription.NotifyClientFailedEvent
 
 public class NotifyService {
 
-    private NotificationClient notificationClient;
-    private String emailSubscriptionConfirmationTemplateId;
-    private String emailConfirmationTemplateId;
-    private String smsSubscriptionConfirmationTemplateId;
-    private String smsConfirmationTemplateId;
+    private final NotificationClient notificationClient;
+    private final String emailSubscriptionConfirmationTemplateId;
+    private final String emailConfirmationTemplateId;
+    private final String smsSubscriptionConfirmationTemplateId;
+    private final String smsConfirmationTemplateId;
 
     public NotifyService(
             NotificationClient notificationClient,

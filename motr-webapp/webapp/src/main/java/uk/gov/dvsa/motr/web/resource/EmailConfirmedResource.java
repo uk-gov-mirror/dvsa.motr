@@ -14,12 +14,10 @@ import javax.ws.rs.core.Response;
 @Path("/confirm-email")
 @Produces("text/html")
 public class EmailConfirmedResource {
-    private UrlHelper urlHelper;
+    private final UrlHelper urlHelper;
 
     @Inject
-    public EmailConfirmedResource(
-            UrlHelper urlHelper
-    ) {
+    public EmailConfirmedResource(UrlHelper urlHelper) {
 
         this.urlHelper = urlHelper;
     }

@@ -1,0 +1,17 @@
+rootProject.name='motr'
+
+include 'motr-common'
+include 'motr-bouncing-email-cleaner'
+include 'motr-notifier'
+include 'motr-sms-receiver'
+include 'motr-subscription-loader'
+include 'motr-webapp:webapp'
+include 'motr-webapp:selenium'
+
+project(':motr-common').name='motr-common'
+project(':motr-bouncing-email-cleaner').name='motr-bouncing-email-cleaner'
+project(':motr-notifier').name='motr-notifier'
+project(':motr-sms-receiver').name='motr-sms-receiver'
+project(':motr-subscription-loader').name='motr-subscription-loader'
+project(':motr-webapp:webapp').name='motr-web'
+project(':motr-webapp:selenium').name='motr-selenium'

@@ -26,7 +26,8 @@ public class MotReminderTestsPostSms extends BaseTest {
     public static final String CONFIRMATION_PAGE_TITLE = "You’ve signed up for an MOT reminder";
 
     @Test(dataProvider = "dataProviderCreateEmailMotReminderForMyVehicle",
-            description = "Owner of a vehicle with a mot is able to set up an email MOT reminder with their VRM and email and unsubscribe from it",
+            description = "Owner of a vehicle with a mot is able to set up an email MOT reminder with their VRM and email and " +
+                    "unsubscribe from it",
             groups = {"PostSms"})
     public void createEmailMotReminderForMyVehicleThenUnsubscribe(String vrm, String email) throws IOException, InterruptedException {
 
@@ -47,8 +48,8 @@ public class MotReminderTestsPostSms extends BaseTest {
     }
 
     @Test(dataProvider = "dataProviderCreateEmailMotReminderForMyVehicle",
-            description = "Reminder subscriber with an active email subscription creates another email subscription with the same VRM and email" +
-                    " does not need to confirm their email again",
+            description = "Reminder subscriber with an active email subscription creates another email subscription with the same VRM and" +
+                    " email does not need to confirm their email again",
             groups = {"PostSms"})
     public void createDuplicateEmailMotReminderDoesNotNeedToConfirmEmailAddressAgain(String vrm, String email)
             throws IOException, InterruptedException {
@@ -62,8 +63,8 @@ public class MotReminderTestsPostSms extends BaseTest {
     }
 
     @Test(dataProvider = "dataProviderCreateEmailMotReminderForMyVehicle",
-            description = "Email reminder subscriber with multiple pending email subscriptions is directed to the confirm email error page when " +
-                    "selecting an old confirm email link",
+            description = "Email reminder subscriber with multiple pending email subscriptions is directed to the confirm email error " +
+                    "page when selecting an old confirm email link",
             groups = {"PostSms"})
     public void userWithDuplicatePendingEmailMotSubscriptionsIsDirectedToConfirmEmailErrorPageWhenSelectingOldConfirmEmailLink(
             String vrm, String email
@@ -109,7 +110,8 @@ public class MotReminderTestsPostSms extends BaseTest {
 
         //Given I am a vehicle owner on the MOTR start page
         //When I enter the vehicle vrm and my email address
-        ReviewPage reviewPage = motReminder.enterReminderDetailsSmsToggleOnUsingEmailChannel(RandomGenerator.generateVrm(), RandomGenerator.generateEmail());
+        ReviewPage reviewPage = motReminder.enterReminderDetailsSmsToggleOnUsingEmailChannel(RandomGenerator.generateVrm(),
+                RandomGenerator.generateEmail());
 
         //And I update my email address
         EmailPage emailPageFromReview = reviewPage.clickChangeEmail();
@@ -126,7 +128,8 @@ public class MotReminderTestsPostSms extends BaseTest {
 
         //Given I am a vehicle owner on the MOTR start page
         //When I enter the vehicle vrm and my email address
-        ReviewPage reviewPage = motReminder.enterReminderDetailsSmsToggleOnUsingEmailChannel(RandomGenerator.generateVrm(), RandomGenerator.generateEmail());
+        ReviewPage reviewPage = motReminder.enterReminderDetailsSmsToggleOnUsingEmailChannel(RandomGenerator.generateVrm(),
+                RandomGenerator.generateEmail());
 
         //And I update my vehicle vrm
         VrmPage vrmPageFromReview = reviewPage.clickChangeVrm();
@@ -155,7 +158,7 @@ public class MotReminderTestsPostSms extends BaseTest {
     @Test(description = "Owner of a vehicle with a mot is able to set up a MOT reminder with their VRM and mobile number",
             dataProvider = "dataProviderCreateSmsMotReminderForMyVehicle",
             groups = {"PostSms"})
-    public void createSMSMotReminderForMyVehicleUsingMobile(String vrm, String mobileNumber) {
+    public void createSmsMotReminderForMyVehicleUsingMobile(String vrm, String mobileNumber) {
 
         //Given I am a vehicle owner on the MOTR start page
         //When I enter the vehicle vrm and my mobile number
@@ -169,7 +172,7 @@ public class MotReminderTestsPostSms extends BaseTest {
 
     @Test(description = "Owner of a new vehicle with a mot is able to set up a MOT reminder with their VRM and mobile number",
             groups = {"PostSms"})
-    public void canCreateSMSReminderWhenVehicleDoesNotHaveAnMotYet() {
+    public void canCreateSmsReminderWhenVehicleDoesNotHaveAnMotYet() {
 
         //Given I am an owner of a new vehicle
         //When I enter the new vehicle vrm and my mobile number
@@ -209,7 +212,7 @@ public class MotReminderTestsPostSms extends BaseTest {
             "mobile number does not need to confirm their number again",
             dataProvider = "dataProviderCreateSmsMotReminderForMyVehicle",
             groups = {"PostSms"})
-    public void createDuplicateMOTSMSReminderDoesNotNeedToConfirmMobileNumberAgain(String vrm, String mobileNumber) {
+    public void createDuplicateMotSmsReminderDoesNotNeedToConfirmMobileNumberAgain(String vrm, String mobileNumber) {
 
         // Given I am a user of the MOT reminders service with an active SMS subscription
         motReminder.subscribeToReminderAndConfirmMobileNumber(vrm, mobileNumber);

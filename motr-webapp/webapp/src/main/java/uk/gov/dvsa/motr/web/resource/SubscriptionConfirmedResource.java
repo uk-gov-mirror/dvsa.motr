@@ -1,6 +1,6 @@
 package uk.gov.dvsa.motr.web.resource;
 
-import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
+import uk.gov.dvsa.motr.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
 import uk.gov.dvsa.motr.web.analytics.SmartSurveyHelper;
 import uk.gov.dvsa.motr.web.component.subscription.exception.InvalidConfirmationIdException;
@@ -41,9 +41,9 @@ public class SubscriptionConfirmedResource {
     private final DataLayerHelper dataLayerHelper;
     private final SmartSurveyHelper smartSurveyHelperSatisfaction;
     private final SmartSurveyHelper smartSurveyHelperFeedback;
-    private SubscriptionConfirmationService subscriptionConfirmationService;
-    private MotrSession motrSession;
-    private UrlHelper urlHelper;
+    private final SubscriptionConfirmationService subscriptionConfirmationService;
+    private final MotrSession motrSession;
+    private final UrlHelper urlHelper;
 
 
     @Inject

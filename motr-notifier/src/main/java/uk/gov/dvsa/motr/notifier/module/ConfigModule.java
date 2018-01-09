@@ -31,7 +31,7 @@ import uk.gov.dvsa.motr.notifier.processing.queue.QueueItemRemover;
 import uk.gov.dvsa.motr.notifier.processing.queue.SubscriptionsReceiver;
 import uk.gov.dvsa.motr.notifier.processing.service.ProcessSubscriptionService;
 import uk.gov.dvsa.motr.notifier.processing.unloader.QueueUnloader;
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
 import uk.gov.service.notify.NotificationClient;
 
 import java.util.HashSet;
@@ -141,8 +141,9 @@ public class ConfigModule extends AbstractModule {
         clientConfig = clientConfig.property(ClientProperties.CONNECT_TIMEOUT, timeoutInMs);
         clientConfig = clientConfig.property(ClientProperties.READ_TIMEOUT, timeoutInMs);
 
-        return new VehicleDetailsClient(clientConfig, config.getValue(MOT_API_MOT_TEST_NUMBER_URI),
-                config.getValue(MOT_TEST_REMINDER_INFO_TOKEN), config.getValue(MOT_API_DVLA_ID_URI));
+        return new VehicleDetailsClient(clientConfig, config.getValue(MOT_TEST_REMINDER_INFO_TOKEN))
+            .withByMotTestNumberUri(config.getValue(MOT_API_MOT_TEST_NUMBER_URI))
+            .withByDvlaIdUri(config.getValue(MOT_API_DVLA_ID_URI));
     }
 
     @Provides

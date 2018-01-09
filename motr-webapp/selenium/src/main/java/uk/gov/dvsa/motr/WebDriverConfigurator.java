@@ -13,6 +13,7 @@ public class WebDriverConfigurator extends Configurator {
     private final Thread hook;
 
     public WebDriverConfigurator() {
+
         DriverFactory driverFactory = new DriverFactory();
 
         cachedDriver = driverFactory.getDriver(this);
@@ -25,6 +26,7 @@ public class WebDriverConfigurator extends Configurator {
     }
 
     private Thread closeWebdriverOnShutdown() {
+
         if (null != this.hook) {
             throw new IllegalStateException();
         }
@@ -40,6 +42,7 @@ public class WebDriverConfigurator extends Configurator {
     }
 
     public BaseAppDriver getDriver() {
+
         return cachedDriver;
     }
 }

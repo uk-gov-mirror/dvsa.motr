@@ -3,7 +3,7 @@ package uk.gov.dvsa.motr.web.cookie;
 import org.junit.Before;
 import org.junit.Test;
 
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

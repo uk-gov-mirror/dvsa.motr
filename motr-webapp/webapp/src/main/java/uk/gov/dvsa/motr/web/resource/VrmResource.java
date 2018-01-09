@@ -1,9 +1,9 @@
 package uk.gov.dvsa.motr.web.resource;
 
 import uk.gov.dvsa.motr.eventlog.EventLogger;
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClientException;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClientException;
 import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.eventlog.HoneyPotTriggeredEvent;
@@ -47,9 +47,9 @@ public class VrmResource {
 
     private final TemplateEngine renderer;
     private final VehicleDetailsClient client;
-    private MotDueDateValidator motDueDateValidator;
+    private final MotDueDateValidator motDueDateValidator;
     private final MotrSession motrSession;
-    private DataLayerHelper dataLayerHelper;
+    private final DataLayerHelper dataLayerHelper;
 
     @Inject
     public VrmResource(
@@ -102,7 +102,7 @@ public class VrmResource {
         VrmValidator validator = new VrmValidator();
         if (validator.isValid(vrm)) {
             try {
-                Optional<VehicleDetails> vehicle = this.client.fetch(vrm);
+                Optional<VehicleDetails> vehicle = this.client.fetchByVrm(vrm);
                 if (vehicleDataIsValid(vehicle)) {
                     motrSession.setVrm(vrm);
                     motrSession.setVehicleDetails(vehicle.get());

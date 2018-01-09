@@ -5,9 +5,9 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
 import uk.gov.dvsa.motr.notifications.service.NotifyService;
-import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
+import uk.gov.dvsa.motr.vehicledetails.MotIdentification;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
 import uk.gov.dvsa.motr.web.component.subscription.model.PendingSubscription;
@@ -81,7 +81,7 @@ public class PendingSubscriptionServiceTest {
         VehicleDetails vehicleDetails = new VehicleDetails();
         vehicleDetails.setMake("TEST-MAKE");
         vehicleDetails.setModel("TEST-MODEL");
-        when(client.fetch(eq(TEST_VRM))).thenReturn(Optional.of(vehicleDetails));
+        when(client.fetchByVrm(eq(TEST_VRM))).thenReturn(Optional.of(vehicleDetails));
 
         withExpectedSubscription(empty(), EMAIL);
         doNothing().when(notifyService).sendEmailAddressConfirmationEmail(EMAIL, CONFIRMATION_LINK, "TEST-MAKE TEST-MODEL, ");
@@ -103,7 +103,7 @@ public class PendingSubscriptionServiceTest {
         VehicleDetails vehicleDetails = new VehicleDetails();
         vehicleDetails.setMake("TEST-MAKE");
         vehicleDetails.setModel("TEST-MODEL");
-        when(client.fetch(eq(TEST_VRM))).thenReturn(Optional.of(vehicleDetails));
+        when(client.fetchByVrm(eq(TEST_VRM))).thenReturn(Optional.of(vehicleDetails));
 
         withExpectedSubscription(empty(), MOBILE);
         LocalDate date = LocalDate.now();
@@ -169,7 +169,7 @@ public class PendingSubscriptionServiceTest {
     @Test
     public void handleSubscriptionWithEmailContactWillCreateNewPendingSubscription() throws Exception {
 
-        when(client.fetch(eq(TEST_VRM))).thenReturn(Optional.of(new VehicleDetails()));
+        when(client.fetchByVrm(eq(TEST_VRM))).thenReturn(Optional.of(new VehicleDetails()));
         withExpectedSubscription(empty(), EMAIL);
         when(pendingSubscriptionRepository.findByVrmAndContactDetails(TEST_VRM, EMAIL)).thenReturn(Optional.empty());
         LocalDate date = LocalDate.now();
@@ -190,7 +190,7 @@ public class PendingSubscriptionServiceTest {
     @Test
     public void handleSubscriptionWithMobileContactWillCreateNewPendingSubscription() throws Exception {
 
-        when(client.fetch(eq(TEST_VRM))).thenReturn(Optional.of(new VehicleDetails()));
+        when(client.fetchByVrm(eq(TEST_VRM))).thenReturn(Optional.of(new VehicleDetails()));
         withExpectedSubscription(empty(), MOBILE);
         LocalDate date = LocalDate.now();
         when(pendingSubscriptionRepository.findByVrmAndContactDetails(TEST_VRM, MOBILE)).thenReturn(Optional.empty());

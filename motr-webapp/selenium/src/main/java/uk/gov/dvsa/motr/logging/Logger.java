@@ -8,21 +8,24 @@ import java.io.StringWriter;
 public class Logger {
 
     public static void info(String logText) {
+
         String logInfo = ("INFO: [" + logText + "]");
         Reporter.log(logInfo, true);
     }
 
     public static void error(String logText) {
+
         String logErr = ("ERROR: [" + logText + "]");
         Reporter.log(logErr, true);
     }
 
-    public static void error(String logText, Exception e) {
+    public static void error(String logText, Exception ex) {
+
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
-        e.printStackTrace(printWriter);
+        ex.printStackTrace(printWriter);
 
-        String logErr = ("ERROR: [" + logText + "]\n" +  stringWriter.toString());
+        String logErr = ("ERROR: [" + logText + "]\n" + stringWriter.toString());
 
         Reporter.log(logErr, true);
     }

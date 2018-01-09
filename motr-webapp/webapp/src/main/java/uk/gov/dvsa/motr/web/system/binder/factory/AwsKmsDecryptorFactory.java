@@ -1,8 +1,8 @@
 package uk.gov.dvsa.motr.web.system.binder.factory;
 
-import uk.gov.dvsa.motr.web.config.Config;
-import uk.gov.dvsa.motr.web.encryption.AwsKmsDecryptor;
-import uk.gov.dvsa.motr.web.encryption.Decryptor;
+import uk.gov.dvsa.motr.config.Config;
+import uk.gov.dvsa.motr.encryption.AwsKmsDecryptor;
+import uk.gov.dvsa.motr.encryption.Decryptor;
 
 import javax.inject.Inject;
 

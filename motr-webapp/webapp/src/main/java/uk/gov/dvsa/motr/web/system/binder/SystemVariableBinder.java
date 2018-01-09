@@ -12,7 +12,7 @@ import org.glassfish.jersey.server.internal.inject.ParamInjectionResolver;
 import org.glassfish.jersey.server.model.Parameter;
 import org.glassfish.jersey.server.spi.internal.ValueFactoryProvider;
 
-import uk.gov.dvsa.motr.web.config.Config;
+import uk.gov.dvsa.motr.config.Config;
 import uk.gov.dvsa.motr.web.helper.SystemVariableParam;
 
 import javax.inject.Inject;

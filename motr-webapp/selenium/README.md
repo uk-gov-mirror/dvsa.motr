@@ -6,7 +6,7 @@ Automated browser test suite for MOT Reminders
 
 ##### Commandline (for developers)
 To run locally against remote env:
-```./runTests <env_url> <aws_region> <table_subscription_name> <table_pending_subscription_name>```
+```./runTests <env_url> <aws_region> <table_subscription_name> <table_pending_subscription_name> <table_sms_confirmation_name>```
 
 ##### Properties file
 Tests suite can be configured through Java properties which can be pointed at with the help of following environment variables:

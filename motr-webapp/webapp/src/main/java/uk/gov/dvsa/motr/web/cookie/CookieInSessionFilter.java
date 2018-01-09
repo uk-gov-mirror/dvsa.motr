@@ -38,8 +38,8 @@ import static javax.ws.rs.core.Cookie.DEFAULT_VERSION;
 public class CookieInSessionFilter implements ContainerResponseFilter, ContainerRequestFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(CookieInSessionFilter.class);
-    public static final int MAX_COOKIE_AGE_IN_SECONDS = 60 * 20;
-    private MotrSession motrSession;
+    private static final int MAX_COOKIE_AGE_IN_SECONDS = 60 * 20;
+    private final MotrSession motrSession;
     private Clock clockReference = Clock.system(ZoneId.of("Europe/London"));
 
     @Inject
@@ -51,7 +51,6 @@ public class CookieInSessionFilter implements ContainerResponseFilter, Container
     public void setClock(Clock clock) {
         this.clockReference = clock;
     }
-
 
     @Override
     public void filter(ContainerRequestContext requestContext) {

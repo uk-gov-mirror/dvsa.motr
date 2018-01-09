@@ -4,9 +4,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import uk.gov.dvsa.motr.notifications.service.NotifyService;
-import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
+import uk.gov.dvsa.motr.vehicledetails.MotIdentification;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.web.component.subscription.exception.InvalidConfirmationIdException;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
@@ -62,7 +62,7 @@ public class SubscriptionConfirmationServiceTest {
 
     @Test
     public void saveSubscriptionWhenSubscriptionDoesNotExistCallsDbToSaveDetails() throws Exception {
-        when(client.fetch(eq(VRM))).thenReturn(Optional.of(new VehicleDetails()));
+        when(client.fetchByVrm(eq(VRM))).thenReturn(Optional.of(new VehicleDetails()));
         PendingSubscription pendingSubscription = pendingSubscriptionEmailStub();
         withPendingSubscriptionFound(of(pendingSubscription));
 
@@ -83,7 +83,7 @@ public class SubscriptionConfirmationServiceTest {
 
     @Test
     public void saveSubscriptionWhenSubscriptionDoesNotExistCallsDbToSaveDetailsWithMobile() throws Exception {
-        when(client.fetch(eq(VRM))).thenReturn(Optional.of(new VehicleDetails()));
+        when(client.fetchByVrm(eq(VRM))).thenReturn(Optional.of(new VehicleDetails()));
         PendingSubscription pendingSubscription = pendingSubscriptionMobileStub();
         withPendingSubscriptionFound(of(pendingSubscription));
 

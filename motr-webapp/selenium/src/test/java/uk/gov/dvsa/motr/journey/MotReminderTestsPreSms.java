@@ -8,7 +8,6 @@ import uk.gov.dvsa.motr.helper.RandomGenerator;
 import uk.gov.dvsa.motr.ui.page.EmailConfirmationPendingPage;
 import uk.gov.dvsa.motr.ui.page.EmailPage;
 import uk.gov.dvsa.motr.ui.page.ReviewPage;
-import uk.gov.dvsa.motr.ui.page.SubscriptionConfirmationPage;
 import uk.gov.dvsa.motr.ui.page.UnsubscribeConfirmationPage;
 import uk.gov.dvsa.motr.ui.page.UnsubscribeErrorPage;
 import uk.gov.dvsa.motr.ui.page.VrmPage;
@@ -46,7 +45,7 @@ public class MotReminderTestsPreSms extends BaseTest {
             description = "Reminder subscriber with an active subscription creates another subscription with the same VRM and email" +
                     " does not need to confirm their email again",
             groups = {"PreSms"})
-    public void createDuplicateMOTReminderDoesNotNeedToConfirmEmailAddressAgain(String vrm, String email)
+    public void createDuplicateMotReminderDoesNotNeedToConfirmEmailAddressAgain(String vrm, String email)
             throws IOException, InterruptedException {
 
         // Given I am a user of the MOT reminders service with an active subscription

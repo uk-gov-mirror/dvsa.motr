@@ -1,6 +1,6 @@
 package uk.gov.dvsa.motr.smsreceiver.system;
 
-import uk.gov.dvsa.motr.smsreceiver.config.ConfigKey;
+import uk.gov.dvsa.motr.config.ConfigKey;
 
 public enum SystemVariable implements ConfigKey {
 

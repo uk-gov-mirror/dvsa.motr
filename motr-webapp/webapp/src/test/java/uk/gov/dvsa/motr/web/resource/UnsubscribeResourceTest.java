@@ -3,8 +3,8 @@ package uk.gov.dvsa.motr.web.resource;
 import org.junit.Before;
 import org.junit.Test;
 
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.service.UnsubscribeService;
@@ -77,7 +77,7 @@ public class UnsubscribeResourceTest {
     @Test
     public void unsubscribeGetWhenFoundDisplayPage() throws Exception {
 
-        when(client.fetch(eq("TEST-VRM"))).thenReturn(Optional.of(new VehicleDetails()));
+        when(client.fetchByVrm(eq("TEST-VRM"))).thenReturn(Optional.of(new VehicleDetails()));
         when(unsubscribeService.findSubscriptionForUnsubscribe(UNSUBSCRIBE_ID)).thenReturn(Optional.of(subscriptionStub()));
 
         resource.unsubscribeGet(UNSUBSCRIBE_ID);

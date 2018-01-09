@@ -3,7 +3,6 @@ package uk.gov.dvsa.motr.web.component.subscription.service;
 import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.web.component.subscription.exception.InvalidUnsubscribeIdException;
 import uk.gov.dvsa.motr.web.component.subscription.model.CancelledSubscription;
-import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.persistence.CancelledSubscriptionRepository;
 import uk.gov.dvsa.motr.web.component.subscription.persistence.SubscriptionRepository;
@@ -18,8 +17,8 @@ public class UnsubscribeService {
 
     private static final String REASON_FOR_CANCELLATION_USER_CANCELLED = "User cancelled";
 
-    private SubscriptionRepository subscriptionRepository;
-    private CancelledSubscriptionRepository cancelledSubscriptionRepository;
+    private final SubscriptionRepository subscriptionRepository;
+    private final CancelledSubscriptionRepository cancelledSubscriptionRepository;
 
     @Inject
     public UnsubscribeService(SubscriptionRepository subscriptionRepository,

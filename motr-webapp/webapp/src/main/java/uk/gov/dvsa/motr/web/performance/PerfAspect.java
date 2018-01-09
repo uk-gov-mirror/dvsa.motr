@@ -19,7 +19,7 @@ public class PerfAspect {
     public void anyPublicMethod() {
     }
 
-    @Pointcut("execution(* uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient.*(..))")
+    @Pointcut("execution(* uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient.*(..))")
     public void vehicleDetailsClientCall() {
     }
 
@@ -27,7 +27,7 @@ public class PerfAspect {
     public void notifyServiceCall() {
     }
 
-    @Pointcut("execution(* uk.gov.dvsa.motr.web.encryption.AwsKmsDecryptor.*(..))")
+    @Pointcut("execution(* uk.gov.dvsa.motr.encryption.AwsKmsDecryptor.*(..))")
     public void decryptorCall() {
     }
 

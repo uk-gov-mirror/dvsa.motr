@@ -26,14 +26,14 @@ public class VrmPage extends Page {
         return "What is the vehicle’s registration number? – MOT reminders";
     }
 
-    public EmailPage enterVrm(String vrm){
+    public EmailPage enterVrm(String vrm) {
 
         vrmField.sendKeys(vrm);
         continueButton.click();
         return new EmailPage();
     }
 
-    public ChannelSelectionPage enterVrmSmsToggleOn(String vrm){
+    public ChannelSelectionPage enterVrmSmsToggleOn(String vrm) {
 
         vrmField.sendKeys(vrm);
         continueButton.click();
@@ -54,13 +54,13 @@ public class VrmPage extends Page {
         return new CookiesPage();
     }
 
-    public TermsAndConditionsPage clickTermsAndConditionsLink(){
+    public TermsAndConditionsPage clickTermsAndConditionsLink() {
 
         termsAndConditionsLink.click();
         return new TermsAndConditionsPage();
     }
 
-    public PrivacyPage clickPrivacyPolicyLink(){
+    public PrivacyPage clickPrivacyPolicyLink() {
 
         privacyPolicyLink.click();
         return new PrivacyPage();

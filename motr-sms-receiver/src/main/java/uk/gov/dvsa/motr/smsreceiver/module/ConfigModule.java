@@ -6,13 +6,13 @@ import com.google.inject.Provides;
 
 import org.apache.log4j.Logger;
 
-import uk.gov.dvsa.motr.smsreceiver.config.CachedConfig;
-import uk.gov.dvsa.motr.smsreceiver.config.Config;
-import uk.gov.dvsa.motr.smsreceiver.config.ConfigKey;
-import uk.gov.dvsa.motr.smsreceiver.config.EncryptionAwareConfig;
-import uk.gov.dvsa.motr.smsreceiver.config.EnvironmentVariableConfig;
-import uk.gov.dvsa.motr.smsreceiver.encryption.AwsKmsDecryptor;
-import uk.gov.dvsa.motr.smsreceiver.encryption.Decryptor;
+import uk.gov.dvsa.motr.config.CachedConfig;
+import uk.gov.dvsa.motr.config.Config;
+import uk.gov.dvsa.motr.config.ConfigKey;
+import uk.gov.dvsa.motr.config.EncryptionAwareConfig;
+import uk.gov.dvsa.motr.config.EnvironmentVariableConfig;
+import uk.gov.dvsa.motr.encryption.AwsKmsDecryptor;
+import uk.gov.dvsa.motr.encryption.Decryptor;
 import uk.gov.dvsa.motr.smsreceiver.notify.NotifySmsService;
 import uk.gov.dvsa.motr.smsreceiver.service.CancelledSubscriptionHelper;
 import uk.gov.dvsa.motr.smsreceiver.service.MessageExtractor;

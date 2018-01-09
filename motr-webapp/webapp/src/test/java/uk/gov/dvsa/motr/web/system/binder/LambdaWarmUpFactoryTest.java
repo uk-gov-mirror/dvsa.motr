@@ -2,7 +2,7 @@ package uk.gov.dvsa.motr.web.system.binder;
 
 import org.junit.Test;
 
-import uk.gov.dvsa.motr.web.config.Config;
+import uk.gov.dvsa.motr.config.Config;
 import uk.gov.dvsa.motr.web.performance.warmup.DefaultLambdaWarmUp;
 import uk.gov.dvsa.motr.web.performance.warmup.LambdaWarmUp;
 

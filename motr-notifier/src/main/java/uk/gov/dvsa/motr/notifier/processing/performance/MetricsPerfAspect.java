@@ -25,7 +25,7 @@ public class MetricsPerfAspect {
     private Timer updateExpiryDateTimer = metricRegistry.timer("subscriptionRepository_updateExpiryDate");
     private Timer processItemTimer = metricRegistry.timer("process_single_item");
 
-    @Around("execution(* uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient.fetchByMotTestNumber(..))")
+    @Around("execution(* uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient.fetchByMotTestNumber(..))")
     public Object vehicleDetailsClientFetch(ProceedingJoinPoint joinPoint) throws Throwable {
 
         Object response;
@@ -40,7 +40,7 @@ public class MetricsPerfAspect {
         return response;
     }
 
-    @Around("execution(* uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient.fetchByDvlaId(..))")
+    @Around("execution(* uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient.fetchByDvlaId(..))")
     public Object vehicleDetailsClientFetchByDvlaId(ProceedingJoinPoint joinPoint) throws Throwable {
 
         Object response;

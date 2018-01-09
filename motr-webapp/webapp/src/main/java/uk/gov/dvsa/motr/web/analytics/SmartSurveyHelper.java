@@ -1,7 +1,5 @@
 package uk.gov.dvsa.motr.web.analytics;
 
-import org.apache.http.client.utils.URIBuilder;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;

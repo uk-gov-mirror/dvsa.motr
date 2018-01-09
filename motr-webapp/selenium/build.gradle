@@ -2,26 +2,17 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 group 'uk.gov.dvsa.motr.selenium'
-version null
-
-apply plugin: 'java'
-apply plugin: 'idea'
-apply plugin: 'eclipse'
-
-sourceCompatibility = 1.8
-
-repositories {
-    mavenCentral()
-}
 
 dependencies {
-    compile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '2.53.1'
-    compile group: 'org.testng', name: 'testng', version: '6.10'
-    compile 'com.amazonaws:aws-java-sdk-dynamodb:1.11.84'
-    compile("org.uncommons:reportng:1.1.4") {
+    // Version(s) from AWS SDK BOM.
+    compile 'com.amazonaws:aws-java-sdk-dynamodb'
+
+    compile "org.seleniumhq.selenium:selenium-java:${seleniumVersion}"
+    compile "org.testng:testng:${orgTestingVersion}"
+    compile("org.uncommons:reportng:${uncommonsReportingVersion}") {
         exclude group: "org.testng", module: "testng"
     }
-    compile "com.google.inject:guice:4.1.0"
+    compile "com.google.inject:guice:${guiceVersion}"
 }
 
 task selenium(type: Test) {
@@ -47,14 +38,14 @@ task selenium(type: Test) {
         }
     }
 
-    useTestNG{
+    useTestNG {
         options ->
             options.parallel = 'classes' //modes: methods, tests, classes or instances.
             options.threadCount = 1
             options.useDefaultListeners = true
             options.listeners << 'org.uncommons.reportng.HTMLReporter'
             options.listeners << 'org.uncommons.reportng.JUnitXMLReporter'
-        suites 'resources/PreSms.xml'
+            suites('resources/PreSms.xml')
     }
 
     systemProperties = (Map<String, String>)System.getProperties().findAll {it.key.startsWith("test.")}
@@ -83,19 +74,15 @@ task selenium_new(type: Test) {
         }
     }
 
-    useTestNG{
+    useTestNG {
         options ->
             options.parallel = 'classes' //modes: methods, tests, classes or instances.
             options.threadCount = 1
             options.useDefaultListeners = true
             options.listeners << 'org.uncommons.reportng.HTMLReporter'
             options.listeners << 'org.uncommons.reportng.JUnitXMLReporter'
-        suites 'resources/PostSms.xml'
+            suites('resources/PostSms.xml')
     }
-
-
 
     systemProperties = (Map<String, String>)System.getProperties().findAll {it.key.startsWith("test.")}
 }
-
-test.dependsOn selenium

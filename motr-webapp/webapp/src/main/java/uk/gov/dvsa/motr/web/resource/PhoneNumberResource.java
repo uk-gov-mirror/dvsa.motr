@@ -35,9 +35,8 @@ public class PhoneNumberResource {
 
     private final TemplateEngine renderer;
     private final MotrSession motrSession;
-    private PhoneNumberValidator validator;
-
-    private DataLayerHelper dataLayerHelper;
+    private final PhoneNumberValidator validator;
+    private final DataLayerHelper dataLayerHelper;
 
     @Inject
     public PhoneNumberResource(

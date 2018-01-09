@@ -17,7 +17,7 @@ import static uk.gov.dvsa.motr.web.resource.RedirectResponseBuilder.redirect;
 public class ResendSmsResource {
 
     private final MotrSession motrSession;
-    private UrlHelper urlHelper;
+    private final UrlHelper urlHelper;
 
     private SmsConfirmationService smsConfirmationService;
 

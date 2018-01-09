@@ -2,10 +2,10 @@ package uk.gov.dvsa.motr.web.component.subscription.service;
 
 import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.notifications.service.NotifyService;
-import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsService;
+import uk.gov.dvsa.motr.vehicledetails.MotIdentification;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
 import uk.gov.dvsa.motr.web.component.subscription.model.PendingSubscription;
@@ -26,11 +26,11 @@ import static uk.gov.dvsa.motr.web.component.subscription.service.RandomIdGenera
 
 public class PendingSubscriptionService {
 
-    private PendingSubscriptionRepository pendingSubscriptionRepository;
-    private SubscriptionRepository subscriptionRepository;
-    private NotifyService notifyService;
-    private UrlHelper urlHelper;
-    private VehicleDetailsClient client;
+    private final PendingSubscriptionRepository pendingSubscriptionRepository;
+    private final SubscriptionRepository subscriptionRepository;
+    private final NotifyService notifyService;
+    private final UrlHelper urlHelper;
+    private final VehicleDetailsClient client;
 
     @Inject
     public PendingSubscriptionService(

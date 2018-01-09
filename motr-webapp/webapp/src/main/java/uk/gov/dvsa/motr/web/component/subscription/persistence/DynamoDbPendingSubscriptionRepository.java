@@ -15,7 +15,7 @@ import com.amazonaws.services.dynamodbv2.model.AmazonDynamoDBException;
 import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException;
 
 import uk.gov.dvsa.motr.eventlog.EventLogger;
-import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
+import uk.gov.dvsa.motr.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
 import uk.gov.dvsa.motr.web.component.subscription.model.PendingSubscription;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
@@ -42,8 +42,8 @@ public class DynamoDbPendingSubscriptionRepository implements PendingSubscriptio
 
     private static final int HOURS_TO_DELETION = 24;
 
-    private DynamoDB dynamoDb;
-    private String tableName;
+    private final DynamoDB dynamoDb;
+    private final String tableName;
 
     @Inject
     public DynamoDbPendingSubscriptionRepository(

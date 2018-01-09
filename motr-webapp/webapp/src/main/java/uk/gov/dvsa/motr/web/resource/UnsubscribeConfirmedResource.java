@@ -1,8 +1,8 @@
 package uk.gov.dvsa.motr.web.resource;
 
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsService;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.cookie.UnsubscribeConfirmationParams;
@@ -28,9 +28,9 @@ import static uk.gov.dvsa.motr.web.analytics.DataLayerHelper.VRM_KEY;
 @Produces("text/html")
 public class UnsubscribeConfirmedResource {
 
-    private TemplateEngine renderer;
-    private MotrSession motrSession;
-    private VehicleDetailsClient client;
+    private final TemplateEngine renderer;
+    private final MotrSession motrSession;
+    private final VehicleDetailsClient client;
 
     @Inject
     public UnsubscribeConfirmedResource(

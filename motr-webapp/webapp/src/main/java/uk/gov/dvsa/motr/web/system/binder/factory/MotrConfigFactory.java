@@ -1,11 +1,11 @@
 package uk.gov.dvsa.motr.web.system.binder.factory;
 
-import uk.gov.dvsa.motr.web.config.CachedConfig;
-import uk.gov.dvsa.motr.web.config.Config;
-import uk.gov.dvsa.motr.web.config.ConfigKey;
-import uk.gov.dvsa.motr.web.config.EncryptionAwareConfig;
-import uk.gov.dvsa.motr.web.config.EnvironmentVariableConfig;
-import uk.gov.dvsa.motr.web.encryption.Decryptor;
+import uk.gov.dvsa.motr.config.CachedConfig;
+import uk.gov.dvsa.motr.config.Config;
+import uk.gov.dvsa.motr.config.ConfigKey;
+import uk.gov.dvsa.motr.config.EncryptionAwareConfig;
+import uk.gov.dvsa.motr.config.EnvironmentVariableConfig;
+import uk.gov.dvsa.motr.encryption.Decryptor;
 
 import java.util.HashSet;
 import java.util.Set;

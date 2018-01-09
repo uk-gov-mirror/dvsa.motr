@@ -1,11 +1,11 @@
 package uk.gov.dvsa.motr.smsreceiver.system.binder.factory;
 
-import uk.gov.dvsa.motr.smsreceiver.config.CachedConfig;
-import uk.gov.dvsa.motr.smsreceiver.config.Config;
-import uk.gov.dvsa.motr.smsreceiver.config.ConfigKey;
-import uk.gov.dvsa.motr.smsreceiver.config.EncryptionAwareConfig;
-import uk.gov.dvsa.motr.smsreceiver.config.EnvironmentVariableConfig;
-import uk.gov.dvsa.motr.smsreceiver.encryption.Decryptor;
+import uk.gov.dvsa.motr.config.CachedConfig;
+import uk.gov.dvsa.motr.config.Config;
+import uk.gov.dvsa.motr.config.ConfigKey;
+import uk.gov.dvsa.motr.config.EncryptionAwareConfig;
+import uk.gov.dvsa.motr.config.EnvironmentVariableConfig;
+import uk.gov.dvsa.motr.encryption.Decryptor;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -2,11 +2,11 @@ package uk.gov.dvsa.motr.web.formatting;
 
 import com.amazonaws.util.StringUtils;
 
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 
 public class MakeModelFormatter {
 
-    private static String UNKNOWN_VALUE = "UNKNOWN";
+    private static final String UNKNOWN_VALUE = "UNKNOWN";
 
     public static String getMakeModelString(String make, String model, String makeInFull) {
 

@@ -2,7 +2,7 @@ package uk.gov.dvsa.motr.web.resource;
 
 import com.amazonaws.util.StringUtils;
 
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.response.PendingSubscriptionServiceResponse;
@@ -38,8 +38,8 @@ public class ReviewResource {
     private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(ReviewResource.class);
 
     private final TemplateEngine renderer;
-    private PendingSubscriptionService pendingSubscriptionService;
-    private SmsConfirmationService smsConfirmationService;
+    private final PendingSubscriptionService pendingSubscriptionService;
+    private final SmsConfirmationService smsConfirmationService;
     private final MotrSession motrSession;
     private final PhoneNumberValidator phoneNumberValidator;
 

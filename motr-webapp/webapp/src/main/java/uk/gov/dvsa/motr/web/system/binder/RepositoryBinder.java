@@ -15,6 +15,7 @@ public class RepositoryBinder extends AbstractBinder {
 
     @Override
     protected void configure() {
+
         bind(DynamoDbSubscriptionRepository.class).to(SubscriptionRepository.class);
         bind(DynamoDbPendingSubscriptionRepository.class).to(PendingSubscriptionRepository.class);
         bind(DynamoDbSmsConfirmationRepository.class).to(SmsConfirmationRepository.class);

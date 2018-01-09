@@ -1,6 +1,5 @@
 package uk.gov.dvsa.motr.subscriptionloader.processing.model;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.Before;
@@ -12,7 +11,6 @@ import java.time.LocalDate;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 public class SubscriptionTest {
 

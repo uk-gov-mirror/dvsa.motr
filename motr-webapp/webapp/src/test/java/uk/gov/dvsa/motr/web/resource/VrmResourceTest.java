@@ -3,9 +3,9 @@ package uk.gov.dvsa.motr.web.resource;
 import org.junit.Before;
 import org.junit.Test;
 
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClientException;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClientException;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.test.render.TemplateEngineStub;
 import uk.gov.dvsa.motr.web.validator.MotDueDateValidator;
@@ -64,7 +64,7 @@ public class VrmResourceTest {
     @Test
     public void postWithValidVrmResultsInRedirectToEmail() throws Exception {
 
-        when(client.fetch(eq(VALID_REG_NUMBER))).thenReturn(Optional.of(new VehicleDetails()));
+        when(client.fetchByVrm(eq(VALID_REG_NUMBER))).thenReturn(Optional.of(new VehicleDetails()));
         when(motDueDateValidator.isDueDateValid(any())).thenReturn(true);
         Response response = resource.vrmPagePost(VALID_REG_NUMBER, HONEY_POT);
         verify(motrSession, times(1)).setVehicleDetails(any(VehicleDetails.class));
@@ -96,7 +96,7 @@ public class VrmResourceTest {
     @Test
     public void postWithValidVrmWhenVehicleServiceReturnsServiceErrorResultsInVrmTemplateAndSystemErrorMessage() throws Exception {
 
-        doThrow(VehicleDetailsClientException.class).when(client).fetch(eq(SYSTEM_ERROR_VRM));
+        doThrow(VehicleDetailsClientException.class).when(client).fetchByVrm(eq(SYSTEM_ERROR_VRM));
         resource.vrmPagePost(SYSTEM_ERROR_VRM, HONEY_POT);
 
         assertEquals("vrm", templateEngine.getTemplate());
@@ -117,7 +117,7 @@ public class VrmResourceTest {
     @Test
     public void whenVehicleDetailsNotFoundShowErrorMessage() throws Exception {
 
-        when(client.fetch(eq(VALID_REG_NUMBER))).thenReturn(Optional.empty());
+        when(client.fetchByVrm(eq(VALID_REG_NUMBER))).thenReturn(Optional.empty());
 
         resource.vrmPagePost(VALID_REG_NUMBER, HONEY_POT);
 
@@ -140,7 +140,7 @@ public class VrmResourceTest {
     @Test
     public void whenVehicleDetailsFoundWithDueDateInThePastShowErrorMessage() throws Exception {
 
-        when(client.fetch(eq(VALID_REG_NUMBER))).thenReturn(Optional.of(new VehicleDetails()));
+        when(client.fetchByVrm(eq(VALID_REG_NUMBER))).thenReturn(Optional.of(new VehicleDetails()));
         when(motDueDateValidator.isDueDateValid(any())).thenReturn(false);
 
         resource.vrmPagePost(VALID_REG_NUMBER, HONEY_POT);
@@ -165,7 +165,7 @@ public class VrmResourceTest {
     public void whenVisitingFromReviewPage_thenButtonAndLinkShowCorrectText() throws Exception {
 
         when(motrSession.visitingFromReviewPage()).thenReturn(true);
-        when(client.fetch(eq(VALID_REG_NUMBER))).thenReturn(Optional.of(new VehicleDetails()));
+        when(client.fetchByVrm(eq(VALID_REG_NUMBER))).thenReturn(Optional.of(new VehicleDetails()));
         when(motDueDateValidator.isDueDateValid(any())).thenReturn(true);
 
         resource = new VrmResource(motrSession, templateEngine, client, motDueDateValidator);
@@ -190,7 +190,7 @@ public class VrmResourceTest {
     public void whenHoneyPotValueIsNotEmpty_thenRedirectToEmailConfirmationPendingPage() throws Exception {
 
         when(motrSession.visitingFromReviewPage()).thenReturn(true);
-        when(client.fetch(eq(VALID_REG_NUMBER))).thenReturn(Optional.of(new VehicleDetails()));
+        when(client.fetchByVrm(eq(VALID_REG_NUMBER))).thenReturn(Optional.of(new VehicleDetails()));
         when(motDueDateValidator.isDueDateValid(any())).thenReturn(true);
 
         resource = new VrmResource(motrSession, templateEngine, client, motDueDateValidator);

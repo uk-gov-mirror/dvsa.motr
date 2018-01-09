@@ -2,11 +2,7 @@ package uk.gov.dvsa.motr.web.resource;
 
 import org.junit.Test;
 
-import uk.gov.dvsa.motr.web.cookie.MotrSession;
-import uk.gov.dvsa.motr.web.test.render.TemplateEngineStub;
-
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.StatusType;
 
 import static org.junit.Assert.assertEquals;
 

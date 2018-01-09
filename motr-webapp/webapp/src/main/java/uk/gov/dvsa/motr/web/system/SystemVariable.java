@@ -1,6 +1,6 @@
 package uk.gov.dvsa.motr.web.system;
 
-import uk.gov.dvsa.motr.web.config.ConfigKey;
+import uk.gov.dvsa.motr.config.ConfigKey;
 
 public enum SystemVariable implements ConfigKey {
 

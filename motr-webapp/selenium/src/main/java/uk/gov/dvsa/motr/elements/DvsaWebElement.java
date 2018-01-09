@@ -17,11 +17,19 @@ public class DvsaWebElement implements WebElement {
     private Locator locator;
     private WebElement underlyingElement;
 
+    protected DvsaWebElement(WebElement underlyingElement, Locator locator) {
+
+        this.underlyingElement = underlyingElement;
+        this.locator = locator;
+    }
+
     public static WebElement wrap(WebElement element, Locator locator) {
+
         return new DvsaWebElement(element, locator);
     }
 
     public static List<WebElement> wrap(List<WebElement> elements, Locator locator) {
+
         List<WebElement> webElements = new ArrayList<>();
 
         for (WebElement element : elements) {
@@ -31,13 +39,9 @@ public class DvsaWebElement implements WebElement {
         return webElements;
     }
 
-    protected DvsaWebElement(WebElement underlyingElement, Locator locator) {
-        this.underlyingElement = underlyingElement;
-        this.locator = locator;
-    }
-
     @Override
     public void click() {
+
         try {
             underlyingElement.click();
         } catch (StaleElementReferenceException sere) {
@@ -48,6 +52,7 @@ public class DvsaWebElement implements WebElement {
 
     @Override
     public void submit() {
+
         try {
             underlyingElement.submit();
         } catch (StaleElementReferenceException sere) {
@@ -58,6 +63,7 @@ public class DvsaWebElement implements WebElement {
 
     @Override
     public void sendKeys(CharSequence... charSequences) {
+
         try {
             underlyingElement.sendKeys(charSequences);
         } catch (StaleElementReferenceException sere) {
@@ -68,6 +74,7 @@ public class DvsaWebElement implements WebElement {
 
     @Override
     public void clear() {
+
         try {
             underlyingElement.clear();
         } catch (StaleElementReferenceException sere) {
@@ -78,6 +85,7 @@ public class DvsaWebElement implements WebElement {
 
     @Override
     public String getTagName() {
+
         try {
             return underlyingElement.getTagName();
         } catch (StaleElementReferenceException sere) {
@@ -88,6 +96,7 @@ public class DvsaWebElement implements WebElement {
 
     @Override
     public String getAttribute(String s) {
+
         try {
             return underlyingElement.getAttribute(s);
         } catch (StaleElementReferenceException sere) {
@@ -98,6 +107,7 @@ public class DvsaWebElement implements WebElement {
 
     @Override
     public boolean isSelected() {
+
         try {
             return underlyingElement.isSelected();
         } catch (StaleElementReferenceException sere) {
@@ -108,6 +118,7 @@ public class DvsaWebElement implements WebElement {
 
     @Override
     public boolean isEnabled() {
+
         try {
             return underlyingElement.isEnabled();
         } catch (StaleElementReferenceException sere) {
@@ -118,6 +129,7 @@ public class DvsaWebElement implements WebElement {
 
     @Override
     public String getText() {
+
         try {
             return underlyingElement.getText();
         } catch (StaleElementReferenceException sere) {
@@ -128,6 +140,7 @@ public class DvsaWebElement implements WebElement {
 
     @Override
     public List<WebElement> findElements(By by) {
+
         try {
             List<WebElement> webElements = new ArrayList<>();
             List<WebElement> webElementsFound = underlyingElement.findElements(by);
@@ -146,6 +159,7 @@ public class DvsaWebElement implements WebElement {
 
     @Override
     public WebElement findElement(By by) {
+
         try {
             return wrap(underlyingElement.findElement(by), new FindElementLocator(this, by));
         } catch (StaleElementReferenceException sere) {
@@ -156,6 +170,7 @@ public class DvsaWebElement implements WebElement {
 
     @Override
     public boolean isDisplayed() {
+
         try {
             return underlyingElement.isDisplayed();
         } catch (StaleElementReferenceException sere) {
@@ -166,6 +181,7 @@ public class DvsaWebElement implements WebElement {
 
     @Override
     public Point getLocation() {
+
         try {
             return underlyingElement.getLocation();
         } catch (StaleElementReferenceException sere) {
@@ -176,6 +192,7 @@ public class DvsaWebElement implements WebElement {
 
     @Override
     public Dimension getSize() {
+
         try {
             return underlyingElement.getSize();
         } catch (StaleElementReferenceException sere) {
@@ -186,6 +203,7 @@ public class DvsaWebElement implements WebElement {
 
     @Override
     public Rectangle getRect() {
+
         try {
             return underlyingElement.getRect();
         } catch (StaleElementReferenceException sere) {
@@ -196,6 +214,7 @@ public class DvsaWebElement implements WebElement {
 
     @Override
     public String getCssValue(String s) {
+
         try {
             return underlyingElement.getCssValue(s);
         } catch (StaleElementReferenceException sere) {
@@ -205,11 +224,13 @@ public class DvsaWebElement implements WebElement {
     }
 
     protected void againLocate() {
+
         underlyingElement = locator.locate();
     }
 
     @Override
     public <X> X getScreenshotAs(OutputType<X> xOutputType) throws WebDriverException {
+
         try {
             return underlyingElement.getScreenshotAs(xOutputType);
         } catch (StaleElementReferenceException sere) {

@@ -2,9 +2,9 @@ package uk.gov.dvsa.motr.web.component.subscription.service;
 
 import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.notifications.service.NotifyService;
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsService;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.web.component.subscription.exception.InvalidConfirmationIdException;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.component.subscription.model.PendingSubscription;
@@ -26,7 +26,7 @@ public class SubscriptionConfirmationService {
     private final UrlHelper urlHelper;
     private final PendingSubscriptionRepository pendingSubscriptionRepository;
     private final SubscriptionRepository subscriptionRepository;
-    private VehicleDetailsClient client;
+    private final VehicleDetailsClient client;
 
     @Inject
     public SubscriptionConfirmationService(

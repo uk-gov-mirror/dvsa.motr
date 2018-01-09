@@ -17,6 +17,7 @@ public class WebDriverConfiguratorRegistry {
     }
 
     public static void clear() {
+
         webDriverConfigurator.remove();
     }
 }
