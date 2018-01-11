@@ -1,4 +1,4 @@
-package uk.gov.dvsa.motr.integration.receiver;
+package uk.gov.dvsa.motr.test.integration.receiver;
 
 import com.amazonaws.serverless.proxy.internal.model.AwsProxyRequest;
 import com.amazonaws.services.dynamodbv2.document.Item;

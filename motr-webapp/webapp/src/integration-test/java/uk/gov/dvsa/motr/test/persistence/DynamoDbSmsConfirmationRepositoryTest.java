@@ -1,4 +1,4 @@
-package uk.gov.dvsa.motr.web.component.subscription.persistence;
+package uk.gov.dvsa.motr.test.persistence;
 
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Item;
@@ -12,6 +12,8 @@ import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.core.DynamoDbFixture;
 import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.model.SmsConfirmationItem;
 import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.model.SmsConfirmationTable;
 import uk.gov.dvsa.motr.web.component.subscription.model.SmsConfirmation;
+import uk.gov.dvsa.motr.web.component.subscription.persistence.DynamoDbSmsConfirmationRepository;
+import uk.gov.dvsa.motr.web.component.subscription.persistence.SmsConfirmationRepository;
 
 import java.time.LocalDateTime;
 
