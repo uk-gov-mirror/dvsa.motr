@@ -66,6 +66,7 @@ subprojects {
     apply plugin: 'idea'
     apply plugin: 'eclipse'
     apply plugin: 'checkstyle'
+    apply plugin: 'jacoco'
 
     [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
@@ -123,7 +124,15 @@ subprojects {
         configFile = getRootProject().file("dvsa_java_checks.xml")
         toolVersion = "6.15"
     }
-        
+
+    jacocoTestReport {
+        group = "Reporting"
+        reports {
+            xml.enabled = true
+            html.enabled = true
+        }
+    }
+
     task buildZip(type: Zip) {
         from compileJava
         from processResources
@@ -186,4 +195,5 @@ subprojects {
 
     jar.dependsOn adjustArchiveBaseName
     build.dependsOn buildZip
+    test.finalizedBy jacocoTestReport
 }
