@@ -19,7 +19,7 @@ allprojects {
 
     ext {
         // AWS Maven 'Bill of Materials' (BOM) version.
-        awsSdkBomVersion = '1.11.251'
+        awsSdkBomVersion = '1.11.264'
 
         // Lambda support libs.
         // See: https://github.com/aws/aws-lambda-java-libs
@@ -53,6 +53,7 @@ allprojects {
         seleniumVersion = '2.53.1'
         orgTestingVersion = '6.10'
         uncommonsReportingVersion = '1.1.4'
+        orgReflectionsVersion = '0.9.11'
     }
 }
 
@@ -192,6 +193,14 @@ subprojects {
     }
 
     task showAllDependencies(type: DependencyReportTask) {}
+
+    if (project.name != 'motr-common' && project.name != 'motr-webapp' && project.name != 'motr-selenium') {
+        task integrationTestReport(type: JavaExec) {
+            classpath sourceSets.integrationTest.runtimeClasspath
+            args project.name
+            main = "uk.gov.dvsa.motr.test.testreports.CreateTestReport"
+        }
+    }
 
     jar.dependsOn adjustArchiveBaseName
     build.dependsOn buildZip

@@ -6,4 +6,6 @@ dependencies {
 
     compile "org.glassfish.jersey.media:jersey-media-json-jackson:${jerseyMediaVersion}"
     compile "org.glassfish.jersey.connectors:jersey-apache-connector:${jerseyConnectorsVersion}"
+    compile "org.reflections:reflections:${orgReflectionsVersion}"
+    compile "org.apache.commons:commons-lang3:${commonsLangVersion}"
 }

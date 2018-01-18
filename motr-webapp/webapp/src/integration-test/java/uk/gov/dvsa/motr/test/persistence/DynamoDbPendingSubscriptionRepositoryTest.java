@@ -1,4 +1,4 @@
-package uk.gov.dvsa.motr.web.component.subscription.persistence;
+package uk.gov.dvsa.motr.test.persistence;
 
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Item;
@@ -14,6 +14,8 @@ import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.model.PendingSubscript
 import uk.gov.dvsa.motr.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
 import uk.gov.dvsa.motr.web.component.subscription.model.PendingSubscription;
+import uk.gov.dvsa.motr.web.component.subscription.persistence.DynamoDbPendingSubscriptionRepository;
+import uk.gov.dvsa.motr.web.component.subscription.persistence.PendingSubscriptionRepository;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
