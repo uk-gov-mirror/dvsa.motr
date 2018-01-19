@@ -3,12 +3,16 @@ package uk.gov.dvsa.motr.notifier.notify;
 import org.junit.Before;
 import org.junit.Test;
 
+import uk.gov.dvsa.motr.notifier.helpers.Checksum;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringJoiner;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -25,6 +29,7 @@ public class NotifyEmailServiceTest {
     private static final String PRESERVATION_STATEMENT_PREFIX =
             "You can get your MOT test done from tomorrow to keep the same expiry date ";
     private static final String PRESERVATION_STATEMENT_SUFFIX = " for next year.";
+    private static final String MOTH_DIRECT_URL_PREFIX = "http://gov.uk/";
 
     private NotificationClient notificationClient = mock(NotificationClient.class);
     private String oneMonthNotificationTemplateId = "TEMPLATE-ONE-MONTH";
@@ -42,7 +47,7 @@ public class NotifyEmailServiceTest {
     @Test
     public void oneMonthNotificationIsSentWithCorrectDetails_whenMotTestNumber() throws NotificationClientException {
 
-        notifyEmailService.sendOneMonthNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK, "");
+        notifyEmailService.sendOneMonthNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK, "", MOTH_DIRECT_URL_PREFIX);
 
         StringBuilder preservationStatementSb = new StringBuilder(128)
                 .append(PRESERVATION_STATEMENT_PREFIX)
@@ -53,6 +58,7 @@ public class NotifyEmailServiceTest {
         personalisation.put("mot_expiry_date", DateFormatterForEmailDisplay.asFormattedForEmailDate(EXPIRY_DATE));
         personalisation.put("is_due_or_expires", "expires");
         personalisation.put("preservation_statement", preservationStatementSb.toString());
+        personalisation.put("moth_url", MOTH_DIRECT_URL_PREFIX);
 
         verify(notificationClient, times(1)).sendEmail(
                 oneMonthNotificationTemplateId,
@@ -63,14 +69,15 @@ public class NotifyEmailServiceTest {
     }
 
     @Test
-    public void oneMonthNotificationIsSentWithCorrectDetails_whenDvlaId() throws NotificationClientException {
+    public void oneMonthNotificationIsSentWithCorrectDetails_whenDvlaId() throws NotificationClientException, NoSuchAlgorithmException {
 
-        notifyEmailService.sendOneMonthNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK, "12234");
+        notifyEmailService.sendOneMonthNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK, "12234", MOTH_DIRECT_URL_PREFIX);
 
         Map<String, String> personalisation = stubGenericPersonalisation();
         personalisation.put("mot_expiry_date", DateFormatterForEmailDisplay.asFormattedForEmailDate(EXPIRY_DATE));
         personalisation.put("is_due_or_expires", "is due");
         personalisation.put("preservation_statement", "");
+        personalisation.put("moth_url", MOTH_DIRECT_URL_PREFIX);
 
         verify(notificationClient, times(1)).sendEmail(
                 oneMonthNotificationTemplateId,
@@ -147,14 +154,15 @@ public class NotifyEmailServiceTest {
     @Test(expected = NotificationClientException.class)
     public void whenClientThrowsAnErrorItIsThrown() throws NotificationClientException {
 
-        when(notificationClient.sendEmail(any(), any(), any(), any())).thenThrow(NotificationClientException.class);
+        when(notificationClient.sendEmail(any(String.class), any(), any(), any())).thenThrow(NotificationClientException.class);
 
         notifyEmailService.sendOneMonthNotificationEmail(
                 "",
                 "",
                 LocalDate.of(2017, 10, 10),
                 "",
-                ""
+                "",
+                MOTH_DIRECT_URL_PREFIX
         );
     }
 

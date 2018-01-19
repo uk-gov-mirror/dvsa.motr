@@ -7,4 +7,10 @@ public class OneMonthEmailReminderEvent extends NotifyEvent {
 
         return "ONE-MONTH-EMAIL-SUCCESS";
     }
+
+    public OneMonthEmailReminderEvent setChecksum(String checksum) {
+
+        params.put("checksum", checksum);
+        return this;
+    }
 }

@@ -5,6 +5,7 @@ import com.amazonaws.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.gov.dvsa.motr.notifier.helpers.Checksum;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 import uk.gov.service.notify.SendEmailResponse;
@@ -12,6 +13,7 @@ import uk.gov.service.notify.SendEmailResponse;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringJoiner;
 
 public class NotifyEmailService {
 
@@ -36,10 +38,11 @@ public class NotifyEmailService {
     }
 
     public SendEmailResponse sendOneMonthNotificationEmail(String emailAddress, String vehicleDetails, LocalDate motExpiryDate,
-            String unsubscribeLink, String dvlaId) throws NotificationClientException {
+            String unsubscribeLink, String dvlaId, String mothUrl) throws NotificationClientException {
 
         Map<String, String> personalisation = genericPersonalisation(vehicleDetails, unsubscribeLink);
         personalisation.put("mot_expiry_date", DateFormatterForEmailDisplay.asFormattedForEmailDate(motExpiryDate));
+        personalisation.put("moth_url", mothUrl);
 
         if (!StringUtils.isNullOrEmpty(dvlaId)) {
             personalisation.put("is_due_or_expires", "is due");

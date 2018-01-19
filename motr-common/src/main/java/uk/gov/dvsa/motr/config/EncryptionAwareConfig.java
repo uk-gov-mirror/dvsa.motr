@@ -26,7 +26,6 @@ public class EncryptionAwareConfig implements Config {
 
         String value = wrappedConfig.getValue(key);
         return encryptedEntries.contains(key) ? decryptor.decrypt(value) : value;
-
     }
 }
 

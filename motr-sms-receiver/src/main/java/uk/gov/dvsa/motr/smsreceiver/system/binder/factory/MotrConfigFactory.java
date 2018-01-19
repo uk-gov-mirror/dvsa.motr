@@ -27,6 +27,7 @@ public class MotrConfigFactory implements BaseFactory<Config> {
         this.decryptor = x -> decryptorProvider.get().decrypt(x);
     }
 
+
     private static Set<ConfigKey> secretVariables() {
 
         return new HashSet<>();
