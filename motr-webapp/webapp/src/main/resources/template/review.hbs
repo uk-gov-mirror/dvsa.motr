@@ -94,7 +94,7 @@
     <div class="grid-row">
         <div class="column-two-thirds">
 
-            <form method="POST">
+            <form id="reviewForm" method="POST">
                 <div class="form-group">
                     <input id="continue-button" type="submit" value="Continue" class="button">
                 </div>
@@ -104,3 +104,11 @@
     </div>
 {{/partial}}
 {{> master pageTitle="Check your details – MOT reminders"}}
+
+<script type="text/javascript">
+    (function() {
+        document.getElementById("reviewForm").onsubmit = function() {
+            document.getElementById("continue-button").setAttribute("disabled", true);
+        };
+    })();
+</script>
