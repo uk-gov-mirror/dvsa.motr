@@ -18,7 +18,7 @@ public class NotifyEmailService {
     private static final Logger logger = LoggerFactory.getLogger(NotifyEmailService.class);
 
     private static final String PRESERVATION_STATEMENT_PREFIX =
-            "You can get your MOT test done from tomorrow to keep the same expiry date ";
+            "You can get your MOT test done from tomorrow to keep the same MOT test date ";
     private static final String PRESERVATION_STATEMENT_SUFFIX = " for next year.";
 
     private NotificationClient notificationClient;

@@ -8,9 +8,13 @@ MESSAGE CONTENT
 
 ((preservation_statement))
 
-#Is your vehicle safe?
+# Was this MOT reminder useful to you?
 
-Check if a vehicle or part has been recalled because of a safety fault at https://www.gov.uk/check-if-a-vehicle-has-been-recalled
+Help us improve the MOT reminder service by telling us what you think at https://www.gov.uk/done/mot-reminder 
+
+# Check MOT history and outstanding safety recalls
+
+Check your vehicle’s MOT history and if it has outstanding manufacturer’s safety recalls at https://www.gov.uk/check-mot-history
 
 DVSA (Driver and Vehicle Standards Agency)
 

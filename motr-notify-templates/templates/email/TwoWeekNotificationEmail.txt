@@ -6,7 +6,11 @@ MESSAGE CONTENT
 ---------------------
 ^#The MOT for ((vehicle_details)) ((is_due_or_expires)) on ((mot_expiry_ date))
 
-Book in for a test now at an approved MOT test centre. Find out about getting your MOT at https://www.gov.uk/getting-an-mot
+Book a test now at an approved MOT test centre. Find out about getting your MOT at https://www.gov.uk/getting-an-mot 
+
+#Was this MOT reminder useful to you?
+
+ Help us improve the MOT reminder service by telling us what you think at https://www.gov.uk/done/mot-reminder
 
 DVSA (Driver and Vehicle Standards Agency)
 
