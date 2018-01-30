@@ -7,6 +7,7 @@ import uk.gov.dvsa.motr.notifier.events.SubscriptionProcessingFailedEvent;
 import uk.gov.dvsa.motr.notifier.events.SubscriptionQueueItemRemovalFailedEvent;
 import uk.gov.dvsa.motr.notifier.events.SuccessfulSubscriptionProcessedEvent;
 import uk.gov.dvsa.motr.notifier.events.VehicleDetailsRetrievalFailedEvent;
+import uk.gov.dvsa.motr.notifier.events.VehicleNotFoundEvent;
 import uk.gov.dvsa.motr.notifier.processing.model.SubscriptionQueueItem;
 import uk.gov.dvsa.motr.notifier.processing.queue.QueueItemRemover;
 import uk.gov.dvsa.motr.notifier.processing.queue.RemoveSubscriptionFromQueueException;
@@ -73,7 +74,23 @@ public class ProcessSubscriptionTask implements Runnable {
 
             report.incrementFailedToProcess();
 
-        } catch (VehicleDetailsClientException | VehicleNotFoundException e) {
+        } catch (VehicleNotFoundException e) {
+
+            VehicleNotFoundEvent event = new VehicleNotFoundEvent()
+                    .setEmail(subscriptionQueueItemToProcess.getContactDetail().getValue())
+                    .setVrm(subscriptionQueueItemToProcess.getVrm())
+                    .setExpiryDate(subscriptionQueueItemToProcess.getMotDueDate());
+
+            if (subscriptionQueueItemToProcess.getMotTestNumber() == null) {
+                event.setDvlaId(subscriptionQueueItemToProcess.getDvlaId());
+            } else {
+                event.setMotTestNumber(subscriptionQueueItemToProcess.getMotTestNumber());
+            }
+
+            EventLogger.logErrorEvent(event, e);
+
+            report.incrementFailedToProcess();
+        } catch (VehicleDetailsClientException e) {
 
             VehicleDetailsRetrievalFailedEvent event = new VehicleDetailsRetrievalFailedEvent()
                     .setEmail(subscriptionQueueItemToProcess.getContactDetail().getValue())
