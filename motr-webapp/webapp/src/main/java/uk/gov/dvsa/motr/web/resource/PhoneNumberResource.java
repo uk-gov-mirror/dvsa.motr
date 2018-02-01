@@ -94,9 +94,11 @@ public class PhoneNumberResource {
         modelMap.put(MESSAGE_MODEL_KEY, validator.getMessage());
         modelMap.put(MESSAGE_AT_FIELD_MODEL_KEY, validator.getMessageAtField());
         dataLayerHelper.putAttribute(ERROR_KEY, validator.getMessage());
-        ReviewFlowUpdater.updateMapBasedOnReviewFlow(modelMap,
+        ReviewFlowUpdater.updateMapBasedOnReviewFlow(
+                modelMap,
                 motrSession.visitingFromContactEntryPage(),
-                motrSession.visitingFromReviewPage());
+                motrSession.visitingFromReviewPage()
+        );
 
         modelMap.put(PHONE_NUMBER_MODEL_KEY, phoneNumber);
         modelMap.put(INPUT_FIELD_ID_MODEL_KEY, INPUT_FIELD_ID);
