@@ -27,7 +27,7 @@ public class NotifyEmailServiceTest {
     private static final String UNSUBSCRIBE_LINK = "http://gov.uk";
     private static final LocalDate EXPIRY_DATE = LocalDate.of(2017, 10, 10);
     private static final String PRESERVATION_STATEMENT_PREFIX =
-            "You can get your MOT test done from tomorrow to keep the same expiry date ";
+            "You can get your MOT test done from tomorrow to keep the same MOT test date ";
     private static final String PRESERVATION_STATEMENT_SUFFIX = " for next year.";
     private static final String MOTH_DIRECT_URL_PREFIX = "http://gov.uk/";
 
