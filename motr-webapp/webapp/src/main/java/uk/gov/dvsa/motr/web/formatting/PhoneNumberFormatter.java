@@ -31,6 +31,6 @@ public class PhoneNumberFormatter {
 
     public static String trimWhitespace(String phoneNumber) {
 
-        return phoneNumber.replaceAll("\\s+","");
+        return phoneNumber.replaceAll("\\s+","").replaceAll("\\p{Cf}", "");
     }
 }

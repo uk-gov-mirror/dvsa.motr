@@ -14,7 +14,7 @@ Help us improve the MOT reminder service by telling us what you think at https:/
 
 # Check MOT history and outstanding safety recalls
 
-Check your vehicle’s MOT history and if it has outstanding manufacturer’s safety recalls at https://www.gov.uk/check-mot-history
+Check if a vehicle or part has been recalled because of a safety fault at ((moth_url))
 
 DVSA (Driver and Vehicle Standards Agency)
 

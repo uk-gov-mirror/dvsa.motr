@@ -42,11 +42,13 @@ import static com.amazonaws.regions.Regions.fromName;
 
 import static org.apache.log4j.Level.toLevel;
 
+import static uk.gov.dvsa.motr.notifier.SystemVariable.CHECKSUM_SALT;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.DB_TABLE_SUBSCRIPTION;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.GOV_NOTIFY_API_TOKEN;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.LOG_LEVEL;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MESSAGE_RECEIVE_TIMEOUT;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MESSAGE_VISIBILITY_TIMEOUT;
+import static uk.gov.dvsa.motr.notifier.SystemVariable.MOTH_DIRECT_URL_PREFIX;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_API_DVLA_ID_URI;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_API_MOT_TEST_NUMBER_URI;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_TEST_REMINDER_INFO_TOKEN;
@@ -154,7 +156,12 @@ public class ConfigModule extends AbstractModule {
             NotifySmsService notifySmsService,
             Config config) {
 
-        return new ProcessSubscriptionService(client, repository, notifyEmailService, notifySmsService, config.getValue(WEB_BASE_URL));
+        String webBaseUrl = config.getValue(WEB_BASE_URL);
+        String mothDirectUrlPrefix = config.getValue(MOTH_DIRECT_URL_PREFIX);
+        String checksumSalt = config.getValue(CHECKSUM_SALT);
+
+        return new ProcessSubscriptionService(client, repository, notifyEmailService, notifySmsService, webBaseUrl,
+                mothDirectUrlPrefix, checksumSalt);
     }
 
     @Provides
@@ -192,6 +199,7 @@ public class ConfigModule extends AbstractModule {
         Set<ConfigKey> secretVariables = new HashSet<>();
         secretVariables.add(SystemVariable.GOV_NOTIFY_API_TOKEN);
         secretVariables.add(SystemVariable.MOT_TEST_REMINDER_INFO_TOKEN);
+        secretVariables.add(SystemVariable.CHECKSUM_SALT);
 
         return secretVariables;
     }

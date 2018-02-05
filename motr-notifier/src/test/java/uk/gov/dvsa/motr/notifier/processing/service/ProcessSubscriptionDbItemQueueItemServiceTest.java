@@ -42,11 +42,15 @@ public class ProcessSubscriptionDbItemQueueItemServiceTest {
     private static final String TEST_MAKE_AND_MODEl = TEST_MAKE + " " + TEST_MODEL + ", ";
     private static final String DVLA_ID = "2131312";
     private static final String TEST_PHONE_NUMBER = "070000000000";
+    private static final String MOTH_DIRECT_URL_PREFIX = "http://gov.uk/";
+    private static final String CHECKSUM_SALT = "SOMESALT";
+    private static final String EXPECTED_CHECKSUM = "8b536c0fbb5bcee2";
 
     @Before
     public void setUp() {
         processSubscriptionService = new ProcessSubscriptionService(
-                vehicleDetailsClient, subscriptionRepository, notifyEmailService, notifySmsService, webBaseUrl
+                vehicleDetailsClient, subscriptionRepository, notifyEmailService, notifySmsService, webBaseUrl,
+                MOTH_DIRECT_URL_PREFIX, CHECKSUM_SALT
         );
     }
 
@@ -91,7 +95,8 @@ public class ProcessSubscriptionDbItemQueueItemServiceTest {
                 eq(TEST_MAKE_AND_MODEl + vehicleDetails.getRegNumber()),
                 eq(vehicleExpiryDate),
                 eq(getExpectedUnsubscribeLink()),
-                any(String.class)
+                any(String.class),
+                eq(MOTH_DIRECT_URL_PREFIX + TEST_VRM + "/" + EXPECTED_CHECKSUM)
         );
     }
 
@@ -130,7 +135,7 @@ public class ProcessSubscriptionDbItemQueueItemServiceTest {
         processSubscriptionService.processSubscription(subscriptionQueueItem, requestDate);
 
         verify(subscriptionRepository, times(0)).updateExpiryDate(any(), any(), any());
-        verify(notifyEmailService, times(0)).sendOneMonthNotificationEmail(any(), any(), any(), any(), any());
+        verify(notifyEmailService, times(0)).sendOneMonthNotificationEmail(any(), any(), any(), any(), any(), any());
         verify(notifyEmailService, times(0)).sendOneDayAfterNotificationEmail(any(), any(), any(), any(), any());
         verify(notifyEmailService, times(1)).sendTwoWeekNotificationEmail(
                 eq("test@this-is-a-test-123"),
@@ -177,7 +182,7 @@ public class ProcessSubscriptionDbItemQueueItemServiceTest {
         processSubscriptionService.processSubscription(subscriptionQueueItem, requestDate);
 
         verify(subscriptionRepository, times(0)).updateExpiryDate(any(), any(), any());
-        verify(notifyEmailService, times(0)).sendOneMonthNotificationEmail(any(), any(), any(), any(), any());
+        verify(notifyEmailService, times(0)).sendOneMonthNotificationEmail(any(), any(), any(), any(), any(), any());
         verify(notifyEmailService, times(0)).sendTwoWeekNotificationEmail(any(), any(), any(), any(), any());
         verify(notifyEmailService, times(1)).sendOneDayAfterNotificationEmail(
                 eq("test@this-is-a-test-123"),
@@ -227,7 +232,7 @@ public class ProcessSubscriptionDbItemQueueItemServiceTest {
         processSubscriptionService.processSubscription(subscription, requestDate);
 
         verify(subscriptionRepository, times(1)).updateExpiryDate(any(), any(), any());
-        verify(notifyEmailService, times(0)).sendOneMonthNotificationEmail(any(), any(), any(), any(), any());
+        verify(notifyEmailService, times(0)).sendOneMonthNotificationEmail(any(), any(), any(), any(), any(), any());
         verify(notifyEmailService, times(0)).sendOneDayAfterNotificationEmail(any(), any(), any(), any(), any());
         verify(notifyEmailService, times(1)).sendTwoWeekNotificationEmail(
                 eq("test@this-is-a-test-123"),
@@ -263,7 +268,8 @@ public class ProcessSubscriptionDbItemQueueItemServiceTest {
                 eq(TEST_MAKE_AND_MODEl + vehicleDetails.getRegNumber()),
                 eq(vehicleExpiryDate),
                 eq(getExpectedUnsubscribeLink()),
-                any(String.class)
+                any(String.class),
+                eq(MOTH_DIRECT_URL_PREFIX + TEST_VRM + "/" + EXPECTED_CHECKSUM)
         );
     }
 
@@ -286,7 +292,7 @@ public class ProcessSubscriptionDbItemQueueItemServiceTest {
 
         verify(subscriptionRepository, times(1)).updateExpiryDate(any(), any(), any());
         verify(notifyEmailService, times(0)).sendTwoWeekNotificationEmail(any(), any(), any(), any(), any());
-        verify(notifyEmailService, times(0)).sendOneMonthNotificationEmail(any(), any(), any(), any(), any());
+        verify(notifyEmailService, times(0)).sendOneMonthNotificationEmail(any(), any(), any(), any(), any(), any());
         verify(notifyEmailService, times(1)).sendOneDayAfterNotificationEmail(
                 eq("test@this-is-a-test-123"),
                 eq(TEST_MAKE_AND_MODEl + vehicleDetails.getRegNumber()),

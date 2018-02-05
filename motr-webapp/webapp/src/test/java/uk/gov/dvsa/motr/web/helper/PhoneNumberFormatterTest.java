@@ -44,4 +44,30 @@ public class PhoneNumberFormatterTest {
                 { "07123 456789...", "07123456789" }
         };
     }
+
+    @Test
+    @UseDataProvider("dataProviderPhoneNumberCopiedFromPhoneApp")
+    public void phoneNumberCopiedFromPhoneAppIsFormattedCorrectly(String phoneNumber, String expectedTrimmedPhoneNumber) {
+
+        String trimmedPhoneNumber = PhoneNumberFormatter.trimWhitespace(phoneNumber);
+        assertEquals(expectedTrimmedPhoneNumber, trimmedPhoneNumber);
+    }
+
+    @DataProvider
+    public static Object[][] dataProviderPhoneNumberCopiedFromPhoneApp() {
+
+        return new Object[][] {
+                /* Test the following unicode characters are removed when trimming a phone number copied from Phone app:
+                 *
+                 * POP DIRECTIONAL FORMATTING (U+202C) - U+202C‬+44 7123 456789U+202C
+                 * LEFT-TO-RIGHT EMBEDDING (U+202A) - U+202A‬+44 7123 456789U+202A
+                 * LEFT-TO-RIGHT OVERRIDE (U+202D) - U+202D‬+44 7123 456789U+202D
+                 * LEFT-TO-RIGHT OVERRIDE (U+202D) and POP DIRECTIONAL FORMATTING (U+202C) - U+202DU+202D‬+44 7123 456789U+202CU+202C
+                 */
+                { "‬+44 7123 456789‬ ", "+447123456789" },
+                { "‪+44 7123 456789‪ ", "+447123456789" },
+                { "‭+44 7123 456789‭ ", "+447123456789" },
+                { "‭‭+44 7123 456789‬‬ ", "+447123456789" }
+        };
+    }
 }

@@ -6,11 +6,13 @@ import uk.gov.dvsa.motr.notifier.SystemVariable;
 
 import java.util.Optional;
 
+import static uk.gov.dvsa.motr.notifier.SystemVariable.CHECKSUM_SALT;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.DB_TABLE_SUBSCRIPTION;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.GOV_NOTIFY_API_TOKEN;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.LOG_LEVEL;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MESSAGE_RECEIVE_TIMEOUT;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MESSAGE_VISIBILITY_TIMEOUT;
+import static uk.gov.dvsa.motr.notifier.SystemVariable.MOTH_DIRECT_URL_PREFIX;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_API_DVLA_ID_URI;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_API_MOT_TEST_NUMBER_URI;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_TEST_REMINDER_INFO_TOKEN;
@@ -51,6 +53,8 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
         set(REMAINING_TIME_THRESHOLD, "20");
         set(VEHICLE_API_CLIENT_TIMEOUT, "10");
         set(WEB_BASE_URL, "");
+        set(MOTH_DIRECT_URL_PREFIX, mothDirectUrlPrefix());
+        set(CHECKSUM_SALT, checksumSalt());
     }
 
     public static String motTestNumberApiEndpoint() {
@@ -119,6 +123,16 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
     public static String notifySmsOneDayAfterTemplateId() {
 
         return lookupProperty("test.notify.template.sms.one.day.after");
+    }
+
+    public static String mothDirectUrlPrefix() {
+
+        return lookupProperty("test.moth.direct.url.prefix");
+    }
+
+    public static String checksumSalt() {
+
+        return lookupProperty("test.checksum.salt");
     }
 
     private static String lookupProperty(String property) {
