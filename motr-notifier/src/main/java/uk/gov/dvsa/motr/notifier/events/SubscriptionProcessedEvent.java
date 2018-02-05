@@ -2,6 +2,8 @@ package uk.gov.dvsa.motr.notifier.events;
 
 import uk.gov.dvsa.motr.eventlog.Event;
 
+import java.time.LocalDate;
+
 public abstract class SubscriptionProcessedEvent extends Event {
 
     public SubscriptionProcessedEvent setMessageBody(String messageBody) {
@@ -25,6 +27,17 @@ public abstract class SubscriptionProcessedEvent extends Event {
     public SubscriptionProcessedEvent setVrm(String vrm) {
 
         params.put("vrm", vrm);
+        return this;
+    }
+
+    public SubscriptionProcessedEvent setExpiryDate(LocalDate expiryDate) {
+
+        params.put("expiry-date", expiryDate.toString());
+        return this;
+    }
+
+    public SubscriptionProcessedEvent setDvlaId(String dvlaId) {
+        params.put("dvla-id", dvlaId);
         return this;
     }
 

@@ -275,7 +275,7 @@ public class SubscriptionDbItemQueueItemUnloaderTest {
         fixture.table(new SubscriptionTable().item(subscriptionItem)).run();
 
         // Invoke the subscription loader with correct date to load items from db into queue.
-        String testTime = subscriptionItem.getMotDueDate().minusMonths(1) + "T12:00:00Z";
+        String testTime = subscriptionItem.getMotDueDate().minusDays(30) + "T12:00:00Z";
         loaderHelper.invokeLoader(buildLoaderRequest(testTime));
 
         // Invoke the notifiers handle event with correct date to read items from the queue.

@@ -15,15 +15,14 @@ import uk.gov.dvsa.motr.notifier.processing.unloader.NotifierReport;
 @Aspect
 public class MetricsPerfAspect {
 
-    public static MetricRegistry metricRegistry = new MetricRegistry();
-    private static final int MULTIPLIER = 1000000;
+    private static final MetricRegistry METRIC_REGISTRY = new MetricRegistry();
 
-    private Timer vehicleDetailsFetchByMotTestNumber = metricRegistry.timer("vehicleDetailsFetchByMotTestNumber");
-    private Timer vehicleDetailsFetchByDvlaId = metricRegistry.timer("vehicleDetailsFetchByDvlaId");
-    private Timer sendEmailTimer = metricRegistry.timer("notifyService_sendEmail");
-    private Timer sendSmsTimer = metricRegistry.timer("notifyService_sendSms");
-    private Timer updateExpiryDateTimer = metricRegistry.timer("subscriptionRepository_updateExpiryDate");
-    private Timer processItemTimer = metricRegistry.timer("process_single_item");
+    private Timer vehicleDetailsFetchByMotTestNumber = METRIC_REGISTRY.timer("vehicleDetailsFetchByMotTestNumber");
+    private Timer vehicleDetailsFetchByDvlaId = METRIC_REGISTRY.timer("vehicleDetailsFetchByDvlaId");
+    private Timer sendEmailTimer = METRIC_REGISTRY.timer("notifyService_sendEmail");
+    private Timer sendSmsTimer = METRIC_REGISTRY.timer("notifyService_sendSms");
+    private Timer updateExpiryDateTimer = METRIC_REGISTRY.timer("subscriptionRepository_updateExpiryDate");
+    private Timer processItemTimer = METRIC_REGISTRY.timer("process_single_item");
 
     @Around("execution(* uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient.fetchByMotTestNumber(..))")
     public Object vehicleDetailsClientFetch(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -117,14 +116,12 @@ public class MetricsPerfAspect {
 
     @Before("execution(* uk.gov.dvsa.motr.notifier.processing.unloader.QueueUnloader.run(..))")
     public void beginMetrics() {
-
-        metricRegistry = new MetricRegistry();
-        vehicleDetailsFetchByMotTestNumber = metricRegistry.timer("vehicleDetailsFetchByMotTestNumber");
-        vehicleDetailsFetchByDvlaId = metricRegistry.timer("vehicleDetailsFetchByDvlaId");
-        sendEmailTimer = metricRegistry.timer("notifyService_sendEmail");
-        sendSmsTimer = metricRegistry.timer("notifyService_sendSms");
-        updateExpiryDateTimer = metricRegistry.timer("subscriptionRepository_updateExpiryDate");
-        processItemTimer = metricRegistry.timer("process_single_item");
+        vehicleDetailsFetchByMotTestNumber = METRIC_REGISTRY.timer("vehicleDetailsFetchByMotTestNumber");
+        vehicleDetailsFetchByDvlaId = METRIC_REGISTRY.timer("vehicleDetailsFetchByDvlaId");
+        sendEmailTimer = METRIC_REGISTRY.timer("notifyService_sendEmail");
+        sendSmsTimer = METRIC_REGISTRY.timer("notifyService_sendSms");
+        updateExpiryDateTimer = METRIC_REGISTRY.timer("subscriptionRepository_updateExpiryDate");
+        processItemTimer = METRIC_REGISTRY.timer("process_single_item");
     }
 
     @Around("execution(* uk.gov.dvsa.motr.notifier.processing.unloader.QueueUnloader.run(..))")

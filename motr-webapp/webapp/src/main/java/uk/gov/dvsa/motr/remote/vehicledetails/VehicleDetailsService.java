@@ -14,7 +14,13 @@ public class VehicleDetailsService {
 
         try {
             Optional<VehicleDetails> vehicle = client.fetchByVrm(vrm);
+
+            if (!vehicle.isPresent()) {
+                EventLogger.logErrorEvent(new VehicleDetailsExceptionEvent().setVrm(vrm));
+                return null;
+            }
             return vehicle.get();
+
         } catch (VehicleDetailsClientException exception) {
             EventLogger.logErrorEvent(new VehicleDetailsExceptionEvent().setVrm(vrm), exception);
             return null;

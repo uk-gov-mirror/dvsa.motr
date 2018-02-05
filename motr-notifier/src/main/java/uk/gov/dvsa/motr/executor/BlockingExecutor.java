@@ -17,7 +17,7 @@ public class BlockingExecutor extends ThreadPoolExecutor {
 
     public BlockingExecutor(final int workerCount) {
 
-        super(workerCount, workerCount, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
+        super(workerCount, workerCount, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
         semaphore = new Semaphore(workerCount);
     }
 
@@ -32,6 +32,9 @@ public class BlockingExecutor extends ThreadPoolExecutor {
                 acquired = true;
             } catch (final InterruptedException e) {
                 logger.warn("InterruptedException whilst aquiring semaphore", e);
+
+                // Restore interrupted state...
+                Thread.currentThread().interrupt();
             }
         } while (!acquired);
 

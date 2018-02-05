@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
-public class PhoneNumberValidator {
+public class PhoneNumberValidator implements Validator {
 
     private static final String EMPTY_PHONE_NUMBER_MESSAGE = "Enter your mobile number";
     private static final String INVALID_PHONE_NUMBER_MESSAGE_HEADING = "The number you entered is not a UK mobile phone " +
@@ -29,6 +29,7 @@ public class PhoneNumberValidator {
         this.subscriptionsValidationService = subscriptionsValidationService;
     }
 
+    @Override
     public boolean isValid(String phoneNumber) {
 
         return hasPhoneNumberBeenEntered(phoneNumber) && isPhoneNumberAValidUkNumber(phoneNumber)

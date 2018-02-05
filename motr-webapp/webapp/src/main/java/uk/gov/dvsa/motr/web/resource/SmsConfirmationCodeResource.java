@@ -6,8 +6,8 @@ import uk.gov.dvsa.motr.web.component.subscription.service.SmsConfirmationServic
 import uk.gov.dvsa.motr.web.component.subscription.service.SmsConfirmationService.Confirmation;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
+import uk.gov.dvsa.motr.web.validator.FieldValidator;
 import uk.gov.dvsa.motr.web.validator.SmsConfirmationCodeValidator;
-import uk.gov.dvsa.motr.web.validator.Validator;
 import uk.gov.dvsa.motr.web.viewmodel.SmsConfirmationCodeViewModel;
 
 import java.util.HashMap;
@@ -92,7 +92,7 @@ public class SmsConfirmationCodeResource {
             return redirect(HomepageResource.HOMEPAGE_URL);
         }
 
-        Validator validator = new SmsConfirmationCodeValidator();
+        FieldValidator validator = new SmsConfirmationCodeValidator();
         boolean showInLine = true;
 
         if (validator.isValid(confirmationCode)) {

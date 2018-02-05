@@ -5,7 +5,6 @@ import com.amazonaws.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.dvsa.motr.notifier.helpers.Checksum;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 import uk.gov.service.notify.SendEmailResponse;
@@ -13,14 +12,13 @@ import uk.gov.service.notify.SendEmailResponse;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.StringJoiner;
 
 public class NotifyEmailService {
 
     private static final Logger logger = LoggerFactory.getLogger(NotifyEmailService.class);
 
     private static final String PRESERVATION_STATEMENT_PREFIX =
-            "You can get your MOT test done from tomorrow to keep the same expiry date ";
+            "You can get your MOT test done from tomorrow to keep the same MOT test date ";
     private static final String PRESERVATION_STATEMENT_SUFFIX = " for next year.";
 
     private NotificationClient notificationClient;

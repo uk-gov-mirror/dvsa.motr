@@ -14,6 +14,7 @@ import uk.gov.dvsa.motr.subscriptionloader.processing.model.Subscription;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * Produces
@@ -70,6 +71,10 @@ public class DynamoDbProducer implements SubscriptionProducer {
 
             @Override
             public Subscription next() {
+
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                }
 
                 Item item;
                 if (iterator2WeeksAhead.hasNext()) {

@@ -5,7 +5,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.lang.reflect.Method;
-
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
@@ -57,10 +56,8 @@ public class TestReportsOutput {
 
         try {
             Path path = TestReportsOutput.createReportPath(OUTPUT_NAME);
-            try {
-                BufferedWriter out = newBufferedWriter(path);
+            try (BufferedWriter out = newBufferedWriter(path)) {
                 out.write(output);
-                out.close();
             } catch (NoSuchFileException e) {
                 System.out.println("Could not write to " + OUTPUT_NAME);
             }
@@ -90,7 +87,7 @@ public class TestReportsOutput {
         return String.format(HTML_TABLE_TEMPLATE, output);
     }
 
-    private   static Path createReportPath(String fileName) throws IOException {
+    private static Path createReportPath(String fileName) throws IOException {
 
         Path directoryPath = Paths.get("");
         Path filePath = directoryPath.resolve(fileName);
@@ -104,9 +101,9 @@ public class TestReportsOutput {
     private static String convertCamelCaseToSentence(String name) {
 
         if (!name.equals("")) {
-            name =  StringUtils.capitalize(
+            name = StringUtils.capitalize(
                     StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(StringUtils.capitalize(name)), ' ')
-                    .replace(" _ ", " ").toLowerCase()
+                            .replace(" _ ", " ").toLowerCase()
             );
         }
         return name;

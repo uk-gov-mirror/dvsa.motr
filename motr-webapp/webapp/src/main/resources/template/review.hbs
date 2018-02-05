@@ -6,7 +6,7 @@
 
             <h1 class="heading-large">Check your details</h1>
 
-            <p>Make sure the vehicle and your {{correctContactType}} are correct.</p>
+            <p>Make sure the vehicle and your {{#if viewModel.emailChannel}}email address{{else}}mobile number{{/if}} are correct.</p>
 
             <h2 class="heading-medium">Vehicle details</h2>
 
@@ -41,7 +41,7 @@
                     </tr>
 
                     <tr>
-                        {{#if isDvlaVehicle}}
+                        {{#if viewModel.dvlaVehicle}}
                             <th class="key-value-list__key">MOT due date</th>
                         {{else}}
                             <th class="key-value-list__key">MOT expiry date</th>
@@ -79,9 +79,15 @@
                 <tbody>
 
                     <tr>
-                        <th class="key-value-list__key">{{viewModel.contactType}}</th>
+                        <th class="key-value-list__key">{{#if viewModel.emailChannel}}Email address{{else}}Mobile number{{/if}}</th>
                         <td class="key-value-list__value">{{viewModel.contact}}</td>
-                        <td class="key-value-list__item-action"><a id={{changeContactId}} href={{url this changeContactUrl}}>Change <span class="visuallyhidden">{{viewModel.contactType}}</span></a></td>
+                        <td class="key-value-list__item-action">
+                            {{#if viewModel.emailChannel}}
+                                <a id="change-email-link" href={{url this "/email"}}>Change <span class="visuallyhidden">Email address</span></a>
+                            {{else}}
+                                <a id="change-mobile-link" href={{url this "/phone-number"}}>Change <span class="visuallyhidden">Mobile number</span></a>
+                            {{/if}}
+                        </td>
                     </tr>
 
                 </tbody>

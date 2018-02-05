@@ -1,6 +1,8 @@
 package uk.gov.dvsa.motr.web.cookie;
 
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
+import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
+import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.helper.SystemVariableParam;
 
 import java.util.HashMap;
@@ -60,16 +62,41 @@ public class MotrSession {
         return regFromSession == null ? "" : regFromSession.toString();
     }
 
-    public String getEmailFromSession() {
-
-        Object emailFromSession = getAttribute(EMAIL_COOKIE_ID);
-        return emailFromSession == null ? "" : emailFromSession.toString();
-    }
-
     public String getConfirmationIdFromSession() {
 
         Object confirmationIdFromSession = getAttribute(CONFIRMATION_ID_COOKIE_ID);
         return confirmationIdFromSession == null ? "" : confirmationIdFromSession.toString();
+    }
+
+    public ContactDetail getContactDetailFromSession() {
+        return new ContactDetail(getContactValueFromSession(), getContactTypeFromSession());
+    }
+
+    public Subscription.ContactType getContactTypeFromSession() {
+        if (isUsingEmailChannel()) {
+            return Subscription.ContactType.EMAIL;
+        }
+
+        if (isUsingSmsChannel()) {
+            return Subscription.ContactType.MOBILE;
+        }
+        return null;
+    }
+
+    public String getContactValueFromSession() {
+        if (isUsingEmailChannel()) {
+            return getEmailFromSession();
+        }
+        if (isUsingSmsChannel()) {
+            return getPhoneNumberFromSession();
+        }
+        return null;
+    }
+
+    public String getEmailFromSession() {
+
+        Object emailFromSession = getAttribute(EMAIL_COOKIE_ID);
+        return emailFromSession == null ? "" : emailFromSession.toString();
     }
 
     public String getPhoneNumberFromSession() {

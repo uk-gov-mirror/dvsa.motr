@@ -2,6 +2,9 @@ package uk.gov.dvsa.motr.notifier.processing.unloader;
 
 import com.amazonaws.services.lambda.runtime.Context;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.executor.BlockingExecutor;
 import uk.gov.dvsa.motr.notifier.events.RemindersProcessedEvent;
@@ -15,6 +18,8 @@ import java.time.LocalDate;
 import java.util.concurrent.TimeUnit;
 
 public class QueueUnloader {
+
+    private static final Logger logger = LoggerFactory.getLogger(QueueUnloader.class);
 
     private SubscriptionsReceiver subscriptionsReceiver;
     private QueueItemRemover queueItemRemover;
@@ -60,13 +65,16 @@ public class QueueUnloader {
             executor.shutdown();
             executor.awaitTermination(postProcessingDelayMs, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+            logger.warn("InterruptedException whilst awaiting executor termination", e);
 
-        EventLogger.logEvent(new RemindersProcessedEvent()
-                .setAmountOfMessagesSuccessfullyProcessed(report.getSuccessfullyProcessed())
-                .setDurationToProcessAllMessages(report.getDurationToProcessTheMessages())
-                .setAmountOfMessagesFailedToProcess(report.getFailedToProcess()));
+            // Restore interrupted state...
+            Thread.currentThread().interrupt();
+        } finally {
+            EventLogger.logEvent(new RemindersProcessedEvent()
+                    .setAmountOfMessagesSuccessfullyProcessed(report.getSuccessfullyProcessed())
+                    .setDurationToProcessAllMessages(report.getDurationToProcessTheMessages())
+                    .setAmountOfMessagesFailedToProcess(report.getFailedToProcess()));
+        }
 
         return report;
     }
