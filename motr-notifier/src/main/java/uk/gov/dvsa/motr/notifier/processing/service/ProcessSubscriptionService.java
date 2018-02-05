@@ -15,6 +15,7 @@ import uk.gov.dvsa.motr.notifier.events.TwoWeekEmailReminderEvent;
 import uk.gov.dvsa.motr.notifier.events.TwoWeekSmsReminderEvent;
 import uk.gov.dvsa.motr.notifier.events.UpdateVrmFailedEvent;
 import uk.gov.dvsa.motr.notifier.events.UpdateVrmSuccessfulEvent;
+import uk.gov.dvsa.motr.notifier.helpers.Checksum;
 import uk.gov.dvsa.motr.notifier.notify.NotifyEmailService;
 import uk.gov.dvsa.motr.notifier.notify.NotifySmsService;
 import uk.gov.dvsa.motr.notifier.processing.formatting.MakeModelFormatter;
@@ -24,7 +25,10 @@ import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClientException;
 import uk.gov.service.notify.NotificationClientException;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
+import java.util.StringJoiner;
 
 import javax.ws.rs.core.UriBuilder;
 
@@ -45,23 +49,29 @@ public class ProcessSubscriptionService {
     private NotifyEmailService notifyEmailService;
     private NotifySmsService notifySmsService;
     private String webBaseUrl;
+    private String mothDirectUrlPrefix;
+    private String checksumSalt;
 
     public ProcessSubscriptionService(
             VehicleDetailsClient client,
             SubscriptionRepository repository,
             NotifyEmailService notifyEmailService,
             NotifySmsService notifySmsService,
-            String webBaseUrl) {
+            String webBaseUrl,
+            String mothDirectUrlPrefix,
+            String checksumSalt) {
 
         this.client = client;
         this.subscriptionRepository = repository;
         this.notifyEmailService = notifyEmailService;
         this.notifySmsService = notifySmsService;
         this.webBaseUrl = webBaseUrl;
+        this.mothDirectUrlPrefix = mothDirectUrlPrefix;
+        this.checksumSalt = checksumSalt;
     }
 
     public void processSubscription(SubscriptionQueueItem subscriptionQueueItem, LocalDate requestDate) throws NotificationClientException,
-            VehicleDetailsClientException, VehicleNotFoundException {
+            VehicleDetailsClientException, VehicleNotFoundException, NoSuchAlgorithmException {
 
         VehicleDetails vehicleDetails = getVehicleDetails(subscriptionQueueItem);
 
@@ -113,7 +123,7 @@ public class ProcessSubscriptionService {
     }
 
     private void sendEmailNotfications(SubscriptionQueueItem subscriptionQueueItem, LocalDate requestDate)
-            throws NotificationClientException, VehicleDetailsClientException, VehicleNotFoundException {
+            throws NotificationClientException, VehicleDetailsClientException, VehicleNotFoundException, NoSuchAlgorithmException {
 
         VehicleDetails vehicleDetails = getVehicleDetails(subscriptionQueueItem);
         String email = subscriptionQueueItem.getContactDetail().getValue();
@@ -127,15 +137,24 @@ public class ProcessSubscriptionService {
 
         if (oneMonthNotificationRequired(requestDate, vehicleMotExpiryDate)) {
 
+            String checksum = Checksum.generate(vehicleDetails, this.checksumSalt);
+            StringJoiner mothDirectUrl = new StringJoiner("");
+            mothDirectUrl.add(this.mothDirectUrlPrefix);
+            mothDirectUrl.add(vehicleDetails.getRegNumber());
+            mothDirectUrl.add("/");
+            mothDirectUrl.add(checksum);
+
             notifyEmailService.sendOneMonthNotificationEmail(
                     email,
                     vehicleDetailsString,
                     vehicleMotExpiryDate,
                     unSubscribeLink,
-                    vehicleDetails.getDvlaId()
+                    vehicleDetails.getDvlaId(),
+                    mothDirectUrl.toString()
             );
 
             EventLogger.logEvent(new OneMonthEmailReminderEvent()
+                    .setChecksum(checksum)
                     .setEmail(email)
                     .setVrm(vrm)
                     .setExpiryDate(vehicleMotExpiryDate));

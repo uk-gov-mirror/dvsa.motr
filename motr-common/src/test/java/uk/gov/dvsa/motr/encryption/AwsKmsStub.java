@@ -77,8 +77,6 @@ import com.amazonaws.services.kms.model.UpdateKeyDescriptionResult;
 
 public class AwsKmsStub implements AWSKMS {
 
-    private Region region;
-
     private DecryptRequest decryptRequest;
 
     private DecryptResult expectedDecryptResult;
@@ -90,7 +88,7 @@ public class AwsKmsStub implements AWSKMS {
 
     @Override
     public void setRegion(Region region) {
-        this.region = region;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -312,7 +310,7 @@ public class AwsKmsStub implements AWSKMS {
     }
 
     public Region getRegion() {
-        return region;
+        throw new UnsupportedOperationException();
     }
 
     public DecryptRequest getDecryptRequest() {
