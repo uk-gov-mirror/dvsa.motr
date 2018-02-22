@@ -64,7 +64,7 @@ public class NotifySmsService {
 
         Map<String, String> personalisation = new HashMap<>();
         personalisation.put("vehicle_vrm", vehicleDetails);
-        personalisation.put("mot_expiry_date", DateFormatterForEmailDisplay.asFormattedForEmailDate(motExpiryDate));
+        personalisation.put("mot_expiry_date", DateFormatterForSmsDisplay.asFormattedForSmsDate(motExpiryDate));
         return personalisation;
     }
 }

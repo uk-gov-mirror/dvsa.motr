@@ -41,7 +41,7 @@ public class NotifySmsServiceTest {
         notifySmsService.sendOneMonthNotificationSms(PHONE_NUMBER, REG, EXPIRY_DATE);
 
         Map<String, String> personalisation = stubGenericPersonalisation();
-        personalisation.put("mot_expiry_date", DateFormatterForEmailDisplay.asFormattedForEmailDate(EXPIRY_DATE));
+        personalisation.put("mot_expiry_date", DateFormatterForSmsDisplay.asFormattedForSmsDate(EXPIRY_DATE));
 
         verify(notificationClient, times(1)).sendSms(
                 oneMonthNotificationTemplateId,
@@ -57,7 +57,7 @@ public class NotifySmsServiceTest {
         notifySmsService.sendTwoWeekNotificationSms(PHONE_NUMBER, REG, EXPIRY_DATE);
 
         Map<String, String> personalisation = stubGenericPersonalisation();
-        personalisation.put("mot_expiry_date", DateFormatterForEmailDisplay.asFormattedForEmailDate(EXPIRY_DATE));
+        personalisation.put("mot_expiry_date", DateFormatterForSmsDisplay.asFormattedForSmsDate(EXPIRY_DATE));
 
         verify(notificationClient, times(1)).sendSms(
                 twoWeekNotificationTemplateId,
