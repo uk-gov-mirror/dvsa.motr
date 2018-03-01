@@ -2,7 +2,6 @@ package uk.gov.dvsa.motr.web.render;
 
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Helper;
-import com.github.jknack.handlebars.Options;
 import com.github.jknack.handlebars.cache.ConcurrentMapTemplateCache;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
@@ -80,13 +79,8 @@ public class HandlebarsTemplateEngine implements TemplateEngine {
 
     private static Helper<Object> urlHelper(String baseUrl) {
 
-        return new Helper<Object>() {
-            @Override
-            public Object apply(Object context, Options options) throws IOException {
-
-                return normalizeSlashes(String.format("%s/%s", baseUrl, options.param(0)));
-            }
-        };
+        return (context, options) ->
+                normalizeSlashes(String.format("%s/%s", baseUrl, options.param(0)));
     }
 
     private static String normalizeSlashes(String input) {
