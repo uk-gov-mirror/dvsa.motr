@@ -91,7 +91,7 @@ public class NotifyServiceTest {
 
         Map<String, String> personalisation = new HashMap<>();
         personalisation.put("vehicle_vrm", VRM);
-        personalisation.put("mot_expiry_date", DateFormatter.asDisplayDate(motExpiryDate));
+        personalisation.put("mot_expiry_date", DateFormatterForSmsDisplay.asFormattedForSmsDate(motExpiryDate));
 
         verify(CLIENT, times(1)).sendSms(
                 smsSubscriptionConfirmationTemplateId,

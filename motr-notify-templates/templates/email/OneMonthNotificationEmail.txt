@@ -10,7 +10,7 @@ MESSAGE CONTENT
 
 # Was this MOT reminder useful to you?
 
-Help us improve the MOT reminder service by telling us what you think at https://www.gov.uk/done/mot-reminder 
+Help us improve the MOT reminder service by telling us what you think at https://www.gov.uk/mot-survey
 
 # Check MOT history and outstanding safety recalls
 

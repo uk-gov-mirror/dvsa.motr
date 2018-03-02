@@ -1,6 +1,7 @@
 package uk.gov.dvsa.motr.notifications.service;
 
 import uk.gov.dvsa.motr.eventlog.EventLogger;
+import uk.gov.dvsa.motr.notifications.service.DateFormatterForSmsDisplay;
 import uk.gov.dvsa.motr.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.web.eventlog.subscription.NotifyClientFailedEvent;
 import uk.gov.dvsa.motr.web.formatting.DateFormatter;
@@ -109,7 +110,7 @@ public class NotifyService {
 
         Map<String, String> personalisation = new HashMap<>();
         personalisation.put("vehicle_vrm", vehicleVrm);
-        personalisation.put("mot_expiry_date", DateFormatter.asDisplayDate(motExpiryDate));
+        personalisation.put("mot_expiry_date", DateFormatterForSmsDisplay.asFormattedForSmsDate(motExpiryDate));
 
         try {
 
