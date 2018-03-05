@@ -2,7 +2,6 @@ package uk.gov.dvsa.motr.testreports;
 
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
-import org.reflections.scanners.ResourcesScanner;
 
 import java.lang.reflect.Method;
 import java.util.Set;

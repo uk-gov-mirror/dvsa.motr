@@ -5,7 +5,6 @@ import com.amazonaws.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.gov.dvsa.motr.notifier.helpers.Checksum;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 import uk.gov.service.notify.SendEmailResponse;
@@ -13,7 +12,6 @@ import uk.gov.service.notify.SendEmailResponse;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.StringJoiner;
 
 public class NotifyEmailService {
 

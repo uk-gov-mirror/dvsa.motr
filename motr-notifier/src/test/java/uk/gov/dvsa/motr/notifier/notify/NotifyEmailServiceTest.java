@@ -3,8 +3,6 @@ package uk.gov.dvsa.motr.notifier.notify;
 import org.junit.Before;
 import org.junit.Test;
 
-import uk.gov.dvsa.motr.notifier.helpers.Checksum;
-import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
@@ -12,7 +10,6 @@ import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.StringJoiner;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;

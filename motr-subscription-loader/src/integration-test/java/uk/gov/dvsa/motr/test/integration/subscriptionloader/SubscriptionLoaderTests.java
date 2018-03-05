@@ -55,7 +55,7 @@ public class SubscriptionLoaderTests extends SubscriptionLoaderBase {
     @Test
     public void runLoaderForOneMonthReminderThenEnsureItemsAddedToQueue() throws Exception {
 
-        String testTime = subscriptionItem.getMotDueDate().minusMonths(1) + "T12:00:00Z";
+        String testTime = subscriptionItem.getMotDueDate().minusDays(30) + "T12:00:00Z";
         LoadReport loadReport = eventHandler.handle(buildRequest(testTime), buildContext());
 
         List<Message> messages = queueHelper.getMessagesFromQueue();

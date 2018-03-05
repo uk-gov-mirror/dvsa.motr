@@ -2,7 +2,7 @@ package uk.gov.dvsa.motr.web.validator;
 
 import java.util.regex.Pattern;
 
-public class VrmValidator {
+public class VrmValidator implements Validator {
 
     public static final String REGISTRATION_EMPTY_MESSAGE = "Enter the vehicle’s registration";
     public static final String REGISTRATION_TOO_LONG_MESSAGE = "Registration must be shorter than 14 characters";
@@ -13,6 +13,7 @@ public class VrmValidator {
 
     private String message;
 
+    @Override
     public boolean isValid(String vehicleRegistration) {
 
         if (vehicleRegistration == null || "".equals(vehicleRegistration)) {

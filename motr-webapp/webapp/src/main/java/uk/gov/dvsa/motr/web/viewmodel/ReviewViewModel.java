@@ -14,16 +14,18 @@ public class ReviewViewModel {
 
     private String registration;
     private String contact;
-    private String contactType;
     private String make;
     private String model;
     private String makeInfull;
     private String colour;
     private String yearOfManufacture;
     private LocalDate expiryDate;
-    private boolean isDvlaVehicle;
+    private boolean dvlaVehicle;
+    private boolean emailChannel;
+    private boolean mobileChannel;
 
     public String getRegistration() {
+
         return registration;
     }
 
@@ -31,17 +33,6 @@ public class ReviewViewModel {
 
         this.registration = registration;
         return this;
-    }
-
-    public ReviewViewModel setContactType(String contactType) {
-
-        this.contactType = contactType;
-        return this;
-    }
-
-    public String getContactType() {
-
-        return contactType;
     }
 
     public String getContact() {
@@ -109,13 +100,13 @@ public class ReviewViewModel {
 
     public boolean isDvlaVehicle() {
 
-        return isDvlaVehicle;
+        return dvlaVehicle;
     }
 
     public ReviewViewModel setDvlaVehicle(boolean dvlaVehicle) {
 
         logger.info("ReviewViewModel setDvlaVehicle to: " + dvlaVehicle);
-        isDvlaVehicle = dvlaVehicle;
+        this.dvlaVehicle = dvlaVehicle;
         return this;
     }
 
@@ -168,13 +159,34 @@ public class ReviewViewModel {
 
     private boolean useMakeInFull() {
 
-        if (
-                (StringUtils.isNullOrEmpty(make) || make.equalsIgnoreCase(UNKNOWN_STRING))
+        if ((StringUtils.isNullOrEmpty(make) || make.equalsIgnoreCase(UNKNOWN_STRING))
                 && (StringUtils.isNullOrEmpty(model) || model.equalsIgnoreCase(UNKNOWN_STRING))
                 && !StringUtils.isNullOrEmpty(makeInfull)) {
+
             return true;
         }
         return false;
     }
 
+    public boolean isEmailChannel() {
+
+        return emailChannel;
+    }
+
+    public ReviewViewModel setEmailChannel(boolean emailChannel) {
+
+        this.emailChannel = emailChannel;
+        return this;
+    }
+
+    public boolean isMobileChannel() {
+
+        return mobileChannel;
+    }
+
+    public ReviewViewModel setMobileChannel(boolean mobileChannel) {
+
+        this.mobileChannel = mobileChannel;
+        return this;
+    }
 }

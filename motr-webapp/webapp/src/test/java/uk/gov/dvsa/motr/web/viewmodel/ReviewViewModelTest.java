@@ -103,24 +103,6 @@ public class ReviewViewModelTest {
     }
 
     @Test
-    public void whenContactTypeIsSetItToEmailCanBeRetrieved() {
-
-        String expected = "email";
-        ReviewViewModel viewModel = new ReviewViewModel();
-        viewModel.setContactType(expected);
-        assertEquals(expected, viewModel.getContactType());
-    }
-
-    @Test
-    public void whenContactTypeIsSetItToTextCanBeRetrieved() {
-
-        String expected = "text";
-        ReviewViewModel viewModel = new ReviewViewModel();
-        viewModel.setContactType(expected);
-        assertEquals(expected, viewModel.getContactType());
-    }
-
-    @Test
     public void makeIsUpperCasedWhenSet() {
 
         ReviewViewModel viewModel = new ReviewViewModel();

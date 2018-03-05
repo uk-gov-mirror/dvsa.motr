@@ -3,7 +3,7 @@ package uk.gov.dvsa.motr.web.validator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class SmsConfirmationCodeValidator implements Validator {
+public class SmsConfirmationCodeValidator implements FieldValidator {
 
     public static final String EMPTY_CONFIRMATION_CODE_MESSAGE = "Enter 6-digit code from text message<br/>" +
             "<br/>It can take a couple of minutes for the text to arrive.";
@@ -24,26 +24,31 @@ public class SmsConfirmationCodeValidator implements Validator {
     private String message;
     private String messageAtField;
 
+    @Override
     public String getMessage() {
 
         return message;
     }
 
+    @Override
     public void setMessage(String message) {
 
         this.message = message;
     }
 
+    @Override
     public String getMessageAtField() {
 
         return messageAtField;
     }
 
+    @Override
     public void setMessageAtField(String messageAtField) {
 
         this.messageAtField = messageAtField;
     }
 
+    @Override
     public boolean isValid(String confirmationCode) {
 
         if (confirmationCode == null || confirmationCode.isEmpty()) {

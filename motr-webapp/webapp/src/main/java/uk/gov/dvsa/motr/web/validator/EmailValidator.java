@@ -3,7 +3,7 @@ package uk.gov.dvsa.motr.web.validator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class EmailValidator {
+public class EmailValidator implements Validator {
 
     public static final String EMAIL_EMPTY_MESSAGE = "Enter your email address";
     public static final String EMAIL_INVALID_MESSAGE = "Enter a valid email address";
@@ -11,6 +11,7 @@ public class EmailValidator {
 
     private String message;
 
+    @Override
     public boolean isValid(String email) {
 
         if (email == null || email.isEmpty()) {

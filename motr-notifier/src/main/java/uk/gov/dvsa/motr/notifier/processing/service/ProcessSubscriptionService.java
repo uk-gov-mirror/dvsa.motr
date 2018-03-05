@@ -13,6 +13,8 @@ import uk.gov.dvsa.motr.notifier.events.OneMonthEmailReminderEvent;
 import uk.gov.dvsa.motr.notifier.events.OneMonthSmsReminderEvent;
 import uk.gov.dvsa.motr.notifier.events.TwoWeekEmailReminderEvent;
 import uk.gov.dvsa.motr.notifier.events.TwoWeekSmsReminderEvent;
+import uk.gov.dvsa.motr.notifier.events.UpdateMotExpiryDateFailedEvent;
+import uk.gov.dvsa.motr.notifier.events.UpdateMotExpiryDateSuccessfulEvent;
 import uk.gov.dvsa.motr.notifier.events.UpdateVrmFailedEvent;
 import uk.gov.dvsa.motr.notifier.events.UpdateVrmSuccessfulEvent;
 import uk.gov.dvsa.motr.notifier.helpers.Checksum;
@@ -25,7 +27,6 @@ import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClientException;
 import uk.gov.service.notify.NotificationClientException;
 
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
 import java.util.StringJoiner;
@@ -92,7 +93,20 @@ public class ProcessSubscriptionService {
         }
 
         if (motDueDateUpdateRequired(subscriptionMotDueDate, vehicleMotExpiryDate)) {
-            subscriptionRepository.updateExpiryDate(vrm, email, vehicleMotExpiryDate);
+            try {
+                subscriptionRepository.updateExpiryDate(vrm, email, vehicleMotExpiryDate);
+                EventLogger.logEvent(new UpdateMotExpiryDateSuccessfulEvent()
+                        .setNewExpiryDate(vehicleMotExpiryDate)
+                        .setExpiryDate(subscriptionMotDueDate)
+                        .setEmail(email)
+                        .setVrm(vrm));
+            } catch (Exception e) {
+                EventLogger.logErrorEvent(new UpdateMotExpiryDateFailedEvent()
+                        .setNewExpiryDate(vehicleMotExpiryDate)
+                        .setExpiryDate(subscriptionMotDueDate)
+                        .setEmail(email)
+                        .setVrm(vrm), e);
+            }
         }
 
         SubscriptionQueueItem.ContactType contactType = subscriptionQueueItem.getContactDetail().getContactType();
@@ -133,7 +147,6 @@ public class ProcessSubscriptionService {
 
         String vehicleDetailsString = MakeModelFormatter.getMakeModelDisplayStringFromVehicleDetails(vehicleDetails, ", ") + vrm;
         String unSubscribeLink = UriBuilder.fromPath(webBaseUrl).path("unsubscribe").path(subscriptionId).build().toString();
-
 
         if (oneMonthNotificationRequired(requestDate, vehicleMotExpiryDate)) {
 
@@ -193,7 +206,7 @@ public class ProcessSubscriptionService {
 
     private void sendSmsNotifications(SubscriptionQueueItem subscriptionQueueItem, LocalDate requestDate)
             throws NotificationClientException, VehicleDetailsClientException, VehicleNotFoundException {
-        
+
         VehicleDetails vehicleDetails = getVehicleDetails(subscriptionQueueItem);
         String vrm = vehicleDetails.getRegNumber();
         LocalDate vehicleMotExpiryDate = vehicleDetails.getMotExpiryDate();

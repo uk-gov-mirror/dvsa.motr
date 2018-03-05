@@ -35,23 +35,26 @@ public class SubscriptionHandlerHelperTest {
     }
 
     @Test
-    public void oneMonthSubscriptionShouldBeSentIfDatesAreOneMonthApart() {
+    public void oneMonthSubscriptionShouldBeSentIfDatesAre30DaysApart() {
         LocalDate subscriptionMotDueDate = LocalDate.of(2017, 10, 10);
-        LocalDate vehicleDetailsMotExpiryDate = LocalDate.of(2017, 11, 10);
+        LocalDate vehicleDetailsMotExpiryDate = LocalDate.of(2017, 11, 9);
 
         assertTrue(oneMonthNotificationRequired(subscriptionMotDueDate, vehicleDetailsMotExpiryDate));
     }
 
     @Test
-    public void oneMonthSubscriptionShouldNotBeSentIfDatesAreNotOneMonthApart() {
+    public void oneMonthSubscriptionShouldNotBeSentIfDatesAreNot30DaysApart() {
         LocalDate subscriptionMotDueDate = LocalDate.of(2017, 10, 10);
-        LocalDate vehicleDetailsMotExpiryDate = LocalDate.of(2017, 10, 11);
 
+        LocalDate vehicleDetailsMotExpiryDate = LocalDate.of(2017, 11, 8);
+        assertFalse(oneMonthNotificationRequired(subscriptionMotDueDate, vehicleDetailsMotExpiryDate));
+
+        vehicleDetailsMotExpiryDate = LocalDate.of(2017, 11, 10);
         assertFalse(oneMonthNotificationRequired(subscriptionMotDueDate, vehicleDetailsMotExpiryDate));
     }
 
     @Test
-    public void twoWeekSubscriptionShouldBeSentIfDatesAreTwoWeeksApart() {
+    public void twoWeekSubscriptionShouldBeSentIfDatesAre14DaysApart() {
         LocalDate subscriptionMotDueDate = LocalDate.of(2017, 10, 10);
         LocalDate vehicleDetailsMotExpiryDate = LocalDate.of(2017, 10, 24);
 
@@ -59,7 +62,7 @@ public class SubscriptionHandlerHelperTest {
     }
 
     @Test
-    public void twoWeekSubscriptionShouldNotBeSentIfDatesAreNotTwoWeeksApart() {
+    public void twoWeekSubscriptionShouldNotBeSentIfDatesAreNot14DaysApart() {
         LocalDate subscriptionMotDueDate = LocalDate.of(2017, 10, 10);
         LocalDate vehicleDetailsMotExpiryDate = LocalDate.of(2017, 10, 11);
 

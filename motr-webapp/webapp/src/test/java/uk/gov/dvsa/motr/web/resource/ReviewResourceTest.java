@@ -14,7 +14,7 @@ import uk.gov.dvsa.motr.web.component.subscription.service.SmsConfirmationServic
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.cookie.SubscriptionConfirmationParams;
 import uk.gov.dvsa.motr.web.test.render.TemplateEngineStub;
-import uk.gov.dvsa.motr.web.validator.PhoneNumberValidator;
+import uk.gov.dvsa.motr.web.validator.ContactDetailValidator;
 import uk.gov.dvsa.motr.web.viewmodel.ReviewViewModel;
 
 import java.time.LocalDate;
@@ -53,14 +53,14 @@ public class ReviewResourceTest {
     private static final ContactDetail CONTACT_MOBILE = new ContactDetail(MOBILE, CONTACT_TYPE_MOBILE);
 
     private MotrSession motrSession;
-    private PhoneNumberValidator phoneNumberValidator;
+    private ContactDetailValidator contactDetailValidator;
 
     private ReviewResource resource;
 
     @Before
     public void setUp() {
 
-        phoneNumberValidator = mock(PhoneNumberValidator.class);
+        contactDetailValidator = mock(ContactDetailValidator.class);
 
         motrSession = mock(MotrSession.class);
 
@@ -68,13 +68,14 @@ public class ReviewResourceTest {
                 motrSession,
                 TEMPLATE_ENGINE_STUB,
                 PENDING_SUBSCRIPTION_SERVICE,
-                phoneNumberValidator,
+                contactDetailValidator,
                 PENDING_SMS_CONFIRMATION_SERVICE
         );
 
         when(motrSession.getVrmFromSession()).thenReturn(VRM);
         when(motrSession.getEmailFromSession()).thenReturn(EMAIL);
         when(motrSession.getPhoneNumberFromSession()).thenReturn(MOBILE);
+        when(motrSession.getContactDetailFromSession()).thenReturn(CONTACT_EMAIL);
     }
 
     @Test
@@ -108,6 +109,8 @@ public class ReviewResourceTest {
         PendingSubscriptionServiceResponse pendingSubscriptionResponse = new PendingSubscriptionServiceResponse()
                 .setRedirectUri(EMAIL_CONFIRMATION_PENDING_URI);
 
+        when(motrSession.getContactDetailFromSession()).thenReturn(CONTACT_EMAIL);
+        when(contactDetailValidator.isValid(CONTACT_EMAIL)).thenReturn(true);
         when(motrSession.getVehicleDetailsFromSession()).thenReturn(vehicleDetails);
         when(motrSession.isUsingEmailChannel()).thenReturn(true);
         when(PENDING_SUBSCRIPTION_SERVICE.handlePendingSubscriptionCreation(any(), any(), any(), any()))
@@ -137,7 +140,8 @@ public class ReviewResourceTest {
         PendingSubscriptionServiceResponse pendingSubscriptionResponse = new PendingSubscriptionServiceResponse()
                 .setConfirmationId(CONFIRMATION_ID);
 
-        when(phoneNumberValidator.isValid(MOBILE)).thenReturn(true);
+        when(motrSession.getContactDetailFromSession()).thenReturn(CONTACT_MOBILE);
+        when(contactDetailValidator.isValid(CONTACT_MOBILE)).thenReturn(true);
         when(motrSession.getVehicleDetailsFromSession()).thenReturn(vehicleDetails);
         when(motrSession.isUsingEmailChannel()).thenReturn(false);
         when(motrSession.isUsingSmsChannel()).thenReturn(true);
@@ -192,7 +196,6 @@ public class ReviewResourceTest {
 
         assertEquals(200, resource.reviewPage().getStatus());
         assertEquals("review", TEMPLATE_ENGINE_STUB.getTemplate());
-        assertFalse(((Boolean) TEMPLATE_ENGINE_STUB.getContext(Map.class).get("isDvlaVehicle")));
         assertEquals(ReviewViewModel.class, TEMPLATE_ENGINE_STUB.getContext(Map.class).get("viewModel").getClass());
     }
 
@@ -208,7 +211,6 @@ public class ReviewResourceTest {
 
         assertEquals(200, resource.reviewPage().getStatus());
         assertEquals("review", TEMPLATE_ENGINE_STUB.getTemplate());
-        assertTrue(((Boolean) TEMPLATE_ENGINE_STUB.getContext(Map.class).get("isDvlaVehicle")));
         assertEquals(ReviewViewModel.class, TEMPLATE_ENGINE_STUB.getContext(Map.class).get("viewModel").getClass());
     }
 

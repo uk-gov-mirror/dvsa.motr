@@ -43,6 +43,8 @@ public class DefaultLambdaWarmUp implements LambdaWarmUp {
 
             logger.info("Interrupted due to timeout");
 
+            // Restore interrupted state...
+            Thread.currentThread().interrupt();
         } catch (Exception exception) {
 
             logger.error("Error occurred", exception);

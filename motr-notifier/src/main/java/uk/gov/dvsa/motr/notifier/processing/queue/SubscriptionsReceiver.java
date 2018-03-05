@@ -10,6 +10,7 @@ import uk.gov.dvsa.motr.notifier.processing.model.SubscriptionQueueItem;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 public class SubscriptionsReceiver implements Iterable<SubscriptionQueueItem> {
@@ -59,6 +60,10 @@ public class SubscriptionsReceiver implements Iterable<SubscriptionQueueItem> {
 
         @Override
         public SubscriptionQueueItem next() {
+
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
 
             SubscriptionQueueItem currentSubscriptionQueueItem = currentBatchOfMessages.get(cursor);
             cursor++;

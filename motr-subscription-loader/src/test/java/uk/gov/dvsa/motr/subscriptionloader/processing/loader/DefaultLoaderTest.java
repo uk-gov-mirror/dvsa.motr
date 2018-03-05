@@ -45,7 +45,7 @@ public class DefaultLoaderTest {
         DefaultLoader loader = new DefaultLoader(this.producer, this.dispatcher);
         loader.run(getTestLocalDate(), context);
 
-        LocalDate oneMonth = getTestLocalDate().plusMonths(1L);
+        LocalDate oneMonth = getTestLocalDate().plusDays(30L);
         LocalDate twoWeeks = getTestLocalDate().plusDays(14L);
         LocalDate oneDayBehind = getTestLocalDate().minusDays(1L);
 

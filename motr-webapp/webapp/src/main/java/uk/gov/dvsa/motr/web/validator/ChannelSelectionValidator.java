@@ -1,6 +1,6 @@
 package uk.gov.dvsa.motr.web.validator;
 
-public class ChannelSelectionValidator {
+public class ChannelSelectionValidator implements Validator {
 
     private static final String EMPTY_CHANNEL_SELECTION_MESSAGE = "Choose what type of reminder you want to receive";
     private static final String INVALID_CHANNEL_SELECTION_MESSAGE = "Choose what type of reminder you want to receive";
@@ -9,6 +9,7 @@ public class ChannelSelectionValidator {
 
     private String message;
 
+    @Override
     public boolean isValid(String selection) {
 
         if (selection == null || selection.isEmpty()) {

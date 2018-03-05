@@ -4,15 +4,13 @@ import com.amazonaws.util.StringUtils;
 
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
-import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.response.PendingSubscriptionServiceResponse;
 import uk.gov.dvsa.motr.web.component.subscription.service.PendingSubscriptionService;
 import uk.gov.dvsa.motr.web.component.subscription.service.SmsConfirmationService;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.cookie.SubscriptionConfirmationParams;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
-import uk.gov.dvsa.motr.web.validator.EmailValidator;
-import uk.gov.dvsa.motr.web.validator.PhoneNumberValidator;
+import uk.gov.dvsa.motr.web.validator.ContactDetailValidator;
 import uk.gov.dvsa.motr.web.validator.VrmValidator;
 import uk.gov.dvsa.motr.web.viewmodel.ReviewViewModel;
 
@@ -41,14 +39,14 @@ public class ReviewResource {
     private final PendingSubscriptionService pendingSubscriptionService;
     private final SmsConfirmationService smsConfirmationService;
     private final MotrSession motrSession;
-    private final PhoneNumberValidator phoneNumberValidator;
+    private final ContactDetailValidator contactDetailValidator;
 
     @Inject
     public ReviewResource(
             MotrSession motrSession,
             TemplateEngine renderer,
             PendingSubscriptionService pendingSubscriptionService,
-            PhoneNumberValidator phoneNumberValidator,
+            ContactDetailValidator contactDetailValidator,
             SmsConfirmationService smsConfirmationService
     ) {
 
@@ -56,7 +54,7 @@ public class ReviewResource {
         this.pendingSubscriptionService = pendingSubscriptionService;
         this.smsConfirmationService = smsConfirmationService;
         this.motrSession = motrSession;
-        this.phoneNumberValidator = phoneNumberValidator;
+        this.contactDetailValidator = contactDetailValidator;
     }
 
     @GET
@@ -69,46 +67,26 @@ public class ReviewResource {
         Map<String, Object> map = new HashMap<>();
         ReviewViewModel viewModel = new ReviewViewModel();
 
-        String contactFromSession;
-        String contactTypeFromSession;
-
-        String regNumberFromSession = this.motrSession.getVrmFromSession();
-        if (motrSession.isUsingEmailChannel()) {
-            contactFromSession = this.motrSession.getEmailFromSession();
-            contactTypeFromSession = "Email address";
-            map.put("changeContactUrl", "/email");
-            map.put("correctContactType", "email address");
-            map.put("changeContactId", "change-email-link");
-        } else if (motrSession.isUsingSmsChannel()) {
-            contactFromSession = this.motrSession.getUnnormalizedPhoneNumberFromSession();
-            contactTypeFromSession = "Mobile number";
-            map.put("changeContactUrl", "/phone-number");
-            map.put("correctContactType", "mobile number");
-            map.put("changeContactId", "change-mobile-link");
-        } else {
-            contactFromSession = "";
-            contactTypeFromSession = "";
-            map.put("changeContactUrl", "/");
-            map.put("correctContactType", "");
-            map.put("changeContactId", "");
-        }
-
-        VehicleDetails vehicle = this.motrSession.getVehicleDetailsFromSession();
+        VehicleDetails vehicle = motrSession.getVehicleDetailsFromSession();
+        ContactDetail contactDetail = motrSession.getContactDetailFromSession();
+        String vrmFromSession = motrSession.getVrmFromSession();
 
         if (null != vehicle) {
             logger.info("review page resource vehicle.getMotIdentification().getDvlaId().isPresent() has value: " +
                     vehicle.getMotIdentification().getDvlaId().isPresent());
 
             viewModel.setColour(vehicle.getPrimaryColour(), vehicle.getSecondaryColour())
-                    .setContact(contactFromSession)
-                    .setContactType(contactTypeFromSession)
+                    .setContact(contactDetail.getValue())
                     .setExpiryDate(vehicle.getMotExpiryDate())
                     .setMake(vehicle.getMake())
                     .setModel(vehicle.getModel())
                     .setMakeInFull(vehicle.getMakeInFull())
-                    .setRegistration(regNumberFromSession)
+                    .setRegistration(vrmFromSession)
+                    .setEmailChannel(motrSession.isUsingEmailChannel())
+                    .setMobileChannel(motrSession.isUsingSmsChannel())
+                    .setDvlaVehicle(vehicle.getMotIdentification().getDvlaId().isPresent())
                     .setYearOfManufacture(vehicle.getYearOfManufacture() == null ? null : vehicle.getYearOfManufacture().toString());
-            map.put("isDvlaVehicle", vehicle.getMotIdentification().getDvlaId().isPresent());
+
         } else {
             logger.debug("vehicle is null on get request");
             throw new NotFoundException();
@@ -125,27 +103,14 @@ public class ReviewResource {
     public Response confirmationPagePost() throws Exception {
 
         String vrm = motrSession.getVrmFromSession();
-        String contactFromSession;
-        Subscription.ContactType contactType;
-
-        if (motrSession.isUsingEmailChannel()) {
-            contactFromSession = this.motrSession.getEmailFromSession();
-            contactType = Subscription.ContactType.EMAIL;
-        } else if (motrSession.isUsingSmsChannel()) {
-            contactFromSession = this.motrSession.getPhoneNumberFromSession();
-            contactType = Subscription.ContactType.MOBILE;
-        } else {
-            contactFromSession = "";
-            contactType = null;
-        }
-
+        ContactDetail contactDetail = motrSession.getContactDetailFromSession();
         VehicleDetails vehicle = motrSession.getVehicleDetailsFromSession();
 
-        if (detailsAreValid(vrm, contactFromSession) && null != vehicle) {
+        if (detailsAreValid(vrm, contactDetail) && null != vehicle) {
 
             PendingSubscriptionServiceResponse pendingSubscriptionResponse = pendingSubscriptionService.handlePendingSubscriptionCreation(
                     vrm,
-                    new ContactDetail(contactFromSession, contactType),
+                    contactDetail,
                     vehicle.getMotExpiryDate(),
                     vehicle.getMotIdentification());
 
@@ -157,38 +122,31 @@ public class ReviewResource {
 
                 redirectUri = smsConfirmationService.handleSmsConfirmationCreation(
                         vrm,
-                        contactFromSession,
+                        contactDetail.getValue(),
                         pendingSubscriptionResponse.getConfirmationId());
             }
 
-            return redirectToNextScreen(redirectUri, contactFromSession, contactType, vrm);
+            return redirectToNextScreen(redirectUri, contactDetail, vrm);
         } else {
-            logger.debug("detailsAreValid() {} or vehicle is null: {}", detailsAreValid(vrm, contactFromSession), vehicle);
+            logger.debug("detailsAreValid() {} or vehicle is null: {}", detailsAreValid(vrm, contactDetail), vehicle);
             throw new NotFoundException();
         }
     }
 
-    private Response redirectToNextScreen(String redirectUri, String contact, Subscription.ContactType contactType, String vrm) {
+    private Response redirectToNextScreen(String redirectUri, ContactDetail contactDetail, String vrm) {
 
         SubscriptionConfirmationParams params = new SubscriptionConfirmationParams();
         params.setRegistration(vrm);
-        params.setContact(contact);
-        params.setContactType(contactType.getValue());
+        params.setContact(contactDetail.getValue());
+        params.setContactType(contactDetail.getContactType().getValue());
         motrSession.setSubscriptionConfirmationParams(params);
 
         return redirect(redirectUri);
     }
 
-    private boolean detailsAreValid(String vrm, String contact) {
+    private boolean detailsAreValid(String vrm, ContactDetail contactDetail) {
 
         VrmValidator vrmValidator = new VrmValidator();
-        if (motrSession.isUsingEmailChannel()) {
-            EmailValidator validator = new EmailValidator();
-            return vrmValidator.isValid(vrm) && validator.isValid(contact);
-        } else if (motrSession.isUsingSmsChannel()) {
-            return vrmValidator.isValid(vrm) && phoneNumberValidator.isValid(contact);
-        } else {
-            return false;
-        }
+        return vrmValidator.isValid(vrm) && contactDetailValidator.isValid(contactDetail);
     }
 }
