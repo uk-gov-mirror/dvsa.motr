@@ -1,4 +1,4 @@
-package uk.gov.dvsa.motr.notifications.service;
+package uk.gov.dvsa.motr.web.formatting;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

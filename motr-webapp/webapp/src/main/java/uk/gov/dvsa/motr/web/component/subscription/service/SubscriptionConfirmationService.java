@@ -2,10 +2,9 @@ package uk.gov.dvsa.motr.web.component.subscription.service;
 
 import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.notifications.service.NotifyService;
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsService;
-import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.web.component.subscription.exception.InvalidConfirmationIdException;
+import uk.gov.dvsa.motr.web.component.subscription.exception.SubscriptionAlreadyConfirmedException;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.component.subscription.model.PendingSubscription;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
@@ -14,7 +13,8 @@ import uk.gov.dvsa.motr.web.component.subscription.persistence.SubscriptionRepos
 import uk.gov.dvsa.motr.web.eventlog.subscription.InvalidSubscriptionConfirmationIdUsedEvent;
 import uk.gov.dvsa.motr.web.eventlog.subscription.SubscriptionConfirmationFailedEvent;
 import uk.gov.dvsa.motr.web.eventlog.subscription.SubscriptionConfirmedEvent;
-import uk.gov.dvsa.motr.web.formatting.MakeModelFormatter;
+
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -44,26 +44,29 @@ public class SubscriptionConfirmationService {
         this.client = client;
     }
 
-    public Subscription confirmSubscription(String confirmationId) throws InvalidConfirmationIdException {
+    public Subscription confirmSubscription(String confirmationId) throws SubscriptionAlreadyConfirmedException,
+            InvalidConfirmationIdException {
 
-        return pendingSubscriptionRepository.findByConfirmationId(confirmationId)
-                .map(this::confirm)
-                .orElseThrow(() -> {
-                    EventLogger.logEvent(new InvalidSubscriptionConfirmationIdUsedEvent().setUsedId(confirmationId));
-                    return new InvalidConfirmationIdException();
-                });
+        Optional<PendingSubscription> pendingSubscription = pendingSubscriptionRepository.findByConfirmationId(confirmationId);
+        if (pendingSubscription.isPresent()) {
+            return confirm(pendingSubscription.get());
+        }
+
+        Optional<Subscription> existingSubscription = subscriptionRepository.findByUnsubscribeId(confirmationId);
+        if (existingSubscription.isPresent()) {
+            throw new SubscriptionAlreadyConfirmedException(existingSubscription.get());
+        }
+
+        EventLogger.logEvent(new InvalidSubscriptionConfirmationIdUsedEvent().setUsedId(confirmationId));
+        throw new InvalidConfirmationIdException();
     }
-
+    
     private Subscription confirm(PendingSubscription pendingSubscription) {
 
         try {
             Subscription subscription = applyPendingSubscription(pendingSubscription);
 
-            if (subscription.getContactDetail().getContactType() == Subscription.ContactType.EMAIL) {
-                sendSubscriptionConfirmationEmail(subscription);
-            } else {
-                sendSubscriptionConfirmationSms(subscription);
-            }
+            notifyService.sendSubscriptionConfirmation(subscription);
 
             EventLogger.logEvent(new SubscriptionConfirmedEvent()
                     .setVrm(subscription.getVrm())
@@ -85,7 +88,7 @@ public class SubscriptionConfirmationService {
     private Subscription applyPendingSubscription(PendingSubscription pendingSubscription) {
 
         Subscription subscription = new Subscription()
-                .setUnsubscribeId(generateId())
+                .setUnsubscribeId(pendingSubscription.getConfirmationId())
                 .setVrm(pendingSubscription.getVrm())
                 .setContactDetail(pendingSubscription.getContactDetail())
                 .setMotDueDate(pendingSubscription.getMotDueDate())
@@ -95,25 +98,5 @@ public class SubscriptionConfirmationService {
         pendingSubscriptionRepository.delete(pendingSubscription);
 
         return subscription;
-    }
-
-    private void sendSubscriptionConfirmationEmail(Subscription subscription) {
-
-        VehicleDetails vehicleDetails = VehicleDetailsService.getVehicleDetails(subscription.getVrm(), client);
-
-        notifyService.sendSubscriptionConfirmationEmail(
-                subscription.getContactDetail().getValue(),
-                MakeModelFormatter.getMakeModelDisplayStringFromVehicleDetails(vehicleDetails, ", ") + subscription.getVrm(),
-                subscription.getMotDueDate(),
-                urlHelper.unsubscribeLink(subscription.getUnsubscribeId()),
-                subscription.getMotIdentification());
-    }
-
-    private void sendSubscriptionConfirmationSms(Subscription subscription) {
-
-        notifyService.sendSubscriptionConfirmationSms(
-                subscription.getContactDetail().getValue(),
-                subscription.getVrm(),
-                subscription.getMotDueDate());
     }
 }

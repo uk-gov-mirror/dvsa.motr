@@ -6,6 +6,7 @@ import org.mockito.ArgumentCaptor;
 
 import uk.gov.dvsa.motr.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.web.component.subscription.exception.InvalidConfirmationIdException;
+import uk.gov.dvsa.motr.web.component.subscription.exception.SubscriptionAlreadyConfirmedException;
 import uk.gov.dvsa.motr.web.component.subscription.exception.SubscriptionAlreadyExistsException;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
@@ -209,7 +210,8 @@ public class SubscriptionConfirmedResourceTest {
         assertEquals("{\"vrm\":\"vrm\",\"mot-test-number\":\"12345\",\"contact-type\":\"EMAIL\"}", dataLayer);
     }
 
-    private void mockSubscription(String motTestNumber, String dvlaId) throws InvalidConfirmationIdException {
+    private void mockSubscription(String motTestNumber, String dvlaId) throws SubscriptionAlreadyConfirmedException,
+            InvalidConfirmationIdException {
 
         MotIdentification motIdentification = new MotIdentification(motTestNumber, dvlaId);
         Subscription subscription = new Subscription()

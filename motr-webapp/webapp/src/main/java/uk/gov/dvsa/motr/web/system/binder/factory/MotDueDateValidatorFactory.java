@@ -9,6 +9,6 @@ public class MotDueDateValidatorFactory implements BaseFactory<MotDueDateValidat
     @Override
     public MotDueDateValidator provide() {
 
-        return new MotDueDateValidator(LocalDate.now());
+        return new MotDueDateValidator();
     }
 }
