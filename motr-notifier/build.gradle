@@ -5,6 +5,7 @@ dependencies {
     compile 'com.amazonaws:aws-java-sdk-dynamodb'
     compile 'com.amazonaws:aws-java-sdk-sqs'
 
+    compile "com.github.jknack:handlebars:${handlebarsVersion}"
     compile "com.github.szhem:log4j-json-layout:${log4jJsonLayoutVersion}"
     compile "uk.gov.service.notify:notifications-java-client:${govNotifyClientVersion}"
     compile "com.google.inject:guice:${guiceVersion}"

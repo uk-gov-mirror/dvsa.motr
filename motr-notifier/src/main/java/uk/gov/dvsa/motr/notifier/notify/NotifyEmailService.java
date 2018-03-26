@@ -1,6 +1,8 @@
 package uk.gov.dvsa.motr.notifier.notify;
 
 import com.amazonaws.util.StringUtils;
+import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.Template;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +11,7 @@ import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 import uk.gov.service.notify.SendEmailResponse;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +39,8 @@ public class NotifyEmailService {
     }
 
     public SendEmailResponse sendOneMonthNotificationEmail(String emailAddress, String vehicleDetails, LocalDate motExpiryDate,
-            String unsubscribeLink, String dvlaId, String mothUrl) throws NotificationClientException {
+                                                           String unsubscribeLink, String dvlaId, String mothUrl)
+            throws NotificationClientException {
 
         Map<String, String> personalisation = genericPersonalisation(vehicleDetails, unsubscribeLink);
         personalisation.put("mot_expiry_date", DateFormatterForEmailDisplay.asFormattedForEmailDate(motExpiryDate));
@@ -53,6 +57,8 @@ public class NotifyEmailService {
 
             personalisation.put("is_due_or_expires", "expires");
             personalisation.put("preservation_statement", preservationStatementSb.toString());
+            personalisation.put("email_subject", "Test email");
+            personalisation.put("content", getTextTemplate(personalisation));
         }
 
         logger.debug("Personalisation for one month {}", personalisation);
@@ -86,7 +92,7 @@ public class NotifyEmailService {
     }
 
     public SendEmailResponse sendOneDayAfterNotificationEmail(String emailAddress, String vehicleDetails, LocalDate motExpiryDate,
-            String unsubscribeLink, String dvlaId) throws NotificationClientException {
+                                                              String unsubscribeLink, String dvlaId) throws NotificationClientException {
 
         Map<String, String> personalisation = genericPersonalisation(vehicleDetails, unsubscribeLink);
 
@@ -119,5 +125,20 @@ public class NotifyEmailService {
         personalisation.put("unsubscribe_link", unsubscribeLink);
 
         return personalisation;
+    }
+
+    private String getTextTemplate(Map<String, String> pers) {
+        Handlebars handlebars = new Handlebars();
+
+
+        try {
+            Template template = handlebars.compileInline("The vehicle is {{this}}!");
+
+            String content = template.apply(pers.get("vehicle_details"));
+            return content;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 }

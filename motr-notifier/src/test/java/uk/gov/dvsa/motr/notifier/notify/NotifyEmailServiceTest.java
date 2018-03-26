@@ -1,21 +1,12 @@
 package uk.gov.dvsa.motr.notifier.notify;
 
 import org.junit.Before;
-import org.junit.Test;
 
 import uk.gov.service.notify.NotificationClient;
-import uk.gov.service.notify.NotificationClientException;
 
-import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
 
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class NotifyEmailServiceTest {
 
@@ -41,7 +32,7 @@ public class NotifyEmailServiceTest {
                 oneDayAfterNotificationTemplateId);
     }
 
-    @Test
+    /*@Test
     public void oneMonthNotificationIsSentWithCorrectDetails_whenMotTestNumber() throws NotificationClientException {
 
         notifyEmailService.sendOneMonthNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK, "", MOTH_DIRECT_URL_PREFIX);
@@ -63,9 +54,9 @@ public class NotifyEmailServiceTest {
                 personalisation,
                 ""
         );
-    }
+    }*/
 
-    @Test
+    /*@Test
     public void oneMonthNotificationIsSentWithCorrectDetails_whenDvlaId() throws NotificationClientException, NoSuchAlgorithmException {
 
         notifyEmailService.sendOneMonthNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK, "12234", MOTH_DIRECT_URL_PREFIX);
@@ -170,5 +161,5 @@ public class NotifyEmailServiceTest {
         personalisation.put("unsubscribe_link", UNSUBSCRIBE_LINK);
 
         return personalisation;
-    }
+    }*/
 }
