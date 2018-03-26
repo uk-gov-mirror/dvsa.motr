@@ -53,6 +53,7 @@ public class NotifyEmailService {
 
             personalisation.put("is_due_or_expires", "expires");
             personalisation.put("preservation_statement", preservationStatementSb.toString());
+            personalisation.put("content", getTextTemplate());
         }
 
         logger.debug("Personalisation for one month {}", personalisation);
@@ -119,5 +120,22 @@ public class NotifyEmailService {
         personalisation.put("unsubscribe_link", unsubscribeLink);
 
         return personalisation;
+    }
+
+    private String getTextTemplate() {
+        return "^#The MOT for XXX 123 is due on 01/05/2018\n" +
+                "\n" +
+                "# Was this MOT reminder useful to you?\n" +
+                "\n" +
+                "Help us improve the MOT reminder service by telling us what you think at https://www.gov.uk/mot-survey\n" +
+                "\n" +
+                "# Check MOT history and outstanding safety recalls\n" +
+                "\n" +
+                "Check if a vehicle or part has been recalled because of a safety fault at moth_url\n" +
+                "\n" +
+                "DVSA (Driver and Vehicle Standards Agency)\n" +
+                "\n" +
+                "Unsubscribe from MOT reminders:\n" +
+                "unsubscribe_link";
     }
 }
