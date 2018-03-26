@@ -31,7 +31,13 @@ public class MotDueDateValidatorTest {
     @UseDataProvider("invalidDateDataProvider")
     public void dueDateIsValidReturnsFalseForPastDates(LocalDate invalidDate) {
 
-        MotDueDateValidator validator = new MotDueDateValidator(dateNow);
+        MotDueDateValidator validator = new MotDueDateValidator() {
+            @Override
+            LocalDate getNow() {
+
+                return dateNow;
+            }
+        };
         assertFalse(validator.isDueDateValid(invalidDate));
     }
 
@@ -39,7 +45,13 @@ public class MotDueDateValidatorTest {
     @UseDataProvider("validDateDataProvider")
     public void dueDateIsValidReturnsTrueForFutureDates(LocalDate validDate) {
 
-        MotDueDateValidator validator = new MotDueDateValidator(dateNow);
+        MotDueDateValidator validator = new MotDueDateValidator() {
+            @Override
+            LocalDate getNow() {
+
+                return dateNow;
+            }
+        };
         assertTrue(validator.isDueDateValid(validDate));
     }
 

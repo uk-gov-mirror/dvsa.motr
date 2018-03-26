@@ -8,6 +8,7 @@ import uk.gov.dvsa.motr.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.web.component.subscription.exception.InvalidConfirmationIdException;
+import uk.gov.dvsa.motr.web.component.subscription.exception.SubscriptionAlreadyConfirmedException;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
 import uk.gov.dvsa.motr.web.component.subscription.model.PendingSubscription;
@@ -19,7 +20,6 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -66,19 +66,12 @@ public class SubscriptionConfirmationServiceTest {
         PendingSubscription pendingSubscription = pendingSubscriptionEmailStub();
         withPendingSubscriptionFound(of(pendingSubscription));
 
-        subscriptionService.confirmSubscription(CONFIRMATION_ID);
+        Subscription subscription = subscriptionService.confirmSubscription(CONFIRMATION_ID);
 
         verify(pendingSubscriptionRepository, times(1)).findByConfirmationId(CONFIRMATION_ID);
         verify(subscriptionRepository, times(1)).save(any(Subscription.class));
         verify(pendingSubscriptionRepository, times(1)).delete(pendingSubscription);
-        verify(notifyService, times(1)).sendSubscriptionConfirmationEmail(
-                eq(pendingSubscription.getContactDetail().getValue()),
-                eq(pendingSubscription.getVrm()),
-                eq(pendingSubscription.getMotDueDate()),
-                anyString(),
-                any(MotIdentification.class)
-        );
-        verify(notifyService, times(0)).sendSubscriptionConfirmationSms(any(), any(), any());
+        verify(notifyService, times(1)).sendSubscriptionConfirmation(subscription);
     }
 
     @Test
@@ -87,25 +80,31 @@ public class SubscriptionConfirmationServiceTest {
         PendingSubscription pendingSubscription = pendingSubscriptionMobileStub();
         withPendingSubscriptionFound(of(pendingSubscription));
 
-        subscriptionService.confirmSubscription(CONFIRMATION_ID);
+        Subscription subscription = subscriptionService.confirmSubscription(CONFIRMATION_ID);
 
         verify(pendingSubscriptionRepository, times(1)).findByConfirmationId(CONFIRMATION_ID);
         verify(subscriptionRepository, times(1)).save(any(Subscription.class));
         verify(pendingSubscriptionRepository, times(1)).delete(pendingSubscription);
-        verify(notifyService, times(1)).sendSubscriptionConfirmationSms(MOBILE, VRM, DATE);
-        verify(notifyService, times(0)).sendSubscriptionConfirmationEmail(
-                anyString(),
-                anyString(),
-                any(),
-                anyString(),
-                any(MotIdentification.class)
-        );
+        verify(notifyService, times(1)).sendSubscriptionConfirmation(subscription);
     }
 
     @Test(expected = InvalidConfirmationIdException.class)
     public void throwsExceptionWhenPendingSubscriptionDoesNotExist() throws Exception {
 
         withPendingSubscriptionFound(empty());
+        withExistingSubscriptionFound(empty());
+
+        subscriptionService.confirmSubscription(CONFIRMATION_ID);
+
+        verify(subscriptionRepository, times(0)).save(any());
+        verify(pendingSubscriptionRepository, times(0)).delete(any(PendingSubscription.class));
+    }
+
+    @Test(expected = SubscriptionAlreadyConfirmedException.class)
+    public void throwsExceptionWhenSubscriptionAlreadyConfirmed() throws Exception {
+
+        withPendingSubscriptionFound(empty());
+        withExistingSubscriptionFound(of(subscriptionEmailStub()));
 
         subscriptionService.confirmSubscription(CONFIRMATION_ID);
 
@@ -116,6 +115,11 @@ public class SubscriptionConfirmationServiceTest {
     private void withPendingSubscriptionFound(Optional<PendingSubscription> finding) {
 
         when(pendingSubscriptionRepository.findByConfirmationId(CONFIRMATION_ID)).thenReturn(finding);
+    }
+
+    private void withExistingSubscriptionFound(Optional<Subscription> finding) {
+
+        when(subscriptionRepository.findByUnsubscribeId(CONFIRMATION_ID)).thenReturn(finding);
     }
 
     private PendingSubscription pendingSubscriptionEmailStub() {
@@ -131,6 +135,24 @@ public class SubscriptionConfirmationServiceTest {
 
         return new PendingSubscription()
                 .setConfirmationId(CONFIRMATION_ID)
+                .setMotDueDate(DATE)
+                .setContactDetail(new ContactDetail(MOBILE, CONTACT_TYPE_MOBILE))
+                .setVrm(VRM);
+    }
+
+    private Subscription subscriptionEmailStub() {
+
+        return new Subscription()
+                .setUnsubscribeId(CONFIRMATION_ID)
+                .setMotDueDate(DATE)
+                .setContactDetail(new ContactDetail(EMAIL, CONTACT_TYPE_EMAIL))
+                .setVrm(VRM);
+    }
+
+    private Subscription subscriptionMobileStub() {
+
+        return new Subscription()
+                .setUnsubscribeId(CONFIRMATION_ID)
                 .setMotDueDate(DATE)
                 .setContactDetail(new ContactDetail(MOBILE, CONTACT_TYPE_MOBILE))
                 .setVrm(VRM);

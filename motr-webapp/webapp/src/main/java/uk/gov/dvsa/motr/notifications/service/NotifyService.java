@@ -1,10 +1,16 @@
 package uk.gov.dvsa.motr.notifications.service;
 
 import uk.gov.dvsa.motr.eventlog.EventLogger;
-import uk.gov.dvsa.motr.notifications.service.DateFormatterForSmsDisplay;
+import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsService;
 import uk.gov.dvsa.motr.vehicledetails.MotIdentification;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
+import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
+import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.eventlog.subscription.NotifyClientFailedEvent;
 import uk.gov.dvsa.motr.web.formatting.DateFormatter;
+import uk.gov.dvsa.motr.web.formatting.DateFormatterForSmsDisplay;
+import uk.gov.dvsa.motr.web.formatting.MakeModelFormatter;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
@@ -24,13 +30,16 @@ public class NotifyService {
     private final String emailConfirmationTemplateId;
     private final String smsSubscriptionConfirmationTemplateId;
     private final String smsConfirmationTemplateId;
+    private final UrlHelper urlHelper;
+    private final VehicleDetailsClient vehicleDetailsClient;
 
     public NotifyService(
             NotificationClient notificationClient,
             String emailSubscriptionConfirmationTemplateId,
             String emailConfirmationTemplateId,
             String smsSubscriptionConfirmationTemplateId,
-            String smsConfirmationTemplateId
+            String smsConfirmationTemplateId,UrlHelper urlHelper,
+            VehicleDetailsClient vehicleDetailsClient
     ) {
 
         this.notificationClient = notificationClient;
@@ -38,36 +47,25 @@ public class NotifyService {
         this.emailConfirmationTemplateId = emailConfirmationTemplateId;
         this.smsSubscriptionConfirmationTemplateId = smsSubscriptionConfirmationTemplateId;
         this.smsConfirmationTemplateId = smsConfirmationTemplateId;
+        this.urlHelper = urlHelper;
+        this.vehicleDetailsClient = vehicleDetailsClient;
     }
 
-    public void sendSubscriptionConfirmationEmail(
-            String emailAddress,
-            String vehicleDetails,
-            LocalDate motExpiryDate,
-            String unsubscribeLink,
-            MotIdentification motIdentification
-    ) {
+    public void sendSubscriptionConfirmation(Subscription subscription) {
+        if (subscription.getContactDetail().getContactType() == Subscription.ContactType.EMAIL) {
+            VehicleDetails vehicleDetails = VehicleDetailsService.getVehicleDetails(subscription.getVrm(), vehicleDetailsClient);
 
-        Map<String, String> personalisation = new HashMap<>();
-        personalisation.put("vehicle_details", vehicleDetails);
-        personalisation.put("mot_expiry_date", DateFormatter.asDisplayDate(motExpiryDate));
-        personalisation.put("unsubscribe_link", unsubscribeLink);
-
-        if (motIdentification.getDvlaId().isPresent()) {
-            personalisation.put("is_due_or_expires", "is due");
+            sendSubscriptionConfirmationEmail(
+                    subscription.getContactDetail().getValue(),
+                    MakeModelFormatter.getMakeModelDisplayStringFromVehicleDetails(vehicleDetails, ", ") + subscription.getVrm(),
+                    subscription.getMotDueDate(),
+                    urlHelper.unsubscribeLink(subscription.getUnsubscribeId()),
+                    subscription.getMotIdentification());
         } else {
-            personalisation.put("is_due_or_expires", "expires");
-        }
-
-        try {
-
-            notificationClient.sendEmail(emailSubscriptionConfirmationTemplateId, emailAddress, personalisation, "");
-
-        } catch (NotificationClientException e) {
-
-            EventLogger.logErrorEvent(new NotifyClientFailedEvent().setContact(emailAddress).setType(SUBSCRIPTION_CONFIRMATION), e);
-            // wrapping because nothing can be done about it
-            throw new RuntimeException(e);
+            sendSubscriptionConfirmationSms(
+                    subscription.getContactDetail().getValue(),
+                    subscription.getVrm(),
+                    subscription.getMotDueDate());
         }
     }
 
@@ -106,7 +104,38 @@ public class NotifyService {
         }
     }
 
-    public void sendSubscriptionConfirmationSms(String phoneNumber, String vehicleVrm, LocalDate motExpiryDate) {
+    private void sendSubscriptionConfirmationEmail(
+            String emailAddress,
+            String vehicleDetails,
+            LocalDate motExpiryDate,
+            String unsubscribeLink,
+            MotIdentification motIdentification
+    ) {
+
+        Map<String, String> personalisation = new HashMap<>();
+        personalisation.put("vehicle_details", vehicleDetails);
+        personalisation.put("mot_expiry_date", DateFormatter.asDisplayDate(motExpiryDate));
+        personalisation.put("unsubscribe_link", unsubscribeLink);
+
+        if (motIdentification.getDvlaId().isPresent()) {
+            personalisation.put("is_due_or_expires", "is due");
+        } else {
+            personalisation.put("is_due_or_expires", "expires");
+        }
+
+        try {
+
+            notificationClient.sendEmail(emailSubscriptionConfirmationTemplateId, emailAddress, personalisation, "");
+
+        } catch (NotificationClientException e) {
+
+            EventLogger.logErrorEvent(new NotifyClientFailedEvent().setContact(emailAddress).setType(SUBSCRIPTION_CONFIRMATION), e);
+            // wrapping because nothing can be done about it
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void sendSubscriptionConfirmationSms(String phoneNumber, String vehicleVrm, LocalDate motExpiryDate) {
 
         Map<String, String> personalisation = new HashMap<>();
         personalisation.put("vehicle_vrm", vehicleVrm);

@@ -1,5 +1,6 @@
 package uk.gov.dvsa.motr.web.component.subscription.helper;
 
+import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.helper.SystemVariableParam;
 
 import javax.inject.Inject;
@@ -31,6 +32,14 @@ public class UrlHelper {
     public String subscriptionConfirmedFirstTimeLink() {
 
         return UriBuilder.fromPath(this.baseUrl).path("confirm-subscription/confirmed").build().toString();
+    }
+
+    public String subscriptionConfirmedNthTimeLink(Subscription.ContactType contactType) {
+
+        if (contactType == Subscription.ContactType.EMAIL) {
+            return emailConfirmedNthTimeLink();
+        }
+        return phoneConfirmedNthTimeLink();
     }
 
     public String emailConfirmedNthTimeLink() {

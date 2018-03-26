@@ -4,6 +4,7 @@ import uk.gov.dvsa.motr.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
 import uk.gov.dvsa.motr.web.analytics.SmartSurveyHelper;
 import uk.gov.dvsa.motr.web.component.subscription.exception.InvalidConfirmationIdException;
+import uk.gov.dvsa.motr.web.component.subscription.exception.SubscriptionAlreadyConfirmedException;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.service.SubscriptionConfirmationService;
@@ -75,18 +76,16 @@ public class SubscriptionConfirmedResource {
 
         try {
             Subscription subscription = subscriptionConfirmationService.confirmSubscription(confirmationId);
-            motrSession.clear();
-
-            MotIdentification motIdentification = subscription.getMotIdentification();
-            SubscriptionConfirmationParams params = new SubscriptionConfirmationParams();
-            params.setRegistration(subscription.getVrm());
-            params.setDvlaId(motIdentification.getDvlaId().orElse(""));
-            params.setMotTestNumber(motIdentification.getMotTestNumber().orElse(""));
-            params.setContactType(subscription.getContactDetail().getContactType().getValue());
-            motrSession.setSubscriptionConfirmationParams(params);
-
+            setConfirmationSessionParams(subscription);
             return RedirectResponseBuilder.redirect(urlHelper.subscriptionConfirmedFirstTimeLink());
+        } catch (SubscriptionAlreadyConfirmedException e) {
+
+            Subscription existingSubscription = e.getExistingSubscription();
+            setConfirmationSessionParams(existingSubscription);
+            return RedirectResponseBuilder.redirect(urlHelper.subscriptionConfirmedNthTimeLink(
+                    existingSubscription.getContactDetail().getContactType()));
         } catch (InvalidConfirmationIdException e) {
+
             return Response.ok(renderer.render("subscription-error", emptyMap())).build();
         }
     }
@@ -144,5 +143,18 @@ public class SubscriptionConfirmedResource {
         smartSurveyHelperSatisfaction.clear();
 
         return map;
+    }
+
+    private void setConfirmationSessionParams(Subscription subscription) {
+
+        motrSession.clear();
+
+        MotIdentification motIdentification = subscription.getMotIdentification();
+        SubscriptionConfirmationParams params = new SubscriptionConfirmationParams();
+        params.setRegistration(subscription.getVrm());
+        params.setDvlaId(motIdentification.getDvlaId().orElse(""));
+        params.setMotTestNumber(motIdentification.getMotTestNumber().orElse(""));
+        params.setContactType(subscription.getContactDetail().getContactType().getValue());
+        motrSession.setSubscriptionConfirmationParams(params);
     }
 }
