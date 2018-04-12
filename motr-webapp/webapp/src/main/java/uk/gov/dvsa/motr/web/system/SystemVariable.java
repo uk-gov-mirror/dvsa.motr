@@ -30,7 +30,8 @@ public enum SystemVariable implements ConfigKey {
     WARM_UP_TIMEOUT_SEC("WARM_UP_TIMEOUT_SEC"),
 
     // Feature toggles
-    FEATURE_TOGGLE_SMS("FEATURE_TOGGLE_SMS");
+    FEATURE_TOGGLE_SMS("FEATURE_TOGGLE_SMS"),
+    FEATURE_TOGGLE_HGV_PSV_VEHICLES("FEATURE_TOGGLE_HGV_PSV_VEHICLES");
 
     final String name;
 

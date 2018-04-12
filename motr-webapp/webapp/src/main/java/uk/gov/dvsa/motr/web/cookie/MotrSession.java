@@ -10,6 +10,7 @@ import java.util.Map;
 
 import javax.inject.Singleton;
 
+import static uk.gov.dvsa.motr.web.system.SystemVariable.FEATURE_TOGGLE_HGV_PSV_VEHICLES;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.FEATURE_TOGGLE_SMS;
 
 /**
@@ -37,18 +38,22 @@ public class MotrSession {
     private boolean allowedOnChannelSelectionPage;
     private boolean allowedOnPhoneNumberEntryPage;
     private boolean smsFeatureToggle;
+    private boolean hgvPsvVehiclesFeatureToggle;
 
     // Set during runtime for each container invocation.
     private Map<String, Object> attributes;
     private boolean shouldClearCookies;
     private boolean smsConfirmResendLimited;
 
-    public MotrSession(@SystemVariableParam(FEATURE_TOGGLE_SMS) Boolean featureToggleSms) {
+    public MotrSession(
+            @SystemVariableParam(FEATURE_TOGGLE_SMS) Boolean featureToggleSms,
+            @SystemVariableParam(FEATURE_TOGGLE_HGV_PSV_VEHICLES) Boolean featureToggleHgvPsvVehicle) {
 
         this.attributes = new HashMap<>();
         this.allowedOnChannelSelectionPage = featureToggleSms;
         this.allowedOnPhoneNumberEntryPage = featureToggleSms;
         this.smsFeatureToggle = featureToggleSms;
+        this.hgvPsvVehiclesFeatureToggle = featureToggleHgvPsvVehicle;
     }
 
     public void setShouldClearCookies(boolean shouldClearCookies) {
@@ -259,6 +264,11 @@ public class MotrSession {
         return smsFeatureToggle;
     }
 
+    public boolean isHgvPsvVehiclesFeatureToggleOn() {
+
+        return hgvPsvVehiclesFeatureToggle;
+    }
+
     protected void setAttribute(String attributeKey, Object attributeValue) {
 
         this.attributes.put(attributeKey, attributeValue);
@@ -295,6 +305,7 @@ public class MotrSession {
                 ", allowedOnChannelSelectionPage=" + allowedOnChannelSelectionPage +
                 ", allowedOnPhoneNumberEntryPage=" + allowedOnPhoneNumberEntryPage +
                 ", smsFeatureToggle=" + smsFeatureToggle +
+                ", hgvPsvVehiclesFeatureToggle=" + hgvPsvVehiclesFeatureToggle +
                 ", smsConfirmResendLimited=" + smsConfirmResendLimited +
                 '}';
     }
