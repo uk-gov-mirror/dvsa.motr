@@ -23,7 +23,7 @@ public class MotrSessionTest {
 
     @Before
     public void setUp() {
-        motrSession = new MotrSession(true, true);
+        motrSession = new MotrSession(true);
     }
 
     @Test
@@ -274,48 +274,17 @@ public class MotrSessionTest {
     }
 
     @Test
-    public void isAllowedOnChannelSelectionPageReturnsFalseWithEmptyVrmAndFeatureToggleOn() {
+    public void isAllowedOnChannelSelectionPageReturnsFalseWithEmptyVrm() {
 
         assertFalse(motrSession.isAllowedOnChannelSelectionPage());
     }
 
     @Test
-    public void isAllowedOnChannelSelectionPageReturnsTrueWithToggleOnAndVrm() {
+    public void isAllowedOnChannelSelectionPageReturnsTrueWithVrm() {
 
         motrSession.setVrm(VRM);
 
         assertTrue(motrSession.isAllowedOnChannelSelectionPage());
-    }
-
-    @Test
-    public void isAllowedOnChannelSelectionPageReturnsFalseWithEmptyVrmAndFeatureToggleOff() {
-
-        motrSession = new MotrSession(false, false);
-
-        assertFalse(motrSession.isAllowedOnChannelSelectionPage());
-    }
-
-    @Test
-    public void isAllowedOnChannelSelectionPageReturnsFalseWithVrmAndFeatureToggleOff() {
-
-        motrSession = new MotrSession(false, false);
-        motrSession.setVrm(VRM);
-
-        assertFalse(motrSession.isAllowedOnChannelSelectionPage());
-    }
-
-    @Test
-    public void getSmsFeatureToggleValueReturnsTrueWithToggleOn() {
-
-        assertTrue(motrSession.isSmsFeatureToggleOn());
-    }
-
-    @Test
-    public void getSmsFeatureToggleValueReturnsFalseWithToggleOff() {
-
-        motrSession = new MotrSession(false, false);
-
-        assertFalse(motrSession.isSmsFeatureToggleOn());
     }
 
     @Test
@@ -325,7 +294,7 @@ public class MotrSessionTest {
 
     @Test
     public void getHgvPsvVehiclesFeatureToggleValueReturnsFalseWithToggleOff() {
-        motrSession = new MotrSession(false, false);
+        motrSession = new MotrSession(false);
 
         assertFalse(motrSession.isHgvPsvVehiclesFeatureToggleOn());
     }
