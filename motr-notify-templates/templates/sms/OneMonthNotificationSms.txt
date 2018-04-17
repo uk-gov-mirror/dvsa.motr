@@ -1,3 +1,3 @@
 MESSAGE CONTENT
 ---------------------
-MOT reminder: The MOT for ((vehicle_vrm)) is due by ((mot_expiry_date)). Book the test now. Give us feedback at https://www.gov.uk/mot-survey To unsubscribe reply STOP ((vehicle_vrm))
+MOT reminder: The MOT for ((vehicle_vrm)) is due by ((mot_expiry_date)). Book the test now. The MOT test will change on 20/05/18, find out more at https://www.gov.uk/government/news/mot-changes-20-may-2018. Give us feedback at https://www.gov.uk/mot-survey. To unsubscribe reply STOP ((vehicle_vrm))
