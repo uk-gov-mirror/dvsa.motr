@@ -10,7 +10,7 @@ import java.util.Map;
 
 import javax.inject.Singleton;
 
-import static uk.gov.dvsa.motr.web.system.SystemVariable.FEATURE_TOGGLE_SMS;
+import static uk.gov.dvsa.motr.web.system.SystemVariable.FEATURE_TOGGLE_HGV_PSV_VEHICLES;
 
 /**
  * Singleton session object that will be used across different Lambda container invocations from different users.
@@ -34,21 +34,17 @@ public class MotrSession {
     private static final String TEXT_CHANNEL = "text";
 
     // Set when session singleton is instantiated (container creation).
-    private boolean allowedOnChannelSelectionPage;
-    private boolean allowedOnPhoneNumberEntryPage;
-    private boolean smsFeatureToggle;
+    private boolean hgvPsvVehiclesFeatureToggle;
 
     // Set during runtime for each container invocation.
     private Map<String, Object> attributes;
     private boolean shouldClearCookies;
     private boolean smsConfirmResendLimited;
 
-    public MotrSession(@SystemVariableParam(FEATURE_TOGGLE_SMS) Boolean featureToggleSms) {
+    public MotrSession(@SystemVariableParam(FEATURE_TOGGLE_HGV_PSV_VEHICLES) Boolean featureToggleHgvPsvVehicle) {
 
         this.attributes = new HashMap<>();
-        this.allowedOnChannelSelectionPage = featureToggleSms;
-        this.allowedOnPhoneNumberEntryPage = featureToggleSms;
-        this.smsFeatureToggle = featureToggleSms;
+        this.hgvPsvVehiclesFeatureToggle = featureToggleHgvPsvVehicle;
     }
 
     public void setShouldClearCookies(boolean shouldClearCookies) {
@@ -161,12 +157,12 @@ public class MotrSession {
 
     public boolean isAllowedOnChannelSelectionPage() {
 
-        return allowedOnChannelSelectionPage && !getVrmFromSession().isEmpty();
+        return !getVrmFromSession().isEmpty();
     }
 
     public boolean isAllowedOnPhoneNumberEntryPage() {
 
-        return allowedOnPhoneNumberEntryPage && (!getVrmFromSession().isEmpty() && !getVrmFromSession().equals(""));
+        return !getVrmFromSession().isEmpty() && !getVrmFromSession().equals("");
     }
 
     public boolean isAllowedOnReviewPage() {
@@ -254,9 +250,9 @@ public class MotrSession {
         this.smsConfirmResendLimited = smsConfirmResendLimited;
     }
 
-    public boolean isSmsFeatureToggleOn() {
+    public boolean isHgvPsvVehiclesFeatureToggleOn() {
 
-        return smsFeatureToggle;
+        return hgvPsvVehiclesFeatureToggle;
     }
 
     protected void setAttribute(String attributeKey, Object attributeValue) {
@@ -292,9 +288,7 @@ public class MotrSession {
         return "MotrSession{" +
                 "attributes=" + attributes +
                 ", shouldClearCookies=" + shouldClearCookies +
-                ", allowedOnChannelSelectionPage=" + allowedOnChannelSelectionPage +
-                ", allowedOnPhoneNumberEntryPage=" + allowedOnPhoneNumberEntryPage +
-                ", smsFeatureToggle=" + smsFeatureToggle +
+                ", hgvPsvVehiclesFeatureToggle=" + hgvPsvVehiclesFeatureToggle +
                 ", smsConfirmResendLimited=" + smsConfirmResendLimited +
                 '}';
     }
