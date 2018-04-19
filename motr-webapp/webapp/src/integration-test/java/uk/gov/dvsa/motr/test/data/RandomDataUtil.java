@@ -68,6 +68,10 @@ public class RandomDataUtil {
         return random(6, false, true);
     }
 
+    public static String vin() {
+        return random(17, true, true);
+    }
+
     public static String confirmationCode() {
 
         return random(6, false, true);

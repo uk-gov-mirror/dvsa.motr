@@ -27,6 +27,8 @@ public class Subscription {
 
     private String vrm;
 
+    private String vin;
+
     private ContactDetail contactDetail;
 
     private LocalDate motDueDate;
@@ -87,6 +89,15 @@ public class Subscription {
 
     public Subscription setVehicleType(VehicleType vehicleType) {
         this.vehicleType = vehicleType;
+        return this;
+    }
+
+    public Optional<String> getVin() {
+        return Optional.ofNullable(vin);
+    }
+
+    public Subscription setVin(String vin) {
+        this.vin = vin;
         return this;
     }
 }

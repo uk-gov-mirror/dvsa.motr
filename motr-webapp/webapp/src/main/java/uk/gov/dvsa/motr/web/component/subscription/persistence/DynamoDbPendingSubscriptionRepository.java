@@ -113,6 +113,7 @@ public class DynamoDbPendingSubscriptionRepository implements PendingSubscriptio
                 .withNumber("deletion_date", ZonedDateTime.now().plusHours(HOURS_TO_DELETION).toEpochSecond())
                 .withString("contact_type", subscription.getContactDetail().getContactType().getValue());
 
+        subscription.getVin().ifPresent(vin -> item.withString("vin", vin));
         subscription.getMotIdentification().getMotTestNumber()
                 .ifPresent(motTestNumber -> item.withString("mot_test_number", motTestNumber));
         subscription.getMotIdentification().getDvlaId().ifPresent(dvlaId -> item.withString("dvla_id", dvlaId));
@@ -178,6 +179,7 @@ public class DynamoDbPendingSubscriptionRepository implements PendingSubscriptio
         PendingSubscription subscription = new PendingSubscription();
         subscription.setConfirmationId(item.getString("id"));
         subscription.setVrm(item.getString("vrm"));
+        subscription.setVin(item.getString("vin"));
         subscription.setVehicleType(VehicleType.getFromString(item.getString("vehicle_type")));
         subscription.setContactDetail(contactDetail);
         subscription.setMotDueDate(LocalDate.parse(item.getString("mot_due_date")));

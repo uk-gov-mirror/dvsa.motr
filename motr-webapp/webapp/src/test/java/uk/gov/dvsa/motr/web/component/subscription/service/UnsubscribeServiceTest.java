@@ -3,6 +3,7 @@ package uk.gov.dvsa.motr.web.component.subscription.service;
 import org.junit.Before;
 import org.junit.Test;
 
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 import uk.gov.dvsa.motr.web.component.subscription.model.CancelledSubscription;
 import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
@@ -76,6 +77,7 @@ public class UnsubscribeServiceTest {
                 .setUnsubscribeId(UNSUBSCRIBE_ID)
                 .setMotDueDate(DATE)
                 .setContactDetail(new ContactDetail(EMAIL, Subscription.ContactType.EMAIL))
-                .setVrm(VRM);
+                .setVrm(VRM)
+                .setVehicleType(VehicleType.MOT);
     }
 }

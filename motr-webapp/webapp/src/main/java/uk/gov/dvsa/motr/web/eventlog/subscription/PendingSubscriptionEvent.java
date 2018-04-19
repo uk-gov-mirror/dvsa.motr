@@ -30,9 +30,12 @@ public abstract class PendingSubscriptionEvent extends Event {
 
         if (motIdentification.getMotTestNumber().isPresent()) {
             params.put("mot-test-number", motIdentification.getMotTestNumber().get());
-        } else {
+        }
+
+        if (motIdentification.getDvlaId().isPresent()) {
             params.put("dvla-id", motIdentification.getDvlaId().get());
         }
+
         return this;
     }
 }

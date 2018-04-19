@@ -9,6 +9,7 @@ import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 import java.util.UUID;
 
 public class SubscriptionItem implements DynamoDbFixtureTableItem {
@@ -27,6 +28,8 @@ public class SubscriptionItem implements DynamoDbFixtureTableItem {
     private String dvlaId = RandomDataUtil.motTestNumber();
 
     private VehicleType vehicleType = VehicleType.MOT;
+
+    private String vin = RandomDataUtil.vin();
 
     private Subscription.ContactType contactType = RandomDataUtil.emailOrMobileContactType();
 
@@ -97,6 +100,15 @@ public class SubscriptionItem implements DynamoDbFixtureTableItem {
         return this;
     }
 
+    public String getVin() {
+        return vin;
+    }
+
+    public SubscriptionItem setVin(String vin) {
+        this.vin = vin;
+        return this;
+    }
+
     @Override
     public Item toItem() {
 
@@ -108,11 +120,9 @@ public class SubscriptionItem implements DynamoDbFixtureTableItem {
                 .with("vehicle_type", vehicleType.toString())
                 .with("contact_type", contactType.getValue());
 
-        if (motTestNumber != null) {
-            item.with("mot_test_number", motTestNumber);
-        } else {
-            item.with("dvla_id", dvlaId);
-        }
+        Optional.ofNullable(motTestNumber).ifPresent(value -> item.with("mot_test_number", value));
+        Optional.ofNullable(dvlaId).ifPresent(value ->  item.with("dvla_id", value));
+        Optional.ofNullable(vin).ifPresent(value ->  item.with("vin", value));
 
         return item;
     }

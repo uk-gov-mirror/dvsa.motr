@@ -86,7 +86,9 @@ public class ReviewResource {
                     .setEmailChannel(motrSession.isUsingEmailChannel())
                     .setMobileChannel(motrSession.isUsingSmsChannel())
                     .setDvlaVehicle(vehicle.getMotIdentification().getDvlaId().isPresent())
-                    .setYearOfManufacture(vehicle.getYearOfManufacture() == null ? null : vehicle.getYearOfManufacture().toString());
+                    .setYearOfManufacture(vehicle.getYearOfManufacture() == null ? null : vehicle.getYearOfManufacture().toString())
+                    .setVehicleType(vehicle.getVehicleType())
+                    .setHasTests(vehicle.getMotTestNumber() != null && !vehicle.getMotTestNumber().isEmpty());
 
         } else {
             logger.debug("vehicle is null on get request");

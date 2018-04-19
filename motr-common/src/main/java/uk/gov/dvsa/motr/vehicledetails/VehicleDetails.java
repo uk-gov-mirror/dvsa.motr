@@ -33,6 +33,10 @@ public class VehicleDetails implements Serializable {
     @JsonProperty("registration")
     private String regNumber;
 
+    @JsonProperty("vin")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String vin;
+
     @JsonProperty("vehicleType")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private VehicleType vehicleType;
@@ -165,6 +169,15 @@ public class VehicleDetails implements Serializable {
         return new MotIdentification(this.motTestNumber, this.dvlaId);
     }
 
+    public String getVin() {
+        return vin;
+    }
+
+    public VehicleDetails setVin(String vin) {
+        this.vin = vin;
+        return this;
+    }
+
     public VehicleType getVehicleType() {
         return Optional.ofNullable(vehicleType)
             .orElse(VehicleType.MOT);
@@ -188,6 +201,7 @@ public class VehicleDetails implements Serializable {
                 ", motTestNumber='" + motTestNumber + '\'' +
                 ", dvlaId='" + dvlaId + '\'' +
                 ", makeInFull='" + makeInFull + '\'' +
+                ", vin='" + vin + '\'' +
                 ", vehicleType='" + vehicleType + '\'' +
                 '}';
     }

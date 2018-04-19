@@ -21,7 +21,7 @@ public class VehicleDetailsClient {
 
     private static final String MOT_TESTS_PATH_PARAM = "number";
     private static final String DVLA_ID_PATH_PARAM = "dvlaId";
-    private static final String REG_NUMBER_PATH_PARAM = "registration";
+    private static final String REG_NUMBER_QUERY_PARAM = "registration";
     private static final String API_KEY_HEADER = "x-api-key";
 
     private Client client;
@@ -29,6 +29,7 @@ public class VehicleDetailsClient {
     private String uriByDvlaId;
     private String uriByRegNumber;
     private String apiKey;
+    private boolean hgvPsvFeatureToggle;
 
     public VehicleDetailsClient(ClientConfig clientConfig, String apiKey) {
 
@@ -44,7 +45,11 @@ public class VehicleDetailsClient {
      */
     public Optional<VehicleDetails> fetchByVrm(String vrm) throws VehicleDetailsClientException {
 
-        return fetch(vrm, uriByRegNumber, REG_NUMBER_PATH_PARAM);
+        if (hgvPsvFeatureToggle) {
+            return fetchWithQueryParam(vrm, uriByRegNumber, REG_NUMBER_QUERY_PARAM);
+        }
+
+        return fetch(vrm, uriByRegNumber, REG_NUMBER_QUERY_PARAM);
     }
 
     /**
@@ -87,6 +92,29 @@ public class VehicleDetailsClient {
 
         } catch (ProcessingException processingException) {
 
+            throw new VehicleDetailsClientException(processingException);
+        }
+
+        return processResponse(response);
+    }
+
+    private Optional<VehicleDetails> fetchWithQueryParam(String val, String uri, String queryParam) throws VehicleDetailsClientException {
+
+        if (uri == null) {
+            throw new VehicleDetailsClientException("URI not configured for API method in MOTR");
+        }
+
+        Response response;
+        try {
+            WebTarget target = this.client.target(uri)
+                    .queryParam(queryParam, val);
+
+            response = this.client.target(target.getUri())
+                    .request()
+                    .header(API_KEY_HEADER, apiKey)
+                    .get();
+
+        } catch (ProcessingException processingException) {
             throw new VehicleDetailsClientException(processingException);
         }
 
@@ -140,6 +168,11 @@ public class VehicleDetailsClient {
     public VehicleDetailsClient withByRegNumberUri(String uriByRegNumber) {
 
         this.uriByRegNumber = uriByRegNumber;
+        return this;
+    }
+
+    public VehicleDetailsClient withHgvPsvFeatureToggle(boolean hgvPsvFeatureToggle) {
+        this.hgvPsvFeatureToggle = hgvPsvFeatureToggle;
         return this;
     }
 }

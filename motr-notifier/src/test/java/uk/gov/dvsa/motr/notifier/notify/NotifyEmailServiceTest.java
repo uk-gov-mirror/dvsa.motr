@@ -44,7 +44,7 @@ public class NotifyEmailServiceTest {
     @Test
     public void oneMonthNotificationIsSentWithCorrectDetails_whenMotTestNumber() throws NotificationClientException {
 
-        notifyEmailService.sendOneMonthNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK, "", MOTH_DIRECT_URL_PREFIX);
+        notifyEmailService.sendOneMonthNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK, "123123", MOTH_DIRECT_URL_PREFIX);
 
         StringBuilder preservationStatementSb = new StringBuilder(128)
                 .append(PRESERVATION_STATEMENT_PREFIX)
@@ -66,9 +66,9 @@ public class NotifyEmailServiceTest {
     }
 
     @Test
-    public void oneMonthNotificationIsSentWithCorrectDetails_whenDvlaId() throws NotificationClientException, NoSuchAlgorithmException {
+    public void oneMonthNotificationIsSentWithCorrectDetails_whenNoMotTest() throws NotificationClientException, NoSuchAlgorithmException {
 
-        notifyEmailService.sendOneMonthNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK, "12234", MOTH_DIRECT_URL_PREFIX);
+        notifyEmailService.sendOneMonthNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK, "", MOTH_DIRECT_URL_PREFIX);
 
         Map<String, String> personalisation = stubGenericPersonalisation();
         personalisation.put("mot_expiry_date", DateFormatterForEmailDisplay.asFormattedForEmailDate(EXPIRY_DATE));
@@ -87,7 +87,7 @@ public class NotifyEmailServiceTest {
     @Test
     public void twoWeekNotificationIsSentWithCorrectDetails_whenMotTestNumber() throws NotificationClientException {
 
-        notifyEmailService.sendTwoWeekNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK, "");
+        notifyEmailService.sendTwoWeekNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK, "123123");
 
         Map<String, String> personalisation = stubGenericPersonalisation();
         personalisation.put("mot_expiry_date", DateFormatterForEmailDisplay.asFormattedForEmailDate(EXPIRY_DATE));
@@ -102,9 +102,9 @@ public class NotifyEmailServiceTest {
     }
 
     @Test
-    public void twoWeekNotificationIsSentWithCorrectDetails_whenDvlaId() throws NotificationClientException {
+    public void twoWeekNotificationIsSentWithCorrectDetails_whenNoMotTest() throws NotificationClientException {
 
-        notifyEmailService.sendTwoWeekNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK, "122133");
+        notifyEmailService.sendTwoWeekNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK, "");
 
         Map<String, String> personalisation = stubGenericPersonalisation();
         personalisation.put("mot_expiry_date", DateFormatterForEmailDisplay.asFormattedForEmailDate(EXPIRY_DATE));
@@ -122,7 +122,7 @@ public class NotifyEmailServiceTest {
     public void oneDayAfterNotificationIsSentWithCorrectDetails_whenMotTestNumber() throws NotificationClientException {
 
 
-        notifyEmailService.sendOneDayAfterNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK, "");
+        notifyEmailService.sendOneDayAfterNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK, "123123");
         Map<String, String> personalisation = stubGenericPersonalisation();
         personalisation.put("was_due_or_expired", "expired");
 
@@ -134,10 +134,10 @@ public class NotifyEmailServiceTest {
     }
 
     @Test
-    public void oneDayAfterNotificationIsSentWithCorrectDetails_whenDvlaId() throws NotificationClientException {
+    public void oneDayAfterNotificationIsSentWithCorrectDetails_whenNoMotTest() throws NotificationClientException {
 
 
-        notifyEmailService.sendOneDayAfterNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK, "123456");
+        notifyEmailService.sendOneDayAfterNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK, "");
         Map<String, String> personalisation = stubGenericPersonalisation();
         personalisation.put("was_due_or_expired", "was due");
 

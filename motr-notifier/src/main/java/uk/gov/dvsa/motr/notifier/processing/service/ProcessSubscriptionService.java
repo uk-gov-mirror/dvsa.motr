@@ -162,7 +162,7 @@ public class ProcessSubscriptionService {
                     vehicleDetailsString,
                     vehicleMotExpiryDate,
                     unSubscribeLink,
-                    vehicleDetails.getDvlaId(),
+                    vehicleDetails.getMotTestNumber(),
                     mothDirectUrl.toString()
             );
 
@@ -179,7 +179,7 @@ public class ProcessSubscriptionService {
                     vehicleDetailsString,
                     vehicleMotExpiryDate,
                     unSubscribeLink,
-                    vehicleDetails.getDvlaId()
+                    vehicleDetails.getMotTestNumber()
             );
 
             EventLogger.logEvent(new TwoWeekEmailReminderEvent()
@@ -194,7 +194,7 @@ public class ProcessSubscriptionService {
                     vehicleDetailsString,
                     vehicleMotExpiryDate,
                     unSubscribeLink,
-                    vehicleDetails.getDvlaId()
+                    vehicleDetails.getMotTestNumber()
             );
 
             EventLogger.logEvent(new OneDayAfterEmailReminderEvent()

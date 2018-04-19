@@ -64,7 +64,7 @@ public class DynamoDbSubscriptionRepositoryTest {
     public void saveSubscriptionCorrectlySavesToDb() {
 
         SubscriptionItem subscriptionItem = new SubscriptionItem();
-        MotIdentification motIdentification = new MotIdentification(subscriptionItem.getMotTestNumber(), null);
+        MotIdentification motIdentification = new MotIdentification(subscriptionItem.getMotTestNumber(), subscriptionItem.getDvlaId());
 
         Subscription subscription = new Subscription();
         subscription
@@ -88,6 +88,7 @@ public class DynamoDbSubscriptionRepositoryTest {
         assertEquals(subscriptionItem.getVehicleType(), actualSubscription.getVehicleType());
         assertEquals(subscriptionItem.getMotDueDate(), actualSubscription.getMotDueDate());
         assertEquals(subscriptionItem.getMotTestNumber(), actualSubscription.getMotIdentification().getMotTestNumber().get());
+        assertEquals(subscriptionItem.getDvlaId(), actualSubscription.getMotIdentification().getDvlaId().get());
     }
 
 

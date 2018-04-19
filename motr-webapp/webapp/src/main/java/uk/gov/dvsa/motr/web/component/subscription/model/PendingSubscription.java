@@ -4,12 +4,15 @@ import uk.gov.dvsa.motr.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 public class PendingSubscription {
 
     private String confirmationId;
 
     private String vrm;
+
+    private String vin;
 
     private ContactDetail contactDetail;
 
@@ -84,6 +87,15 @@ public class PendingSubscription {
 
     public PendingSubscription setVehicleType(VehicleType vehicleType) {
         this.vehicleType = vehicleType;
+        return this;
+    }
+
+    public Optional<String> getVin() {
+        return Optional.ofNullable(vin);
+    }
+
+    public PendingSubscription setVin(String vin) {
+        this.vin = vin;
         return this;
     }
 }

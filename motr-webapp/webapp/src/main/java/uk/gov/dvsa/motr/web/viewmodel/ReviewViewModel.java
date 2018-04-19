@@ -2,6 +2,7 @@ package uk.gov.dvsa.motr.web.viewmodel;
 
 import com.amazonaws.util.StringUtils;
 
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 import uk.gov.dvsa.motr.web.formatting.DateFormatter;
 
 import java.time.LocalDate;
@@ -20,9 +21,11 @@ public class ReviewViewModel {
     private String colour;
     private String yearOfManufacture;
     private LocalDate expiryDate;
-    private boolean dvlaVehicle;
+    private boolean dvlaVehicle; // TODO verify whether we can remove that and use hasTests instead even for MOT vehicles
     private boolean emailChannel;
     private boolean mobileChannel;
+    private VehicleType vehicleType;
+    private boolean hasTests;
 
     public String getRegistration() {
 
@@ -188,5 +191,31 @@ public class ReviewViewModel {
 
         this.mobileChannel = mobileChannel;
         return this;
+    }
+
+    public ReviewViewModel setVehicleType(VehicleType vehicleType) {
+        this.vehicleType = vehicleType;
+        return this;
+    }
+
+    public ReviewViewModel setHasTests(boolean hasTests) {
+        this.hasTests = hasTests;
+        return this;
+    }
+
+    public String getExpiryDateLabelText() {
+        if (vehicleType == null || VehicleType.MOT.equals(vehicleType)) {
+            if (this.isDvlaVehicle()) {
+                return "MOT due date";
+            }
+
+            return "MOT expiry date";
+        } else {
+            if (this.hasTests) {
+                return "Annual test expiry date";
+            }
+
+            return "Annual test due date";
+        }
     }
 }

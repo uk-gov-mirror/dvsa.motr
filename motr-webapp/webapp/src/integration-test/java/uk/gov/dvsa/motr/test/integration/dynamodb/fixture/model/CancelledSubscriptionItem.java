@@ -19,6 +19,8 @@ public class CancelledSubscriptionItem {
 
     private VehicleType vehicleType = VehicleType.MOT;
 
+    private String vin = RandomDataUtil.vin();
+
     public String getUnsubscribeId() {
         return unsubscribeId;
     }
@@ -37,6 +39,10 @@ public class CancelledSubscriptionItem {
 
     public VehicleType getVehicleType() {
         return vehicleType;
+    }
+
+    public String getVin() {
+        return vin;
     }
 
     public void setMotTestNumber(String motTestNumber) {
@@ -59,6 +65,7 @@ public class CancelledSubscriptionItem {
                 ", email='" + email + '\'' +
                 ", motTestNumber='" + motTestNumber + '\'' +
                 ", dvlaId='" + dvlaId + '\'' +
+                ", vin='" + vin + '\'' +
                 ", vehicleType='" + vehicleType.toString() + '\'' +
                 '}';
     }

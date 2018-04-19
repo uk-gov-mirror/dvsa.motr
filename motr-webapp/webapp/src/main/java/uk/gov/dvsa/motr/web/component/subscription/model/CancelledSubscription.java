@@ -3,10 +3,14 @@ package uk.gov.dvsa.motr.web.component.subscription.model;
 import uk.gov.dvsa.motr.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 
+import java.util.Optional;
+
 public class CancelledSubscription {
     private String unsubscribeId;
 
     private String vrm;
+
+    private String vin;
 
     private ContactDetail contactDetail;
 
@@ -67,6 +71,15 @@ public class CancelledSubscription {
 
     public CancelledSubscription setVehicleType(VehicleType vehicleType) {
         this.vehicleType = vehicleType;
+        return this;
+    }
+
+    public Optional<String> getVin() {
+        return Optional.ofNullable(vin);
+    }
+
+    public CancelledSubscription setVin(String vin) {
+        this.vin = vin;
         return this;
     }
 }
