@@ -63,10 +63,9 @@ public class MotReminderTestsPostSms extends BaseTest {
     }
 
     @Test(dataProvider = "dataProviderCreateEmailMotReminderForMyVehicle",
-            description = "Email reminder subscriber with multiple pending email subscriptions is directed to the confirm email error " +
-                    "page when selecting an old confirm email link",
+            description = "Email reminder subscriber with multiple pending email subscriptions should use the same confirmatio link ",
             groups = {"PostSms"})
-    public void userWithDuplicatePendingEmailMotSubscriptionsIsDirectedToConfirmEmailErrorPageWhenSelectingOldConfirmEmailLink(
+    public void userWithDuplicatePendingEmailMotSubscriptionsIsGivenSameConfirmationLink(
             String vrm, String email
     ) throws IOException, InterruptedException {
 
@@ -79,9 +78,9 @@ public class MotReminderTestsPostSms extends BaseTest {
         motReminder.enterAndConfirmPendingReminderDetailsPostSms(vrm, email);
         String newConfirmationId = motReminder.subscriptionDb.findConfirmationIdByVrmAndEmail(vrm, email);
 
-        // Then I am directed to the MOT Reminder not found error page
-        assertNotEquals(oldConfirmationId, newConfirmationId);
-        motReminder.navigateToEmailConfirmationExpectingErrorPage(oldConfirmationId);
+        // Then the two confirmation email links should be identical
+        assertEquals(oldConfirmationId, newConfirmationId);
+
         // And I can still confirm my email address using newest email
         motReminder.navigateToEmailConfirmationPage(newConfirmationId);
     }

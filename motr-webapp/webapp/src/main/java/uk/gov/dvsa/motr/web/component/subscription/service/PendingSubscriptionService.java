@@ -87,12 +87,12 @@ public class PendingSubscriptionService {
 
         String confimrationId;
         Optional<PendingSubscription> pendingSubscription = pendingSubscriptionRepository.findByVrmAndContactDetails(vrm, contact);
-        if (pendingSubscription.isPresent() && contactType == Subscription.ContactType.MOBILE) {
+        if (pendingSubscription.isPresent()) {
             confimrationId = pendingSubscription.get().getConfirmationId();
         } else {
             confimrationId = generateId();
-            createPendingSubscription(vrm, contact, motDueDate, confimrationId, motIdentification, contactType);
         }
+        createPendingSubscription(vrm, contact, motDueDate, confimrationId, motIdentification, contactType);
 
         return contactType == Subscription.ContactType.EMAIL
                 ? pendingSubscriptionResponse.setRedirectUri(urlHelper.emailConfirmationPendingLink())
