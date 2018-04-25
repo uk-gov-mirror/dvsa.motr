@@ -14,10 +14,14 @@ import uk.gov.dvsa.motr.subscriptionloader.event.LoadingTimeout;
 import uk.gov.dvsa.motr.subscriptionloader.processing.dispatcher.DispatchResult;
 import uk.gov.dvsa.motr.subscriptionloader.processing.dispatcher.Dispatcher;
 import uk.gov.dvsa.motr.subscriptionloader.processing.model.Subscription;
+import uk.gov.dvsa.motr.subscriptionloader.processing.producer.SubscriptionCriteria;
 import uk.gov.dvsa.motr.subscriptionloader.processing.producer.SubscriptionProducer;
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -26,9 +30,11 @@ import javax.inject.Inject;
 public class DefaultLoader implements Loader {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultLoader.class.getSimpleName());
+
     private static final int ONE_MONTH_AHEAD_NOTIFICATION_TIME_DAYS = 30;
     private static final int TWO_WEEKS_AHEAD_NOTIFICATION_TIME_DAYS = 14;
     private static final int ONE_DAY_AFTER_NOTIFICATION_TIME_DAYS = -1;
+    private static final int TWO_MONTHS_AHEAD_NOTIFICATION_TIME_DAYS = 60;
 
     /**
      * Time in milliseconds used define a threshold beyond which execution has timed out.
@@ -46,16 +52,17 @@ public class DefaultLoader implements Loader {
     }
 
     public LoadReport run(LocalDate referenceDate, Context context) throws Exception {
-
         LoadReport report = new LoadReport();
-        LocalDate oneMonthAhead = referenceDate.plusDays(ONE_MONTH_AHEAD_NOTIFICATION_TIME_DAYS);
-        LocalDate twoWeeksAhead = referenceDate.plusDays(TWO_WEEKS_AHEAD_NOTIFICATION_TIME_DAYS);
-        LocalDate oneDayBehind = referenceDate.plusDays(ONE_DAY_AFTER_NOTIFICATION_TIME_DAYS);
 
-        logger.info("Reference date: {}, +14 days is {}, +1 month (30 days) is {}, -1 day is {}", referenceDate, twoWeeksAhead,
-                oneMonthAhead, oneDayBehind);
+        // TODO flag to use/support indexes
+        boolean hgvPsvFeatureOn = false;
 
-        Iterator<Subscription> subscriptionIterator = producer.getIterator(oneMonthAhead, twoWeeksAhead, oneDayBehind);
+        Iterator<Subscription> subscriptionIterator;
+        if (!hgvPsvFeatureOn) {
+            subscriptionIterator = loadMotSubscriptions(referenceDate);
+        } else {
+            subscriptionIterator = loadSubscriptions(referenceDate);
+        }
         List<DispatchResult> inFlightOps = new ArrayList<>();
         try {
             report.startProcessing();
@@ -85,6 +92,39 @@ public class DefaultLoader implements Loader {
             throw e;
         }
         return report;
+    }
+
+    private Iterator<Subscription> loadMotSubscriptions(LocalDate referenceDate) {
+        LocalDate oneMonthAhead = referenceDate.plusDays(ONE_MONTH_AHEAD_NOTIFICATION_TIME_DAYS);
+        LocalDate twoWeeksAhead = referenceDate.plusDays(TWO_WEEKS_AHEAD_NOTIFICATION_TIME_DAYS);
+        LocalDate oneDayBehind = referenceDate.plusDays(ONE_DAY_AFTER_NOTIFICATION_TIME_DAYS);
+
+        logger.info("Reference date: {}, +14 days is {}, +1 month (30 days) is {}, -1 day is {}", referenceDate, twoWeeksAhead,
+                oneMonthAhead, oneDayBehind);
+
+        return producer.searchSubscriptions(oneMonthAhead, twoWeeksAhead, oneDayBehind);
+    }
+
+    private Iterator<Subscription> loadSubscriptions(LocalDate referenceDate) {
+        LocalDate inTwoMonths = referenceDate.plusDays(TWO_MONTHS_AHEAD_NOTIFICATION_TIME_DAYS);
+        LocalDate inOneMonth = referenceDate.plusDays(ONE_MONTH_AHEAD_NOTIFICATION_TIME_DAYS);
+        LocalDate inTwoWeeks = referenceDate.plusDays(TWO_WEEKS_AHEAD_NOTIFICATION_TIME_DAYS);
+        LocalDate yesterday = referenceDate.plusDays(ONE_DAY_AFTER_NOTIFICATION_TIME_DAYS);
+
+        logger.info("Reference date: {}, +14 days is {}, +1 month (30 days) is {}, +2 months (60 days) is {}, -1 day is {}",
+                referenceDate, inTwoWeeks, inOneMonth, inTwoMonths, yesterday);
+
+        List<SubscriptionCriteria> criteria = Arrays.asList(
+                new SubscriptionCriteria("MOT reminder one month in advance", inOneMonth, VehicleType.MOT),
+                new SubscriptionCriteria("MOT reminder two weeks in advance", inTwoMonths, VehicleType.MOT),
+                new SubscriptionCriteria("MOT reminder one day after", yesterday, VehicleType.MOT),
+                new SubscriptionCriteria("HGV reminder two months in advance", inTwoMonths, VehicleType.HGV),
+                new SubscriptionCriteria("HGV reminder one month in advance", inOneMonth, VehicleType.HGV),
+                new SubscriptionCriteria("HGV reminder two months in advance", inTwoMonths, VehicleType.PSV),
+                new SubscriptionCriteria("HGV reminder one month in advance", inOneMonth, VehicleType.PSV)
+        );
+
+        return producer.searchSubscriptions(criteria);
     }
 
     private void reportFinished(List<DispatchResult> result, LoadReport report, Context context) throws LoadingException {

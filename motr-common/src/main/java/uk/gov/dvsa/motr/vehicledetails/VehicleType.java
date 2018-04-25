@@ -2,7 +2,6 @@ package uk.gov.dvsa.motr.vehicledetails;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import javax.swing.text.html.Option;
 import java.util.Optional;
 
 public enum VehicleType {

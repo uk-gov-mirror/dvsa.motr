@@ -4,8 +4,11 @@ import uk.gov.dvsa.motr.subscriptionloader.processing.model.Subscription;
 
 import java.time.LocalDate;
 import java.util.Iterator;
+import java.util.List;
 
 public interface SubscriptionProducer {
 
-    Iterator<Subscription> getIterator(LocalDate oneMonthAhead, LocalDate twoWeeksAhead, LocalDate oneDayBehind);
+    Iterator<Subscription> searchSubscriptions(LocalDate oneMonthAhead, LocalDate twoWeeksAhead, LocalDate oneDayBehind);
+
+    Iterator<Subscription> searchSubscriptions(List<SubscriptionCriteria> criteria);
 }

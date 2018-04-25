@@ -40,7 +40,7 @@ public class DefaultLoaderTest {
 
         Iterator mockIterator = mock(Iterator.class);
         when(mockIterator.hasNext()).thenReturn(false);
-        when(this.producer.getIterator(any(), any(), any())).thenReturn(mockIterator);
+        when(this.producer.searchSubscriptions(any(), any(), any())).thenReturn(mockIterator);
 
         DefaultLoader loader = new DefaultLoader(this.producer, this.dispatcher);
         loader.run(getTestLocalDate(), context);
@@ -49,14 +49,14 @@ public class DefaultLoaderTest {
         LocalDate twoWeeks = getTestLocalDate().plusDays(14L);
         LocalDate oneDayBehind = getTestLocalDate().minusDays(1L);
 
-        verify(producer, times(1)).getIterator(eq(oneMonth), eq(twoWeeks), eq(oneDayBehind));
+        verify(producer, times(1)).searchSubscriptions(eq(oneMonth), eq(twoWeeks), eq(oneDayBehind));
     }
 
     @Test
     public void whenThereAreDispatchedItems_thenTheResultsAreProcessedForTheReport() throws Exception {
 
         Iterator mockIterator = createIteratorWithHasNextSequence(true, true, false);
-        when(this.producer.getIterator(any(), any(), any())).thenReturn(mockIterator);
+        when(this.producer.searchSubscriptions(any(), any(), any())).thenReturn(mockIterator);
 
         Subscription mockSubscription = new Subscription()
                 .setContactDetail(new ContactDetail("email@email.com", Subscription.ContactType.EMAIL))
@@ -81,7 +81,7 @@ public class DefaultLoaderTest {
     public void whenThereAreDispatchedItems_thenTheResultsAreProcessedForTheReportWithDvlaVehicles() throws Exception {
 
         Iterator mockIterator = createIteratorWithHasNextSequence(true, true, false);
-        when(this.producer.getIterator(any(), any(), any())).thenReturn(mockIterator);
+        when(this.producer.searchSubscriptions(any(), any(), any())).thenReturn(mockIterator);
 
         Subscription mockSubscription = new Subscription()
                 .setContactDetail(new ContactDetail("email@email.com", Subscription.ContactType.EMAIL))
@@ -108,7 +108,7 @@ public class DefaultLoaderTest {
     public void whenThereIsAFailedDispatchResult_thenProcessingStops() throws Exception {
 
         Iterator mockIterator = createIteratorWithHasNextSequence(true, true, false);
-        when(this.producer.getIterator(any(), any(), any())).thenReturn(mockIterator);
+        when(this.producer.searchSubscriptions(any(), any(), any())).thenReturn(mockIterator);
 
         Subscription mockSubscription = new Subscription();
         when(mockIterator.next()).thenReturn(mockSubscription);
