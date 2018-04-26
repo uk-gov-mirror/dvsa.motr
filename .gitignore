@@ -18,3 +18,7 @@ service/src/test/unit/resources/*.yml
 access.log*
 .java-version
 .sonar
+.classpath
+.project
+.settings/
+bin

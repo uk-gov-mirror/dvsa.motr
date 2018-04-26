@@ -2,15 +2,18 @@
 
     <div class="grid-row">
 
-        <div class="column-two-thirds">
+        <div class='column-full'>
 
-            <div class="govuk-box-highlight">
-                <h1 class="bold-large">You’ve unsubscribed</h1>
-
-                <p>You won’t get any more MOT reminders at {{viewModel.email}} for <span style="text-transform: uppercase;">{{viewModel.makeModel}} <span id="vrm">{{viewModel.registration}}</span>.</span></p>
+            <div class="dvsa-banner dvsa-banner--confirmation u-margin-top-20">
+                <h1 id="confirmation-heading" class="dvsa-banner__heading-large">You’ve unsubscribed</h1>
+                <p class="dvsa-banner__secondary-text">You won’t get any more MOT reminders at {{viewModel.email}} for <span style="text-transform: uppercase;">{{viewModel.makeModel}} <span id="vrm">{{viewModel.registration}}</span>.</span></p>
             </div>
 
-            <nav class="content-navigation u-space-t30">
+        </div>
+
+        <div class="column-two-thirds">
+
+            <nav class="content-navigation u-margin-top-20">
                 <ul class="content-navigation__secondary">
                     <li>
                         <a href="{{{url this "/"}}}">Sign up for another MOT reminder</a>
@@ -18,11 +21,9 @@
                 </ul>
             </nav>
 
-            <div class="text u-space-t45">
-                <ul>
-                    <li>Help us improve the service - <a href="http://www.smartsurvey.co.uk/s/CRUBR/" target="_blank" id="unsubscribe-survey">tell us why you unsubscribed today</a>.</li>
-                </ul>
-            </div>
+            <ul class="u-margin-top-45">
+                <li>Help us improve the service - <a href="http://www.smartsurvey.co.uk/s/CRUBR/" target="_blank" id="unsubscribe-survey">tell us why you unsubscribed today</a>.</li>
+            </ul>
 
         </div>
 

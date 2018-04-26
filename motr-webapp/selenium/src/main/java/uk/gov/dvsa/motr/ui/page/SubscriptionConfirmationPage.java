@@ -10,7 +10,7 @@ import uk.gov.dvsa.motr.ui.base.PageIdentityVerificationException;
 @GotoUrl("/confirm-subscription/{0}")
 public class SubscriptionConfirmationPage extends Page {
 
-    @FindBy(className = "bold-large")
+    @FindBy(id = "confirmation-heading")
     private WebElement headerTitle;
 
     @FindBy(id = "email")
