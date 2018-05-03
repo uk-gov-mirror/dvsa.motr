@@ -14,7 +14,7 @@
                 {{> partial/system-error }}
             {{/showSystemError}}
 
-            <h1 class="heading-large">What type of reminder do you want to get?</h1>
+            <h1 class="heading heading-large heading--large">What type of reminder do you want to get?</h1>
 
             <form method="POST" autocomplete="off" novalidate="" action="channel-selection">
 
@@ -25,9 +25,7 @@
                     <div class="form-group {{#message}} form-group-error{{/message}}">
 
                         {{#message}}
-                            <span class="u-space-b15">
-                                <span class="error-message">Chose one reminder you want</span>
-                            </span>
+                            <span class="error-message">Chose one reminder you want</span>
                         {{/message}}
 
                         <div class="multiple-choice">

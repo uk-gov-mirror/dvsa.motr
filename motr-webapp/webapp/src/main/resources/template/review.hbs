@@ -1,16 +1,16 @@
 {{#partial "content" }}
 
-    <div class="grid-row u-space-b30">
+    <div class="grid-row">
 
         <div class="column-two-thirds">
 
-            <h1 class="heading-large">Check your details</h1>
+            <h1 class="heading heading-large heading--large">Check your details</h1>
 
             <p>Make sure the vehicle and your {{#if viewModel.emailChannel}}email address{{else}}mobile number{{/if}} are correct.</p>
 
-            <h2 class="heading-medium">Vehicle details</h2>
+            <h2 class="heading heading-medium heading--medium">Vehicle details</h2>
 
-            <table class="key-value-list">
+            <table class="key-value-list u-margin-bottom-30">
 
                 <tbody>
 
@@ -53,12 +53,6 @@
 
             </table>
 
-        </div>
-    </div>
-
-    <div class="grid-row">
-        <div class="column-two-thirds">
-
             <details>
                 <summary role="button"><span class="summary">Incorrect vehicle details?</span></summary>
                 <div class="panel panel-border-narrow">
@@ -66,15 +60,9 @@
                 </div>
             </details>
 
-        </div>
-    </div>
+            <h2 class="heading heading-medium heading--medium">Your details</h2>
 
-    <div class="grid-row u-space-b30">
-        <div class="column-two-thirds">
-
-            <h2 class="heading-medium">Your details</h2>
-
-            <table class="key-value-list">
+            <table class="key-value-list u-margin-bottom-45">
 
                 <tbody>
 
@@ -93,20 +81,13 @@
                 </tbody>
 
             </table>
-            
-        </div>
-    </div>
-
-    <div class="grid-row">
-        <div class="column-two-thirds">
 
             <form id="reviewForm" method="POST">
-                <div class="form-group">
-                    <input id="continue-button" type="submit" value="Continue" class="button">
-                </div>
+                <input id="continue-button" type="submit" value="Continue" class="button">
             </form>
 
         </div>
+
     </div>
 {{/partial}}
 {{> master pageTitle="Check your details – MOT reminders"}}

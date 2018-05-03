@@ -10,7 +10,7 @@ import uk.gov.dvsa.motr.ui.base.PageIdentityVerificationException;
 @GotoUrl("/unsubscribe/confirmed")
 public class UnsubscribeConfirmationPage extends Page {
 
-    @FindBy(className = "bold-large")
+    @FindBy(id = "confirmation-heading")
     private WebElement bannerTitle;
 
     @FindBy(id = "unsubscribe-survey")

@@ -12,7 +12,7 @@
                 {{> partial/system-error }}
             {{/showSystemError}}
 
-            <h1 class="heading-large">One more step</h1>
+            <h1 class="heading heading-large heading--large">One more step</h1>
 
             <p>We sent you a text message with a 6-digit activation code, which expires in 24h. Enter the code on this page to activate your reminder.</p>
 
@@ -32,9 +32,9 @@
                 <div class="form-group">
                     <details role="group">
                         <summary role="button" aria-controls="details-content-0" aria-expanded="false"><span class="summary">Text didn’t arrive?</span></summary>
-                        <div id="details-content-0" aria-hidden="true">
+                        <p id="details-content-0" aria-hidden="true">
                             We sent you a text message to {{viewModel.phoneNumber}}. It can take a couple of minutes for the text to arrive. <a href="{{url this resendUrl}}">Resend the text</a>.
-                        </div>
+                        </p>
                     </details>
                 </div>
 
