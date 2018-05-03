@@ -7,6 +7,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+
 import org.apache.log4j.Logger;
 import org.glassfish.jersey.apache.connector.ApacheClientProperties;
 import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
@@ -19,6 +20,7 @@ import uk.gov.dvsa.motr.config.Config;
 import uk.gov.dvsa.motr.config.ConfigKey;
 import uk.gov.dvsa.motr.config.EncryptionAwareConfig;
 import uk.gov.dvsa.motr.config.EnvironmentVariableConfig;
+
 import uk.gov.dvsa.motr.encryption.AwsKmsDecryptor;
 import uk.gov.dvsa.motr.encryption.Decryptor;
 import uk.gov.dvsa.motr.executor.BlockingExecutor;
@@ -44,6 +46,7 @@ import static org.apache.log4j.Level.toLevel;
 
 import static uk.gov.dvsa.motr.notifier.SystemVariable.CHECKSUM_SALT;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.DB_TABLE_SUBSCRIPTION;
+import static uk.gov.dvsa.motr.notifier.SystemVariable.EU_GO_LIVE_DATE;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.GOV_NOTIFY_API_TOKEN;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.LOG_LEVEL;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MESSAGE_RECEIVE_TIMEOUT;
@@ -53,14 +56,20 @@ import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_API_DVLA_ID_URI;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_API_MOT_TEST_NUMBER_URI;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_TEST_REMINDER_INFO_TOKEN;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID;
+import static uk.gov.dvsa.motr.notifier.SystemVariable.ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID_POST_EU;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.ONE_MONTH_NOTIFICATION_TEMPLATE_ID;
+import static uk.gov.dvsa.motr.notifier.SystemVariable.ONE_MONTH_NOTIFICATION_TEMPLATE_ID_POST_EU;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.REGION;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.REMAINING_TIME_THRESHOLD;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.SMS_ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID;
+import static uk.gov.dvsa.motr.notifier.SystemVariable.SMS_ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID_POST_EU;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.SMS_ONE_MONTH_NOTIFICATION_TEMPLATE_ID;
+import static uk.gov.dvsa.motr.notifier.SystemVariable.SMS_ONE_MONTH_NOTIFICATION_TEMPLATE_ID_POST_EU;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.SMS_TWO_WEEK_NOTIFICATION_TEMPLATE_ID;
+import static uk.gov.dvsa.motr.notifier.SystemVariable.SMS_TWO_WEEK_NOTIFICATION_TEMPLATE_ID_POST_EU;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.SUBSCRIPTIONS_QUEUE_URL;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.TWO_WEEK_NOTIFICATION_TEMPLATE_ID;
+import static uk.gov.dvsa.motr.notifier.SystemVariable.TWO_WEEK_NOTIFICATION_TEMPLATE_ID_POST_EU;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.VEHICLE_API_CLIENT_TIMEOUT;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.WEB_BASE_URL;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.WORKER_COUNT;
@@ -176,7 +185,13 @@ public class ConfigModule extends AbstractModule {
         String oneMonthTemplateId = config.getValue(ONE_MONTH_NOTIFICATION_TEMPLATE_ID);
         String twoWeekTemplateId = config.getValue(TWO_WEEK_NOTIFICATION_TEMPLATE_ID);
         String oneDayAfterTemplateId = config.getValue(ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID);
-        return new NotifyEmailService(client, oneMonthTemplateId, twoWeekTemplateId, oneDayAfterTemplateId);
+        String oneMonthTemplateIdPostEu = config.getValue(ONE_MONTH_NOTIFICATION_TEMPLATE_ID_POST_EU);
+        String twoWeekTemplateIdPostEu = config.getValue(TWO_WEEK_NOTIFICATION_TEMPLATE_ID_POST_EU);
+        String oneDayAfterTemplateIdPostEu = config.getValue(ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID_POST_EU);
+        String euGoLiveDate = config.getValue(EU_GO_LIVE_DATE);
+
+        return new NotifyEmailService(client, oneMonthTemplateId, twoWeekTemplateId, oneDayAfterTemplateId,
+        oneMonthTemplateIdPostEu, twoWeekTemplateIdPostEu, oneDayAfterTemplateIdPostEu, euGoLiveDate);
     }
 
     @Provides
@@ -185,7 +200,13 @@ public class ConfigModule extends AbstractModule {
         String oneMonthTemplateId = config.getValue(SMS_ONE_MONTH_NOTIFICATION_TEMPLATE_ID);
         String twoWeekTemplateId = config.getValue(SMS_TWO_WEEK_NOTIFICATION_TEMPLATE_ID);
         String oneDayAfterTemplateId = config.getValue(SMS_ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID);
-        return new NotifySmsService(client, oneMonthTemplateId, twoWeekTemplateId, oneDayAfterTemplateId);
+        String oneMonthTemplateIdPostEu = config.getValue(SMS_ONE_MONTH_NOTIFICATION_TEMPLATE_ID_POST_EU);
+        String twoWeekTemplateIdPostEu = config.getValue(SMS_TWO_WEEK_NOTIFICATION_TEMPLATE_ID_POST_EU);
+        String oneDayAfterTemplatedIdPostEu = config.getValue(SMS_ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID_POST_EU);
+        String euGoLiveDate = config.getValue(EU_GO_LIVE_DATE);
+
+        return new NotifySmsService(client, oneMonthTemplateId, twoWeekTemplateId, oneDayAfterTemplateId, oneMonthTemplateIdPostEu,
+                twoWeekTemplateIdPostEu, oneDayAfterTemplatedIdPostEu, euGoLiveDate);
     }
 
     @Provides

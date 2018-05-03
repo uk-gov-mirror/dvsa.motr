@@ -25,14 +25,24 @@ public class NotifyEmailService {
     private String oneMonthNotificationTemplateId;
     private String twoWeekNotificationTemplateId;
     private String oneDayAfterNotificationTemplateId;
+    private String oneMonthNotificationTemplateIdPostEu;
+    private String twoWeekNotificationTemplateIdPostEu;
+    private String oneDayAfterNotificationTemplateIdPostEu;
+    private String euGoLiveDate;
 
     public NotifyEmailService(NotificationClient notificationClient, String oneMonthNotificationTemplateId, String
-            twoWeekNotificationTemplateId, String oneDayAfterNotificationTemplateId) {
+            twoWeekNotificationTemplateId, String oneDayAfterNotificationTemplateId, String oneMonthNotificationTemplateIdPostEu,
+                              String twoWeekNotificationTemplateIdPostEu, String oneDayAfterNotificationTemplateIdPostEu,
+                              String euGoLiveDate) {
 
         this.notificationClient = notificationClient;
         this.oneMonthNotificationTemplateId = oneMonthNotificationTemplateId;
         this.twoWeekNotificationTemplateId = twoWeekNotificationTemplateId;
         this.oneDayAfterNotificationTemplateId = oneDayAfterNotificationTemplateId;
+        this.oneMonthNotificationTemplateIdPostEu = oneMonthNotificationTemplateIdPostEu;
+        this.twoWeekNotificationTemplateIdPostEu = twoWeekNotificationTemplateIdPostEu;
+        this.oneDayAfterNotificationTemplateIdPostEu = oneDayAfterNotificationTemplateIdPostEu;
+        this.euGoLiveDate = euGoLiveDate;
     }
 
     public SendEmailResponse sendOneMonthNotificationEmail(String emailAddress, String vehicleDetails, LocalDate motExpiryDate,
@@ -57,6 +67,14 @@ public class NotifyEmailService {
 
         logger.debug("Personalisation for one month {}", personalisation);
 
+        if (this.isEuRoadworthinessLive(this.euGoLiveDate)) {
+            return sendEmail(
+                    emailAddress,
+                    this.oneMonthNotificationTemplateIdPostEu,
+                    personalisation
+            );
+        }
+
         return sendEmail(
                 emailAddress,
                 this.oneMonthNotificationTemplateId,
@@ -77,6 +95,14 @@ public class NotifyEmailService {
         }
 
         logger.debug("Personalisation for two week {}", personalisation);
+
+        if (this.isEuRoadworthinessLive(this.euGoLiveDate)) {
+            return sendEmail(
+                    emailAddress,
+                    this.twoWeekNotificationTemplateIdPostEu,
+                    personalisation
+            );
+        }
 
         return sendEmail(
                 emailAddress,
@@ -99,6 +125,14 @@ public class NotifyEmailService {
 
         logger.debug("Personalisation for one day after {}", personalisation);
 
+        if (this.isEuRoadworthinessLive(this.euGoLiveDate)) {
+            return sendEmail(
+                    emailAddress,
+                    this.oneDayAfterNotificationTemplateIdPostEu,
+                    personalisation
+            );
+        }
+
         return sendEmail(
                 emailAddress,
                 this.oneDayAfterNotificationTemplateId,
@@ -119,5 +153,13 @@ public class NotifyEmailService {
         personalisation.put("unsubscribe_link", unsubscribeLink);
 
         return personalisation;
+    }
+
+    public boolean isEuRoadworthinessLive(String euGoLiveDateFromConfig) {
+
+        LocalDate currentDate = LocalDate.now();
+        LocalDate euGoLiveDate = LocalDate.parse(euGoLiveDateFromConfig);
+
+        return currentDate.isAfter(euGoLiveDate) || currentDate.isEqual(euGoLiveDate);
     }
 }

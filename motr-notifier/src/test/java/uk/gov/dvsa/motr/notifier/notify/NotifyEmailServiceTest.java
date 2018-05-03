@@ -3,6 +3,9 @@ package uk.gov.dvsa.motr.notifier.notify;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
@@ -32,13 +35,18 @@ public class NotifyEmailServiceTest {
     private String oneMonthNotificationTemplateId = "TEMPLATE-ONE-MONTH";
     private String twoWeekNotificationTemplateId = "TEMPLATE-TWO-WEEK";
     private String oneDayAfterNotificationTemplateId = "TEMPLATE-ONE-DAY-AFTER";
+    private String oneMonthNotificationTemplateIdPostEu = "TEMPLATE-ONE-MONTH-POST-EU";
+    private String twoWeekNotificationTemplateIdPostEu = "TEMPLATE-TWO-WEEK-POST-EU";
+    private String oneDayAfterNotificationTemplateIdPostEu = "TEMPLATE-ONE-DAY-AFTER-POST-EU";
 
+    private String euGoLiveDate = "2018-06-20";
     private NotifyEmailService notifyEmailService;
 
     @Before
     public void setUp() {
         notifyEmailService = new NotifyEmailService(notificationClient, oneMonthNotificationTemplateId, twoWeekNotificationTemplateId,
-                oneDayAfterNotificationTemplateId);
+                oneDayAfterNotificationTemplateId, oneMonthNotificationTemplateIdPostEu, twoWeekNotificationTemplateIdPostEu,
+                oneDayAfterNotificationTemplateIdPostEu, euGoLiveDate);
     }
 
     @Test
@@ -170,5 +178,23 @@ public class NotifyEmailServiceTest {
         personalisation.put("unsubscribe_link", UNSUBSCRIBE_LINK);
 
         return personalisation;
+    }
+
+    @Test
+    public void testGetEuRoadworthinessReturnsTrue_WhenCurrentDateIsGreaterThanGoLiveDate() {
+
+        String euGoLiveDate = "2018-01-20";
+        boolean isEuRoadworthinessLive = this.notifyEmailService.isEuRoadworthinessLive(euGoLiveDate);
+
+        assertTrue(isEuRoadworthinessLive);
+    }
+
+    @Test
+    public void testGetEuRoadworthinessReturnsFalse_WhenCurrentDateIsLessThanGoLiveDate() {
+
+        String euGoLiveDate = "2019-05-20";
+        boolean isEuRoadworthinessLive = this.notifyEmailService.isEuRoadworthinessLive(euGoLiveDate);
+
+        assertFalse(isEuRoadworthinessLive);
     }
 }

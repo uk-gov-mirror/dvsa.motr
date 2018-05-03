@@ -8,6 +8,7 @@ import uk.gov.service.notify.NotificationClientException;
 import uk.gov.service.notify.SendSmsResponse;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,14 +20,24 @@ public class NotifySmsService {
     private String oneMonthNotificationTemplateId;
     private String twoWeekNotificationTemplateId;
     private String oneDayAfterNotificationTemplateId;
+    private String oneMonthNotificationTemplateIdPostEu;
+    private String twoWeekNotificationTemplateIdPostEu;
+    private String oneDayAfterNotificationTemplateIdPostEu;
+    private String euGoLiveDate;
 
     public NotifySmsService(NotificationClient notificationClient, String oneMonthNotificationTemplateId, String
-            twoWeekNotificationTemplateId, String oneDayAfterNotificationTemplateId) {
+            twoWeekNotificationTemplateId, String oneDayAfterNotificationTemplateId, String oneMonthNotificationTemplateIdPostEu,
+                            String twoWeekNotificationTemplateIdPostEu, String oneDayAfterNotificationTemplateIdPostEu,
+                            String euGoLiveDate) {
 
         this.notificationClient = notificationClient;
         this.oneMonthNotificationTemplateId = oneMonthNotificationTemplateId;
         this.twoWeekNotificationTemplateId = twoWeekNotificationTemplateId;
         this.oneDayAfterNotificationTemplateId = oneDayAfterNotificationTemplateId;
+        this.oneMonthNotificationTemplateIdPostEu = oneMonthNotificationTemplateIdPostEu;
+        this.twoWeekNotificationTemplateIdPostEu = twoWeekNotificationTemplateIdPostEu;
+        this.oneDayAfterNotificationTemplateIdPostEu = oneDayAfterNotificationTemplateIdPostEu;
+        this.euGoLiveDate = euGoLiveDate;
     }
 
     public SendSmsResponse sendOneMonthNotificationSms(String phoneNumber, String vrm, LocalDate motExpiryDate)
@@ -34,6 +45,10 @@ public class NotifySmsService {
 
         Map<String, String> personalisation = vrmAndExpiryDatePersonalisation(vrm, motExpiryDate);
         logger.debug("Sms Personalisation for one month {}", personalisation);
+
+        if (this.isEuRoadworthinessLive(this.euGoLiveDate)) {
+            return sendSms(phoneNumber, this.oneMonthNotificationTemplateIdPostEu, personalisation);
+        }
         return sendSms(phoneNumber, this.oneMonthNotificationTemplateId, personalisation);
     }
 
@@ -42,6 +57,10 @@ public class NotifySmsService {
 
         Map<String, String> personalisation = vrmAndExpiryDatePersonalisation(vrm, motExpiryDate);
         logger.debug("Sms Personalisation for two week {}", personalisation);
+
+        if (this.isEuRoadworthinessLive(this.euGoLiveDate)) {
+            return sendSms(phoneNumber, this.twoWeekNotificationTemplateIdPostEu, personalisation);
+        }
         return sendSms(phoneNumber, this.twoWeekNotificationTemplateId, personalisation);
     }
 
@@ -51,6 +70,10 @@ public class NotifySmsService {
         Map<String, String> personalisation = new HashMap<>();
         personalisation.put("vehicle_vrm", vrm);
         logger.debug("Sms Personalisation for one day after {}", personalisation);
+
+        if (this.isEuRoadworthinessLive(this.euGoLiveDate)) {
+            return sendSms(phoneNumber, this.oneDayAfterNotificationTemplateIdPostEu, personalisation);
+        }
         return sendSms(phoneNumber, this.oneDayAfterNotificationTemplateId, personalisation);
     }
 
@@ -66,5 +89,13 @@ public class NotifySmsService {
         personalisation.put("vehicle_vrm", vehicleDetails);
         personalisation.put("mot_expiry_date", DateFormatterForSmsDisplay.asFormattedForSmsDate(motExpiryDate));
         return personalisation;
+    }
+
+    public boolean isEuRoadworthinessLive(String euGoLiveDateFromConig) {
+
+        LocalDate currentDate = LocalDate.now();
+        LocalDate euGoLiveDate = LocalDate.parse(euGoLiveDateFromConig);
+
+        return currentDate.isAfter(euGoLiveDate) || currentDate.isEqual(euGoLiveDate);
     }
 }
