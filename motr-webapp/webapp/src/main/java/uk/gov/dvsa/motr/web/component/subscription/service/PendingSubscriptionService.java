@@ -22,8 +22,6 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
-import static uk.gov.dvsa.motr.web.component.subscription.service.RandomIdGenerator.generateId;
-
 public class PendingSubscriptionService {
 
     private final PendingSubscriptionRepository pendingSubscriptionRepository;
@@ -31,6 +29,7 @@ public class PendingSubscriptionService {
     private final NotifyService notifyService;
     private final UrlHelper urlHelper;
     private final VehicleDetailsClient client;
+    private RandomIdGenerator randomIdGenerator = new RandomIdGenerator();
 
     @Inject
     public PendingSubscriptionService(
@@ -85,18 +84,18 @@ public class PendingSubscriptionService {
             MotIdentification motIdentification, Subscription.ContactType contactType,
             PendingSubscriptionServiceResponse pendingSubscriptionResponse) {
 
-        String confimrationId;
+        String confirmationId;
         Optional<PendingSubscription> pendingSubscription = pendingSubscriptionRepository.findByVrmAndContactDetails(vrm, contact);
         if (pendingSubscription.isPresent()) {
-            confimrationId = pendingSubscription.get().getConfirmationId();
+            confirmationId = pendingSubscription.get().getConfirmationId();
         } else {
-            confimrationId = generateId();
+            confirmationId = randomIdGenerator.generateId();
         }
-        createPendingSubscription(vrm, contact, motDueDate, confimrationId, motIdentification, contactType);
+        createPendingSubscription(vrm, contact, motDueDate, confirmationId, motIdentification, contactType);
 
         return contactType == Subscription.ContactType.EMAIL
                 ? pendingSubscriptionResponse.setRedirectUri(urlHelper.emailConfirmationPendingLink())
-                : pendingSubscriptionResponse.setConfirmationId(confimrationId);
+                : pendingSubscriptionResponse.setConfirmationId(confirmationId);
     }
 
     /**
@@ -149,5 +148,10 @@ public class PendingSubscriptionService {
         subscriptionRepository.save(subscription);
 
         return subscription;
+    }
+
+    public PendingSubscriptionService setRandomIdGenerator(RandomIdGenerator randomIdGenerator) {
+        this.randomIdGenerator = randomIdGenerator;
+        return this;
     }
 }
