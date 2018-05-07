@@ -15,3 +15,5 @@ project(':motr-sms-receiver').name='motr-sms-receiver'
 project(':motr-subscription-loader').name='motr-subscription-loader'
 project(':motr-webapp:webapp').name='motr-web'
 project(':motr-webapp:selenium').name='motr-selenium'
+include 'motr-data-mock'
+

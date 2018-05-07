@@ -1,0 +1,7 @@
+group 'uk.gov.dvsa.motr.datamock'
+
+dependencies {
+
+    compile "org.glassfish.jersey.media:jersey-media-json-jackson:${jerseyMediaVersion}"
+    compile "com.amazonaws.serverless:aws-serverless-java-container-jersey:${awsServerlessContainerVersion}"
+}
