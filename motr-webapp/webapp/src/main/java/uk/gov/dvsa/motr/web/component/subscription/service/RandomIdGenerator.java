@@ -7,12 +7,12 @@ import static org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString;
 
 class RandomIdGenerator {
 
-    static String generateId() {
+    public String generateId() {
 
         return encodeBase64URLSafeString(cryptoStrongRandomBytes(16));
     }
 
-    private static byte[] cryptoStrongRandomBytes(int size) {
+    private byte[] cryptoStrongRandomBytes(int size) {
 
         try {
             byte[] randomKey = new byte[size];

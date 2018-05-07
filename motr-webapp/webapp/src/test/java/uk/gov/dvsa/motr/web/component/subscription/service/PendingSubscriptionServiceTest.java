@@ -18,6 +18,7 @@ import uk.gov.dvsa.motr.web.component.subscription.response.PendingSubscriptionS
 
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -69,6 +70,13 @@ public class PendingSubscriptionServiceTest {
                 urlHelper,
                 client
         );
+        this.subscriptionService.setRandomIdGenerator(new RandomIdGenerator() {
+
+            @Override
+            public String generateId() {
+                return String.valueOf(new Random().nextInt());
+            }
+        });
 
         when(urlHelper.confirmSubscriptionLink(CONFIRMATION_ID)).thenReturn(CONFIRMATION_LINK);
         when(urlHelper.emailConfirmedNthTimeLink()).thenReturn(EMAIL_ALREADY_CONFIRMED_LINK);

@@ -18,8 +18,6 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
-import static uk.gov.dvsa.motr.web.component.subscription.service.RandomIdGenerator.generateId;
-
 public class SubscriptionConfirmationService {
 
     private final NotifyService notifyService;
