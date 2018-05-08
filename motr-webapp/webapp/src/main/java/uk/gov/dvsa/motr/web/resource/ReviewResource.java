@@ -3,6 +3,7 @@ package uk.gov.dvsa.motr.web.resource;
 import com.amazonaws.util.StringUtils;
 
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
 import uk.gov.dvsa.motr.web.component.subscription.response.PendingSubscriptionServiceResponse;
 import uk.gov.dvsa.motr.web.component.subscription.service.PendingSubscriptionService;
@@ -112,7 +113,9 @@ public class ReviewResource {
                     vrm,
                     contactDetail,
                     vehicle.getMotExpiryDate(),
-                    vehicle.getMotIdentification());
+                    vehicle.getMotIdentification(),
+                    vehicle.getVehicleType()
+            );
 
             String redirectUri = pendingSubscriptionResponse.getRedirectUri();
 

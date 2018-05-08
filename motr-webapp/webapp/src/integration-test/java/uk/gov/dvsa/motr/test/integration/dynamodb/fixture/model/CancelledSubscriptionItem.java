@@ -1,6 +1,7 @@
 package uk.gov.dvsa.motr.test.integration.dynamodb.fixture.model;
 
 import uk.gov.dvsa.motr.test.data.RandomDataUtil;
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 
 import java.util.UUID;
 
@@ -16,6 +17,8 @@ public class CancelledSubscriptionItem {
 
     private String dvlaId = RandomDataUtil.motTestNumber();
 
+    private VehicleType vehicleType = VehicleType.MOT;
+
     public String getUnsubscribeId() {
         return unsubscribeId;
     }
@@ -30,6 +33,10 @@ public class CancelledSubscriptionItem {
 
     public String getMotTestNumber() {
         return motTestNumber;
+    }
+
+    public VehicleType getVehicleType() {
+        return vehicleType;
     }
 
     public void setMotTestNumber(String motTestNumber) {
@@ -52,6 +59,7 @@ public class CancelledSubscriptionItem {
                 ", email='" + email + '\'' +
                 ", motTestNumber='" + motTestNumber + '\'' +
                 ", dvlaId='" + dvlaId + '\'' +
+                ", vehicleType='" + vehicleType.toString() + '\'' +
                 '}';
     }
 }

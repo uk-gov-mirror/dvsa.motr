@@ -13,6 +13,7 @@ import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.core.DynamoDbFixture;
 import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.model.SubscriptionItem;
 import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.model.SubscriptionTable;
 import uk.gov.dvsa.motr.vehicledetails.MotIdentification;
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.persistence.DynamoDbSubscriptionRepository;
@@ -70,6 +71,7 @@ public class DynamoDbSubscriptionRepositoryTest {
                 .setUnsubscribeId(subscriptionItem.getUnsubscribeId())
                 .setContactDetail(new ContactDetail(subscriptionItem.getEmail(), subscriptionItem.getContactType()))
                 .setVrm(subscriptionItem.getVrm())
+                .setVehicleType(VehicleType.MOT)
                 .setMotDueDate(subscriptionItem.getMotDueDate())
                 .setMotIdentification(motIdentification);
 
@@ -83,6 +85,7 @@ public class DynamoDbSubscriptionRepositoryTest {
 
         assertEquals(subscriptionItem.getEmail(), actualSubscription.getContactDetail().getValue());
         assertEquals(subscriptionItem.getVrm(), actualSubscription.getVrm());
+        assertEquals(subscriptionItem.getVehicleType(), actualSubscription.getVehicleType());
         assertEquals(subscriptionItem.getMotDueDate(), actualSubscription.getMotDueDate());
         assertEquals(subscriptionItem.getMotTestNumber(), actualSubscription.getMotIdentification().getMotTestNumber().get());
     }
@@ -99,6 +102,7 @@ public class DynamoDbSubscriptionRepositoryTest {
                 .setUnsubscribeId(subscriptionItem.getUnsubscribeId())
                 .setContactDetail(new ContactDetail(subscriptionItem.getEmail(), subscriptionItem.getContactType()))
                 .setVrm(subscriptionItem.getVrm())
+                .setVehicleType(subscriptionItem.getVehicleType())
                 .setMotDueDate(subscriptionItem.getMotDueDate())
                 .setMotIdentification(motIdentification);
 

@@ -13,6 +13,7 @@ import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
 import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 
 import uk.gov.dvsa.motr.vehicledetails.MotIdentification;
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.helper.SystemVariableParam;
@@ -116,7 +117,8 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
                 .withString("mot_due_date", subscription.getMotDueDate().format(DateTimeFormatter.ISO_LOCAL_DATE))
                 .withString("mot_due_date_md", subscription.getMotDueDate().format(DateTimeFormatter.ofPattern("MM-dd")))
                 .withString("created_at", ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT))
-                .withString("contact_type", subscription.getContactDetail().getContactType().getValue());
+                .withString("contact_type", subscription.getContactDetail().getContactType().getValue())
+                .withString("vehicle_type", subscription.getVehicleType().name());
 
         if (subscription.getMotIdentification().getMotTestNumber().isPresent()) {
             item.withString("mot_test_number", subscription.getMotIdentification().getMotTestNumber().get());
@@ -154,6 +156,7 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
         subscription.setMotDueDate(LocalDate.parse(item.getString("mot_due_date")));
         subscription.setMotIdentification(new MotIdentification(item.getString("mot_test_number"), item.getString("dvla_id")));
         subscription.setContactDetail(contactDetail);
+        subscription.setVehicleType(VehicleType.getFromString(item.getString("vehicle_type")));
         return subscription;
     }
 

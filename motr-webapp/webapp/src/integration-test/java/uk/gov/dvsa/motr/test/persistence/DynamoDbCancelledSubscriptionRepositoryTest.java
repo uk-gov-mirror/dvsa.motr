@@ -11,6 +11,7 @@ import org.junit.Test;
 import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.core.DynamoDbFixture;
 import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.model.CancelledSubscriptionItem;
 import uk.gov.dvsa.motr.vehicledetails.MotIdentification;
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 import uk.gov.dvsa.motr.web.component.subscription.model.CancelledSubscription;
 import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
@@ -51,6 +52,7 @@ public class DynamoDbCancelledSubscriptionRepositoryTest {
                 .setContactDetail(new ContactDetail(cancelledSubscriptionItemForMotVehicle.getEmail(), Subscription.ContactType.EMAIL))
                 .setVrm(cancelledSubscriptionItemForMotVehicle.getVrm())
                 .setMotIdentification(motIdentification)
+                .setVehicleType(cancelledSubscriptionItemForMotVehicle.getVehicleType())
                 .setReasonForCancellation(REASON_FOR_CANCELLATION_USER_CANCELLED);
 
         repository.save(cancelledSubscriptionForMotVehicle);
@@ -83,6 +85,7 @@ public class DynamoDbCancelledSubscriptionRepositoryTest {
                 .setUnsubscribeId(cancelledSubscriptionItemForDvlaVehicle.getUnsubscribeId())
                 .setContactDetail(new ContactDetail(cancelledSubscriptionItemForDvlaVehicle.getEmail(), Subscription.ContactType.EMAIL))
                 .setVrm(cancelledSubscriptionItemForDvlaVehicle.getVrm())
+                .setVehicleType(cancelledSubscriptionItemForDvlaVehicle.getVehicleType())
                 .setMotIdentification(motIdentification)
                 .setReasonForCancellation(REASON_FOR_CANCELLATION_USER_CANCELLED);
 

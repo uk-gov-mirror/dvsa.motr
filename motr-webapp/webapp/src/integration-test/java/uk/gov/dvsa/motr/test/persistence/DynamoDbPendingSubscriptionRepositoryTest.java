@@ -12,6 +12,7 @@ import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.core.DynamoDbFixture;
 import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.model.PendingSubscriptionItem;
 import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.model.PendingSubscriptionTable;
 import uk.gov.dvsa.motr.vehicledetails.MotIdentification;
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
 import uk.gov.dvsa.motr.web.component.subscription.model.PendingSubscription;
 import uk.gov.dvsa.motr.web.component.subscription.persistence.DynamoDbPendingSubscriptionRepository;
@@ -94,6 +95,7 @@ public class DynamoDbPendingSubscriptionRepositoryTest {
         subscription
                 .setConfirmationId(subscriptionItemForMotVehicle.getConfirmationId())
                 .setContactDetail(contactDetail)
+                .setVehicleType(VehicleType.MOT)
                 .setVrm(subscriptionItemForMotVehicle.getVrm())
                 .setMotDueDate(subscriptionItemForMotVehicle.getMotDueDate())
                 .setMotIdentification(motIdentification);
@@ -108,6 +110,7 @@ public class DynamoDbPendingSubscriptionRepositoryTest {
 
         assertEquals(subscriptionItemForMotVehicle.getEmail(), actualSubscription.getContactDetail().getValue());
         assertEquals(subscriptionItemForMotVehicle.getVrm(), actualSubscription.getVrm());
+        assertEquals(subscriptionItemForMotVehicle.getVehicleType(), actualSubscription.getVehicleType());
         assertEquals(subscriptionItemForMotVehicle.getMotDueDate(), actualSubscription.getMotDueDate());
         assertEquals(subscriptionItemForMotVehicle.getMotTestNumber(), actualSubscription.getMotIdentification().getMotTestNumber().get());
     }
@@ -126,6 +129,7 @@ public class DynamoDbPendingSubscriptionRepositoryTest {
         subscription
                 .setConfirmationId(subscriptionItemForDvlaVehicle.getConfirmationId())
                 .setContactDetail(contactDetail)
+                .setVehicleType(VehicleType.MOT)
                 .setVrm(subscriptionItemForDvlaVehicle.getVrm())
                 .setMotDueDate(subscriptionItemForDvlaVehicle.getMotDueDate())
                 .setMotIdentification(motIdentification);
@@ -140,6 +144,7 @@ public class DynamoDbPendingSubscriptionRepositoryTest {
 
         assertEquals(subscriptionItemForDvlaVehicle.getEmail(), actualSubscription.getContactDetail().getValue());
         assertEquals(subscriptionItemForDvlaVehicle.getVrm(), actualSubscription.getVrm());
+        assertEquals(subscriptionItemForDvlaVehicle.getVehicleType(), actualSubscription.getVehicleType());
         assertEquals(subscriptionItemForDvlaVehicle.getMotDueDate(), actualSubscription.getMotDueDate());
         assertEquals(subscriptionItemForDvlaVehicle.getDvlaId(), actualSubscription.getMotIdentification().getDvlaId().get());
     }
@@ -157,6 +162,7 @@ public class DynamoDbPendingSubscriptionRepositoryTest {
                 .setConfirmationId(subscriptionItem.getConfirmationId())
                 .setContactDetail(new ContactDetail(subscriptionItem.getEmail(), subscriptionItem.getContactType()))
                 .setVrm(subscriptionItem.getVrm())
+                .setVehicleType(VehicleType.MOT)
                 .setMotDueDate(subscriptionItem.getMotDueDate())
                 .setMotIdentification(motIdentification);
 
@@ -196,6 +202,7 @@ public class DynamoDbPendingSubscriptionRepositoryTest {
                 .setConfirmationId(sub.getConfirmationId())
                 .setContactDetail(new ContactDetail(sub.getEmail(), sub.getContactType()))
                 .setVrm(sub.getVrm())
+                .setVehicleType(VehicleType.MOT)
                 .setMotIdentification(motIdentification);
 
         repo.delete(subscription);

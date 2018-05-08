@@ -1,6 +1,7 @@
 package uk.gov.dvsa.motr.web.eventlog.subscription;
 
 import uk.gov.dvsa.motr.eventlog.Event;
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -16,6 +17,12 @@ public abstract class SubscriptionEvent extends Event {
     public SubscriptionEvent setVrm(String vrm) {
 
         params.put("vrm", vrm);
+        return this;
+    }
+
+    public SubscriptionEvent setVehicleType(VehicleType vehicleType) {
+
+        params.put("vehicle-type", vehicleType.name());
         return this;
     }
 

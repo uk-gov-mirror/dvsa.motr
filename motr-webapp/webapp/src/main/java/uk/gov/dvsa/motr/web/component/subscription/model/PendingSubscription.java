@@ -1,6 +1,7 @@
 package uk.gov.dvsa.motr.web.component.subscription.model;
 
 import uk.gov.dvsa.motr.vehicledetails.MotIdentification;
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 
 import java.time.LocalDate;
 
@@ -15,6 +16,8 @@ public class PendingSubscription {
     private LocalDate motDueDate;
 
     private MotIdentification motIdentification;
+
+    private VehicleType vehicleType;
 
     private String dvlaId;
 
@@ -72,6 +75,15 @@ public class PendingSubscription {
 
     public PendingSubscription setContactDetail(ContactDetail contactDetail) {
         this.contactDetail = contactDetail;
+        return this;
+    }
+
+    public VehicleType getVehicleType() {
+        return vehicleType;
+    }
+
+    public PendingSubscription setVehicleType(VehicleType vehicleType) {
+        this.vehicleType = vehicleType;
         return this;
     }
 }

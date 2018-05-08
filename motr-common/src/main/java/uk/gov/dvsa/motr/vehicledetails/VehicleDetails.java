@@ -9,6 +9,7 @@ import uk.gov.dvsa.motr.serialisation.LocalDateDeserialiser;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Optional;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class VehicleDetails implements Serializable {
@@ -31,6 +32,10 @@ public class VehicleDetails implements Serializable {
 
     @JsonProperty("registration")
     private String regNumber;
+
+    @JsonProperty("vehicleType")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private VehicleType vehicleType;
 
     @JsonProperty("manufactureYear")
     private Integer yearOfManufacture;
@@ -160,6 +165,16 @@ public class VehicleDetails implements Serializable {
         return new MotIdentification(this.motTestNumber, this.dvlaId);
     }
 
+    public VehicleType getVehicleType() {
+        return Optional.ofNullable(vehicleType)
+            .orElse(VehicleType.MOT);
+    }
+
+    public VehicleDetails setVehicleType(VehicleType vehicleType) {
+        this.vehicleType = vehicleType;
+        return this;
+    }
+
     @Override
     public String toString() {
         return "VehicleDetails{" +
@@ -173,6 +188,7 @@ public class VehicleDetails implements Serializable {
                 ", motTestNumber='" + motTestNumber + '\'' +
                 ", dvlaId='" + dvlaId + '\'' +
                 ", makeInFull='" + makeInFull + '\'' +
+                ", vehicleType='" + vehicleType + '\'' +
                 '}';
     }
 }

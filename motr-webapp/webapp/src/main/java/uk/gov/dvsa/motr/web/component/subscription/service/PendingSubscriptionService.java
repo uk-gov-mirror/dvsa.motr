@@ -6,6 +6,7 @@ import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsService;
 import uk.gov.dvsa.motr.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
 import uk.gov.dvsa.motr.web.component.subscription.model.PendingSubscription;
@@ -51,7 +52,8 @@ public class PendingSubscriptionService {
             String vrm,
             ContactDetail contactDetail,
             LocalDate motDueDate,
-            MotIdentification motIdentification) {
+            MotIdentification motIdentification,
+            VehicleType vehicleType) {
 
         String contact = contactDetail.getValue();
         Subscription.ContactType contactType = contactDetail.getContactType();
@@ -63,7 +65,7 @@ public class PendingSubscriptionService {
             return getRedirectUrlWhenSubscriptionAlreadyExisis(subscription.get(), motDueDate, contactType, pendingSubscriptionResponse);
         } else {
             return getRedirectUrlWhenNewSubscription(vrm, contact, motDueDate, motIdentification,
-                    contactType, pendingSubscriptionResponse);
+                    contactType, pendingSubscriptionResponse, vehicleType);
         }
     }
 
@@ -80,9 +82,13 @@ public class PendingSubscriptionService {
         return pendingSubscriptionResponse.setRedirectUri(redirectUri);
     }
 
-    private PendingSubscriptionServiceResponse getRedirectUrlWhenNewSubscription(String vrm, String contact, LocalDate motDueDate,
-            MotIdentification motIdentification, Subscription.ContactType contactType,
-            PendingSubscriptionServiceResponse pendingSubscriptionResponse) {
+    private PendingSubscriptionServiceResponse getRedirectUrlWhenNewSubscription(
+            String vrm, String contact, LocalDate motDueDate,
+            MotIdentification motIdentification,
+            Subscription.ContactType contactType,
+            PendingSubscriptionServiceResponse pendingSubscriptionResponse,
+            VehicleType vehicleType
+    ) {
 
         String confirmationId;
         Optional<PendingSubscription> pendingSubscription = pendingSubscriptionRepository.findByVrmAndContactDetails(vrm, contact);
@@ -91,7 +97,7 @@ public class PendingSubscriptionService {
         } else {
             confirmationId = randomIdGenerator.generateId();
         }
-        createPendingSubscription(vrm, contact, motDueDate, confirmationId, motIdentification, contactType);
+        createPendingSubscription(vrm, contact, motDueDate, confirmationId, motIdentification, contactType, vehicleType);
 
         return contactType == Subscription.ContactType.EMAIL
                 ? pendingSubscriptionResponse.setRedirectUri(urlHelper.emailConfirmationPendingLink())
@@ -105,18 +111,21 @@ public class PendingSubscriptionService {
      * @param motDueDate most recent mot due date
      * @param confirmationId confirmation id
      * @param motIdentification the identifier for this vehicle (may be dvla id or mot test number)
+     * @param vehicleType tyoe of vehicle
      */
     public void createPendingSubscription(
             String vrm, String contact, LocalDate motDueDate,
             String confirmationId, MotIdentification motIdentification,
-            Subscription.ContactType contactType) {
+            Subscription.ContactType contactType, VehicleType vehicleType
+    ) {
 
         PendingSubscription pendingSubscription = new PendingSubscription()
                 .setConfirmationId(confirmationId)
                 .setContactDetail(new ContactDetail(contact, contactType))
                 .setVrm(vrm)
                 .setMotDueDate(motDueDate)
-                .setMotIdentification(motIdentification);
+                .setMotIdentification(motIdentification)
+                .setVehicleType(vehicleType);
 
         try {
             pendingSubscriptionRepository.save(pendingSubscription);

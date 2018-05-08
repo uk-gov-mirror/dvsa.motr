@@ -16,6 +16,7 @@ import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException;
 
 import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.vehicledetails.MotIdentification;
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
 import uk.gov.dvsa.motr.web.component.subscription.model.PendingSubscription;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
@@ -106,6 +107,7 @@ public class DynamoDbPendingSubscriptionRepository implements PendingSubscriptio
                 .withString("vrm", subscription.getVrm())
                 .withString("email", subscription.getContactDetail().getValue())
                 .withString("mot_due_date", subscription.getMotDueDate().format(DateTimeFormatter.ISO_LOCAL_DATE))
+                .withString("vehicle_type", subscription.getVehicleType().name())
                 .withString("mot_due_date_md", subscription.getMotDueDate().format(DateTimeFormatter.ofPattern("MM-dd")))
                 .withString("created_at", ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT))
                 .withNumber("deletion_date", ZonedDateTime.now().plusHours(HOURS_TO_DELETION).toEpochSecond())
@@ -147,6 +149,7 @@ public class DynamoDbPendingSubscriptionRepository implements PendingSubscriptio
         EventLogger.logEvent(new PendingSubscriptionAlreadyDeletedEvent()
                 .setConfirmationId(subscription.getConfirmationId())
                 .setVrm(subscription.getVrm())
+                .setVehicleType(subscription.getVehicleType())
                 .setContact(subscription.getContactDetail().getValue())
                 .setMessage(exception.getMessage())
                 .setErrorMessage(exception.getErrorMessage())
@@ -160,6 +163,7 @@ public class DynamoDbPendingSubscriptionRepository implements PendingSubscriptio
         EventLogger.logEvent(new PendingSubscriptionDeletionFailedEvent()
                 .setConfirmationId(subscription.getConfirmationId())
                 .setVrm(subscription.getVrm())
+                .setVehicleType(subscription.getVehicleType())
                 .setContact(subscription.getContactDetail().getValue())
                 .setMessage(exception.getMessage())
                 .setErrorMessage(exception.getErrorMessage())
@@ -174,6 +178,7 @@ public class DynamoDbPendingSubscriptionRepository implements PendingSubscriptio
         PendingSubscription subscription = new PendingSubscription();
         subscription.setConfirmationId(item.getString("id"));
         subscription.setVrm(item.getString("vrm"));
+        subscription.setVehicleType(VehicleType.getFromString(item.getString("vehicle_type")));
         subscription.setContactDetail(contactDetail);
         subscription.setMotDueDate(LocalDate.parse(item.getString("mot_due_date")));
         subscription.setMotIdentification(new MotIdentification(item.getString("mot_test_number"), item.getString("dvla_id")));

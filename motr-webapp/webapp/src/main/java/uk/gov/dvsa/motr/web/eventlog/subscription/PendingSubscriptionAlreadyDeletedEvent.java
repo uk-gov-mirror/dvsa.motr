@@ -2,6 +2,7 @@ package uk.gov.dvsa.motr.web.eventlog.subscription;
 
 
 import uk.gov.dvsa.motr.eventlog.Event;
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 
 public class PendingSubscriptionAlreadyDeletedEvent extends Event {
 
@@ -20,6 +21,12 @@ public class PendingSubscriptionAlreadyDeletedEvent extends Event {
     public PendingSubscriptionAlreadyDeletedEvent setVrm(String vrm) {
 
         params.put("vrm", vrm);
+        return this;
+    }
+
+    public PendingSubscriptionAlreadyDeletedEvent setVehicleType(VehicleType vehicleType) {
+
+        params.put("vehicle-type", vehicleType.name());
         return this;
     }
 

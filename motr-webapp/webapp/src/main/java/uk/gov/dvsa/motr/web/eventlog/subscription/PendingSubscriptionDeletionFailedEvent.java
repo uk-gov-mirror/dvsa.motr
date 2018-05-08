@@ -2,6 +2,7 @@ package uk.gov.dvsa.motr.web.eventlog.subscription;
 
 
 import uk.gov.dvsa.motr.eventlog.Event;
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 
 public class PendingSubscriptionDeletionFailedEvent extends Event {
 
@@ -26,6 +27,12 @@ public class PendingSubscriptionDeletionFailedEvent extends Event {
     public PendingSubscriptionDeletionFailedEvent setContact(String contact) {
 
         params.put("contact", contact);
+        return this;
+    }
+
+    public PendingSubscriptionDeletionFailedEvent setVehicleType(VehicleType vehicleType) {
+
+        params.put("vehicle-type", vehicleType.name());
         return this;
     }
 

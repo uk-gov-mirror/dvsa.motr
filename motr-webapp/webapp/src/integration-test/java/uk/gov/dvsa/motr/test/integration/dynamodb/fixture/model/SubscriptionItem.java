@@ -4,6 +4,7 @@ import com.amazonaws.services.dynamodbv2.document.Item;
 
 import uk.gov.dvsa.motr.test.data.RandomDataUtil;
 import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.core.DynamoDbFixtureTableItem;
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 
 import java.time.LocalDate;
@@ -24,6 +25,8 @@ public class SubscriptionItem implements DynamoDbFixtureTableItem {
     private String motTestNumber = RandomDataUtil.motTestNumber();
 
     private String dvlaId = RandomDataUtil.motTestNumber();
+
+    private VehicleType vehicleType = VehicleType.MOT;
 
     private Subscription.ContactType contactType = RandomDataUtil.emailOrMobileContactType();
 
@@ -85,6 +88,15 @@ public class SubscriptionItem implements DynamoDbFixtureTableItem {
         return this;
     }
 
+    public VehicleType getVehicleType() {
+        return vehicleType;
+    }
+
+    public SubscriptionItem setVehicleType(VehicleType vehicleType) {
+        this.vehicleType = vehicleType;
+        return this;
+    }
+
     @Override
     public Item toItem() {
 
@@ -93,6 +105,7 @@ public class SubscriptionItem implements DynamoDbFixtureTableItem {
                 .with("mot_due_date", motDueDate.format(DateTimeFormatter.ISO_DATE))
                 .with("vrm", vrm)
                 .with("email", email)
+                .with("vehicle_type", vehicleType.toString())
                 .with("contact_type", contactType.getValue());
 
         if (motTestNumber != null) {

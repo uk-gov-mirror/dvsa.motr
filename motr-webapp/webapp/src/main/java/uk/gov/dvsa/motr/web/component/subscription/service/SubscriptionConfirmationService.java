@@ -90,7 +90,8 @@ public class SubscriptionConfirmationService {
                 .setVrm(pendingSubscription.getVrm())
                 .setContactDetail(pendingSubscription.getContactDetail())
                 .setMotDueDate(pendingSubscription.getMotDueDate())
-                .setMotIdentification(pendingSubscription.getMotIdentification());
+                .setMotIdentification(pendingSubscription.getMotIdentification())
+                .setVehicleType(pendingSubscription.getVehicleType());
 
         subscriptionRepository.save(subscription);
         pendingSubscriptionRepository.delete(pendingSubscription);

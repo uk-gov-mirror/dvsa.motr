@@ -1,8 +1,10 @@
 package uk.gov.dvsa.motr.web.component.subscription.model;
 
 import uk.gov.dvsa.motr.vehicledetails.MotIdentification;
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 public class Subscription {
 
@@ -30,6 +32,8 @@ public class Subscription {
     private LocalDate motDueDate;
 
     private MotIdentification motIdentification;
+
+    private VehicleType vehicleType;
 
     public String getUnsubscribeId() {
         return unsubscribeId;
@@ -73,6 +77,16 @@ public class Subscription {
 
     public Subscription setContactDetail(ContactDetail contactDetail) {
         this.contactDetail = contactDetail;
+        return this;
+    }
+
+    public VehicleType getVehicleType() {
+        return Optional.ofNullable(vehicleType)
+            .orElse(VehicleType.getDefault());
+    }
+
+    public Subscription setVehicleType(VehicleType vehicleType) {
+        this.vehicleType = vehicleType;
         return this;
     }
 }

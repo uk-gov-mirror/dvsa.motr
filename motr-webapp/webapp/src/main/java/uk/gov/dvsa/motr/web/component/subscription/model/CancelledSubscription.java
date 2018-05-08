@@ -1,6 +1,7 @@
 package uk.gov.dvsa.motr.web.component.subscription.model;
 
 import uk.gov.dvsa.motr.vehicledetails.MotIdentification;
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 
 public class CancelledSubscription {
     private String unsubscribeId;
@@ -10,6 +11,8 @@ public class CancelledSubscription {
     private ContactDetail contactDetail;
 
     private MotIdentification motIdentification;
+
+    private VehicleType vehicleType;
 
     private String reasonForCancellation;
 
@@ -55,6 +58,15 @@ public class CancelledSubscription {
 
     public CancelledSubscription setMotIdentification(MotIdentification motIdentification) {
         this.motIdentification = motIdentification;
+        return this;
+    }
+
+    public VehicleType getVehicleType() {
+        return vehicleType;
+    }
+
+    public CancelledSubscription setVehicleType(VehicleType vehicleType) {
+        this.vehicleType = vehicleType;
         return this;
     }
 }

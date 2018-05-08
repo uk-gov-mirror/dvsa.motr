@@ -8,6 +8,7 @@ import uk.gov.dvsa.motr.notifications.service.NotifyService;
 import uk.gov.dvsa.motr.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
 import uk.gov.dvsa.motr.web.component.subscription.model.PendingSubscription;
@@ -96,7 +97,7 @@ public class PendingSubscriptionServiceTest {
         LocalDate date = LocalDate.now();
 
         this.subscriptionService.createPendingSubscription(TEST_VRM, EMAIL, date, CONFIRMATION_ID,
-                new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID), CONTACT_TYPE_EMAIL);
+                new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID), CONTACT_TYPE_EMAIL, VehicleType.MOT);
 
         verify(pendingSubscriptionRepository, times(1)).save(any(PendingSubscription.class));
         verify(notifyService, times(1)).sendEmailAddressConfirmationEmail(
@@ -117,7 +118,7 @@ public class PendingSubscriptionServiceTest {
         LocalDate date = LocalDate.now();
 
         this.subscriptionService.createPendingSubscription(TEST_VRM, MOBILE, date, CONFIRMATION_ID,
-                new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID), CONTACT_TYPE_MOBILE);
+                new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID), CONTACT_TYPE_MOBILE, VehicleType.MOT);
 
         verify(pendingSubscriptionRepository, times(1)).save(any(PendingSubscription.class));
         verifyZeroInteractions(notifyService);;
@@ -131,7 +132,7 @@ public class PendingSubscriptionServiceTest {
         LocalDate date = LocalDate.now();
 
         this.subscriptionService.createPendingSubscription(TEST_VRM, EMAIL, date, CONFIRMATION_ID,
-                new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID), CONTACT_TYPE_EMAIL);
+                new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID), CONTACT_TYPE_EMAIL, VehicleType.MOT);
         verify(pendingSubscriptionRepository, times(1)).save(any(PendingSubscription.class));
         verifyZeroInteractions(notifyService);
     }
@@ -148,7 +149,7 @@ public class PendingSubscriptionServiceTest {
 
         ContactDetail contactDetail = new ContactDetail(newEmailWithDifferentCase, CONTACT_TYPE_EMAIL);
         PendingSubscriptionServiceResponse pendingSubscriptionResponse = this.subscriptionService.handlePendingSubscriptionCreation(
-                TEST_VRM, contactDetail, date, new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID));
+                TEST_VRM, contactDetail, date, new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID), VehicleType.MOT);
 
         verify(subscriptionRepository, times(1)).save(subscriptionArgumentCaptor.capture());
         assertEquals(subscriptionArgumentCaptor.getValue().getMotDueDate(), date);
@@ -165,7 +166,7 @@ public class PendingSubscriptionServiceTest {
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
 
         PendingSubscriptionServiceResponse pendingSubscriptionResponse = this.subscriptionService.handlePendingSubscriptionCreation(
-                TEST_VRM, CONTACT_MOBILE, date, new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID));
+                TEST_VRM, CONTACT_MOBILE, date, new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID), VehicleType.MOT);
 
         verify(subscriptionRepository, times(1)).save(subscriptionArgumentCaptor.capture());
         assertEquals(subscriptionArgumentCaptor.getValue().getMotDueDate(), date);
@@ -184,7 +185,7 @@ public class PendingSubscriptionServiceTest {
         ArgumentCaptor<PendingSubscription> pendingSubscriptionArgumentCaptor = ArgumentCaptor.forClass(PendingSubscription.class);
 
         PendingSubscriptionServiceResponse pendingSubscriptionResponse = this.subscriptionService.handlePendingSubscriptionCreation(
-                TEST_VRM, CONTACT_EMAIL, date, new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID));
+                TEST_VRM, CONTACT_EMAIL, date, new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID), VehicleType.MOT);
 
         verify(pendingSubscriptionRepository, times(1)).save(pendingSubscriptionArgumentCaptor.capture());
         verify(notifyService, times(1)).sendEmailAddressConfirmationEmail(any(), any(), any());
@@ -205,7 +206,7 @@ public class PendingSubscriptionServiceTest {
         ArgumentCaptor<PendingSubscription> pendingSubscriptionArgumentCaptor = ArgumentCaptor.forClass(PendingSubscription.class);
 
         PendingSubscriptionServiceResponse pendingSubscriptionResponse = this.subscriptionService.handlePendingSubscriptionCreation(
-                TEST_VRM, CONTACT_MOBILE, date, new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID));
+                TEST_VRM, CONTACT_MOBILE, date, new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID), VehicleType.MOT);
 
         verifyZeroInteractions(notifyService);
         verify(pendingSubscriptionRepository, times(1)).save(pendingSubscriptionArgumentCaptor.capture());
