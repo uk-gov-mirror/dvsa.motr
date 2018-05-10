@@ -10,6 +10,8 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -26,13 +28,18 @@ public class NotifySmsServiceTest {
     private String oneMonthNotificationTemplateId = "TEMPLATE-ONE-MONTH";
     private String twoWeekNotificationTemplateId = "TEMPLATE-TWO-WEEK";
     private String oneDayAfterNotificationTemplateId = "TEMPLATE-ONE-DAY-AFTER";
+    private String oneMonthNotificationTemplateIdPostEu = "TEMPLATE-ONE-MONTH-POST-EU";
+    private String twoWeekNotificationTemplateIdPostEu = "TEMPLATE-TWO-WEEK-POST-EU";
+    private String oneDayAfterNotificationTemplateIdPostEu = "TEMPLATE-ONE-DAY-AFTER-POST-EU";
 
     private NotifySmsService notifySmsService;
+    private String euGoLiveDate = "2018-05-20";
 
     @Before
     public void setUp() {
         notifySmsService = new NotifySmsService(notificationClient, oneMonthNotificationTemplateId, twoWeekNotificationTemplateId,
-                oneDayAfterNotificationTemplateId);
+                oneDayAfterNotificationTemplateId, oneMonthNotificationTemplateIdPostEu, twoWeekNotificationTemplateIdPostEu,
+                oneDayAfterNotificationTemplateIdPostEu, euGoLiveDate);
     }
 
     @Test
@@ -97,5 +104,23 @@ public class NotifySmsServiceTest {
         Map<String, String> personalisation = new HashMap<>();
         personalisation.put("vehicle_vrm", REG);
         return personalisation;
+    }
+
+    @Test
+    public void testGetEuRoadworthinessReturnsTrue_WhenCurrentDateIsGreaterThanGoLiveDate() {
+
+        String euGoLiveDate = "2018-01-20";
+        boolean isEuRoadworthinessLive = this.notifySmsService.isEuRoadworthinessLive(euGoLiveDate);
+
+        assertTrue(isEuRoadworthinessLive);
+    }
+
+    @Test
+    public void testGetEuRoadworthinessReturnsFalse_WhenCurrentDateIsLessThanGoLiveDate() {
+
+        String euGoLiveDate = "2019-05-20";
+        boolean isEuRoadworthinessLive = this.notifySmsService.isEuRoadworthinessLive(euGoLiveDate);
+
+        assertFalse(isEuRoadworthinessLive);
     }
 }
