@@ -1,6 +1,9 @@
 package uk.gov.dvsa.motr.notifications.service;
 
 import uk.gov.dvsa.motr.eventlog.EventLogger;
+import uk.gov.dvsa.motr.notify.NotifyTemplateEngine;
+import uk.gov.dvsa.motr.notify.NotifyTemplateEngineException;
+import uk.gov.dvsa.motr.notify.NotifyTemplateEngineFailedEvent;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsService;
 import uk.gov.dvsa.motr.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
@@ -32,6 +35,14 @@ public class NotifyService {
     private final String smsConfirmationTemplateId;
     private final UrlHelper urlHelper;
     private final VehicleDetailsClient vehicleDetailsClient;
+    private final NotifyTemplateEngine notifyTemplateEngine;
+
+    private static final String SIGN_UP_CONFIRM_EMAIL_SUBJECT = "sign-up-confirm-email-subject.txt";
+    private static final String SIGN_UP_CONFIRM_EMAIL_BODY = "sign-up-confirm-email-body.txt";
+    private static final String SIGN_UP_CONFIRM_SMS = "sign-up-confirm-sms.txt";
+    private static final String SIGNED_UP_COMPLETE_EMAIL_SUBJECT = "signed-up-complete-email-subject.txt";
+    private static final String SIGNED_UP_COMPLETE_EMAIL_BODY = "signed-up-complete-email-body.txt";
+    private static final String SIGNED_UP_COMPLETE_SMS = "signed-up-complete-sms.txt";
 
     public NotifyService(
             NotificationClient notificationClient,
@@ -39,7 +50,8 @@ public class NotifyService {
             String emailConfirmationTemplateId,
             String smsSubscriptionConfirmationTemplateId,
             String smsConfirmationTemplateId,UrlHelper urlHelper,
-            VehicleDetailsClient vehicleDetailsClient
+            VehicleDetailsClient vehicleDetailsClient,
+            NotifyTemplateEngine notifyTemplateEngine
     ) {
 
         this.notificationClient = notificationClient;
@@ -49,6 +61,7 @@ public class NotifyService {
         this.smsConfirmationTemplateId = smsConfirmationTemplateId;
         this.urlHelper = urlHelper;
         this.vehicleDetailsClient = vehicleDetailsClient;
+        this.notifyTemplateEngine = notifyTemplateEngine;
     }
 
     public void sendSubscriptionConfirmation(Subscription subscription) {
@@ -75,12 +88,14 @@ public class NotifyService {
         personalisation.put("confirmation_link", confirmationLink);
         personalisation.put("vehicle_details", vehicleDetails);
 
-        try {
+        Map<String, String> notifyParams = getNotifyParameters(
+                SIGN_UP_CONFIRM_EMAIL_SUBJECT, SIGN_UP_CONFIRM_EMAIL_BODY,
+                personalisation);
 
-            notificationClient.sendEmail(emailConfirmationTemplateId, emailAddress, personalisation, "");
+        try {
+            notificationClient.sendEmail(emailConfirmationTemplateId, emailAddress, notifyParams, "");
 
         } catch (NotificationClientException e) {
-
             EventLogger.logErrorEvent(new NotifyClientFailedEvent().setContact(emailAddress).setType(EMAIL_CONFIRMATION), e);
             // wrapping because nothing can be done about it
             throw new RuntimeException(e);
@@ -92,12 +107,13 @@ public class NotifyService {
         Map<String, String> personalisation = new HashMap<>();
         personalisation.put("confirmation_code", confirmationCode);
 
+        Map<String, String> notifyParams = getNotifyParameters(SIGN_UP_CONFIRM_SMS, personalisation);
+
         try {
 
-            notificationClient.sendSms(smsConfirmationTemplateId, phoneNumber, personalisation, "");
+            notificationClient.sendSms(smsConfirmationTemplateId, phoneNumber, notifyParams, "");
 
         } catch (NotificationClientException e) {
-
             EventLogger.logErrorEvent(new NotifyClientFailedEvent().setContact(phoneNumber).setType(PHONE_NUMBER_CONFIRMATION), e);
             // wrapping because nothing can be done about it
             throw new RuntimeException(e);
@@ -123,9 +139,13 @@ public class NotifyService {
             personalisation.put("is_due_or_expires", "expires");
         }
 
+        Map<String, String> notifyParams = getNotifyParameters(
+                SIGNED_UP_COMPLETE_EMAIL_SUBJECT, SIGNED_UP_COMPLETE_EMAIL_BODY,
+                personalisation);
+
         try {
 
-            notificationClient.sendEmail(emailSubscriptionConfirmationTemplateId, emailAddress, personalisation, "");
+            notificationClient.sendEmail(emailSubscriptionConfirmationTemplateId, emailAddress, notifyParams, "");
 
         } catch (NotificationClientException e) {
 
@@ -135,15 +155,41 @@ public class NotifyService {
         }
     }
 
+    private Map<String, String> getNotifyParameters(String subject, String body, Map<String, String> parameters) {
+        try {
+            return notifyTemplateEngine.getNotifyParameters(subject, body, parameters);
+        } catch (NotifyTemplateEngineException exception) {
+            EventLogger.logErrorEvent(
+                    new NotifyTemplateEngineFailedEvent().setType(NotifyTemplateEngineFailedEvent.Type.ERROR_GETTING_PARAMETERS),
+                    exception);
+            // wrapping because nothing can be done about it
+            throw new RuntimeException(exception);
+        }
+    }
+
+    private Map<String, String> getNotifyParameters(String body, Map<String, String> parameters) {
+        try {
+            return notifyTemplateEngine.getNotifyParameters(body, parameters);
+        } catch (NotifyTemplateEngineException exception) {
+
+            EventLogger.logErrorEvent(
+                    new NotifyTemplateEngineFailedEvent().setType(NotifyTemplateEngineFailedEvent.Type.ERROR_GETTING_PARAMETERS),
+                    exception);
+            // wrapping because nothing can be done about it
+            throw new RuntimeException(exception);
+        }
+    }
+
     private void sendSubscriptionConfirmationSms(String phoneNumber, String vehicleVrm, LocalDate motExpiryDate) {
 
         Map<String, String> personalisation = new HashMap<>();
         personalisation.put("vehicle_vrm", vehicleVrm);
         personalisation.put("mot_expiry_date", DateFormatterForSmsDisplay.asFormattedForSmsDate(motExpiryDate));
+        Map<String, String> notifyParams = getNotifyParameters(SIGNED_UP_COMPLETE_SMS, personalisation);
 
         try {
 
-            notificationClient.sendSms(smsSubscriptionConfirmationTemplateId, phoneNumber, personalisation, "");
+            notificationClient.sendSms(smsSubscriptionConfirmationTemplateId, phoneNumber, notifyParams, "");
 
         } catch (NotificationClientException e) {
 

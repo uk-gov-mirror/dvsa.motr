@@ -1,0 +1,12 @@
+^#The MOT for ((vehicle_details)) ((is_due_or_expires)) on ((mot_expiry_date))
+
+((preservation_statement))
+
+#Is your vehicle safe?
+
+Check if a vehicle or part has been recalled because of a safety fault at https://www.gov.uk/check-if-a-vehicle-has-been-recalled
+
+DVSA (Driver and Vehicle Standards Agency)
+
+Unsubscribe from MOT reminders:
+((unsubscribe_link))

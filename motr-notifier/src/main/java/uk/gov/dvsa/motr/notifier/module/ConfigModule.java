@@ -33,6 +33,7 @@ import uk.gov.dvsa.motr.notifier.processing.queue.QueueItemRemover;
 import uk.gov.dvsa.motr.notifier.processing.queue.SubscriptionsReceiver;
 import uk.gov.dvsa.motr.notifier.processing.service.ProcessSubscriptionService;
 import uk.gov.dvsa.motr.notifier.processing.unloader.QueueUnloader;
+import uk.gov.dvsa.motr.notify.NotifyTemplateEngine;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
 import uk.gov.service.notify.NotificationClient;
 
@@ -189,9 +190,10 @@ public class ConfigModule extends AbstractModule {
         String twoWeekTemplateIdPostEu = config.getValue(TWO_WEEK_NOTIFICATION_TEMPLATE_ID_POST_EU);
         String oneDayAfterTemplateIdPostEu = config.getValue(ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID_POST_EU);
         String euGoLiveDate = config.getValue(EU_GO_LIVE_DATE);
+        NotifyTemplateEngine notifyTemplateEngine = new NotifyTemplateEngine();
 
         return new NotifyEmailService(client, oneMonthTemplateId, twoWeekTemplateId, oneDayAfterTemplateId,
-        oneMonthTemplateIdPostEu, twoWeekTemplateIdPostEu, oneDayAfterTemplateIdPostEu, euGoLiveDate);
+        oneMonthTemplateIdPostEu, twoWeekTemplateIdPostEu, oneDayAfterTemplateIdPostEu, euGoLiveDate, notifyTemplateEngine);
     }
 
     @Provides
@@ -202,11 +204,12 @@ public class ConfigModule extends AbstractModule {
         String oneDayAfterTemplateId = config.getValue(SMS_ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID);
         String oneMonthTemplateIdPostEu = config.getValue(SMS_ONE_MONTH_NOTIFICATION_TEMPLATE_ID_POST_EU);
         String twoWeekTemplateIdPostEu = config.getValue(SMS_TWO_WEEK_NOTIFICATION_TEMPLATE_ID_POST_EU);
-        String oneDayAfterTemplatedIdPostEu = config.getValue(SMS_ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID_POST_EU);
+        String oneDayAfterTemplateIdPostEu = config.getValue(SMS_ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID_POST_EU);
         String euGoLiveDate = config.getValue(EU_GO_LIVE_DATE);
+        NotifyTemplateEngine notifyTemplateEngine = new NotifyTemplateEngine();
 
         return new NotifySmsService(client, oneMonthTemplateId, twoWeekTemplateId, oneDayAfterTemplateId, oneMonthTemplateIdPostEu,
-                twoWeekTemplateIdPostEu, oneDayAfterTemplatedIdPostEu, euGoLiveDate);
+                twoWeekTemplateIdPostEu, oneDayAfterTemplateIdPostEu, euGoLiveDate, notifyTemplateEngine);
     }
 
     @Provides

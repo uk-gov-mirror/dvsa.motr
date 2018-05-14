@@ -13,6 +13,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.exception.InvalidNotifyCredentialsException;
+import uk.gov.dvsa.motr.notify.NotifyTemplateEngineException;
 import uk.gov.dvsa.motr.smsreceiver.events.FailedToFindSubscriptionEvent;
 import uk.gov.dvsa.motr.smsreceiver.events.InvalidVrmSentEvent;
 import uk.gov.dvsa.motr.smsreceiver.events.UnableToProcessMessageEvent;
@@ -64,7 +65,7 @@ public class SmsMessageProcessorTest {
 
     @Test
     public void whenMessageIsWellFormed_AndThereIsAMatchingSubscriptionToCancel_ThenSubscriptionSuccessfullyCancelled()
-            throws IOException, InvalidNotifyCredentialsException, NotificationClientException {
+            throws IOException, InvalidNotifyCredentialsException, NotificationClientException, NotifyTemplateEngineException {
 
         Subscription subscription = buildTestSubscription(TEST_VRM, MOBILE_NUMBER);
 

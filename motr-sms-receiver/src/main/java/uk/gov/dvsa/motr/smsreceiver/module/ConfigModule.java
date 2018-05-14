@@ -13,6 +13,7 @@ import uk.gov.dvsa.motr.config.EncryptionAwareConfig;
 import uk.gov.dvsa.motr.config.EnvironmentVariableConfig;
 import uk.gov.dvsa.motr.encryption.AwsKmsDecryptor;
 import uk.gov.dvsa.motr.encryption.Decryptor;
+import uk.gov.dvsa.motr.notify.NotifyTemplateEngine;
 import uk.gov.dvsa.motr.smsreceiver.notify.NotifySmsService;
 import uk.gov.dvsa.motr.smsreceiver.service.CancelledSubscriptionHelper;
 import uk.gov.dvsa.motr.smsreceiver.service.MessageExtractor;
@@ -115,8 +116,8 @@ public class ConfigModule extends AbstractModule {
 
         NotificationClient notificationClient = new NotificationClient(config.getValue(GOV_NOTIFY_API_TOKEN));
         String smsUnsubscriptionConfirmationTemplateId = config.getValue(SMS_UNSUBSCRIPTION_CONFIRMATION_TEMPLATE_ID);
-
-        return new NotifySmsService(notificationClient, smsUnsubscriptionConfirmationTemplateId);
+        NotifyTemplateEngine notifyTemplateEngine = new NotifyTemplateEngine();
+        return new NotifySmsService(notificationClient, smsUnsubscriptionConfirmationTemplateId, notifyTemplateEngine);
     }
 
     private static Set<ConfigKey> secretVariables() {

@@ -1,9 +1,3 @@
-MESSAGE SUBJECT
----------------------
-Activate your MOT reminder for ((vehicle_details))
-
-MESSAGE CONTENT
----------------------
 Click to activate your MOT reminder:
 
 ((confirmation_link))

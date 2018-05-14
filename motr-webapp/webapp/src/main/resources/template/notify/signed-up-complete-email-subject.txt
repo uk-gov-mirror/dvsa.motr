@@ -1,0 +1,1 @@
+You’ve signed up for an MOT reminder for ((vehicle_details))
