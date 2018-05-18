@@ -1,1 +1,1 @@
-MOT reminders: The MOT for ((vehicle_vrm)) ran out yesterday! If you drive without a valid MOT you risk a fine of up to £1000. To unsubscribe reply STOP ((vehicle_vrm))
+MOT reminder: The MOT for ((vehicle_vrm)) expired yesterday. You can be fined £1000. Give us feedback at https://www.gov.uk/mot-survey To unsubscribe reply STOP ((vehicle_vrm))
