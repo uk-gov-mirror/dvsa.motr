@@ -2,7 +2,10 @@ package uk.gov.dvsa.motr.notifier.notify;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Matchers;
 
+import uk.gov.dvsa.motr.notify.NotifyTemplateEngine;
+import uk.gov.dvsa.motr.notify.NotifyTemplateEngineException;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
@@ -35,60 +38,81 @@ public class NotifySmsServiceTest {
     private NotifySmsService notifySmsService;
     private String euGoLiveDate = "2018-05-20";
 
+    private NotifyTemplateEngine notifyTemplateEngine = mock(NotifyTemplateEngine.class);
+    private Map<String, String> body = new HashMap<>();
+
     @Before
     public void setUp() {
         notifySmsService = new NotifySmsService(notificationClient, oneMonthNotificationTemplateId, twoWeekNotificationTemplateId,
                 oneDayAfterNotificationTemplateId, oneMonthNotificationTemplateIdPostEu, twoWeekNotificationTemplateIdPostEu,
-                oneDayAfterNotificationTemplateIdPostEu, euGoLiveDate);
+                oneDayAfterNotificationTemplateIdPostEu, euGoLiveDate, notifyTemplateEngine);
+        body.put("body", "This is the body");
+        try {
+            when(notifyTemplateEngine.getNotifyParameters(any(), any())).thenReturn(body);
+            when(notifyTemplateEngine.getNotifyParameters(any(), any(), any())).thenReturn(body);
+
+        } catch (NotifyTemplateEngineException exception) {
+            throw new RuntimeException(exception);
+        }
     }
 
     @Test
-    public void oneMonthNotificationIsSentWithCorrectDetails() throws NotificationClientException {
-
-        notifySmsService.sendOneMonthNotificationSms(PHONE_NUMBER, REG, EXPIRY_DATE);
+    public void oneMonthNotificationIsSentWithCorrectDetails()
+            throws NotificationClientException, NotifyTemplateEngineException {
 
         Map<String, String> personalisation = stubGenericPersonalisation();
         personalisation.put("mot_expiry_date", DateFormatterForSmsDisplay.asFormattedForSmsDate(EXPIRY_DATE));
+
+        notifySmsService.sendOneMonthNotificationSms(PHONE_NUMBER, REG, EXPIRY_DATE);
+
+        verify(notifyTemplateEngine, times(1)).getNotifyParameters(any(), Matchers.eq(personalisation));
 
         verify(notificationClient, times(1)).sendSms(
                 oneMonthNotificationTemplateId,
                 PHONE_NUMBER,
-                personalisation,
+                body,
                 ""
         );
     }
 
     @Test
-    public void twoWeekNotificationIsSentWithCorrectDetails() throws NotificationClientException {
-
-        notifySmsService.sendTwoWeekNotificationSms(PHONE_NUMBER, REG, EXPIRY_DATE);
+    public void twoWeekNotificationIsSentWithCorrectDetails()
+            throws NotificationClientException, NotifyTemplateEngineException {
 
         Map<String, String> personalisation = stubGenericPersonalisation();
         personalisation.put("mot_expiry_date", DateFormatterForSmsDisplay.asFormattedForSmsDate(EXPIRY_DATE));
+        notifySmsService.sendTwoWeekNotificationSms(PHONE_NUMBER, REG, EXPIRY_DATE);
+
+        verify(notifyTemplateEngine, times(1)).getNotifyParameters(any(), Matchers.eq(personalisation));
 
         verify(notificationClient, times(1)).sendSms(
                 twoWeekNotificationTemplateId,
                 PHONE_NUMBER,
-                personalisation,
+                body,
                 ""
         );
     }
 
     @Test
-    public void oneDayAfterNotificationIsSentWithCorrectDetails() throws NotificationClientException {
+    public void oneDayAfterNotificationIsSentWithCorrectDetails()
+            throws NotificationClientException, NotifyTemplateEngineException {
         
-        notifySmsService.sendOneDayAfterNotificationSms(PHONE_NUMBER, REG);
         Map<String, String> personalisation = stubGenericPersonalisation();
+
+        notifySmsService.sendOneDayAfterNotificationSms(PHONE_NUMBER, REG);
+
+        verify(notifyTemplateEngine, times(1)).getNotifyParameters(any(), Matchers.eq(personalisation));
 
         verify(notificationClient, times(1)).sendSms(
                 oneDayAfterNotificationTemplateId,
                 PHONE_NUMBER,
-                personalisation,
+                body,
                 "");
     }
 
     @Test(expected = NotificationClientException.class)
-    public void whenClientThrowsAnErrorItIsThrown() throws NotificationClientException {
+    public void whenClientThrowsAnErrorItIsThrown()
+            throws NotificationClientException, NotifyTemplateEngineException {
 
         when(notificationClient.sendSms(any(), any(), any(), any())).thenThrow(NotificationClientException.class);
 

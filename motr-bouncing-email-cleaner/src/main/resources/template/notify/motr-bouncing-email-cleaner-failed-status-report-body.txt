@@ -1,0 +1,5 @@
+# MOTR Notify - Failed Notifications for ((date))
+
+Permanent: ((permanent_failures))
+Temporary: ((temporary_failures))
+Technical: ((technical_failures))

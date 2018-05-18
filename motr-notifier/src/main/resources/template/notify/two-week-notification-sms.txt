@@ -1,0 +1,1 @@
+MOT reminder: The MOT for ((vehicle_vrm)) is due by ((mot_expiry_date)). Book the test now. Give us feedback at https://www.gov.uk/mot-survey To unsubscribe reply STOP ((vehicle_vrm))

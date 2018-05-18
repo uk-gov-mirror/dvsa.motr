@@ -1,3 +1,0 @@
-MESSAGE CONTENT
----------------------
-MOT reminders: Your activation code is ((confirmation_code)). Enter the code in the 'One more step' page. The code expires in 24h.

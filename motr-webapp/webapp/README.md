@@ -10,7 +10,10 @@ Expect ZIP artefact: in ${project-root}/build/distributions.
 ##### Testing
 
 ###### Unit testing
-Unit tests are part of the artefact building process (see Building paragraph)
+To run unit tests from the project root:
+```
+./gradlew :motr-webapp:motr-web:clean :motr-webapp:motr-web:build
+```
 
 ###### Integration testing
 

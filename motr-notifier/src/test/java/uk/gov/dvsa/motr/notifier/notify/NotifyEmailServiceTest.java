@@ -2,10 +2,10 @@ package uk.gov.dvsa.motr.notifier.notify;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Matchers;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
+import uk.gov.dvsa.motr.notify.NotifyTemplateEngine;
+import uk.gov.dvsa.motr.notify.NotifyTemplateEngineException;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
@@ -14,6 +14,8 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -41,18 +43,29 @@ public class NotifyEmailServiceTest {
 
     private String euGoLiveDate = "2018-06-20";
     private NotifyEmailService notifyEmailService;
+    private NotifyTemplateEngine notifyTemplateEngine = mock(NotifyTemplateEngine.class);
+    private Map<String, String> body = new HashMap<>();
 
     @Before
     public void setUp() {
         notifyEmailService = new NotifyEmailService(notificationClient, oneMonthNotificationTemplateId, twoWeekNotificationTemplateId,
                 oneDayAfterNotificationTemplateId, oneMonthNotificationTemplateIdPostEu, twoWeekNotificationTemplateIdPostEu,
-                oneDayAfterNotificationTemplateIdPostEu, euGoLiveDate);
+                oneDayAfterNotificationTemplateIdPostEu, euGoLiveDate, notifyTemplateEngine);
+
+        body.put("body", "This is the body");
+
+        try {
+            when(notifyTemplateEngine.getNotifyParameters(any(), any())).thenReturn(body);
+            when(notifyTemplateEngine.getNotifyParameters(any(), any(), any())).thenReturn(body);
+
+        } catch (NotifyTemplateEngineException exception) {
+            throw new RuntimeException(exception);
+        }
     }
 
     @Test
-    public void oneMonthNotificationIsSentWithCorrectDetails_whenMotTestNumber() throws NotificationClientException {
-
-        notifyEmailService.sendOneMonthNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK, "", MOTH_DIRECT_URL_PREFIX);
+    public void oneMonthNotificationIsSentWithCorrectDetails_whenMotTestNumber()
+            throws NotificationClientException, NotifyTemplateEngineException {
 
         StringBuilder preservationStatementSb = new StringBuilder(128)
                 .append(PRESERVATION_STATEMENT_PREFIX)
@@ -65,94 +78,108 @@ public class NotifyEmailServiceTest {
         personalisation.put("preservation_statement", preservationStatementSb.toString());
         personalisation.put("moth_url", MOTH_DIRECT_URL_PREFIX);
 
+        notifyEmailService.sendOneMonthNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK, "", MOTH_DIRECT_URL_PREFIX);
+        verify(notifyTemplateEngine, times(1)).getNotifyParameters(any(), any(), Matchers.eq(personalisation));
+
         verify(notificationClient, times(1)).sendEmail(
                 oneMonthNotificationTemplateId,
                 EMAIL,
-                personalisation,
+                body,
                 ""
         );
     }
 
     @Test
-    public void oneMonthNotificationIsSentWithCorrectDetails_whenDvlaId() throws NotificationClientException, NoSuchAlgorithmException {
-
-        notifyEmailService.sendOneMonthNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK, "12234", MOTH_DIRECT_URL_PREFIX);
+    public void oneMonthNotificationIsSentWithCorrectDetails_whenDvlaId()
+            throws NotificationClientException, NoSuchAlgorithmException, NotifyTemplateEngineException {
 
         Map<String, String> personalisation = stubGenericPersonalisation();
         personalisation.put("mot_expiry_date", DateFormatterForEmailDisplay.asFormattedForEmailDate(EXPIRY_DATE));
         personalisation.put("is_due_or_expires", "is due");
         personalisation.put("preservation_statement", "");
         personalisation.put("moth_url", MOTH_DIRECT_URL_PREFIX);
+        notifyEmailService.sendOneMonthNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK, "12234", MOTH_DIRECT_URL_PREFIX);
 
+        verify(notifyTemplateEngine, times(1)).getNotifyParameters(any(), any(), Matchers.eq(personalisation));
         verify(notificationClient, times(1)).sendEmail(
                 oneMonthNotificationTemplateId,
                 EMAIL,
-                personalisation,
+                body,
                 ""
         );
     }
 
     @Test
-    public void twoWeekNotificationIsSentWithCorrectDetails_whenMotTestNumber() throws NotificationClientException {
-
-        notifyEmailService.sendTwoWeekNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK, "");
+    public void twoWeekNotificationIsSentWithCorrectDetails_whenMotTestNumber()
+            throws NotificationClientException, NotifyTemplateEngineException {
 
         Map<String, String> personalisation = stubGenericPersonalisation();
         personalisation.put("mot_expiry_date", DateFormatterForEmailDisplay.asFormattedForEmailDate(EXPIRY_DATE));
         personalisation.put("is_due_or_expires", "expires");
+        notifyEmailService.sendTwoWeekNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK, "");
+
+        verify(notifyTemplateEngine, times(1)).getNotifyParameters(any(), any(), Matchers.eq(personalisation));
 
         verify(notificationClient, times(1)).sendEmail(
                 twoWeekNotificationTemplateId,
                 EMAIL,
-                personalisation,
+                body,
                 ""
         );
     }
 
     @Test
-    public void twoWeekNotificationIsSentWithCorrectDetails_whenDvlaId() throws NotificationClientException {
+    public void twoWeekNotificationIsSentWithCorrectDetails_whenDvlaId()
+            throws NotificationClientException, NotifyTemplateEngineException {
 
-        notifyEmailService.sendTwoWeekNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK, "122133");
 
         Map<String, String> personalisation = stubGenericPersonalisation();
         personalisation.put("mot_expiry_date", DateFormatterForEmailDisplay.asFormattedForEmailDate(EXPIRY_DATE));
         personalisation.put("is_due_or_expires", "is due");
 
+        notifyEmailService.sendTwoWeekNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK, "122133");
+
+        verify(notifyTemplateEngine, times(1)).getNotifyParameters(any(), any(), Matchers.eq(personalisation));
         verify(notificationClient, times(1)).sendEmail(
                 twoWeekNotificationTemplateId,
                 EMAIL,
-                personalisation,
+                body,
                 ""
         );
     }
 
     @Test
-    public void oneDayAfterNotificationIsSentWithCorrectDetails_whenMotTestNumber() throws NotificationClientException {
+    public void oneDayAfterNotificationIsSentWithCorrectDetails_whenMotTestNumber()
+            throws NotificationClientException, NotifyTemplateEngineException {
 
 
-        notifyEmailService.sendOneDayAfterNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK, "");
         Map<String, String> personalisation = stubGenericPersonalisation();
         personalisation.put("was_due_or_expired", "expired");
+        notifyEmailService.sendOneDayAfterNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK, "");
+        verify(notifyTemplateEngine, times(1)).getNotifyParameters(any(), any(), Matchers.eq(personalisation));
 
         verify(notificationClient, times(1)).sendEmail(
                 oneDayAfterNotificationTemplateId,
                 EMAIL,
-                personalisation,
+                body,
                 "");
     }
 
     @Test
-    public void oneDayAfterNotificationIsSentWithCorrectDetails_whenDvlaId() throws NotificationClientException {
+    public void oneDayAfterNotificationIsSentWithCorrectDetails_whenDvlaId()
+            throws NotificationClientException, NotifyTemplateEngineException {
 
-
-        notifyEmailService.sendOneDayAfterNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK, "123456");
         Map<String, String> personalisation = stubGenericPersonalisation();
         personalisation.put("was_due_or_expired", "was due");
+
+        notifyEmailService.sendOneDayAfterNotificationEmail(EMAIL, REG, EXPIRY_DATE, UNSUBSCRIBE_LINK, "123456");
+
+        verify(notifyTemplateEngine, times(1)).getNotifyParameters(any(), any(), Matchers.eq(personalisation));
 
         verify(notificationClient, times(1)).sendEmail(
                 oneDayAfterNotificationTemplateId,
                 EMAIL,
-                personalisation,
+                body,
                 "");
     }
 

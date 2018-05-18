@@ -1,6 +1,7 @@
 package uk.gov.dvsa.motr.web.system.binder.factory;
 
 import uk.gov.dvsa.motr.notifications.service.NotifyService;
+import uk.gov.dvsa.motr.notify.NotifyTemplateEngine;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.helper.SystemVariableParam;
@@ -47,6 +48,7 @@ public class NotifyServiceFactory implements BaseFactory<NotifyService> {
     public NotifyService provide() {
 
         NotificationClient client = new NotificationClient(apiKey);
+        NotifyTemplateEngine templateEngine = new NotifyTemplateEngine();
 
         return new NotifyService(client,
                 emailSubscriptionConfirmationTemplateId,
@@ -54,6 +56,8 @@ public class NotifyServiceFactory implements BaseFactory<NotifyService> {
                 smsSubscriptionConfirmationTemplateId,
                 smsConfirmationTemplateId,
                 urlHelper,
-                vehicleDetailsClient);
+                vehicleDetailsClient,
+                templateEngine
+        );
     }
 }
