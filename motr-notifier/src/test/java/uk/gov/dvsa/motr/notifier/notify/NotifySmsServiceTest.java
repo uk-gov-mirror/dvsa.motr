@@ -68,7 +68,7 @@ public class NotifySmsServiceTest {
         verify(notifyTemplateEngine, times(1)).getNotifyParameters(any(), Matchers.eq(personalisation));
 
         verify(notificationClient, times(1)).sendSms(
-                oneMonthNotificationTemplateId,
+                oneMonthNotificationTemplateIdPostEu,
                 PHONE_NUMBER,
                 body,
                 ""
@@ -86,7 +86,7 @@ public class NotifySmsServiceTest {
         verify(notifyTemplateEngine, times(1)).getNotifyParameters(any(), Matchers.eq(personalisation));
 
         verify(notificationClient, times(1)).sendSms(
-                twoWeekNotificationTemplateId,
+                twoWeekNotificationTemplateIdPostEu,
                 PHONE_NUMBER,
                 body,
                 ""
@@ -104,7 +104,7 @@ public class NotifySmsServiceTest {
         verify(notifyTemplateEngine, times(1)).getNotifyParameters(any(), Matchers.eq(personalisation));
 
         verify(notificationClient, times(1)).sendSms(
-                oneDayAfterNotificationTemplateId,
+                oneDayAfterNotificationTemplateIdPostEu,
                 PHONE_NUMBER,
                 body,
                 "");
