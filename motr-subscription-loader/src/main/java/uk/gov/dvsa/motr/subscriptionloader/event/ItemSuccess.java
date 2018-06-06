@@ -1,6 +1,7 @@
 package uk.gov.dvsa.motr.subscriptionloader.event;
 
 import uk.gov.dvsa.motr.eventlog.Event;
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 
 import java.time.LocalDate;
 
@@ -53,6 +54,13 @@ public class ItemSuccess extends Event {
     public ItemSuccess setDueDate(LocalDate dueDate) {
 
         params.put("due-date", dueDate.format(ISO_DATE));
+        return this;
+    }
+
+    public ItemSuccess setVehicleType(VehicleType vehicleType) {
+        if (null != vehicleType) {
+            params.put("vehicle-type", vehicleType.name());
+        }
         return this;
     }
 }

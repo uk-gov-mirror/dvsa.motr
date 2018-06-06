@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
+
 import java.io.IOException;
 import java.time.LocalDate;
 
@@ -92,12 +94,13 @@ public class SubscriptionTest {
                 .setVrm(TEST_VRM)
                 .setContactDetail(new ContactDetail(TEST_EMAIL, TEST_CONTACT_TYPE))
                 .setMotTestNumber(TEST_MOT_TEST_NUMBER)
+                .setVehicleType(VehicleType.MOT)
                 .setLoadedOnDate(now);
 
         assertEquals("Subscription{id='testId', motDueDate=" +
                 now.toString() +
                 ", vrm='test_vrm', email='test_email', contactType='EMAIL', motTestNumber='test_mot_test_number', dvlaId='null', " +
-                "loadedOnDate=" + now.toString() + "}", subscription.toString());
+                "loadedOnDate=" + now.toString() + ", vehicleType=MOT}", subscription.toString());
     }
 
     @Test
@@ -109,12 +112,13 @@ public class SubscriptionTest {
                 .setVrm(TEST_VRM)
                 .setContactDetail(new ContactDetail(TEST_EMAIL, TEST_CONTACT_TYPE))
                 .setDvlaId(TEST_DVLA_ID)
+                .setVehicleType(VehicleType.MOT)
                 .setLoadedOnDate(now);
 
         assertEquals("Subscription{id='testId', motDueDate=" +
                 now.toString() +
                 ", vrm='test_vrm', email='test_email', contactType='EMAIL', motTestNumber='null', dvlaId='test_dvla_id', loadedOnDate=" +
-                now.toString() + "}", subscription.toString());
+                now.toString() + ", vehicleType=MOT}", subscription.toString());
     }
 
     @Test

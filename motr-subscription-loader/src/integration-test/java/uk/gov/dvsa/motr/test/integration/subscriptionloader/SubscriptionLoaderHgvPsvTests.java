@@ -13,11 +13,9 @@ import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.model.SubscriptionItem
 import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.model.SubscriptionTable;
 import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 
-
 import static org.junit.Assert.assertEquals;
 
-
-public class SubscriptionLoaderTests extends SubscriptionLoaderBase {
+public class SubscriptionLoaderHgvPsvTests extends SubscriptionLoaderBase {
 
     @Rule
     public final EnvironmentVariables environmentVariables = new TestEnvironmentVariables();
@@ -27,10 +25,7 @@ public class SubscriptionLoaderTests extends SubscriptionLoaderBase {
     @Before
     public void setUp() {
         super.setUp();
-        subscriptionItem = new SubscriptionItem()
-                .generateMotTestNumber()
-                .setVehicleType(VehicleType.MOT);
-        fixture.table(new SubscriptionTable().item(subscriptionItem)).run();
+        subscriptionItem = new SubscriptionItem().generateDvlaId();
     }
 
     @After
@@ -39,7 +34,9 @@ public class SubscriptionLoaderTests extends SubscriptionLoaderBase {
     }
 
     @Test
-    public void runLoaderForOneMonthReminderThenEnsureItemsAddedToQueue() throws Exception {
+    public void runLoaderForOneMonthHgvReminderThenEnsureItemsAddedToQueue() throws Exception {
+        subscriptionItem.setVehicleType(VehicleType.HGV);
+        fixture.table(new SubscriptionTable().item(subscriptionItem)).run();
         String testTime = subscriptionItem.getMotDueDate().minusDays(30) + "T12:00:00Z";
 
         LoadReport loadReport = eventHandler.handle(buildRequest(testTime), buildContext());
@@ -49,18 +46,10 @@ public class SubscriptionLoaderTests extends SubscriptionLoaderBase {
     }
 
     @Test
-    public void runLoaderForTwoWeeksReminderThenEnsureItemsAddedToQueue() throws Exception {
-        String testTime = subscriptionItem.getMotDueDate().minusDays(14) + "T12:00:00Z";
-
-        LoadReport loadReport = eventHandler.handle(buildRequest(testTime), buildContext());
-
-        assertSubscriptionIsAddedToQueue();
-        assertReportIsUpdatedCorrectly(loadReport);
-    }
-
-    @Test
-    public void runLoaderForOneDayAfterReminderThenEnsureItemsAddedToQueue() throws Exception {
-        String testTime = subscriptionItem.getMotDueDate().plusDays(1L) + "T12:00:00Z";
+    public void runLoaderForTwoMonthsPsvReminderThenEnsureItemsAddedToQueue() throws Exception {
+        subscriptionItem.setVehicleType(VehicleType.PSV);
+        fixture.table(new SubscriptionTable().item(subscriptionItem)).run();
+        String testTime = subscriptionItem.getMotDueDate().minusDays(60) + "T12:00:00Z";
 
         LoadReport loadReport = eventHandler.handle(buildRequest(testTime), buildContext());
 
@@ -83,8 +72,8 @@ public class SubscriptionLoaderTests extends SubscriptionLoaderBase {
     private void assertReportIsUpdatedCorrectly(LoadReport loadReport) {
 
         assertEquals(1, loadReport.getSubmittedForProcessing());
-        assertEquals(0, loadReport.getDvlaVehiclesProcessed());
-        assertEquals(1, loadReport.getNonDvlaVehiclesProcessed());
+        assertEquals(1, loadReport.getDvlaVehiclesProcessed());
+        assertEquals(0, loadReport.getNonDvlaVehiclesProcessed());
         assertEquals(1, loadReport.getTotalProcessed());
     }
 }

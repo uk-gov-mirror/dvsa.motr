@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import uk.gov.dvsa.motr.subscriptionloader.serialisation.LocalDateDeserialiser;
 import uk.gov.dvsa.motr.subscriptionloader.serialisation.LocalDateSerialiser;
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 
 import java.time.LocalDate;
 
@@ -55,6 +56,9 @@ public class Subscription {
     @JsonSerialize(using = LocalDateSerialiser.class)
     @JsonDeserialize(using = LocalDateDeserialiser.class)
     private LocalDate loadedOnDate;
+
+    @JsonProperty("vehicleType")
+    private VehicleType vehicleType;
 
     public String getId() {
 
@@ -133,6 +137,15 @@ public class Subscription {
         return this;
     }
 
+    public VehicleType getVehicleType() {
+        return vehicleType;
+    }
+
+    public Subscription setVehicleType(VehicleType vehicleType) {
+        this.vehicleType = vehicleType;
+        return this;
+    }
+
     @Override
     public String toString() {
 
@@ -145,6 +158,7 @@ public class Subscription {
                 ", motTestNumber='" + motTestNumber + '\'' +
                 ", dvlaId='" + dvlaId + '\'' +
                 ", loadedOnDate=" + loadedOnDate +
+                ", vehicleType=" + vehicleType +
                 '}';
     }
 }

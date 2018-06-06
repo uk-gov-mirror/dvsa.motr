@@ -101,7 +101,7 @@ subprojects {
         testCompile "com.github.tomakehurst:wiremock:${wiremockVersion}"
         testCompile "com.github.stefanbirkner:system-rules:${systemRulesVersion}"
         testCompile "junit:junit:${junitVersion}"
-        testCompile "org.mockito:mockito-all:${mockitoVersion}"
+        testCompile "org.mockito:mockito-core:${mockitoVersion}"
         testCompile "commons-io:commons-io:${commonsIoVersion}"
     }
 

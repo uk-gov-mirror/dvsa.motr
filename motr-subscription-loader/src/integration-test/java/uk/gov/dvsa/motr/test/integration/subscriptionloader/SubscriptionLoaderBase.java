@@ -5,12 +5,30 @@ import com.amazonaws.services.lambda.runtime.CognitoIdentity;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
 
-import uk.gov.dvsa.motr.subscriptionloader.handler.LoaderInvocationEvent;
+import com.amazonaws.services.sqs.model.Message;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import uk.gov.dvsa.motr.subscriptionloader.handler.EventHandler;
+import uk.gov.dvsa.motr.subscriptionloader.handler.LoaderInvocationEvent;
+import uk.gov.dvsa.motr.subscriptionloader.processing.model.Subscription;
+import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.core.DynamoDbFixture;
+import uk.gov.dvsa.motr.test.integration.sqs.SqsHelper;
+
+import java.util.List;
 import java.util.UUID;
 
+import static uk.gov.dvsa.motr.test.integration.dynamodb.DynamoDbIntegrationHelper.dynamoDbClient;
 
-public class SubscriptionLoaderBase {
+
+public abstract class SubscriptionLoaderBase {
+
+    private ObjectMapper jsonMapper = new ObjectMapper();
+
+    private SqsHelper queueHelper;
+
+    protected EventHandler eventHandler;
+
+    protected DynamoDbFixture fixture;
 
     protected LoaderInvocationEvent buildRequest(String testTime) {
 
@@ -75,5 +93,18 @@ public class SubscriptionLoaderBase {
                 return null;
             }
         };
+    }
+
+    public void setUp() {
+        queueHelper = new SqsHelper();
+        eventHandler = new EventHandler();
+        fixture = new DynamoDbFixture(dynamoDbClient());
+    }
+
+    protected Subscription getQueuedSubscription() throws java.io.IOException {
+        List<Message> messages = queueHelper.getMessagesFromQueue();
+        Subscription queuedSubscription = jsonMapper.readValue(messages.get(0).getBody(), Subscription.class);
+        queueHelper.deleteMessageFromQueue(messages.get(0));
+        return queuedSubscription;
     }
 }
