@@ -9,6 +9,7 @@ import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 import java.util.UUID;
 
 public class SubscriptionItem implements DynamoDbFixtureTableItem {
@@ -108,11 +109,8 @@ public class SubscriptionItem implements DynamoDbFixtureTableItem {
                 .with("vehicle_type", vehicleType.toString())
                 .with("contact_type", contactType.getValue());
 
-        if (motTestNumber != null) {
-            item.with("mot_test_number", motTestNumber);
-        } else {
-            item.with("dvla_id", dvlaId);
-        }
+        Optional.ofNullable(motTestNumber).ifPresent(value -> item.with("mot_test_number", value));
+        Optional.ofNullable(dvlaId).ifPresent(value ->  item.with("dvla_id", value));
 
         return item;
     }

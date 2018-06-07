@@ -105,4 +105,42 @@ public class DynamoDbCancelledSubscriptionRepositoryTest {
 
         assertEquals("Returned item does not match", cancelledSubscriptionEmail, savedItem.getString("email"));
     }
+
+    @Test
+    public void saveCancelledSubscriptionForHgvVehicle_CorrectlySavesToDb() {
+
+        CancelledSubscriptionItem cancelledSubscriptionItem = new CancelledSubscriptionItem();
+        cancelledSubscriptionItem.setVehicleType(VehicleType.HGV);
+
+        MotIdentification motIdentification = new MotIdentification(cancelledSubscriptionItem.getMotTestNumber(),
+                cancelledSubscriptionItem.getDvlaId());
+
+        CancelledSubscription cancelledSubscriptionVehicle = new CancelledSubscription();
+        cancelledSubscriptionVehicle
+                .setUnsubscribeId(cancelledSubscriptionItem.getUnsubscribeId())
+                .setContactDetail(new ContactDetail(cancelledSubscriptionItem.getEmail(), Subscription.ContactType.EMAIL))
+                .setVrm(cancelledSubscriptionItem.getVrm())
+                .setMotIdentification(motIdentification)
+                .setVehicleType(cancelledSubscriptionItem.getVehicleType())
+                .setReasonForCancellation(REASON_FOR_CANCELLATION_USER_CANCELLED);
+
+        repository.save(cancelledSubscriptionVehicle);
+
+        String cancelledSubscriptionEmail = cancelledSubscriptionVehicle.getContactDetail().getValue();
+        ValueMap specValueMap = new ValueMap()
+                .withString(":id", cancelledSubscriptionVehicle.getUnsubscribeId())
+                .withString(":email", cancelledSubscriptionEmail);
+        QuerySpec spec = new QuerySpec()
+                .withKeyConditionExpression("id = :id AND email = :email")
+                .withValueMap(specValueMap);
+
+        Item savedItem = new DynamoDB(client()).getTable(cancelledSubscriptionTableName()).query(spec).iterator().next();
+
+        assertNotNull("cancelled_at cannot be null when saving db", savedItem.getString("cancelled_at"));
+
+        assertEquals(cancelledSubscriptionEmail, savedItem.getString("email"));
+        assertEquals(cancelledSubscriptionItem.getVehicleType(), VehicleType.getFromString(savedItem.getString("vehicle_type")));
+        assertEquals(cancelledSubscriptionItem.getVrm(), savedItem.getString("vrm"));
+        assertEquals(REASON_FOR_CANCELLATION_USER_CANCELLED, savedItem.getString("reason_for_cancellation"));
+    }
 }

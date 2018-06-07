@@ -85,9 +85,15 @@ public class ReviewResourceTest {
         when(motrSession.isAllowedOnReviewPage()).thenReturn(true);
         when(motrSession.getVehicleDetailsFromSession()).thenReturn(vehicleDetailsInSession());
 
-        assertEquals(200, resource.reviewPage().getStatus());
-        assertEquals("review", TEMPLATE_ENGINE_STUB.getTemplate());
+        int status = resource.reviewPage().getStatus();
+
         assertEquals(ReviewViewModel.class, TEMPLATE_ENGINE_STUB.getContext(Map.class).get("viewModel").getClass());
+        ReviewViewModel viewModel = (ReviewViewModel) TEMPLATE_ENGINE_STUB.getContext(Map.class).get("viewModel");
+
+        assertEquals(200, status);
+        assertEquals("review", TEMPLATE_ENGINE_STUB.getTemplate());
+        assertEquals(vehicleDetailsInSession().getVehicleType(), viewModel.getVehicleType());
+        assertEquals(vehicleDetailsInSession().getMake().toUpperCase(), viewModel.getMake());
     }
 
     @Test(expected = NotFoundException.class)
@@ -99,7 +105,7 @@ public class ReviewResourceTest {
     }
 
     @Test
-    public void userIsRedirectedAfterSuccessfullFormSubmission() throws Exception {
+    public void userIsRedirectedAfterSuccessfulFormSubmission() throws Exception {
 
         LocalDate now = LocalDate.now();
         VehicleDetails vehicleDetails = new VehicleDetails();
@@ -130,7 +136,7 @@ public class ReviewResourceTest {
     }
 
     @Test
-    public void userIsRedirectedAfterSuccessfullFormSubmissionWhenUsingSmsChannel() throws Exception {
+    public void userIsRedirectedAfterSuccessfulFormSubmissionWhenUsingSmsChannel() throws Exception {
 
         LocalDate now = LocalDate.now();
         VehicleDetails vehicleDetails = new VehicleDetails();
@@ -224,6 +230,7 @@ public class ReviewResourceTest {
         vehicleDetails.setYearOfManufacture(2000);
         vehicleDetails.setMotExpiryDate(LocalDate.now());
         vehicleDetails.setMotTestNumber(TEST_MOT_TEST_NUMBER);
+        vehicleDetails.setVehicleType(VehicleType.MOT);
 
         return vehicleDetails;
     }

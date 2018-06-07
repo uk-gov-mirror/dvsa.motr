@@ -11,9 +11,6 @@ import com.tngtech.java.junit.dataprovider.UseDataProvider;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
@@ -23,7 +20,7 @@ public class EventHandlerTest {
     @Test
     public void searchByVrmReturnsMockDataAsJson() {
 
-        AwsProxyResponse response = new EventHandler().handle(requestWithParam("vrm", "WDD2040022A65"), null);
+        AwsProxyResponse response = new EventHandler().handle(searchByVrmRequest("WDD2040022A65"), null);
 
         assertEquals(200, response.getStatusCode());
         assertEquals("MERCEDES-BENZ", asJson(response.getBody()).get("make").asText());
@@ -38,14 +35,14 @@ public class EventHandlerTest {
     @Test
     public void searchByVrmReturnsErrorAsRequired(int statusCode) {
 
-        AwsProxyResponse response = new EventHandler().handle(requestWithParam("vrm", "ERROR" + statusCode), null);
+        AwsProxyResponse response = new EventHandler().handle(searchByVrmRequest("ERROR" + statusCode), null);
         assertEquals(statusCode, response.getStatusCode());
     }
 
     @Test
     public void searchByVrmReturnsMockDataWithNullsNotMapped() {
 
-        AwsProxyResponse response = new EventHandler().handle(requestWithParam("vrm", "HGV-ONECOLOR"), null);
+        AwsProxyResponse response = new EventHandler().handle(searchByVrmRequest("HGV-ONECOLOR"), null);
 
         assertFalse(asJson(response.getBody()).has("secondaryColour"));
     }
@@ -86,17 +83,6 @@ public class EventHandlerTest {
         }
     }
 
-    private AwsProxyRequest requestWithParam(String queryParam, String value) {
-
-        AwsProxyRequest request = new AwsProxyRequest();
-        request.setPath("/mot-test-reminder-mock/motr/v2/search");
-        request.setHttpMethod("GET");
-        Map<String, String> queryParams = new HashMap<>();
-        queryParams.put(queryParam, value);
-        request.setQueryStringParameters(queryParams);
-        return request;
-    }
-
     private AwsProxyRequest legacyDvlaIdRequest(String value) {
 
         AwsProxyRequest request = new AwsProxyRequest();
@@ -117,6 +103,14 @@ public class EventHandlerTest {
 
         AwsProxyRequest request = new AwsProxyRequest();
         request.setPath("/mot-test-reminder-mock/vehicles/" + value);
+        request.setHttpMethod("GET");
+        return request;
+    }
+
+    private AwsProxyRequest searchByVrmRequest(String value) {
+
+        AwsProxyRequest request = new AwsProxyRequest();
+        request.setPath("/mot-test-reminder-mock/motr/v2/search/registration/" + value);
         request.setHttpMethod("GET");
         return request;
     }

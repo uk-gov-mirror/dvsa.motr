@@ -41,11 +41,7 @@
                     </tr>
 
                     <tr>
-                        {{#if viewModel.dvlaVehicle}}
-                            <th class="key-value-list__key">MOT due date</th>
-                        {{else}}
-                            <th class="key-value-list__key">MOT expiry date</th>
-                        {{/if}}
+                        <th class="key-value-list__key">{{viewModel.expiryDateLabelText}}</th>
                         <td class="key-value-list__value" colspan="2">{{viewModel.expiryDate}}</td>
                     </tr>
 

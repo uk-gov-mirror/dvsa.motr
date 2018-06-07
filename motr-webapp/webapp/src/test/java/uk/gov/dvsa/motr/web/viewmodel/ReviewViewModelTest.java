@@ -1,22 +1,35 @@
 package uk.gov.dvsa.motr.web.viewmodel;
 
-import org.junit.Test;
+import com.tngtech.java.junit.dataprovider.DataProvider;
+import com.tngtech.java.junit.dataprovider.DataProviderRunner;
+import com.tngtech.java.junit.dataprovider.UseDataProvider;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
+
+import java.io.IOException;
 import java.time.LocalDate;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+@RunWith(DataProviderRunner.class)
 public class ReviewViewModelTest {
 
     private static String UNKNOWN_STRING = "UNKNOWN";
+    private static String ANNUAL_EXPIRE_LABEL = "Annual test expiry date";
+    private static String MOT_EXPIRE_LABEL = "MOT expiry date";
+    private static String ANNUAL_DUE_LABEL = "Annual test due date";
+    private static String MOT_DUE_LABEL = "MOT due date";
 
     @Test
     public void whenColourIsNullItIsSetToUnknown() {
 
         ReviewViewModel viewModel = new ReviewViewModel();
         viewModel.setColour(null, null);
-        assertTrue(viewModel.getColour().equals(UNKNOWN_STRING));
+        assertEquals(UNKNOWN_STRING, viewModel.getColour());
     }
 
     @Test
@@ -24,23 +37,43 @@ public class ReviewViewModelTest {
 
         ReviewViewModel viewModel = new ReviewViewModel();
         viewModel.setColour("", null);
-        assertTrue(viewModel.getColour().equals(UNKNOWN_STRING));
+        assertEquals(UNKNOWN_STRING, viewModel.getColour());
     }
 
     @Test
-    public void colourIsUpperCasedWhenSet() {
+    public void colourIsUpperCasedWhenSetForMotVehicle() {
 
         ReviewViewModel viewModel = new ReviewViewModel();
+        viewModel.setVehicleType(VehicleType.MOT);
         viewModel.setColour("black", "");
-        assertTrue(viewModel.getColour().equals("BLACK"));
+        assertEquals("BLACK", viewModel.getColour());
     }
 
     @Test
-    public void colourAndSecondaryColourIsUpperCasedWhenSet() {
+    public void whenColourSetForHgvVehicleItIsSetToUnknown() {
 
         ReviewViewModel viewModel = new ReviewViewModel();
+        viewModel.setVehicleType(VehicleType.HGV);
+        viewModel.setColour("black", "");
+        assertEquals(UNKNOWN_STRING, viewModel.getColour());
+    }
+
+    @Test
+    public void whenColourSetForPsvVehicleItIsSetToUnknown() {
+
+        ReviewViewModel viewModel = new ReviewViewModel();
+        viewModel.setVehicleType(VehicleType.PSV);
+        viewModel.setColour("black", "red");
+        assertEquals(UNKNOWN_STRING, viewModel.getColour());
+    }
+
+    @Test
+    public void colourAndSecondaryColourIsUpperCasedWhenSetForMotVehicle() {
+
+        ReviewViewModel viewModel = new ReviewViewModel();
+        viewModel.setVehicleType(VehicleType.MOT);
         viewModel.setColour("black", "blue");
-        assertTrue(viewModel.getColour().equals("BLACK, BLUE"));
+        assertEquals("BLACK, BLUE", viewModel.getColour());
     }
 
     @Test
@@ -48,7 +81,7 @@ public class ReviewViewModelTest {
 
         ReviewViewModel viewModel = new ReviewViewModel();
         viewModel.setYearOfManufacture(null);
-        assertTrue(viewModel.getYearOfManufacture().equals(UNKNOWN_STRING));
+        assertEquals(UNKNOWN_STRING, viewModel.getYearOfManufacture());
     }
 
     @Test
@@ -56,7 +89,7 @@ public class ReviewViewModelTest {
 
         ReviewViewModel viewModel = new ReviewViewModel();
         viewModel.setYearOfManufacture("");
-        assertTrue(viewModel.getYearOfManufacture().equals(UNKNOWN_STRING));
+        assertEquals(UNKNOWN_STRING, viewModel.getYearOfManufacture());
     }
 
     @Test
@@ -162,4 +195,36 @@ public class ReviewViewModelTest {
         assertEquals("FORD", viewModel.getMake());
     }
 
+    @Test
+    @UseDataProvider("dataProviderExpiryDateLabel")
+    public void whenToggleTypeAndHasTestsAreSet_AppropriateLabelIsReturned(
+            boolean hgvPsvToggle,
+            VehicleType vehicleType,
+            boolean hasTests,
+            String expectedLabel) {
+
+        ReviewViewModel viewModel = new ReviewViewModel();
+        viewModel.setHgvPsvToggle(hgvPsvToggle);
+        viewModel.setVehicleType(vehicleType);
+        viewModel.setHasTests(hasTests);
+        viewModel.setDvlaVehicle(!hasTests);
+        assertEquals(expectedLabel, viewModel.getExpiryDateLabelText());
+    }
+
+    @DataProvider
+    public static Object[][] dataProviderExpiryDateLabel() throws IOException {
+
+        return new Object[][]{
+                {true, VehicleType.HGV, true, ANNUAL_EXPIRE_LABEL},
+                {true, VehicleType.PSV, true, ANNUAL_EXPIRE_LABEL},
+                {true, VehicleType.MOT, true, MOT_EXPIRE_LABEL},
+                {false, VehicleType.HGV, true, MOT_EXPIRE_LABEL},
+                {false, VehicleType.MOT, true, MOT_EXPIRE_LABEL},
+                {true, VehicleType.HGV, false, ANNUAL_DUE_LABEL},
+                {true, VehicleType.PSV, false, ANNUAL_DUE_LABEL},
+                {true, VehicleType.MOT, false, MOT_DUE_LABEL},
+                {false, VehicleType.HGV, false, MOT_DUE_LABEL},
+                {false, VehicleType.MOT, false, MOT_DUE_LABEL}
+        };
+    }
 }

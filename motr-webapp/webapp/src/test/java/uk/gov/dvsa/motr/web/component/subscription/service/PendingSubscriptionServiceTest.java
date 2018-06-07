@@ -87,17 +87,15 @@ public class PendingSubscriptionServiceTest {
 
     @Test
     public void createPendingSubscriptionWithEmailCallsDbToSaveDetailsAndSendsNotification() throws Exception {
-        VehicleDetails vehicleDetails = new VehicleDetails();
-        vehicleDetails.setMake("TEST-MAKE");
-        vehicleDetails.setModel("TEST-MODEL");
+        VehicleDetails vehicleDetails = getMockVehicleDetails();
+
         when(client.fetchByVrm(eq(TEST_VRM))).thenReturn(Optional.of(vehicleDetails));
 
         withExpectedSubscription(empty(), EMAIL);
         doNothing().when(notifyService).sendEmailAddressConfirmationEmail(EMAIL, CONFIRMATION_LINK, "TEST-MAKE TEST-MODEL, ");
-        LocalDate date = LocalDate.now();
 
-        this.subscriptionService.createPendingSubscription(TEST_VRM, EMAIL, date, CONFIRMATION_ID,
-                new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID), CONTACT_TYPE_EMAIL, VehicleType.MOT);
+        this.subscriptionService.createPendingSubscription(TEST_VRM, EMAIL, vehicleDetails.getMotExpiryDate(), CONFIRMATION_ID,
+                new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID), CONTACT_TYPE_EMAIL, vehicleDetails.getVehicleType());
 
         verify(pendingSubscriptionRepository, times(1)).save(any(PendingSubscription.class));
         verify(notifyService, times(1)).sendEmailAddressConfirmationEmail(
@@ -109,19 +107,16 @@ public class PendingSubscriptionServiceTest {
 
     @Test
     public void createPendingSubscriptionWithMobileCallsDbToSaveDetailsAndDoesNotSendNotification() throws Exception {
-        VehicleDetails vehicleDetails = new VehicleDetails();
-        vehicleDetails.setMake("TEST-MAKE");
-        vehicleDetails.setModel("TEST-MODEL");
+        VehicleDetails vehicleDetails = getMockVehicleDetails();
         when(client.fetchByVrm(eq(TEST_VRM))).thenReturn(Optional.of(vehicleDetails));
 
         withExpectedSubscription(empty(), MOBILE);
-        LocalDate date = LocalDate.now();
 
-        this.subscriptionService.createPendingSubscription(TEST_VRM, MOBILE, date, CONFIRMATION_ID,
-                new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID), CONTACT_TYPE_MOBILE, VehicleType.MOT);
+        this.subscriptionService.createPendingSubscription(TEST_VRM, MOBILE, vehicleDetails.getMotExpiryDate(), CONFIRMATION_ID,
+                new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID), CONTACT_TYPE_MOBILE, vehicleDetails.getVehicleType());
 
         verify(pendingSubscriptionRepository, times(1)).save(any(PendingSubscription.class));
-        verifyZeroInteractions(notifyService);;
+        verifyZeroInteractions(notifyService);
     }
 
     @Test(expected = RuntimeException.class)
@@ -134,6 +129,18 @@ public class PendingSubscriptionServiceTest {
         this.subscriptionService.createPendingSubscription(TEST_VRM, EMAIL, date, CONFIRMATION_ID,
                 new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID), CONTACT_TYPE_EMAIL, VehicleType.MOT);
         verify(pendingSubscriptionRepository, times(1)).save(any(PendingSubscription.class));
+        verifyZeroInteractions(notifyService);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void whenPublicApiDataConfirmationFailsSubscriptionIsNotSaved() throws Exception {
+        when(client.fetchByVrm(any())).thenReturn(Optional.empty());
+
+        LocalDate date = LocalDate.now();
+
+        this.subscriptionService.createPendingSubscription(TEST_VRM, EMAIL, date, CONFIRMATION_ID,
+                new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID), CONTACT_TYPE_EMAIL, VehicleType.MOT);
+        verify(pendingSubscriptionRepository, times(0)).save(any());
         verifyZeroInteractions(notifyService);
     }
 
@@ -177,19 +184,20 @@ public class PendingSubscriptionServiceTest {
 
     @Test
     public void handleSubscriptionWithEmailContactWillCreateNewPendingSubscription() throws Exception {
+        VehicleDetails vehicleDetails = getMockVehicleDetails();
 
-        when(client.fetchByVrm(eq(TEST_VRM))).thenReturn(Optional.of(new VehicleDetails()));
+        when(client.fetchByVrm(eq(TEST_VRM))).thenReturn(Optional.of(vehicleDetails));
         withExpectedSubscription(empty(), EMAIL);
         when(pendingSubscriptionRepository.findByVrmAndContactDetails(TEST_VRM, EMAIL)).thenReturn(Optional.empty());
-        LocalDate date = LocalDate.now();
         ArgumentCaptor<PendingSubscription> pendingSubscriptionArgumentCaptor = ArgumentCaptor.forClass(PendingSubscription.class);
 
         PendingSubscriptionServiceResponse pendingSubscriptionResponse = this.subscriptionService.handlePendingSubscriptionCreation(
-                TEST_VRM, CONTACT_EMAIL, date, new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID), VehicleType.MOT);
+                TEST_VRM, CONTACT_EMAIL, vehicleDetails.getMotExpiryDate(), new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID),
+                vehicleDetails.getVehicleType());
 
         verify(pendingSubscriptionRepository, times(1)).save(pendingSubscriptionArgumentCaptor.capture());
         verify(notifyService, times(1)).sendEmailAddressConfirmationEmail(any(), any(), any());
-        assertEquals(pendingSubscriptionArgumentCaptor.getValue().getMotDueDate(), date);
+        assertEquals(pendingSubscriptionArgumentCaptor.getValue().getMotDueDate(), vehicleDetails.getMotExpiryDate());
         assertEquals(pendingSubscriptionArgumentCaptor.getValue().getContactDetail().getValue(), EMAIL);
         assertEquals(pendingSubscriptionArgumentCaptor.getValue().getVrm(), TEST_VRM);
         assertEquals(CONFIRMATION_PENDING_LINK, pendingSubscriptionResponse.getRedirectUri());
@@ -199,14 +207,17 @@ public class PendingSubscriptionServiceTest {
     @Test
     public void handleSubscriptionWithMobileContactWillCreateNewPendingSubscription() throws Exception {
 
-        when(client.fetchByVrm(eq(TEST_VRM))).thenReturn(Optional.of(new VehicleDetails()));
+        VehicleDetails vehicleDetails = getMockVehicleDetails();
+
+        when(client.fetchByVrm(eq(TEST_VRM))).thenReturn(Optional.of(vehicleDetails));
         withExpectedSubscription(empty(), MOBILE);
         LocalDate date = LocalDate.now();
         when(pendingSubscriptionRepository.findByVrmAndContactDetails(TEST_VRM, MOBILE)).thenReturn(Optional.empty());
         ArgumentCaptor<PendingSubscription> pendingSubscriptionArgumentCaptor = ArgumentCaptor.forClass(PendingSubscription.class);
 
         PendingSubscriptionServiceResponse pendingSubscriptionResponse = this.subscriptionService.handlePendingSubscriptionCreation(
-                TEST_VRM, CONTACT_MOBILE, date, new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID), VehicleType.MOT);
+                TEST_VRM, CONTACT_MOBILE, date, new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID),
+                vehicleDetails.getVehicleType());
 
         verifyZeroInteractions(notifyService);
         verify(pendingSubscriptionRepository, times(1)).save(pendingSubscriptionArgumentCaptor.capture());
@@ -219,5 +230,18 @@ public class PendingSubscriptionServiceTest {
 
     private void withExpectedSubscription(Optional<Subscription> subscription, String contact) {
         when(subscriptionRepository.findByVrmAndEmail(TEST_VRM, contact)).thenReturn(subscription);
+    }
+
+    private VehicleDetails getMockVehicleDetails() {
+        LocalDate date = LocalDate.now();
+        VehicleDetails vehicleDetails = new VehicleDetails();
+        vehicleDetails.setMake("TEST-MAKE");
+        vehicleDetails.setModel("TEST-MODEL");
+        vehicleDetails.setVehicleType(VehicleType.MOT);
+        vehicleDetails.setMotExpiryDate(date);
+        vehicleDetails.setDvlaId(TEST_DVLA_ID);
+        vehicleDetails.setMotTestNumber(TEST_MOT_TEST_NUMBER);
+
+        return vehicleDetails;
     }
 }

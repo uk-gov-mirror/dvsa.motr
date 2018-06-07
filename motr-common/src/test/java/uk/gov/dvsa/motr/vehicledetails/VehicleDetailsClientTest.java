@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.anyUrl;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
@@ -168,9 +169,25 @@ public class VehicleDetailsClientTest {
         assertEquals(2006, details.getYearOfManufacture().intValue());
     }
 
+    @Test
+    public void vehicleDetailsByVrm() throws Exception {
+        stubFor(onAnyRequest().willReturn(aResponse().withBody(validResponse())
+                .withHeader("Content-Type", "application/json")));
+
+        withByVrmClient().fetchByVrm("11111111111");
+
+        verify(getRequestedFor(urlEqualTo("/vehicle-details-endpoint/11111111111")));
+    }
+
     private MappingBuilder onRequest() {
 
         return get(urlEqualTo("/vehicle-details-endpoint/11111111111"))
+                .withHeader("x-api-key", equalTo("api-key"));
+    }
+
+    private MappingBuilder onAnyRequest() {
+
+        return get(anyUrl())
                 .withHeader("x-api-key", equalTo("api-key"));
     }
 
@@ -180,11 +197,11 @@ public class VehicleDetailsClientTest {
         return new VehicleDetailsClient(new ClientConfig(), "api-key").withByMotTestNumberUri(endpointUriByMotTestNumber);
     }
 
-    private VehicleDetailsClient withByDvlaIdDefaultClient() {
+    private VehicleDetailsClient withByVrmClient() {
 
-        final String endpointUriByDvlaId = "http://localhost:8098/vehicle-details-endpoint/{dvlaId}";
+        final String endpointUriByRegistrationNumber = "http://localhost:8098/vehicle-details-endpoint/{registration}";
         return new VehicleDetailsClient(new ClientConfig(), "api-key")
-            .withByDvlaIdUri(endpointUriByDvlaId);
+            .withByRegNumberUri(endpointUriByRegistrationNumber);
     }
 
     private static String loadResponseMock(String resourcePath) throws IOException {

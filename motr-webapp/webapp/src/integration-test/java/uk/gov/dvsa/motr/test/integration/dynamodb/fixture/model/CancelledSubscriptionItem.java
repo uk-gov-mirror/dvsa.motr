@@ -39,6 +39,10 @@ public class CancelledSubscriptionItem {
         return vehicleType;
     }
 
+    public void setVehicleType(VehicleType vehicleType) {
+        this.vehicleType = vehicleType;
+    }
+
     public void setMotTestNumber(String motTestNumber) {
         this.motTestNumber = motTestNumber;
     }

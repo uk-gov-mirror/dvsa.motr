@@ -66,9 +66,8 @@ public class ByVrmResolver {
                     .primaryColour("testPrimaryColour")
                     .secondaryColour("testSecondaryColour")
                     .vehicleType(HGV)
-                    .vin("HGV23528765")
                     .manufactureYear("1999")
-                    .dueDate("2020-03-09")
+                    .dueDate("2017-03-09")
                     .testNumber("12349876");
         } else if (vrm.contains("HGVMULTICOLOR")) {
             response.make("Mercedes-Benz")
@@ -76,7 +75,6 @@ public class ByVrmResolver {
                     .primaryColour("Multi-colour")
                     .secondaryColour("Multi-colour")
                     .vehicleType(HGV)
-                    .vin("HGV73525231")
                     .manufactureYear("1999")
                     .dueDate("2025-03-09")
                     .dvlaId("344541")
@@ -86,7 +84,6 @@ public class ByVrmResolver {
                     .model("Econic")
                     .primaryColour("White")
                     .vehicleType(HGV)
-                    .vin("HGV12574352")
                     .manufactureYear("1999")
                     .dueDate("2022-01-09")
                     .dvlaId("344541")
@@ -96,7 +93,6 @@ public class ByVrmResolver {
                     .model("Econic")
                     .primaryColour("White")
                     .vehicleType(HGV)
-                    .vin("HGV15423")
                     .manufactureYear("1999")
                     .dueDate("2026-01-09")
                     .dvlaId("46362");
@@ -106,9 +102,8 @@ public class ByVrmResolver {
                     .primaryColour("testPrimaryColour")
                     .secondaryColour("testSecondaryColour")
                     .vehicleType(PSV)
-                    .vin("PSV543435")
                     .manufactureYear("1999")
-                    .dueDate("2017-01-04")
+                    .dueDate("2020-01-04")
                     .dvlaId("567623")
                     .testNumber("546431");
         } else if (vrm.contains("PSVMULTICOLOR")) {
@@ -117,7 +112,6 @@ public class ByVrmResolver {
                     .primaryColour("Multi-colour")
                     .secondaryColour("Multi-colour")
                     .vehicleType(PSV)
-                    .vin("PSV7352324231")
                     .manufactureYear("1999")
                     .dueDate("2025-06-06")
                     .dvlaId("4537474")
@@ -127,7 +121,6 @@ public class ByVrmResolver {
                     .model("PSVModel")
                     .primaryColour("White")
                     .vehicleType(PSV)
-                    .vin("PSV7352324231")
                     .manufactureYear("1999")
                     .dueDate("2022-02-01")
                     .dvlaId("213123")
@@ -137,7 +130,6 @@ public class ByVrmResolver {
                     .model("PSVTestModel")
                     .primaryColour("White")
                     .vehicleType(PSV)
-                    .vin("PSV154142323")
                     .manufactureYear("1999")
                     .dueDate("2026-01-09")
                     .dvlaId("245436");

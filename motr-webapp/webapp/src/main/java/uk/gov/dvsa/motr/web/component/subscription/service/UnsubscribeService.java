@@ -41,6 +41,7 @@ public class UnsubscribeService {
             EventLogger.logEvent(new UnsubscribedEvent()
                     .setVrm(sub.getVrm())
                     .setEmail(sub.getContactDetail().getValue())
+                    .setVehicleType(sub.getVehicleType())
                     .setDueDate(sub.getMotDueDate())
                     .setReasonForCancellation(REASON_FOR_CANCELLATION_USER_CANCELLED)
             );
@@ -60,6 +61,7 @@ public class UnsubscribeService {
         return new CancelledSubscription()
                 .setUnsubscribeId(subscription.getUnsubscribeId())
                 .setVrm(subscription.getVrm())
+                .setVehicleType(subscription.getVehicleType())
                 .setContactDetail(subscription.getContactDetail())
                 .setReasonForCancellation(REASON_FOR_CANCELLATION_USER_CANCELLED);
     }

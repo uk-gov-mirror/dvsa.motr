@@ -38,6 +38,9 @@ public class VrmResource {
     private static final String VEHICLE_NOT_FOUND_MESSAGE = "Check that you’ve typed in the correct registration number.<br/>" +
             "<br/>You can only sign up if the vehicle has a current MOT.";
 
+    private static final String VEHICLE_NOT_FOUND_MESSAGE_POST_HGV = "We don't hold information about this vehicle.<br/>" +
+            "<br/>Check that you've typed in the correct registration number.";
+
     private static final String MESSAGE_KEY = "message";
     private static final String SHOW_INLINE_KEY = "showInLine";
     private static final String VRM_TEMPLATE_NAME = "vrm";
@@ -135,7 +138,12 @@ public class VrmResource {
     private void addVehicleNotFoundErrorMessageToViewModel(Map<String, Object> modelMap) {
 
         dataLayerHelper.putAttribute(ERROR_KEY, "Vehicle not found");
-        modelMap.put(MESSAGE_KEY, VEHICLE_NOT_FOUND_MESSAGE);
+        if (motrSession.isHgvPsvVehiclesFeatureToggleOn()) {
+            modelMap.put(MESSAGE_KEY, VEHICLE_NOT_FOUND_MESSAGE_POST_HGV);
+        } else {
+            modelMap.put(MESSAGE_KEY, VEHICLE_NOT_FOUND_MESSAGE);
+        }
+
         modelMap.put(SHOW_INLINE_KEY, false);
     }
 

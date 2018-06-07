@@ -29,8 +29,6 @@ import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
     public String motTestExpiryDate;
     @JsonProperty("motTestNumber")
     public String testNumber;
-    @JsonProperty("vin")
-    public String vin;
     @JsonProperty("dvlaId")
     public String dvlaId;
     
@@ -81,11 +79,6 @@ import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
 
     public MockResponse secondaryColour(String secondaryColour) {
         this.secondaryColour = secondaryColour;
-        return this;
-    }
-
-    public MockResponse vin(String vin) {
-        this.vin = vin;
         return this;
     }
 

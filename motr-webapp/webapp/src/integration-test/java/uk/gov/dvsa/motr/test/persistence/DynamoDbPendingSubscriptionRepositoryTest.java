@@ -21,6 +21,7 @@ import uk.gov.dvsa.motr.web.component.subscription.persistence.PendingSubscripti
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import static uk.gov.dvsa.motr.test.integration.dynamodb.DynamoDbIntegrationHelper.client;
 import static uk.gov.dvsa.motr.test.integration.dynamodb.DynamoDbIntegrationHelper.pendingSubscriptionTableName;
@@ -149,6 +150,44 @@ public class DynamoDbPendingSubscriptionRepositoryTest {
         assertEquals(subscriptionItemForDvlaVehicle.getDvlaId(), actualSubscription.getMotIdentification().getDvlaId().get());
     }
 
+    @Test
+    public void saveSubscriptionForHgvVehicleCorrectlySavesToDb() {
+
+        PendingSubscriptionItem subscriptionItemForHgvVehicle = new PendingSubscriptionItem();
+
+        MotIdentification motIdentification = new MotIdentification(
+                subscriptionItemForHgvVehicle.getMotTestNumber(),
+                subscriptionItemForHgvVehicle.getDvlaId());
+
+        ContactDetail contactDetail =
+                new ContactDetail(subscriptionItemForHgvVehicle.getEmail(), subscriptionItemForHgvVehicle.getContactType());
+
+        PendingSubscription subscription = new PendingSubscription();
+        subscription
+                .setConfirmationId(subscriptionItemForHgvVehicle.getConfirmationId())
+                .setContactDetail(contactDetail)
+                .setVehicleType(VehicleType.HGV)
+                .setVrm(subscriptionItemForHgvVehicle.getVrm())
+                .setMotDueDate(subscriptionItemForHgvVehicle.getMotDueDate())
+                .setMotIdentification(motIdentification);
+
+        repo.save(subscription);
+
+        PendingSubscription actualSubscription = waitUntilPresent(
+                () -> repo.findByConfirmationId(subscription.getConfirmationId()),
+                true,
+                5000
+        ).get();
+
+        assertEquals(subscriptionItemForHgvVehicle.getEmail(), actualSubscription.getContactDetail().getValue());
+        assertEquals(subscriptionItemForHgvVehicle.getVrm(), actualSubscription.getVrm());
+        assertEquals(
+                "Wrong vehicle type for pending sub wth vrm: " + subscriptionItemForHgvVehicle.getVrm(),
+                VehicleType.HGV, actualSubscription.getVehicleType());
+        assertEquals(subscriptionItemForHgvVehicle.getMotDueDate(), actualSubscription.getMotDueDate());
+        assertTrue(actualSubscription.getMotIdentification().getDvlaId().isPresent());
+        assertEquals(subscriptionItemForHgvVehicle.getDvlaId(), actualSubscription.getMotIdentification().getDvlaId().get());
+    }
 
     @Test
     public void saveSubscriptionCorrectlySavesNonModelAttributesToDb() {

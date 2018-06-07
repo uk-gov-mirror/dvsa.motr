@@ -60,13 +60,13 @@ public class NotifyEmailService {
     }
 
     public SendEmailResponse sendOneMonthNotificationEmail(String emailAddress, String vehicleDetails, LocalDate motExpiryDate,
-            String unsubscribeLink, String dvlaId, String mothUrl) throws NotificationClientException {
+            String unsubscribeLink, String motTestNumber, String mothUrl) throws NotificationClientException {
 
         Map<String, String> personalisation = genericPersonalisation(vehicleDetails, unsubscribeLink);
         personalisation.put("mot_expiry_date", DateFormatterForEmailDisplay.asFormattedForEmailDate(motExpiryDate));
         personalisation.put("moth_url", mothUrl);
 
-        if (!StringUtils.isNullOrEmpty(dvlaId)) {
+        if (StringUtils.isNullOrEmpty(motTestNumber)) {
             personalisation.put("is_due_or_expires", "is due");
             personalisation.put("preservation_statement", "");
         } else {
@@ -107,12 +107,12 @@ public class NotifyEmailService {
     }
 
     public SendEmailResponse sendTwoWeekNotificationEmail(String emailAddress, String vehicleDetails, LocalDate motExpiryDate, String
-            unsubscribeLink, String dvlaId) throws NotificationClientException {
+            unsubscribeLink, String motTestNumber) throws NotificationClientException {
 
         Map<String, String> personalisation = genericPersonalisation(vehicleDetails, unsubscribeLink);
         personalisation.put("mot_expiry_date", DateFormatterForEmailDisplay.asFormattedForEmailDate(motExpiryDate));
 
-        if (!StringUtils.isNullOrEmpty(dvlaId)) {
+        if (StringUtils.isNullOrEmpty(motTestNumber)) {
             personalisation.put("is_due_or_expires", "is due");
         } else {
             personalisation.put("is_due_or_expires", "expires");
@@ -146,11 +146,11 @@ public class NotifyEmailService {
     }
 
     public SendEmailResponse sendOneDayAfterNotificationEmail(String emailAddress, String vehicleDetails, LocalDate motExpiryDate,
-            String unsubscribeLink, String dvlaId) throws NotificationClientException {
+            String unsubscribeLink, String motTestNumber) throws NotificationClientException {
 
         Map<String, String> personalisation = genericPersonalisation(vehicleDetails, unsubscribeLink);
 
-        if (!StringUtils.isNullOrEmpty(dvlaId)) {
+        if (StringUtils.isNullOrEmpty(motTestNumber)) {
 
             personalisation.put("was_due_or_expired", "was due");
         } else {

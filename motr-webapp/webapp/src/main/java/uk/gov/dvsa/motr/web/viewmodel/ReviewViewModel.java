@@ -2,6 +2,7 @@ package uk.gov.dvsa.motr.web.viewmodel;
 
 import com.amazonaws.util.StringUtils;
 
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 import uk.gov.dvsa.motr.web.formatting.DateFormatter;
 
 import java.time.LocalDate;
@@ -23,6 +24,9 @@ public class ReviewViewModel {
     private boolean dvlaVehicle;
     private boolean emailChannel;
     private boolean mobileChannel;
+    private VehicleType vehicleType;
+    private boolean hasTests;
+    private boolean hgvPsvToggle;
 
     public String getRegistration() {
 
@@ -53,7 +57,7 @@ public class ReviewViewModel {
 
     public ReviewViewModel setColour(String colour, String colourSecondary) {
 
-        if (colour == null || "".equals(colour)) {
+        if (colour == null || "".equals(colour) || !VehicleType.MOT.equals(vehicleType)) {
             this.colour = UNKNOWN_STRING;
             return this;
         }
@@ -188,5 +192,40 @@ public class ReviewViewModel {
 
         this.mobileChannel = mobileChannel;
         return this;
+    }
+
+    public ReviewViewModel setVehicleType(VehicleType vehicleType) {
+        this.vehicleType = vehicleType;
+        return this;
+    }
+
+    public VehicleType getVehicleType() {
+        return vehicleType;
+    }
+
+    public ReviewViewModel setHasTests(boolean hasTests) {
+        this.hasTests = hasTests;
+        return this;
+    }
+
+    public ReviewViewModel setHgvPsvToggle(boolean hgvPsvToggle) {
+        this.hgvPsvToggle = hgvPsvToggle;
+        return this;
+    }
+
+    public String getExpiryDateLabelText() {
+        if (VehicleType.MOT.equals(vehicleType) || !hgvPsvToggle) {
+            if (this.isDvlaVehicle()) {
+                return "MOT due date";
+            }
+
+            return "MOT expiry date";
+        } else {
+            if (this.hasTests) {
+                return "Annual test expiry date";
+            }
+
+            return "Annual test due date";
+        }
     }
 }

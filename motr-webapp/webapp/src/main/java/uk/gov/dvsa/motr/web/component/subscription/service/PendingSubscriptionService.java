@@ -111,7 +111,7 @@ public class PendingSubscriptionService {
      * @param motDueDate most recent mot due date
      * @param confirmationId confirmation id
      * @param motIdentification the identifier for this vehicle (may be dvla id or mot test number)
-     * @param vehicleType tyoe of vehicle
+     * @param vehicleType type of vehicle
      */
     public void createPendingSubscription(
             String vrm, String contact, LocalDate motDueDate,
@@ -119,34 +119,38 @@ public class PendingSubscriptionService {
             Subscription.ContactType contactType, VehicleType vehicleType
     ) {
 
-        PendingSubscription pendingSubscription = new PendingSubscription()
-                .setConfirmationId(confirmationId)
-                .setContactDetail(new ContactDetail(contact, contactType))
-                .setVrm(vrm)
-                .setMotDueDate(motDueDate)
-                .setMotIdentification(motIdentification)
-                .setVehicleType(vehicleType);
-
         try {
+            // We have the relevant data in motrSession, but for security reasons we don't won't to create
+            // a subscription based on untrusted data. We call directly for vehicle details here.
+            VehicleDetails vehicleDetails = VehicleDetailsService.getVehicleDetails(vrm, client);
+
+            PendingSubscription pendingSubscription = new PendingSubscription()
+                    .setConfirmationId(confirmationId)
+                    .setContactDetail(new ContactDetail(contact, contactType))
+                    .setVrm(vrm)
+                    .setMotDueDate(vehicleDetails.getMotExpiryDate())
+                    .setMotIdentification(vehicleDetails.getMotIdentification())
+                    .setVehicleType(vehicleDetails.getVehicleType());
+
             pendingSubscriptionRepository.save(pendingSubscription);
 
             if (contactType == Subscription.ContactType.EMAIL) {
 
-                VehicleDetails vehicleDetails = VehicleDetailsService.getVehicleDetails(vrm, client);
                 notifyService.sendEmailAddressConfirmationEmail(
                         contact,
                         urlHelper.confirmSubscriptionLink(pendingSubscription.getConfirmationId()),
                         MakeModelFormatter.getMakeModelDisplayStringFromVehicleDetails(vehicleDetails, ", ") + vrm
                 );
             }
+
             EventLogger.logEvent(
-                    new PendingSubscriptionCreatedEvent().setVrm(vrm).setEmail(contact).setMotDueDate(motDueDate)
-                    .setMotIdentification(motIdentification)
+                    new PendingSubscriptionCreatedEvent().setVrm(vrm).setEmail(contact).setMotDueDate(vehicleDetails.getMotExpiryDate())
+                    .setMotIdentification(vehicleDetails.getMotIdentification()).setVehicleType(vehicleDetails.getVehicleType())
             );
         } catch (Exception e) {
             EventLogger.logErrorEvent(
                     new PendingSubscriptionCreationFailedEvent().setVrm(vrm).setEmail(contact).setMotDueDate(motDueDate)
-                    .setMotIdentification(motIdentification), e);
+                    .setMotIdentification(motIdentification).setVehicleType(vehicleType), e);
             throw e;
         }
     }

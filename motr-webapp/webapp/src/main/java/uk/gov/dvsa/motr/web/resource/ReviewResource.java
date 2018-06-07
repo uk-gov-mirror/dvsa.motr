@@ -3,7 +3,6 @@ package uk.gov.dvsa.motr.web.resource;
 import com.amazonaws.util.StringUtils;
 
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
-import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
 import uk.gov.dvsa.motr.web.component.subscription.response.PendingSubscriptionServiceResponse;
 import uk.gov.dvsa.motr.web.component.subscription.service.PendingSubscriptionService;
@@ -86,7 +85,10 @@ public class ReviewResource {
                     .setEmailChannel(motrSession.isUsingEmailChannel())
                     .setMobileChannel(motrSession.isUsingSmsChannel())
                     .setDvlaVehicle(vehicle.getMotIdentification().getDvlaId().isPresent())
-                    .setYearOfManufacture(vehicle.getYearOfManufacture() == null ? null : vehicle.getYearOfManufacture().toString());
+                    .setYearOfManufacture(vehicle.getYearOfManufacture() == null ? null : vehicle.getYearOfManufacture().toString())
+                    .setVehicleType(vehicle.getVehicleType())
+                    .setHgvPsvToggle(motrSession.isHgvPsvVehiclesFeatureToggleOn())
+                    .setHasTests(vehicle.getMotTestNumber() != null && !vehicle.getMotTestNumber().isEmpty());
 
         } else {
             logger.debug("vehicle is null on get request");
