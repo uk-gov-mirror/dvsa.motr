@@ -84,7 +84,7 @@ public class SmsMessageProcessor {
                 Subscription subscriptionToProcess = subscription.get();
                 cancelledSubscriptionHelper.createANewCancelledSubscriptionEntry(subscriptionToProcess);
                 subscriptionRepository.delete(subscriptionToProcess);
-                notifySmsService.sendUnsubscriptionConfirmationSms(mobileNumber, vrm);
+                notifySmsService.sendUnsubscriptionConfirmationSms(mobileNumber, vrm, subscriptionToProcess.getVehicleType());
                 EventLogger.logEvent(new SmsUnsubscribedConfirmationEvent().setVrm(vrm));
             } else if (cancelledSubscriptionHelper.foundMatchingCancelledSubscription(vrm, mobileNumber)) {
                 EventLogger.logEvent(new UserAlreadyUnsubscribedEvent().setVrm(vrm));

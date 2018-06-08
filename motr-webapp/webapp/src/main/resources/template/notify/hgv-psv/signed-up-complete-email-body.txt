@@ -1,0 +1,13 @@
+^#You’ve signed up for annual test (MOT) reminders
+The annual test for ((vehicle_details)) ((is_due_or_expires)) on ((mot_expiry_date))
+
+You'll get a reminder 2 months before your annual test is due, and again a month later if you don't have your annual test yet.
+You'll get a reminder every year until you unsubscribe.
+
+# The annual test changed on 20 May 2018
+The annual test has new defect types and new emissions values, among many other changes. Find out more at https://www.gov.uk/government/publications/hgv-inspection-manual
+
+DVSA (Driver and Vehicle Standards Agency)
+
+Unsubscribe from MOT reminders: ((unsubscribe_link))
+

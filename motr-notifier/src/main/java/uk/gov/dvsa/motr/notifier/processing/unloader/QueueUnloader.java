@@ -14,7 +14,6 @@ import uk.gov.dvsa.motr.notifier.processing.queue.QueueItemRemover;
 import uk.gov.dvsa.motr.notifier.processing.queue.SubscriptionsReceiver;
 import uk.gov.dvsa.motr.notifier.processing.service.ProcessSubscriptionService;
 
-import java.time.LocalDate;
 import java.util.concurrent.TimeUnit;
 
 public class QueueUnloader {
@@ -55,10 +54,8 @@ public class QueueUnloader {
                 break;
             }
 
-            LocalDate requestDate = subscriptionQueueItemFromQueue.getLoadedOnDate();
-
             executor.execute(new ProcessSubscriptionTask(
-                    requestDate, subscriptionQueueItemFromQueue, report, processSubscriptionService, queueItemRemover));
+                    subscriptionQueueItemFromQueue, report, processSubscriptionService, queueItemRemover));
         }
 
         try {

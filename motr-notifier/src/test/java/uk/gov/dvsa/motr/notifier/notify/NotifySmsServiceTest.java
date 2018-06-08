@@ -2,8 +2,14 @@ package uk.gov.dvsa.motr.notifier.notify;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Matchers;
 
+import uk.gov.dvsa.motr.notifier.processing.model.SubscriptionQueueItem;
+import uk.gov.dvsa.motr.notifier.processing.model.notification.sms.HgvPsvOneMonthSmsNotification;
+import uk.gov.dvsa.motr.notifier.processing.model.notification.sms.HgvPsvTwoMonthSmsNotification;
+import uk.gov.dvsa.motr.notifier.processing.model.notification.sms.MotOneDayAfterSmsNotification;
+import uk.gov.dvsa.motr.notifier.processing.model.notification.sms.MotOneMonthSmsNotification;
+import uk.gov.dvsa.motr.notifier.processing.model.notification.sms.MotTwoWeekSmsNotification;
+import uk.gov.dvsa.motr.notifier.processing.model.notification.sms.SendableSmsNotification;
 import uk.gov.dvsa.motr.notify.NotifyTemplateEngine;
 import uk.gov.dvsa.motr.notify.NotifyTemplateEngineException;
 import uk.gov.service.notify.NotificationClient;
@@ -13,9 +19,8 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -25,27 +30,26 @@ public class NotifySmsServiceTest {
 
     private static final String PHONE_NUMBER = "0700000000";
     private static final String REG = "TEST-REG";
+    private static final String HGV_PSV_DIRECTORY = "hgv-psv/";
     private static final LocalDate EXPIRY_DATE = LocalDate.of(2017, 10, 10);
 
     private NotificationClient notificationClient = mock(NotificationClient.class);
-    private String oneMonthNotificationTemplateId = "TEMPLATE-ONE-MONTH";
-    private String twoWeekNotificationTemplateId = "TEMPLATE-TWO-WEEK";
-    private String oneDayAfterNotificationTemplateId = "TEMPLATE-ONE-DAY-AFTER";
-    private String oneMonthNotificationTemplateIdPostEu = "TEMPLATE-ONE-MONTH-POST-EU";
-    private String twoWeekNotificationTemplateIdPostEu = "TEMPLATE-TWO-WEEK-POST-EU";
-    private String oneDayAfterNotificationTemplateIdPostEu = "TEMPLATE-ONE-DAY-AFTER-POST-EU";
+
+    private NotificationTemplateIds notificationTemplateIds = new NotificationTemplateIds()
+            .setTwoMonthHgvPsvNotificationTemplateId("TEMPLATE-TWO-MONTH-HGV-PSV")
+            .setOneMonthHgvPsvNotificationTemplateId("TEMPLATE-ONE-MONTH-HGV-PSV")
+            .setOneMonthNotificationTemplateId("TEMPLATE-ONE-MONTH")
+            .setTwoWeekNotificationTemplateId("TEMPLATE-TWO-WEEK")
+            .setOneDayAfterNotificationTemplateId("TEMPLATE-ONE-DAY-AFTER");
 
     private NotifySmsService notifySmsService;
-    private String euGoLiveDate = "2018-05-20";
 
     private NotifyTemplateEngine notifyTemplateEngine = mock(NotifyTemplateEngine.class);
     private Map<String, String> body = new HashMap<>();
 
     @Before
     public void setUp() {
-        notifySmsService = new NotifySmsService(notificationClient, oneMonthNotificationTemplateId, twoWeekNotificationTemplateId,
-                oneDayAfterNotificationTemplateId, oneMonthNotificationTemplateIdPostEu, twoWeekNotificationTemplateIdPostEu,
-                oneDayAfterNotificationTemplateIdPostEu, euGoLiveDate, notifyTemplateEngine);
+        notifySmsService = new NotifySmsService(notificationClient, notifyTemplateEngine);
         body.put("body", "This is the body");
         try {
             when(notifyTemplateEngine.getNotifyParameters(any(), any())).thenReturn(body);
@@ -63,12 +67,17 @@ public class NotifySmsServiceTest {
         Map<String, String> personalisation = stubGenericPersonalisation();
         personalisation.put("mot_expiry_date", DateFormatterForSmsDisplay.asFormattedForSmsDate(EXPIRY_DATE));
 
-        notifySmsService.sendOneMonthNotificationSms(PHONE_NUMBER, REG, EXPIRY_DATE);
+        SendableSmsNotification notification = new MotOneMonthSmsNotification()
+                .setTemplateId(notificationTemplateIds.getOneMonthNotificationTemplateId());
 
-        verify(notifyTemplateEngine, times(1)).getNotifyParameters(any(), Matchers.eq(personalisation));
+        notification.personalise(stubSubscriptionQueueItem());
+
+        notifySmsService.sendSms(PHONE_NUMBER, notification);
+
+        verify(notifyTemplateEngine, times(1)).getNotifyParameters(eq("one-month-notification-sms.txt"), eq(personalisation));
 
         verify(notificationClient, times(1)).sendSms(
-                oneMonthNotificationTemplateIdPostEu,
+                notificationTemplateIds.getOneMonthNotificationTemplateId(),
                 PHONE_NUMBER,
                 body,
                 ""
@@ -81,12 +90,18 @@ public class NotifySmsServiceTest {
 
         Map<String, String> personalisation = stubGenericPersonalisation();
         personalisation.put("mot_expiry_date", DateFormatterForSmsDisplay.asFormattedForSmsDate(EXPIRY_DATE));
-        notifySmsService.sendTwoWeekNotificationSms(PHONE_NUMBER, REG, EXPIRY_DATE);
 
-        verify(notifyTemplateEngine, times(1)).getNotifyParameters(any(), Matchers.eq(personalisation));
+        SendableSmsNotification notification = new MotTwoWeekSmsNotification()
+                .setTemplateId(notificationTemplateIds.getTwoWeekNotificationTemplateId());
+
+        notification.personalise(stubSubscriptionQueueItem());
+
+        notifySmsService.sendSms(PHONE_NUMBER, notification);
+
+        verify(notifyTemplateEngine, times(1)).getNotifyParameters(eq("two-week-notification-sms.txt"), eq(personalisation));
 
         verify(notificationClient, times(1)).sendSms(
-                twoWeekNotificationTemplateIdPostEu,
+                notificationTemplateIds.getTwoWeekNotificationTemplateId(),
                 PHONE_NUMBER,
                 body,
                 ""
@@ -96,30 +111,85 @@ public class NotifySmsServiceTest {
     @Test
     public void oneDayAfterNotificationIsSentWithCorrectDetails()
             throws NotificationClientException, NotifyTemplateEngineException {
-        
+
         Map<String, String> personalisation = stubGenericPersonalisation();
 
-        notifySmsService.sendOneDayAfterNotificationSms(PHONE_NUMBER, REG);
+        SendableSmsNotification notification = new MotOneDayAfterSmsNotification()
+                .setTemplateId(notificationTemplateIds.getOneDayAfterNotificationTemplateId());
 
-        verify(notifyTemplateEngine, times(1)).getNotifyParameters(any(), Matchers.eq(personalisation));
+        notification.personalise(stubSubscriptionQueueItem());
+
+        notifySmsService.sendSms(PHONE_NUMBER, notification);
+
+        verify(notifyTemplateEngine, times(1)).getNotifyParameters(eq("one-day-after-notification-sms.txt"), eq(personalisation));
 
         verify(notificationClient, times(1)).sendSms(
-                oneDayAfterNotificationTemplateIdPostEu,
+                notificationTemplateIds.getOneDayAfterNotificationTemplateId(),
                 PHONE_NUMBER,
                 body,
-                "");
+                ""
+        );
+    }
+
+    @Test
+    public void twoMonthHgvPsvNotificationIsSentWithCorrectDetails()
+            throws NotificationClientException, NotifyTemplateEngineException {
+
+        Map<String, String> personalisation = stubGenericPersonalisation();
+        personalisation.put("mot_expiry_date", DateFormatterForSmsDisplay.asFormattedForSmsDate(EXPIRY_DATE));
+
+        SendableSmsNotification notification = new HgvPsvTwoMonthSmsNotification()
+                .setTemplateId(notificationTemplateIds.getTwoMonthHgvPsvNotificationTemplateId());
+
+        notification.personalise(stubSubscriptionQueueItem());
+
+        notifySmsService.sendSms(PHONE_NUMBER, notification);
+
+        verify(notifyTemplateEngine, times(1)).getNotifyParameters(
+                eq(HGV_PSV_DIRECTORY + "hgv-psv-notification-sms.txt"), eq(personalisation));
+
+        verify(notificationClient, times(1)).sendSms(
+                notificationTemplateIds.getTwoMonthHgvPsvNotificationTemplateId(),
+                PHONE_NUMBER,
+                body,
+                ""
+        );
+    }
+
+    @Test
+    public void oneMonthHgvPsvNotificationIsSentWithCorrectDetails()
+            throws NotificationClientException, NotifyTemplateEngineException {
+
+        Map<String, String> personalisation = stubGenericPersonalisation();
+        personalisation.put("mot_expiry_date", DateFormatterForSmsDisplay.asFormattedForSmsDate(EXPIRY_DATE));
+
+        SendableSmsNotification notification = new HgvPsvOneMonthSmsNotification()
+                .setTemplateId(notificationTemplateIds.getOneMonthHgvPsvNotificationTemplateId());
+
+        notification.personalise(stubSubscriptionQueueItem());
+
+        notifySmsService.sendSms(PHONE_NUMBER, notification);
+
+        verify(notifyTemplateEngine, times(1)).getNotifyParameters(
+                eq(HGV_PSV_DIRECTORY + "hgv-psv-notification-sms.txt"), eq(personalisation));
+
+        verify(notificationClient, times(1)).sendSms(
+                notificationTemplateIds.getOneMonthHgvPsvNotificationTemplateId(),
+                PHONE_NUMBER,
+                body,
+                ""
+        );
     }
 
     @Test(expected = NotificationClientException.class)
     public void whenClientThrowsAnErrorItIsThrown()
-            throws NotificationClientException, NotifyTemplateEngineException {
+            throws NotificationClientException {
 
         when(notificationClient.sendSms(any(), any(), any(), any())).thenThrow(NotificationClientException.class);
 
-        notifySmsService.sendOneMonthNotificationSms(
-                "",
-                "",
-                LocalDate.of(2017, 10, 10)
+        notifySmsService.sendSms(
+                PHONE_NUMBER,
+                new MotOneMonthSmsNotification()
         );
     }
 
@@ -130,21 +200,11 @@ public class NotifySmsServiceTest {
         return personalisation;
     }
 
-    @Test
-    public void testGetEuRoadworthinessReturnsTrue_WhenCurrentDateIsGreaterThanGoLiveDate() {
-
-        String euGoLiveDate = "2018-01-20";
-        boolean isEuRoadworthinessLive = this.notifySmsService.isEuRoadworthinessLive(euGoLiveDate);
-
-        assertTrue(isEuRoadworthinessLive);
-    }
-
-    @Test
-    public void testGetEuRoadworthinessReturnsFalse_WhenCurrentDateIsLessThanGoLiveDate() {
-
-        String euGoLiveDate = "2019-05-20";
-        boolean isEuRoadworthinessLive = this.notifySmsService.isEuRoadworthinessLive(euGoLiveDate);
-
-        assertFalse(isEuRoadworthinessLive);
+    private SubscriptionQueueItem stubSubscriptionQueueItem() {
+        SubscriptionQueueItem subscription = new SubscriptionQueueItem();
+        subscription.setId("a")
+                .setVrm(REG)
+                .setMotDueDate(EXPIRY_DATE);
+        return subscription;
     }
 }

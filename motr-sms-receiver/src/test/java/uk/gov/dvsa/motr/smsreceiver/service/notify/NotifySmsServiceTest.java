@@ -11,6 +11,7 @@ import org.junit.runner.RunWith;
 import uk.gov.dvsa.motr.notify.NotifyTemplateEngine;
 import uk.gov.dvsa.motr.notify.NotifyTemplateEngineException;
 import uk.gov.dvsa.motr.smsreceiver.notify.NotifySmsService;
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
@@ -46,7 +47,7 @@ public class NotifySmsServiceTest {
     public void smsUnsubscriptionConfirmationIsSentWithCorrectDetails()
             throws NotificationClientException, NotifyTemplateEngineException {
 
-        notifySmsService.sendUnsubscriptionConfirmationSms(PHONE_NUMBER, VRM);
+        notifySmsService.sendUnsubscriptionConfirmationSms(PHONE_NUMBER, VRM, VehicleType.MOT);
 
         Map<String, String> personalisation = new HashMap<>();
         personalisation.put("vehicle_vrm", VRM);
@@ -68,7 +69,7 @@ public class NotifySmsServiceTest {
 
         when(notificationClient.sendSms(any(), any(), any(), any())).thenThrow(NotificationClientException.class);
 
-        notifySmsService.sendUnsubscriptionConfirmationSms(phoneNumber, vrm);
+        notifySmsService.sendUnsubscriptionConfirmationSms(phoneNumber, vrm, VehicleType.MOT);
     }
 
     @DataProvider

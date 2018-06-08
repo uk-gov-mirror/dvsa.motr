@@ -17,24 +17,19 @@ import uk.gov.dvsa.motr.notifier.processing.service.VehicleNotFoundException;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClientException;
 import uk.gov.service.notify.NotificationClientException;
 
-import java.time.LocalDate;
-
 public class ProcessSubscriptionTask implements Runnable {
 
-    private LocalDate requestDate;
     private SubscriptionQueueItem subscriptionQueueItemToProcess;
     private NotifierReport report;
     private ProcessSubscriptionService processSubscriptionService;
     private QueueItemRemover queueItemRemover;
 
     public ProcessSubscriptionTask(
-            LocalDate requestDate,
             SubscriptionQueueItem subscriptionQueueItemToProcess,
             NotifierReport report,
             ProcessSubscriptionService processSubscriptionService,
             QueueItemRemover queueItemRemover) {
 
-        this.requestDate = requestDate;
         this.subscriptionQueueItemToProcess = subscriptionQueueItemToProcess;
         this.report = report;
         this.processSubscriptionService = processSubscriptionService;
@@ -48,7 +43,7 @@ public class ProcessSubscriptionTask implements Runnable {
 
         try {
 
-            processSubscriptionService.processSubscription(subscriptionQueueItemToProcess, requestDate);
+            processSubscriptionService.processSubscription(subscriptionQueueItemToProcess);
 
             queueItemRemover.removeProcessedQueueItem(subscriptionQueueItemToProcess);
 

@@ -1,0 +1,16 @@
+^#The annual test for ((vehicle_details)) ((is_due_or_expires)) on ((mot_expiry_date))
+
+((preservation_statement))
+
+# The annual test changed on 20 May 2018
+
+The annual test has new defect types and new emissions values, among many other changes. Find out more at https://www.gov.uk/government/publications/hgv-inspection-manual
+
+# Was this reminder useful to you?
+
+Help us improve the MOT reminder service by telling us what you think at https://www.gov.uk/mot-survey
+
+DVSA (Driver and Vehicle Standards Agency)
+
+Unsubscribe from MOT reminders:
+((unsubscribe_link))

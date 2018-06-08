@@ -5,9 +5,9 @@ import uk.gov.dvsa.motr.notify.NotifyTemplateEngine;
 import uk.gov.dvsa.motr.notify.NotifyTemplateEngineException;
 import uk.gov.dvsa.motr.notify.NotifyTemplateEngineFailedEvent;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsService;
-import uk.gov.dvsa.motr.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.eventlog.subscription.NotifyClientFailedEvent;
@@ -17,7 +17,6 @@ import uk.gov.dvsa.motr.web.formatting.MakeModelFormatter;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,9 +36,12 @@ public class NotifyService {
     private final VehicleDetailsClient vehicleDetailsClient;
     private final NotifyTemplateEngine notifyTemplateEngine;
 
+    private static final String HGV_PSV_TEMPLATES_DIRECTORY = "hgv-psv/";
+
     private static final String SIGN_UP_CONFIRM_EMAIL_SUBJECT = "sign-up-confirm-email-subject.txt";
     private static final String SIGN_UP_CONFIRM_EMAIL_BODY = "sign-up-confirm-email-body.txt";
     private static final String SIGN_UP_CONFIRM_SMS = "sign-up-confirm-sms.txt";
+
     private static final String SIGNED_UP_COMPLETE_EMAIL_SUBJECT = "signed-up-complete-email-subject.txt";
     private static final String SIGNED_UP_COMPLETE_EMAIL_BODY = "signed-up-complete-email-body.txt";
     private static final String SIGNED_UP_COMPLETE_SMS = "signed-up-complete-sms.txt";
@@ -53,7 +55,6 @@ public class NotifyService {
             VehicleDetailsClient vehicleDetailsClient,
             NotifyTemplateEngine notifyTemplateEngine
     ) {
-
         this.notificationClient = notificationClient;
         this.emailSubscriptionConfirmationTemplateId = emailSubscriptionConfirmationTemplateId;
         this.emailConfirmationTemplateId = emailConfirmationTemplateId;
@@ -65,20 +66,12 @@ public class NotifyService {
     }
 
     public void sendSubscriptionConfirmation(Subscription subscription) {
-        if (subscription.getContactDetail().getContactType() == Subscription.ContactType.EMAIL) {
-            VehicleDetails vehicleDetails = VehicleDetailsService.getVehicleDetails(subscription.getVrm(), vehicleDetailsClient);
+        VehicleDetails vehicleDetails = VehicleDetailsService.getVehicleDetails(subscription.getVrm(), vehicleDetailsClient);
 
-            sendSubscriptionConfirmationEmail(
-                    subscription.getContactDetail().getValue(),
-                    MakeModelFormatter.getMakeModelDisplayStringFromVehicleDetails(vehicleDetails, ", ") + subscription.getVrm(),
-                    subscription.getMotDueDate(),
-                    urlHelper.unsubscribeLink(subscription.getUnsubscribeId()),
-                    subscription.getMotIdentification());
+        if (subscription.getContactDetail().getContactType() == Subscription.ContactType.EMAIL) {
+            sendSubscriptionCompleteEmail(subscription, vehicleDetails);
         } else {
-            sendSubscriptionConfirmationSms(
-                    subscription.getContactDetail().getValue(),
-                    subscription.getVrm(),
-                    subscription.getMotDueDate());
+            sendSubscriptionConfirmationSms(subscription, vehicleDetails);
         }
     }
 
@@ -120,27 +113,26 @@ public class NotifyService {
         }
     }
 
-    private void sendSubscriptionConfirmationEmail(
-            String emailAddress,
-            String vehicleDetails,
-            LocalDate motExpiryDate,
-            String unsubscribeLink,
-            MotIdentification motIdentification
+    private void sendSubscriptionCompleteEmail(
+            Subscription subscription,
+            VehicleDetails vehicleDetails
     ) {
-
+        String emailAddress = subscription.getContactDetail().getValue();
         Map<String, String> personalisation = new HashMap<>();
-        personalisation.put("vehicle_details", vehicleDetails);
-        personalisation.put("mot_expiry_date", DateFormatter.asDisplayDate(motExpiryDate));
-        personalisation.put("unsubscribe_link", unsubscribeLink);
+        personalisation.put("vehicle_details", MakeModelFormatter.getMakeModelDisplayStringFromVehicleDetails(
+                vehicleDetails, ", " + subscription.getVrm()));
+        personalisation.put("mot_expiry_date", DateFormatter.asDisplayDate(subscription.getMotDueDate()));
+        personalisation.put("unsubscribe_link", urlHelper.unsubscribeLink(subscription.getUnsubscribeId()));
 
-        if (motIdentification.getDvlaId().isPresent()) {
+        if (subscription.getMotIdentification().getDvlaId().isPresent()) {
             personalisation.put("is_due_or_expires", "is due");
         } else {
             personalisation.put("is_due_or_expires", "expires");
         }
 
         Map<String, String> notifyParams = getNotifyParameters(
-                SIGNED_UP_COMPLETE_EMAIL_SUBJECT, SIGNED_UP_COMPLETE_EMAIL_BODY,
+                modifyTemplatePathForVehicleType(SIGNED_UP_COMPLETE_EMAIL_SUBJECT, vehicleDetails.getVehicleType()),
+                modifyTemplatePathForVehicleType(SIGNED_UP_COMPLETE_EMAIL_BODY, vehicleDetails.getVehicleType()),
                 personalisation);
 
         try {
@@ -180,12 +172,14 @@ public class NotifyService {
         }
     }
 
-    private void sendSubscriptionConfirmationSms(String phoneNumber, String vehicleVrm, LocalDate motExpiryDate) {
+    private void sendSubscriptionConfirmationSms(Subscription subscription, VehicleDetails vehicleDetails) {
 
+        String phoneNumber = subscription.getContactDetail().getValue();
         Map<String, String> personalisation = new HashMap<>();
-        personalisation.put("vehicle_vrm", vehicleVrm);
-        personalisation.put("mot_expiry_date", DateFormatterForSmsDisplay.asFormattedForSmsDate(motExpiryDate));
-        Map<String, String> notifyParams = getNotifyParameters(SIGNED_UP_COMPLETE_SMS, personalisation);
+        personalisation.put("vehicle_vrm", subscription.getVrm());
+        personalisation.put("mot_expiry_date", DateFormatterForSmsDisplay.asFormattedForSmsDate(subscription.getMotDueDate()));
+        Map<String, String> notifyParams = getNotifyParameters(
+                modifyTemplatePathForVehicleType(SIGNED_UP_COMPLETE_SMS, vehicleDetails.getVehicleType()), personalisation);
 
         try {
 
@@ -198,4 +192,12 @@ public class NotifyService {
             throw new RuntimeException(e);
         }
     }
+
+    private String modifyTemplatePathForVehicleType(String templatePath, VehicleType vehicleType) {
+        if (vehicleType == VehicleType.HGV || vehicleType == VehicleType.PSV) {
+            templatePath = HGV_PSV_TEMPLATES_DIRECTORY + templatePath;
+        }
+        return templatePath;
+    }
+
 }

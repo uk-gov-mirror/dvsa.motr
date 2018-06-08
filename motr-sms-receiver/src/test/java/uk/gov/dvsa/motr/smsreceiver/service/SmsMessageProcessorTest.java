@@ -12,8 +12,6 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import uk.gov.dvsa.motr.eventlog.EventLogger;
-import uk.gov.dvsa.motr.exception.InvalidNotifyCredentialsException;
-import uk.gov.dvsa.motr.notify.NotifyTemplateEngineException;
 import uk.gov.dvsa.motr.smsreceiver.events.FailedToFindSubscriptionEvent;
 import uk.gov.dvsa.motr.smsreceiver.events.InvalidVrmSentEvent;
 import uk.gov.dvsa.motr.smsreceiver.events.UnableToProcessMessageEvent;
@@ -22,6 +20,7 @@ import uk.gov.dvsa.motr.smsreceiver.model.Message;
 import uk.gov.dvsa.motr.smsreceiver.notify.NotifySmsService;
 import uk.gov.dvsa.motr.smsreceiver.subscription.model.Subscription;
 import uk.gov.dvsa.motr.smsreceiver.subscription.persistence.SubscriptionRepository;
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 import uk.gov.service.notify.NotificationClientException;
 
 import java.io.IOException;
@@ -65,7 +64,7 @@ public class SmsMessageProcessorTest {
 
     @Test
     public void whenMessageIsWellFormed_AndThereIsAMatchingSubscriptionToCancel_ThenSubscriptionSuccessfullyCancelled()
-            throws IOException, InvalidNotifyCredentialsException, NotificationClientException, NotifyTemplateEngineException {
+            throws IOException, NotificationClientException {
 
         Subscription subscription = buildTestSubscription(TEST_VRM, MOBILE_NUMBER);
 
@@ -80,12 +79,12 @@ public class SmsMessageProcessorTest {
 
         verify(cancelledSubscriptionHelper, times(1)).createANewCancelledSubscriptionEntry(subscription);
         verify(subscriptionRepository, times(1)).delete(subscription);
-        verify(notifySmsService, times(1)).sendUnsubscriptionConfirmationSms(MOBILE_NUMBER, TEST_VRM);
+        verify(notifySmsService, times(1)).sendUnsubscriptionConfirmationSms(MOBILE_NUMBER, TEST_VRM, VehicleType.MOT);
     }
 
     @Test
     public void whenThereAreInsufficentDetailsInTheTextMessage_ThenAnExceptionIsThrown()
-            throws IOException, InvalidNotifyCredentialsException, NotificationClientException {
+            throws IOException {
 
         smsMessageProcessor = initialiseProcessor();
         smsMessageProcessor.run(buildTestRequest("SOMETHING INSUFFICIENT"));
@@ -97,7 +96,7 @@ public class SmsMessageProcessorTest {
 
     @Test
     public void whenTheMessageDoesntHaveAValidVrm_ThenAnErrorEventIsLogged()
-            throws IOException, InvalidNotifyCredentialsException, NotificationClientException {
+            throws IOException {
 
         when(smsMessageValidator.messageHasSufficientDetails(any())).thenReturn(true);
         when(vrmValidator.isValid(TEST_VRM)).thenReturn(false);
@@ -111,7 +110,7 @@ public class SmsMessageProcessorTest {
 
     @Test
     public void whenNoSubscriptionIsFound_ButCancelledSubscriptionIsPresent_ThenUserAlreadyUnsubscribedEventIsLogged()
-            throws IOException, InvalidNotifyCredentialsException, NotificationClientException {
+            throws IOException {
 
         when(smsMessageValidator.messageHasSufficientDetails(any())).thenReturn(true);
         when(vrmValidator.isValid(TEST_VRM)).thenReturn(true);
@@ -127,7 +126,7 @@ public class SmsMessageProcessorTest {
 
     @Test
     public void whenNoSubscriptionIsFound_AndNoCancelledSubscriptionIsPresent_ThenFailedToFindSubscriptionEventIsLogged()
-            throws IOException, InvalidNotifyCredentialsException, NotificationClientException {
+            throws IOException {
 
         when(smsMessageValidator.messageHasSufficientDetails(any())).thenReturn(true);
         when(vrmValidator.isValid(TEST_VRM)).thenReturn(true);
@@ -143,7 +142,7 @@ public class SmsMessageProcessorTest {
 
     @Test
     public void testBearerTokenIsVerified()
-            throws IOException, InvalidNotifyCredentialsException, NotificationClientException {
+            throws IOException {
 
         smsMessageProcessor = initialiseProcessorWithBadToken();
         smsMessageProcessor.run(buildTestRequest("STOP" + TEST_VRM));

@@ -2,7 +2,6 @@ package uk.gov.dvsa.motr.notifications.service;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Matchers;
 
 import uk.gov.dvsa.motr.notify.NotifyTemplateEngine;
 import uk.gov.dvsa.motr.notify.NotifyTemplateEngineException;
@@ -10,6 +9,7 @@ import uk.gov.dvsa.motr.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClientException;
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -34,9 +35,9 @@ public class NotifyServiceTest {
 
     private NotifyService service;
 
-    private static final NotificationClient NOTIFICATION_CLIENT_MOCK = mock(NotificationClient.class);
-    private static final VehicleDetailsClient VEHICLE_DETAILS_CLIENT_MOCK = mock(VehicleDetailsClient.class);
-    private static final NotifyTemplateEngine NOTIFY_TEMPLATE_ENGINE_MOCK = mock(NotifyTemplateEngine.class);
+    private NotificationClient notificationClientMock;
+    private VehicleDetailsClient vehicleDetailsClientMock;
+    private NotifyTemplateEngine notifyTemplateEngineMock;
 
     private static final UrlHelper URL_HELPER_MOCK = mock(UrlHelper.class);
 
@@ -51,6 +52,12 @@ public class NotifyServiceTest {
     private String templateId = "180";
     private String emailConfirmationTemplateId = "180";
     private String smsSubscriptionConfirmationTemplateId = "SMS-SUBSCRIPTION-CONFIRMATION-TEMPLATE";
+
+    private static final String HGV_PSV_TEMPLATES_DIRECTORY = "hgv-psv/";
+    private static final String SIGNED_UP_COMPLETE_EMAIL_SUBJECT = "signed-up-complete-email-subject.txt";
+    private static final String SIGNED_UP_COMPLETE_EMAIL_BODY = "signed-up-complete-email-body.txt";
+    private static final String SIGNED_UP_COMPLETE_SMS = "signed-up-complete-sms.txt";
+
     private String smsConfirmationTemplateId = "SMS-CONFIRMATION-TEMPLATE";
     private String vehicleDetails = "TEST-MAKE TEST-MODEL, ABC123";
     private LocalDate motExpiryDate = LocalDate.of(2017, 1, 1);
@@ -61,26 +68,29 @@ public class NotifyServiceTest {
     @Before
     public void setUp() {
 
-        this.service = new NotifyService(NOTIFICATION_CLIENT_MOCK,
+        notificationClientMock = mock(NotificationClient.class);
+        vehicleDetailsClientMock = mock(VehicleDetailsClient.class);
+        notifyTemplateEngineMock = mock(NotifyTemplateEngine.class);
+
+        this.service = new NotifyService(notificationClientMock,
                 templateId,
                 emailConfirmationTemplateId,
                 smsSubscriptionConfirmationTemplateId,
                 smsConfirmationTemplateId,
                 URL_HELPER_MOCK,
-                VEHICLE_DETAILS_CLIENT_MOCK,
-                NOTIFY_TEMPLATE_ENGINE_MOCK
+                vehicleDetailsClientMock,
+                notifyTemplateEngineMock
                 );
         body.put("body", BODY_CONTENTS);
 
         try {
-            when(NOTIFY_TEMPLATE_ENGINE_MOCK.getNotifyParameters(any(), any())).thenReturn(body);
-            when(NOTIFY_TEMPLATE_ENGINE_MOCK.getNotifyParameters(any(), any(), any())).thenReturn(body);
+            when(notifyTemplateEngineMock.getNotifyParameters(any(), any())).thenReturn(body);
+            when(notifyTemplateEngineMock.getNotifyParameters(any(), any(), any())).thenReturn(body);
 
         } catch (NotifyTemplateEngineException exception) {
             throw new RuntimeException(exception);
         }
     }
-
 
     @Test
     public void notifyCalledWithCorrectValues()
@@ -88,19 +98,19 @@ public class NotifyServiceTest {
 
         Map<String, String> personalisation = stubPersonalisationMap(vehicleDetails, motExpiryDate, unsubscribeLink);
 
-        when(NOTIFICATION_CLIENT_MOCK.sendEmail(any(), any(), any(), any())).thenReturn(mock(SendEmailResponse.class));
-        when(VEHICLE_DETAILS_CLIENT_MOCK.fetchByVrm(VRM)).thenReturn(mockVehicleDetailsStub());
+        when(notificationClientMock.sendEmail(any(), any(), any(), any())).thenReturn(mock(SendEmailResponse.class));
+        when(vehicleDetailsClientMock.fetchByVrm(VRM)).thenReturn(mockVehicleDetailsStub());
         when(URL_HELPER_MOCK.unsubscribeLink(subscriptionId)).thenReturn(unsubscribeLink);
 
         this.service.sendSubscriptionConfirmation(emailSubscriptionStub());
-        verify(NOTIFY_TEMPLATE_ENGINE_MOCK, times(1)).getNotifyParameters(any(), any(), Matchers.eq(personalisation));
-        verify(NOTIFICATION_CLIENT_MOCK, times(1)).sendEmail(templateId, email, body, "");
+        verify(notifyTemplateEngineMock, times(1)).getNotifyParameters(any(), any(), eq(personalisation));
+        verify(notificationClientMock, times(1)).sendEmail(templateId, email, body, "");
     }
 
     @Test(expected = RuntimeException.class)
     public void whenNotifyFailsExceptionIsThrown() throws NotificationClientException {
 
-        when(NOTIFICATION_CLIENT_MOCK.sendEmail(any(), any(), any(), any())).thenThrow(NotificationClientException.class);
+        when(notificationClientMock.sendEmail(any(), any(), any(), any())).thenThrow(NotificationClientException.class);
 
         this.service.sendSubscriptionConfirmation(emailSubscriptionStub());
     }
@@ -108,15 +118,14 @@ public class NotifyServiceTest {
     @Test
     public void sendPhoneNumberConfirmationSmsIsSentWithCorrectDetails() throws NotificationClientException, NotifyTemplateEngineException {
 
-
         this.service.sendPhoneNumberConfirmationSms(PHONE_NUMBER, CONFIRMATION_CODE);
 
         Map<String, String> personalisation = new HashMap<>();
         personalisation.put("confirmation_code", CONFIRMATION_CODE);
 
-        verify(NOTIFY_TEMPLATE_ENGINE_MOCK, times(1)).getNotifyParameters(any(), Matchers.eq(personalisation));
+        verify(notifyTemplateEngineMock, times(1)).getNotifyParameters(any(), eq(personalisation));
 
-        verify(NOTIFICATION_CLIENT_MOCK, times(1)).sendSms(
+        verify(notificationClientMock, times(1)).sendSms(
                 smsConfirmationTemplateId,
                 PHONE_NUMBER,
                 body,
@@ -125,8 +134,44 @@ public class NotifyServiceTest {
     }
 
     @Test
+    public void emailSubscriptionComplete_sentWithCorrectDetails_forHgvPsv()
+            throws NotifyTemplateEngineException, VehicleDetailsClientException {
+
+        when(vehicleDetailsClientMock.fetchByVrm(any())).thenReturn(Optional.of(
+                new VehicleDetails().setVehicleType(VehicleType.PSV)
+        ));
+
+        this.service.sendSubscriptionConfirmation(emailSubscriptionStub());
+
+        verify(notifyTemplateEngineMock, times(1)).getNotifyParameters(
+                eq(HGV_PSV_TEMPLATES_DIRECTORY + SIGNED_UP_COMPLETE_EMAIL_SUBJECT),
+                eq(HGV_PSV_TEMPLATES_DIRECTORY + SIGNED_UP_COMPLETE_EMAIL_BODY),
+                any()
+        );
+    }
+
+    @Test
+    public void emailSubscriptionComplete_sentWithCorrectDetails_forMotVehicle()
+            throws NotifyTemplateEngineException, VehicleDetailsClientException {
+
+        when(vehicleDetailsClientMock.fetchByVrm(any())).thenReturn(Optional.of(
+                new VehicleDetails().setVehicleType(VehicleType.MOT)
+        ));
+
+        this.service.sendSubscriptionConfirmation(emailSubscriptionStub());
+
+        verify(notifyTemplateEngineMock, times(1)).getNotifyParameters(
+                eq(SIGNED_UP_COMPLETE_EMAIL_SUBJECT),
+                eq(SIGNED_UP_COMPLETE_EMAIL_BODY),
+                any()
+        );
+    }
+
+    @Test
     public void sendSubscriptionConfirmationSmsIsSentWithCorrectDetails()
-            throws NotificationClientException, NotifyTemplateEngineException {
+            throws NotificationClientException, NotifyTemplateEngineException, VehicleDetailsClientException {
+
+        when(vehicleDetailsClientMock.fetchByVrm(any())).thenReturn(Optional.of(new VehicleDetails()));
 
         this.service.sendSubscriptionConfirmation(smsSubscriptionStub());
 
@@ -134,13 +179,45 @@ public class NotifyServiceTest {
         personalisation.put("vehicle_vrm", VRM);
         personalisation.put("mot_expiry_date", DateFormatterForSmsDisplay.asFormattedForSmsDate(motExpiryDate));
 
-        verify(NOTIFY_TEMPLATE_ENGINE_MOCK, times(1)).getNotifyParameters(any(), Matchers.eq(personalisation));
+        verify(notifyTemplateEngineMock, times(1)).getNotifyParameters(any(), eq(personalisation));
 
-        verify(NOTIFICATION_CLIENT_MOCK, times(1)).sendSms(
+        verify(notificationClientMock, times(1)).sendSms(
                 smsSubscriptionConfirmationTemplateId,
                 PHONE_NUMBER,
                 body,
                 ""
+        );
+    }
+
+    @Test
+    public void smsSubscriptionComplete_sentWithCorrectDetails_forHgvPsv()
+            throws NotifyTemplateEngineException, VehicleDetailsClientException {
+
+        when(vehicleDetailsClientMock.fetchByVrm(any())).thenReturn(Optional.of(
+                new VehicleDetails().setVehicleType(VehicleType.PSV)
+        ));
+
+        this.service.sendSubscriptionConfirmation(smsSubscriptionStub());
+
+        verify(notifyTemplateEngineMock, times(1)).getNotifyParameters(
+                eq(HGV_PSV_TEMPLATES_DIRECTORY + SIGNED_UP_COMPLETE_SMS),
+                any()
+        );
+    }
+
+    @Test
+    public void smsSubscriptionComplete_sentWithCorrectDetails_forMotVehicle()
+            throws NotifyTemplateEngineException, VehicleDetailsClientException {
+
+        when(vehicleDetailsClientMock.fetchByVrm(any())).thenReturn(Optional.of(
+                new VehicleDetails().setVehicleType(VehicleType.MOT)
+        ));
+
+        this.service.sendSubscriptionConfirmation(smsSubscriptionStub());
+
+        verify(notifyTemplateEngineMock, times(1)).getNotifyParameters(
+                eq(SIGNED_UP_COMPLETE_SMS),
+                any()
         );
     }
 

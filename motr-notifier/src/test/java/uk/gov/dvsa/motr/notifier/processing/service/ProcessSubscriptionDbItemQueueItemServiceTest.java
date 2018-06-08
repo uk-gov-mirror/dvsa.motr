@@ -6,18 +6,23 @@ import org.junit.Test;
 import uk.gov.dvsa.motr.notifier.component.subscription.persistence.SubscriptionRepository;
 import uk.gov.dvsa.motr.notifier.notify.NotifyEmailService;
 import uk.gov.dvsa.motr.notifier.notify.NotifySmsService;
+import uk.gov.dvsa.motr.notifier.processing.factory.SendableNotificationFactory;
 import uk.gov.dvsa.motr.notifier.processing.model.ContactDetail;
 import uk.gov.dvsa.motr.notifier.processing.model.SubscriptionQueueItem;
+import uk.gov.dvsa.motr.notifier.processing.model.notification.email.MotTwoWeekEmailNotification;
+import uk.gov.dvsa.motr.notifier.processing.model.notification.email.SendableEmailNotification;
+import uk.gov.dvsa.motr.notifier.processing.model.notification.sms.MotOneDayAfterSmsNotification;
+import uk.gov.dvsa.motr.notifier.processing.model.notification.sms.MotOneMonthSmsNotification;
+import uk.gov.dvsa.motr.notifier.processing.model.notification.sms.MotTwoWeekSmsNotification;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
 
 import java.time.LocalDate;
 import java.util.Optional;
 
-import javax.ws.rs.core.UriBuilder;
-
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -31,46 +36,44 @@ public class ProcessSubscriptionDbItemQueueItemServiceTest {
     private SubscriptionRepository subscriptionRepository = mock(SubscriptionRepository.class);
     private NotifyEmailService notifyEmailService = mock(NotifyEmailService.class);
     private NotifySmsService notifySmsService = mock(NotifySmsService.class);
-    private String webBaseUrl = "http://gov.uk";
+    private SendableNotificationFactory notificationFactory = mock(SendableNotificationFactory.class);
 
+    private static final String WEB_BASE_URL = "http://gov.uk";
     private static final String TEST_VRM = "TEST-VRM";
     private static final String UPDATED_VRM = "UPDATED-VRM";
     private static final String SUBSCRIPTION_ID = "12345";
     private static final String MOT_TEST_NUMBER = "test-mot-number-123";
     private static final String TEST_MAKE = "TEST-MAKE";
     private static final String TEST_MODEL = "TEST-MODEL";
-    private static final String TEST_MAKE_AND_MODEl = TEST_MAKE + " " + TEST_MODEL + ", ";
     private static final String DVLA_ID = "2131312";
     private static final String TEST_PHONE_NUMBER = "070000000000";
-    private static final String MOTH_DIRECT_URL_PREFIX = "http://gov.uk/";
-    private static final String CHECKSUM_SALT = "SOMESALT";
-    private static final String EXPECTED_CHECKSUM = "8b536c0fbb5bcee2";
 
     @Before
     public void setUp() {
         processSubscriptionService = new ProcessSubscriptionService(
-                vehicleDetailsClient, subscriptionRepository, notifyEmailService, notifySmsService, webBaseUrl,
-                MOTH_DIRECT_URL_PREFIX, CHECKSUM_SALT
+                vehicleDetailsClient, subscriptionRepository, notifyEmailService, notifySmsService, notificationFactory
         );
     }
 
     @Test(expected = VehicleNotFoundException.class)
     public void whenVehicleNotFoundInTradeApiExceptionThrown() throws Exception {
         when(this.vehicleDetailsClient.fetchByMotTestNumber(any())).thenReturn(Optional.empty());
-        processSubscriptionService.processSubscription(emailSubscriptionStub(LocalDate.now()), LocalDate.now());
+        processSubscriptionService.processSubscription(emailSubscriptionStub(LocalDate.now()));
     }
 
     @Test
     public void whenVehicleExpiryDateDiffersForSubscriptionItIsUpdatedInDatabase() throws Exception {
 
         LocalDate vehicleExpiryDate = LocalDate.of(2018, 10, 10);
-        SubscriptionQueueItem subscriptionQueueItem = emailSubscriptionStub(LocalDate.of(2017, 10, 10)).setMotTestNumber(MOT_TEST_NUMBER);
+        SubscriptionQueueItem subscriptionQueueItem = emailSubscriptionStub(LocalDate.of(2017, 10, 10))
+                .setLoadedOnDate(LocalDate.of(2017, 8, 8))
+                .setMotTestNumber(MOT_TEST_NUMBER);
         VehicleDetails vehicleDetails = vehicleDetailsStub(vehicleExpiryDate);
-        LocalDate requestDate = LocalDate.of(2017, 8, 8);
 
         when(this.vehicleDetailsClient.fetchByMotTestNumber(any())).thenReturn(Optional.of(vehicleDetails));
+        when(this.notificationFactory.getEmailNotification(any(), any(), any())).thenReturn(Optional.of(sendableEmailNotificationStub()));
 
-        processSubscriptionService.processSubscription(subscriptionQueueItem, requestDate);
+        processSubscriptionService.processSubscription(subscriptionQueueItem);
 
         verify(subscriptionRepository, times(1)).updateExpiryDate(TEST_VRM, "test@this-is-a-test-123", vehicleExpiryDate);
     }
@@ -79,24 +82,19 @@ public class ProcessSubscriptionDbItemQueueItemServiceTest {
     public void whenVehicleExpiryDateIsInOneMonthEmailReminderIsSent() throws Exception {
 
         LocalDate vehicleExpiryDate = LocalDate.of(2017, 10, 10);
-        SubscriptionQueueItem subscriptionQueueItem = emailSubscriptionStub(vehicleExpiryDate).setMotTestNumber(MOT_TEST_NUMBER);
+        SubscriptionQueueItem subscriptionQueueItem = emailSubscriptionStub(vehicleExpiryDate)
+                .setLoadedOnDate(LocalDate.of(2017, 9, 10))
+                .setMotTestNumber(MOT_TEST_NUMBER);
         VehicleDetails vehicleDetails = vehicleDetailsStub(vehicleExpiryDate);
-        LocalDate requestDate = LocalDate.of(2017, 9, 10);
 
         when(this.vehicleDetailsClient.fetchByMotTestNumber(any())).thenReturn(Optional.of(vehicleDetails));
+        when(this.notificationFactory.getEmailNotification(any(), any(), any())).thenReturn(Optional.of(sendableEmailNotificationStub()));
 
-        processSubscriptionService.processSubscription(subscriptionQueueItem, requestDate);
+        processSubscriptionService.processSubscription(subscriptionQueueItem);
 
         verify(subscriptionRepository, times(0)).updateExpiryDate(any(), any(), any());
-        verify(notifyEmailService, times(0)).sendTwoWeekNotificationEmail(any(), any(), any(), any(), any());
-        verify(notifyEmailService, times(0)).sendOneDayAfterNotificationEmail(any(), any(), any(), any(), any());
-        verify(notifyEmailService, times(1)).sendOneMonthNotificationEmail(
-                eq("test@this-is-a-test-123"),
-                eq(TEST_MAKE_AND_MODEl + vehicleDetails.getRegNumber()),
-                eq(vehicleExpiryDate),
-                eq(getExpectedUnsubscribeLink()),
-                any(String.class),
-                eq(MOTH_DIRECT_URL_PREFIX + TEST_VRM + "/" + EXPECTED_CHECKSUM)
+        verify(notifyEmailService, times(1)).sendEmail(
+                eq("test@this-is-a-test-123"), isA(SendableEmailNotification.class), eq(vehicleDetails)
         );
     }
 
@@ -104,92 +102,79 @@ public class ProcessSubscriptionDbItemQueueItemServiceTest {
     public void whenVehicleExpiryDateIsInOneMonthSmsReminderIsSent() throws Exception {
 
         LocalDate vehicleExpiryDate = LocalDate.of(2017, 10, 10);
-        SubscriptionQueueItem subscriptionQueueItem = smsSubscriptionStub(vehicleExpiryDate).setMotTestNumber(MOT_TEST_NUMBER);
+        SubscriptionQueueItem subscriptionQueueItem = smsSubscriptionStub(vehicleExpiryDate)
+                .setLoadedOnDate(LocalDate.of(2017, 9, 10))
+                .setMotTestNumber(MOT_TEST_NUMBER);
         VehicleDetails vehicleDetails = vehicleDetailsStub(vehicleExpiryDate);
         LocalDate requestDate = LocalDate.of(2017, 9, 10);
 
         when(this.vehicleDetailsClient.fetchByMotTestNumber(any())).thenReturn(Optional.of(vehicleDetails));
+        when(this.notificationFactory.getSmsNotification(any(), any())).thenReturn(Optional.of(new MotOneMonthSmsNotification()));
 
-        processSubscriptionService.processSubscription(subscriptionQueueItem, requestDate);
+        processSubscriptionService.processSubscription(subscriptionQueueItem);
 
         verify(subscriptionRepository, times(0)).updateExpiryDate(any(), any(), any());
-        verify(notifySmsService, times(0)).sendTwoWeekNotificationSms(any(), any(), any());
-        verify(notifySmsService, times(0)).sendOneDayAfterNotificationSms(any(), any());
-        verify(notifySmsService, times(1)).sendOneMonthNotificationSms(
-                eq(TEST_PHONE_NUMBER),
-                eq(vehicleDetails.getRegNumber()),
-                eq(vehicleExpiryDate)
+        verify(notifySmsService, times(1)).sendSms(
+                eq(TEST_PHONE_NUMBER), isA(MotOneMonthSmsNotification.class)
         );
     }
 
     @Test
     public void whenVehicleExpiryDateIsInTwoWeeksEmailReminderIsSent() throws Exception {
-
         LocalDate vehicleExpiryDate = LocalDate.of(2017, 10, 24);
-        SubscriptionQueueItem subscriptionQueueItem = emailSubscriptionStub(vehicleExpiryDate).setMotTestNumber(MOT_TEST_NUMBER);
-        VehicleDetails vehicleDetails = vehicleDetailsStub(vehicleExpiryDate);
         LocalDate requestDate = LocalDate.of(2017, 10, 10);
+        SubscriptionQueueItem subscription = emailSubscriptionStub(vehicleExpiryDate)
+                .setLoadedOnDate(requestDate)
+                .setMotTestNumber(MOT_TEST_NUMBER);
+        VehicleDetails vehicleDetails = vehicleDetailsStub(vehicleExpiryDate);
 
         when(this.vehicleDetailsClient.fetchByMotTestNumber(any())).thenReturn(Optional.of(vehicleDetails));
+        when(this.notificationFactory.getEmailNotification(any(), any(), any())).thenReturn(Optional.of(sendableEmailNotificationStub()));
 
-        processSubscriptionService.processSubscription(subscriptionQueueItem, requestDate);
+        processSubscriptionService.processSubscription(subscription);
 
         verify(subscriptionRepository, times(0)).updateExpiryDate(any(), any(), any());
-        verify(notifyEmailService, times(0)).sendOneMonthNotificationEmail(any(), any(), any(), any(), any(), any());
-        verify(notifyEmailService, times(0)).sendOneDayAfterNotificationEmail(any(), any(), any(), any(), any());
-        verify(notifyEmailService, times(1)).sendTwoWeekNotificationEmail(
-                eq("test@this-is-a-test-123"),
-                eq(TEST_MAKE_AND_MODEl + vehicleDetails.getRegNumber()),
-                eq(vehicleExpiryDate),
-                eq(getExpectedUnsubscribeLink()),
-                any(String.class)
-        );
+        verify(notificationFactory, times(1)).getEmailNotification(eq(requestDate), eq(subscription),eq(vehicleDetails));
+        verify(notifyEmailService, times(1)).sendEmail(any(), isA(SendableEmailNotification.class), any());
     }
 
     @Test
     public void whenVehicleExpiryDateIsInTwoWeeksSmsReminderIsSent() throws Exception {
 
         LocalDate vehicleExpiryDate = LocalDate.of(2017, 10, 24);
-        SubscriptionQueueItem subscriptionQueueItem = smsSubscriptionStub(vehicleExpiryDate).setMotTestNumber(MOT_TEST_NUMBER);
+        SubscriptionQueueItem subscriptionQueueItem = smsSubscriptionStub(vehicleExpiryDate)
+                .setLoadedOnDate(LocalDate.of(2017, 10, 10))
+                .setMotTestNumber(MOT_TEST_NUMBER);
         VehicleDetails vehicleDetails = vehicleDetailsStub(vehicleExpiryDate);
-        LocalDate requestDate = LocalDate.of(2017, 10, 10);
 
         when(this.vehicleDetailsClient.fetchByMotTestNumber(any())).thenReturn(Optional.of(vehicleDetails));
+        when(this.notificationFactory.getSmsNotification(any(), any())).thenReturn(Optional.of(new MotTwoWeekSmsNotification()));
 
-        processSubscriptionService.processSubscription(subscriptionQueueItem, requestDate);
+        processSubscriptionService.processSubscription(subscriptionQueueItem);
 
         verify(subscriptionRepository, times(0)).updateExpiryDate(any(), any(), any());
-        verify(notifySmsService, times(0)).sendOneMonthNotificationSms(any(), any(), any());
-        verify(notifySmsService, times(0)).sendOneDayAfterNotificationSms(any(), any());
-        verify(notifySmsService, times(1)).sendTwoWeekNotificationSms(
-                eq(TEST_PHONE_NUMBER),
-                eq(vehicleDetails.getRegNumber()),
-                eq(vehicleExpiryDate)
+        verify(notifySmsService, times(1)).sendSms(
+                eq(TEST_PHONE_NUMBER), isA(MotTwoWeekSmsNotification.class)
         );
     }
-
 
     @Test
     public void whenVehicleExpiryDateOneDayAgoEmailReminderIsSent() throws Exception {
 
         LocalDate vehicleExpiryDate = LocalDate.of(2017, 10, 24);
-        SubscriptionQueueItem subscriptionQueueItem = emailSubscriptionStub(vehicleExpiryDate).setMotTestNumber(MOT_TEST_NUMBER);
+        SubscriptionQueueItem subscriptionQueueItem = emailSubscriptionStub(vehicleExpiryDate)
+                .setLoadedOnDate(LocalDate.of(2017, 10, 25))
+                .setMotTestNumber(MOT_TEST_NUMBER);
         VehicleDetails vehicleDetails = vehicleDetailsStub(vehicleExpiryDate);
-        LocalDate requestDate = LocalDate.of(2017, 10, 25);
 
         when(this.vehicleDetailsClient.fetchByMotTestNumber(any())).thenReturn(Optional.of(vehicleDetails));
+        when(this.notificationFactory.getEmailNotification(any(), any(), any())).thenReturn(Optional.of(sendableEmailNotificationStub()));
 
-        processSubscriptionService.processSubscription(subscriptionQueueItem, requestDate);
+        processSubscriptionService.processSubscription(subscriptionQueueItem);
 
         verify(subscriptionRepository, times(0)).updateExpiryDate(any(), any(), any());
-        verify(notifyEmailService, times(0)).sendOneMonthNotificationEmail(any(), any(), any(), any(), any(), any());
-        verify(notifyEmailService, times(0)).sendTwoWeekNotificationEmail(any(), any(), any(), any(), any());
-        verify(notifyEmailService, times(1)).sendOneDayAfterNotificationEmail(
-                eq("test@this-is-a-test-123"),
-                eq(TEST_MAKE_AND_MODEl + vehicleDetails.getRegNumber()),
-                eq(vehicleExpiryDate),
-                eq(getExpectedUnsubscribeLink()),
-                any(String.class)
+        verify(notifyEmailService, times(1)).sendEmail(
+                eq("test@this-is-a-test-123"), isA(SendableEmailNotification.class), eq(vehicleDetails)
         );
     }
 
@@ -197,20 +182,19 @@ public class ProcessSubscriptionDbItemQueueItemServiceTest {
     public void whenVehicleExpiryDateOneDayAgoSmsReminderIsSent() throws Exception {
 
         LocalDate vehicleExpiryDate = LocalDate.of(2017, 10, 24);
-        SubscriptionQueueItem subscriptionQueueItem = smsSubscriptionStub(vehicleExpiryDate).setMotTestNumber(MOT_TEST_NUMBER);
+        SubscriptionQueueItem subscriptionQueueItem = smsSubscriptionStub(vehicleExpiryDate)
+                .setLoadedOnDate(LocalDate.of(2017, 10, 25))
+                .setMotTestNumber(MOT_TEST_NUMBER);
         VehicleDetails vehicleDetails = vehicleDetailsStub(vehicleExpiryDate);
-        LocalDate requestDate = LocalDate.of(2017, 10, 25);
 
         when(this.vehicleDetailsClient.fetchByMotTestNumber(any())).thenReturn(Optional.of(vehicleDetails));
+        when(this.notificationFactory.getSmsNotification(any(), any())).thenReturn(Optional.of(new MotOneDayAfterSmsNotification()));
 
-        processSubscriptionService.processSubscription(subscriptionQueueItem, requestDate);
+        processSubscriptionService.processSubscription(subscriptionQueueItem);
 
         verify(subscriptionRepository, times(0)).updateExpiryDate(any(), any(), any());
-        verify(notifySmsService, times(0)).sendOneMonthNotificationSms(any(), any(), any());
-        verify(notifySmsService, times(0)).sendTwoWeekNotificationSms(any(), any(), any());
-        verify(notifySmsService, times(1)).sendOneDayAfterNotificationSms(
-                eq(TEST_PHONE_NUMBER),
-                eq(vehicleDetails.getRegNumber())
+        verify(notifySmsService, times(1)).sendSms(
+                eq(TEST_PHONE_NUMBER), isA(MotOneDayAfterSmsNotification.class)
         );
     }
 
@@ -223,23 +207,19 @@ public class ProcessSubscriptionDbItemQueueItemServiceTest {
     public void whenStoredExpiryDateIsBeforeTheVehicleApiButWithinTwoWeeksReminder_ThenRecordIsUpdatedAndEmailSent() throws Exception {
 
         LocalDate vehicleExpiryDate = LocalDate.of(2017, 10, 24);
-        SubscriptionQueueItem subscription = emailSubscriptionStub(LocalDate.of(2014, 10, 24)).setMotTestNumber(MOT_TEST_NUMBER);
+        SubscriptionQueueItem subscription = emailSubscriptionStub(LocalDate.of(2014, 10, 24))
+                .setLoadedOnDate(LocalDate.of(2017, 9, 24))
+                .setMotTestNumber(MOT_TEST_NUMBER);
         VehicleDetails vehicleDetails = vehicleDetailsStub(vehicleExpiryDate);
-        LocalDate requestDate = LocalDate.of(2017, 10, 10);
 
         when(this.vehicleDetailsClient.fetchByMotTestNumber(any())).thenReturn(Optional.of(vehicleDetails));
+        when(this.notificationFactory.getEmailNotification(any(), any(), any())).thenReturn(Optional.of(sendableEmailNotificationStub()));
 
-        processSubscriptionService.processSubscription(subscription, requestDate);
+        processSubscriptionService.processSubscription(subscription);
 
         verify(subscriptionRepository, times(1)).updateExpiryDate(any(), any(), any());
-        verify(notifyEmailService, times(0)).sendOneMonthNotificationEmail(any(), any(), any(), any(), any(), any());
-        verify(notifyEmailService, times(0)).sendOneDayAfterNotificationEmail(any(), any(), any(), any(), any());
-        verify(notifyEmailService, times(1)).sendTwoWeekNotificationEmail(
-                eq("test@this-is-a-test-123"),
-                eq(TEST_MAKE_AND_MODEl + vehicleDetails.getRegNumber()),
-                eq(vehicleExpiryDate),
-                eq(getExpectedUnsubscribeLink()),
-                any(String.class)
+        verify(notifyEmailService, times(1)).sendEmail(
+                eq("test@this-is-a-test-123"), isA(SendableEmailNotification.class), eq(vehicleDetails)
         );
     }
 
@@ -252,24 +232,18 @@ public class ProcessSubscriptionDbItemQueueItemServiceTest {
     public void whenStoredExpiryDateIsAfterTheVehicleApiButWithinOneMonthReminder_ThenRecordIsUpdatedAndEmailSent() throws Exception {
 
         LocalDate vehicleExpiryDate = LocalDate.of(2017, 10, 24);
-        SubscriptionQueueItem subscription = emailSubscriptionStub(LocalDate.of(2019, 10, 24));
+        SubscriptionQueueItem subscription = emailSubscriptionStub(LocalDate.of(2019, 10, 24))
+                .setLoadedOnDate(LocalDate.of(2017, 9, 24));
         VehicleDetails vehicleDetails = vehicleDetailsStub(vehicleExpiryDate);
-        LocalDate requestDate = LocalDate.of(2017, 9, 24);
 
         when(this.vehicleDetailsClient.fetchByMotTestNumber(any())).thenReturn(Optional.of(vehicleDetails));
+        when(this.notificationFactory.getEmailNotification(any(), any(), any())).thenReturn(Optional.of(sendableEmailNotificationStub()));
 
-        processSubscriptionService.processSubscription(subscription, requestDate);
+        processSubscriptionService.processSubscription(subscription);
 
         verify(subscriptionRepository, times(1)).updateExpiryDate(any(), any(), any());
-        verify(notifyEmailService, times(0)).sendOneDayAfterNotificationEmail(any(), any(), any(), any(), any());
-        verify(notifyEmailService, times(0)).sendTwoWeekNotificationEmail(any(), any(), any(), any(), any());
-        verify(notifyEmailService, times(1)).sendOneMonthNotificationEmail(
-                eq("test@this-is-a-test-123"),
-                eq(TEST_MAKE_AND_MODEl + vehicleDetails.getRegNumber()),
-                eq(vehicleExpiryDate),
-                eq(getExpectedUnsubscribeLink()),
-                any(String.class),
-                eq(MOTH_DIRECT_URL_PREFIX + TEST_VRM + "/" + EXPECTED_CHECKSUM)
+        verify(notifyEmailService, times(1)).sendEmail(
+                eq("test@this-is-a-test-123"), isA(SendableEmailNotification.class), eq(vehicleDetails)
         );
     }
 
@@ -282,23 +256,18 @@ public class ProcessSubscriptionDbItemQueueItemServiceTest {
     public void whenStoredExpiryDateIsBeforeTheVehicleApiButIsOneDayAfterReminder_ThenRecordIsUpdatedAndEmailSent() throws Exception {
 
         LocalDate vehicleExpiryDate = LocalDate.of(2017, 10, 24);
-        SubscriptionQueueItem subscription = emailSubscriptionStub(LocalDate.of(2014, 10, 24));
+        SubscriptionQueueItem subscription = emailSubscriptionStub(LocalDate.of(2014, 10, 24))
+                .setLoadedOnDate(LocalDate.of(2017, 10, 25));
         VehicleDetails vehicleDetails = vehicleDetailsStub(vehicleExpiryDate);
-        LocalDate requestDate = LocalDate.of(2017, 10, 25);
 
         when(this.vehicleDetailsClient.fetchByMotTestNumber(any())).thenReturn(Optional.of(vehicleDetails));
+        when(this.notificationFactory.getEmailNotification(any(), any(), any())).thenReturn(Optional.of(sendableEmailNotificationStub()));
 
-        processSubscriptionService.processSubscription(subscription, requestDate);
+        processSubscriptionService.processSubscription(subscription);
 
         verify(subscriptionRepository, times(1)).updateExpiryDate(any(), any(), any());
-        verify(notifyEmailService, times(0)).sendTwoWeekNotificationEmail(any(), any(), any(), any(), any());
-        verify(notifyEmailService, times(0)).sendOneMonthNotificationEmail(any(), any(), any(), any(), any(), any());
-        verify(notifyEmailService, times(1)).sendOneDayAfterNotificationEmail(
-                eq("test@this-is-a-test-123"),
-                eq(TEST_MAKE_AND_MODEl + vehicleDetails.getRegNumber()),
-                eq(vehicleExpiryDate),
-                eq(getExpectedUnsubscribeLink()),
-                any(String.class)
+        verify(notifyEmailService, times(1)).sendEmail(
+                eq("test@this-is-a-test-123"), isA(SendableEmailNotification.class), eq(vehicleDetails)
         );
     }
 
@@ -310,13 +279,15 @@ public class ProcessSubscriptionDbItemQueueItemServiceTest {
     public void whenStoredVrmIsDifferentFromTheVehicleApi_ThenRecordIsUpdated() throws Exception {
 
         LocalDate vehicleExpiryDate = LocalDate.of(2017, 10, 24);
-        SubscriptionQueueItem subscription = emailSubscriptionStub(LocalDate.of(2019, 10, 24)).setMotTestNumber(MOT_TEST_NUMBER);
+        SubscriptionQueueItem subscription = emailSubscriptionStub(LocalDate.of(2019, 10, 24))
+                .setLoadedOnDate(LocalDate.of(2017, 9, 24))
+                .setMotTestNumber(MOT_TEST_NUMBER);
         VehicleDetails vehicleDetails = vehicleDetailsStub(vehicleExpiryDate);
-        LocalDate requestDate = LocalDate.of(2017, 9, 24);
 
         when(this.vehicleDetailsClient.fetchByMotTestNumber(any())).thenReturn(Optional.of(vehicleDetails.setRegNumber(UPDATED_VRM)));
+        when(this.notificationFactory.getEmailNotification(any(), any(), any())).thenReturn(Optional.of(sendableEmailNotificationStub()));
 
-        processSubscriptionService.processSubscription(subscription, requestDate);
+        processSubscriptionService.processSubscription(subscription);
 
         verify(subscriptionRepository, times(1)).updateVrm(TEST_VRM, "test@this-is-a-test-123", UPDATED_VRM);
     }
@@ -329,13 +300,15 @@ public class ProcessSubscriptionDbItemQueueItemServiceTest {
     public void whenStoredVrmIsTheSameFromTheVehicleApi_ThenRecordIsNotUpdated() throws Exception {
 
         LocalDate vehicleExpiryDate = LocalDate.of(2017, 10, 24);
-        SubscriptionQueueItem subscription = emailSubscriptionStub(LocalDate.of(2019, 10, 24)).setMotTestNumber(MOT_TEST_NUMBER);
+        SubscriptionQueueItem subscription = emailSubscriptionStub(LocalDate.of(2019, 10, 24))
+                .setLoadedOnDate(LocalDate.of(2017, 9, 24))
+                .setMotTestNumber(MOT_TEST_NUMBER);
         VehicleDetails vehicleDetails = vehicleDetailsStub(vehicleExpiryDate);
-        LocalDate requestDate = LocalDate.of(2017, 9, 24);
 
         when(this.vehicleDetailsClient.fetchByMotTestNumber(any())).thenReturn(Optional.of(vehicleDetails.setRegNumber(TEST_VRM)));
+        when(this.notificationFactory.getEmailNotification(any(), any(), any())).thenReturn(Optional.of(sendableEmailNotificationStub()));
 
-        processSubscriptionService.processSubscription(subscription, requestDate);
+        processSubscriptionService.processSubscription(subscription);
 
         verify(subscriptionRepository, times(0)).updateVrm(TEST_VRM, "test@this-is-a-test-123", TEST_VRM);
     }
@@ -348,13 +321,15 @@ public class ProcessSubscriptionDbItemQueueItemServiceTest {
     public void whenStoredMotTestNumberIsDifferentFromTheVehicleApi_ThenRecordIsUpdated() throws Exception {
 
         LocalDate vehicleExpiryDate = LocalDate.of(2017, 10, 24);
-        SubscriptionQueueItem subscription = emailSubscriptionStub(LocalDate.of(2019, 10, 24)).setMotTestNumber(MOT_TEST_NUMBER);
+        SubscriptionQueueItem subscription = emailSubscriptionStub(LocalDate.of(2019, 10, 24))
+                .setLoadedOnDate(LocalDate.of(2017, 9, 24))
+                .setMotTestNumber(MOT_TEST_NUMBER);
         VehicleDetails vehicleDetails = vehicleDetailsStub(vehicleExpiryDate);
-        LocalDate requestDate = LocalDate.of(2017, 9, 24);
 
         when(this.vehicleDetailsClient.fetchByMotTestNumber(any())).thenReturn(Optional.of(vehicleDetails.setMotTestNumber("123")));
+        when(this.notificationFactory.getEmailNotification(any(), any(), any())).thenReturn(Optional.of(sendableEmailNotificationStub()));
 
-        processSubscriptionService.processSubscription(subscription, requestDate);
+        processSubscriptionService.processSubscription(subscription);
 
         verify(subscriptionRepository, times(1)).updateMotTestNumber(TEST_VRM, "test@this-is-a-test-123", "123");
     }
@@ -367,13 +342,15 @@ public class ProcessSubscriptionDbItemQueueItemServiceTest {
     public void whenStoredMotTestNumberIsTheSameFromTheVehicleApi_ThenRecordIsNotUpdated() throws Exception {
 
         LocalDate vehicleExpiryDate = LocalDate.of(2017, 10, 24);
-        SubscriptionQueueItem subscription = emailSubscriptionStub(LocalDate.of(2019, 10, 24)).setMotTestNumber(MOT_TEST_NUMBER);
+        SubscriptionQueueItem subscription = emailSubscriptionStub(LocalDate.of(2019, 10, 24))
+                .setLoadedOnDate(LocalDate.of(2017, 9, 24))
+                .setMotTestNumber(MOT_TEST_NUMBER);
         VehicleDetails vehicleDetails = vehicleDetailsStub(vehicleExpiryDate).setMotTestNumber(MOT_TEST_NUMBER);
-        LocalDate requestDate = LocalDate.of(2017, 9, 24);
 
         when(this.vehicleDetailsClient.fetchByMotTestNumber(any())).thenReturn(Optional.of(vehicleDetails));
+        when(this.notificationFactory.getEmailNotification(any(), any(), any())).thenReturn(Optional.of(sendableEmailNotificationStub()));
 
-        processSubscriptionService.processSubscription(subscription, requestDate);
+        processSubscriptionService.processSubscription(subscription);
 
         verify(subscriptionRepository, times(0)).updateMotTestNumber(TEST_VRM, "test@this-is-a-test-123", MOT_TEST_NUMBER);
     }
@@ -386,14 +363,16 @@ public class ProcessSubscriptionDbItemQueueItemServiceTest {
     public void whenWeHaveStoredDvlaId_andTradeApiReturnsTestNumber_thenRecordUpdated() throws Exception {
 
         LocalDate vehicleExpiryDate = LocalDate.of(2017, 10, 24);
-        SubscriptionQueueItem subscription = emailSubscriptionStub(LocalDate.of(2019, 10, 24)).setDvlaId(DVLA_ID);
+        SubscriptionQueueItem subscription = emailSubscriptionStub(LocalDate.of(2019, 10, 24))
+                .setLoadedOnDate(LocalDate.of(2017, 9, 24))
+                .setDvlaId(DVLA_ID);
         VehicleDetails vehicleDetails = vehicleDetailsStub(vehicleExpiryDate);
-        LocalDate requestDate = LocalDate.of(2017, 9, 24);
 
         when(this.vehicleDetailsClient.fetchByDvlaId(any())).thenReturn(Optional.of(vehicleDetails.setMotTestNumber(MOT_TEST_NUMBER)));
+        when(this.notificationFactory.getEmailNotification(any(), any(), any())).thenReturn(Optional.of(sendableEmailNotificationStub()));
         verify(this.vehicleDetailsClient, times(0)).fetchByMotTestNumber(MOT_TEST_NUMBER);
 
-        processSubscriptionService.processSubscription(subscription, requestDate);
+        processSubscriptionService.processSubscription(subscription);
 
         verify(subscriptionRepository, times(1)).updateMotTestNumber(TEST_VRM, "test@this-is-a-test-123", MOT_TEST_NUMBER);
     }
@@ -423,7 +402,7 @@ public class ProcessSubscriptionDbItemQueueItemServiceTest {
         return new VehicleDetails().setMotExpiryDate(expiryDate).setRegNumber(TEST_VRM).setMake(TEST_MAKE).setModel(TEST_MODEL);
     }
 
-    private String getExpectedUnsubscribeLink() {
-        return UriBuilder.fromPath(this.webBaseUrl).path("unsubscribe").path(SUBSCRIPTION_ID).build().toString();
+    private SendableEmailNotification sendableEmailNotificationStub() {
+        return new MotTwoWeekEmailNotification(WEB_BASE_URL);
     }
 }

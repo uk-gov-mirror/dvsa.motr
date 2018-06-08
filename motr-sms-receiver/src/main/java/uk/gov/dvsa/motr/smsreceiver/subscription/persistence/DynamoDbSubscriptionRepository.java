@@ -13,6 +13,7 @@ import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 
 import uk.gov.dvsa.motr.smsreceiver.subscription.model.MotIdentification;
 import uk.gov.dvsa.motr.smsreceiver.subscription.model.Subscription;
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -83,6 +84,7 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
 
         subscription.setMotDueDate(LocalDate.parse(item.getString("mot_due_date")));
         subscription.setMotIdentification(new MotIdentification(item.getString("mot_test_number"), item.getString("dvla_id")));
+        subscription.setVehicleType(VehicleType.getFromString(item.getString("vehicle_type")));
         return subscription;
     }
 }

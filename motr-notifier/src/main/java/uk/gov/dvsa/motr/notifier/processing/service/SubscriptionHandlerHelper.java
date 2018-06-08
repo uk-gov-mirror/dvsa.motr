@@ -8,6 +8,7 @@ import java.time.LocalDate;
 public class SubscriptionHandlerHelper {
 
     private static final int MONTHS_BEFORE_DELETION = 59;
+    private static final int TWO_MONTHS_AHEAD_NOTIFICATION_TIME_DAYS = 60;
     private static final int ONE_MONTH_AHEAD_NOTIFICATION_TIME_DAYS = 30;
     private static final int TWO_WEEKS_AHEAD_NOTIFICATION_TIME_DAYS = 14;
     private static final int ONE_DAY_AFTER_NOTIFICATION_TIME_DAYS = -1;
@@ -15,6 +16,11 @@ public class SubscriptionHandlerHelper {
     public static boolean motDueDateUpdateRequired(LocalDate subscriptionMotDueDate, LocalDate vehicleDetailsMotExpiryDate) {
 
         return !subscriptionMotDueDate.equals(vehicleDetailsMotExpiryDate);
+    }
+
+    public static boolean twoMonthNotificationRequired(LocalDate requestDate, LocalDate vehicleDetailsMotExpiryDate) {
+
+        return requestDate.plusDays(TWO_MONTHS_AHEAD_NOTIFICATION_TIME_DAYS).equals(vehicleDetailsMotExpiryDate);
     }
 
     public static boolean oneMonthNotificationRequired(LocalDate requestDate, LocalDate vehicleDetailsMotExpiryDate) {

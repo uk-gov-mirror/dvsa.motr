@@ -7,8 +7,10 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import uk.gov.dvsa.motr.serialisation.LocalDateDeserialiser;
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SubscriptionQueueItem {
@@ -52,6 +54,9 @@ public class SubscriptionQueueItem {
     @JsonProperty("loadedOnDate")
     @JsonDeserialize(using = LocalDateDeserialiser.class)
     private LocalDate loadedOnDate;
+
+    @JsonProperty("vehicleType")
+    private VehicleType vehicleType;
 
     private String messageReceiptHandle;
 
@@ -145,6 +150,17 @@ public class SubscriptionQueueItem {
         return this;
     }
 
+    public VehicleType getVehicleType() {
+        return Optional.ofNullable(vehicleType)
+                .orElse(VehicleType.getDefault());
+    }
+
+    public SubscriptionQueueItem setVehicleType(VehicleType vehicleType) {
+        this.vehicleType = vehicleType;
+        return this;
+    }
+
+
     @Override
     public String toString() {
         return "SubscriptionQueueItem{" +
@@ -156,6 +172,7 @@ public class SubscriptionQueueItem {
                 ", dvlaId='" + dvlaId + '\'' +
                 ", email='" + contactDetail.getValue() + '\'' +
                 ", loadedOnDate=" + loadedOnDate +
+                ", vehicleType=" + vehicleType +
                 ", messageReceiptHandle='" + messageReceiptHandle + '\'' +
                 ", messageCorrelationId='" + messageCorrelationId + '\'' +
                 '}';

@@ -10,6 +10,8 @@ import static uk.gov.dvsa.motr.notifier.SystemVariable.CHECKSUM_SALT;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.DB_TABLE_SUBSCRIPTION;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.EU_GO_LIVE_DATE;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.GOV_NOTIFY_API_TOKEN;
+import static uk.gov.dvsa.motr.notifier.SystemVariable.HGV_PSV_ONE_MONTH_NOTIFICATION_TEMPLATE_ID;
+import static uk.gov.dvsa.motr.notifier.SystemVariable.HGV_PSV_TWO_MONTH_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.LOG_LEVEL;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MESSAGE_RECEIVE_TIMEOUT;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MESSAGE_VISIBILITY_TIMEOUT;
@@ -23,6 +25,8 @@ import static uk.gov.dvsa.motr.notifier.SystemVariable.ONE_MONTH_NOTIFICATION_TE
 import static uk.gov.dvsa.motr.notifier.SystemVariable.ONE_MONTH_NOTIFICATION_TEMPLATE_ID_POST_EU;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.REGION;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.REMAINING_TIME_THRESHOLD;
+import static uk.gov.dvsa.motr.notifier.SystemVariable.SMS_HGV_PSV_ONE_MONTH_NOTIFICATION_TEMPLATE_ID;
+import static uk.gov.dvsa.motr.notifier.SystemVariable.SMS_HGV_PSV_TWO_MONTH_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.SMS_ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.SMS_ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID_POST_EU;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.SMS_ONE_MONTH_NOTIFICATION_TEMPLATE_ID;
@@ -48,6 +52,8 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
         set(MOT_TEST_REMINDER_INFO_TOKEN, motTestReminderInfoToken());
         set(MOT_API_MOT_TEST_NUMBER_URI, motTestNumberApiEndpoint());
         set(MOT_API_DVLA_ID_URI, dvlaIdApiEndpoint());
+        set(HGV_PSV_TWO_MONTH_NOTIFICATION_TEMPLATE_ID, notifyHgvPsvTwoMonthTemplateId());
+        set(HGV_PSV_ONE_MONTH_NOTIFICATION_TEMPLATE_ID, notifyHgvPsvOneMonthTemplateId());
         set(ONE_MONTH_NOTIFICATION_TEMPLATE_ID, notifyOneMonthTemplateId());
         set(TWO_WEEK_NOTIFICATION_TEMPLATE_ID, notifyTwoWeekTemplateId());
         set(ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID, notifyOneDayAfterTemplateId());
@@ -61,6 +67,8 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
         set(SMS_ONE_MONTH_NOTIFICATION_TEMPLATE_ID_POST_EU, notifySmsOneMonthTemplateIdPostEu());
         set(SMS_TWO_WEEK_NOTIFICATION_TEMPLATE_ID_POST_EU, notifySmsTwoWeekTemplateIdPostEu());
         set(SMS_ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID_POST_EU, notifySmsOneDayAfterTemplateIdPostEu());
+        set(SMS_HGV_PSV_TWO_MONTH_NOTIFICATION_TEMPLATE_ID, notifySmsHgvPsvTwoMonthTemplateId());
+        set(SMS_HGV_PSV_ONE_MONTH_NOTIFICATION_TEMPLATE_ID, notifySmsHgvPsvOneMonthTemplateId());
 
         set(EU_GO_LIVE_DATE, euGoLiveDate());
 
@@ -116,6 +124,26 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
     public static String notifyTwoWeekTemplateId() {
 
         return lookupProperty("test.notify.template.two.week");
+    }
+
+    public static String notifyHgvPsvTwoMonthTemplateId() {
+
+        return lookupProperty("test.notify.template.hgv.psv.two.month");
+    }
+
+    public static String notifyHgvPsvOneMonthTemplateId() {
+
+        return lookupProperty("test.notify.template.hgv.psv.one.month");
+    }
+
+    public static String notifySmsHgvPsvTwoMonthTemplateId() {
+
+        return lookupProperty("test.notify.template.sms.hgv.psv.two.month");
+    }
+
+    public static String notifySmsHgvPsvOneMonthTemplateId() {
+
+        return lookupProperty("test.notify.template.sms.hgv.psv.one.month");
     }
 
     public static String notifyOneMonthTemplateId() {
