@@ -185,6 +185,10 @@ public class MotrSession {
         return isAllowedOnSmsConfirmationCodePage() && (!getConfirmationIdFromSession().isEmpty());
     }
 
+    public boolean isAllowedOnTestExpiredPage() {
+        return getVehicleDetailsFromSession() != null;
+    }
+
     public void setVisitingFromReview(boolean visitingFromReview) {
 
         this.setAttribute(VISITING_FROM_REVIEW_COOKIE_ID, visitingFromReview);

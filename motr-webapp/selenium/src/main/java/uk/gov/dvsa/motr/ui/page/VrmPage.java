@@ -59,4 +59,11 @@ public class VrmPage extends Page {
         termsAndConditionsLink.click();
         return new TermsAndConditionsPage();
     }
+
+    public TestExpiredPage enterVrmAndGoToTestExpiredPage(String vrm) {
+
+        vrmField.sendKeys(vrm);
+        continueButton.click();
+        return new TestExpiredPage();
+    }
 }

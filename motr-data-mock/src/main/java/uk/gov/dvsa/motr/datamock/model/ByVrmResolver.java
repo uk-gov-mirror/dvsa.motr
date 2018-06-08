@@ -133,6 +133,15 @@ public class ByVrmResolver {
                     .manufactureYear("1999")
                     .dueDate("2026-01-09")
                     .dvlaId("245436");
+        } else if (vrm.contains("TEST-EXPIRED")) {
+            response.make("Mercedes-Benz")
+                    .model("PSVTestModel")
+                    .primaryColour("White")
+                    .vehicleType(PSV)
+                    .manufactureYear("1999")
+                    .dueDate("2016-01-09")
+                    .dvlaId("245437")
+                    .testNumber("2325326");
         } else {
             response.make("testMake")
                     .model("testModel")

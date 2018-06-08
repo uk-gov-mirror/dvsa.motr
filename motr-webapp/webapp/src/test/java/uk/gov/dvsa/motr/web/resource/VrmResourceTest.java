@@ -6,11 +6,13 @@ import org.junit.Test;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClientException;
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.test.render.TemplateEngineStub;
 import uk.gov.dvsa.motr.web.validator.MotDueDateValidator;
 import uk.gov.dvsa.motr.web.validator.VrmValidator;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -66,6 +68,7 @@ public class VrmResourceTest {
 
         when(client.fetchByVrm(eq(VALID_REG_NUMBER))).thenReturn(Optional.of(new VehicleDetails()));
         when(motDueDateValidator.isDueDateValid(any())).thenReturn(true);
+        when(motDueDateValidator.isDueDateInTheFuture(any())).thenReturn(false);
         Response response = resource.vrmPagePost(VALID_REG_NUMBER, HONEY_POT);
         verify(motrSession, times(1)).setVehicleDetails(any(VehicleDetails.class));
         assertEquals(302, response.getStatus());
@@ -123,8 +126,8 @@ public class VrmResourceTest {
 
         HashMap<String, Object> expectedContext = new HashMap<>();
         expectedContext.put("inputFieldId", "reg-number-input");
-        expectedContext.put("message", "Check that you’ve typed in the correct registration number.<br/>" +
-                "<br/>You can only sign up if the vehicle has a current MOT.");
+        expectedContext.put("message", "We don't hold information about this vehicle.<br/>" +
+                "<br/>Check that you've typed in the correct registration number.");
         expectedContext.put("back_url", HomepageResource.HOMEPAGE_URL);
         expectedContext.put("vrm", VALID_REG_NUMBER);
         expectedContext.put("continue_button_text", "Continue");
@@ -162,27 +165,20 @@ public class VrmResourceTest {
     }
 
     @Test
-    public void whenVehicleDetailsFoundWithDueDateInThePastShowErrorMessage() throws Exception {
+    public void whenVehicleDetailsFoundWithDueDateInThePast_thenShouldRedirect() throws Exception {
+        LocalDate testExpiryDate = LocalDate.now().minusDays(2);
 
-        when(client.fetchByVrm(eq(VALID_REG_NUMBER))).thenReturn(Optional.of(new VehicleDetails()));
-        when(motDueDateValidator.isDueDateValid(any())).thenReturn(false);
+        VehicleDetails vehicle = new VehicleDetails();
+        vehicle.setMotExpiryDate(testExpiryDate);
+        vehicle.setVehicleType(VehicleType.MOT);
 
-        resource.vrmPagePost(VALID_REG_NUMBER, HONEY_POT);
+        when(client.fetchByVrm(eq(VALID_REG_NUMBER))).thenReturn(Optional.of(vehicle));
+        when(motDueDateValidator.isDueDateValid(any())).thenReturn(true);
+        when(motDueDateValidator.isDueDateInTheFuture(any())).thenReturn(false);
 
-        HashMap<String, Object> expectedContext = new HashMap<>();
-        expectedContext.put("inputFieldId", "reg-number-input");
-        expectedContext.put("message", "Check that you’ve typed in the correct registration number.<br/>" +
-                "<br/>You can only sign up if the vehicle has a current MOT.");
-        expectedContext.put("back_url", HomepageResource.HOMEPAGE_URL);
-        expectedContext.put("vrm", VALID_REG_NUMBER);
-        expectedContext.put("continue_button_text", "Continue");
-        expectedContext.put("showInLine", "false");
-        expectedContext.put("back_button_text", "Back");
-        expectedContext.put("showSystemError", false);
-        expectedContext.put("dataLayer", "{\"vrm\":\"FP12345\",\"error\":\"Vehicle not found\"}");
+        Response response = resource.vrmPagePost(VALID_REG_NUMBER, HONEY_POT);
 
-        assertEquals(expectedContext.toString(), templateEngine.getContext(Map.class).toString());
-        assertEquals("vrm", templateEngine.getTemplate());
+        assertEquals(302, response.getStatus());
     }
 
     @Test
@@ -191,6 +187,7 @@ public class VrmResourceTest {
         when(motrSession.visitingFromReviewPage()).thenReturn(true);
         when(client.fetchByVrm(eq(VALID_REG_NUMBER))).thenReturn(Optional.of(new VehicleDetails()));
         when(motDueDateValidator.isDueDateValid(any())).thenReturn(true);
+        when(motDueDateValidator.isDueDateInTheFuture(any())).thenReturn(true);
 
         resource = new VrmResource(motrSession, templateEngine, client, motDueDateValidator);
         Response response = resource.vrmPagePost(VALID_REG_NUMBER, HONEY_POT);
@@ -216,6 +213,7 @@ public class VrmResourceTest {
         when(motrSession.visitingFromReviewPage()).thenReturn(true);
         when(client.fetchByVrm(eq(VALID_REG_NUMBER))).thenReturn(Optional.of(new VehicleDetails()));
         when(motDueDateValidator.isDueDateValid(any())).thenReturn(true);
+        when(motDueDateValidator.isDueDateInTheFuture(any())).thenReturn(true);
 
         resource = new VrmResource(motrSession, templateEngine, client, motDueDateValidator);
         Response response = resource.vrmPagePost(VALID_REG_NUMBER, "Honey");

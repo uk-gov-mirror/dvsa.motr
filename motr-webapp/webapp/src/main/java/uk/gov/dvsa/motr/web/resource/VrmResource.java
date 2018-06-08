@@ -35,10 +35,7 @@ import static uk.gov.dvsa.motr.web.resource.RedirectResponseBuilder.redirect;
 public class VrmResource {
 
     private static final String VRM_MODEL_KEY = "vrm";
-    private static final String VEHICLE_NOT_FOUND_MESSAGE = "Check that you’ve typed in the correct registration number.<br/>" +
-            "<br/>You can only sign up if the vehicle has a current MOT.";
-
-    private static final String VEHICLE_NOT_FOUND_MESSAGE_POST_HGV = "We don't hold information about this vehicle.<br/>" +
+    private static final String VEHICLE_NOT_FOUND_MESSAGE = "We don't hold information about this vehicle.<br/>" +
             "<br/>Check that you've typed in the correct registration number.";
 
     private static final String MESSAGE_KEY = "message";
@@ -110,6 +107,10 @@ public class VrmResource {
                     motrSession.setVrm(vrm);
                     motrSession.setVehicleDetails(vehicle.get());
 
+                    if (testDateIsExpired(vehicle.get())) {
+                        return redirect("test-expired");
+                    }
+
                     return getRedirectAfterSuccessfulEdit();
                 } else {
                     addVehicleNotFoundErrorMessageToViewModel(modelMap);
@@ -138,12 +139,7 @@ public class VrmResource {
     private void addVehicleNotFoundErrorMessageToViewModel(Map<String, Object> modelMap) {
 
         dataLayerHelper.putAttribute(ERROR_KEY, "Vehicle not found");
-        if (motrSession.isHgvPsvVehiclesFeatureToggleOn()) {
-            modelMap.put(MESSAGE_KEY, VEHICLE_NOT_FOUND_MESSAGE_POST_HGV);
-        } else {
-            modelMap.put(MESSAGE_KEY, VEHICLE_NOT_FOUND_MESSAGE);
-        }
-
+        modelMap.put(MESSAGE_KEY, VEHICLE_NOT_FOUND_MESSAGE);
         modelMap.put(SHOW_INLINE_KEY, false);
     }
 
@@ -157,11 +153,6 @@ public class VrmResource {
             return redirect("channel-selection");
         }
         return redirect("email");
-    }
-
-    private boolean vehicleDataIsValid(Optional<VehicleDetails> vehicle) {
-
-        return vehicle.isPresent() && motDueDateValidator.isDueDateValid(vehicle.get().getMotExpiryDate());
     }
 
     private void updateMapBasedOnReviewFlow(Map<String, Object> modelMap) {
@@ -180,5 +171,15 @@ public class VrmResource {
     private static String normalizeFormInputVrm(String formInput) {
 
         return formInput.replaceAll("\\s+", "").toUpperCase();
+    }
+
+    private boolean vehicleDataIsValid(Optional<VehicleDetails> vehicle) {
+
+        return vehicle.isPresent() && motDueDateValidator.isDueDateValid(vehicle.get().getMotExpiryDate());
+    }
+
+    private boolean testDateIsExpired(VehicleDetails vehicle) {
+
+        return !motDueDateValidator.isDueDateInTheFuture(vehicle.getMotExpiryDate());
     }
 }

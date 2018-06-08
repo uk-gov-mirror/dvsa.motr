@@ -1,0 +1,25 @@
+{{#partial "content" }}
+
+    <div class="grid-row">
+
+        <div class="column-two-thirds">
+
+            {{#if isTestExpired}}
+                <h1 class="heading heading-large heading--large">This vehicle’s MOT test expired on {{testExpiryDate}}</h1>
+            {{else}}
+                <h1 class="heading heading-large heading--large">First MOT test was due {{testExpiryDate}}</h1>
+            {{/if}}
+
+            <p>You must get the MOT test done before you can sign up to get free reminders</p>
+
+            <p>You can be fined up to £1,000 for driving a vehicle without a valid MOT</p>
+
+            <p><a href="https://www.gov.uk/getting-an-mot/vehicles-exempt-from-mot" id="publications-link">Check if your vehicle doesn't need an annual test</a></p>
+            <br/>
+            <p><a href="https://www.gov.uk/mot-reminder" id="reminders-link">Sign up a different vehicle</a></p>
+
+        </div>
+
+    </div>
+{{/partial}}
+{{> master pageTitle="MOT reminders"}}
