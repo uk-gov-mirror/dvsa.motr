@@ -20,6 +20,7 @@ import uk.gov.dvsa.motr.notifier.processing.model.notification.sms.SendableSmsNo
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClientException;
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 import uk.gov.service.notify.NotificationClientException;
 
 import java.time.LocalDate;
@@ -149,26 +150,41 @@ public class ProcessSubscriptionService {
     private VehicleDetails getVehicleDetails(SubscriptionQueueItem subscriptionQueueItem) throws VehicleDetailsClientException,
             VehicleNotFoundException {
 
-        String subscriptionDvlaId = subscriptionQueueItem.getDvlaId();
-        String subscriptionMotTestNumber = subscriptionQueueItem.getMotTestNumber();
+        final String dvlaId = subscriptionQueueItem.getDvlaId();
+        final String motTestNumber = subscriptionQueueItem.getMotTestNumber();
+        final String vrm = subscriptionQueueItem.getVrm();
+        final VehicleType vehicleType = subscriptionQueueItem.getVehicleType();
 
-        logger.debug("Subscription dvlaId is {}, and subscription mot test number is {}", subscriptionDvlaId, subscriptionMotTestNumber);
+        logger.debug("Subscription dvlaId is {}, mot test number is {} and vrm is {}", dvlaId, motTestNumber, vrm);
 
-        if (subscriptionMotTestNumber == null && subscriptionDvlaId != null) {
+        if (vehicleType == VehicleType.MOT && motTestNumber != null) {
+            logger.trace("going to fetch by mot test number");
 
-            logger.trace("going to fetch by dvla id");
-
-            return client.fetchByDvlaId(subscriptionDvlaId).orElseThrow(() -> {
-                logger.debug("no vehicle found for dvla id {}", subscriptionDvlaId);
-                return new VehicleNotFoundException("no vehicle found for dvlaid: " + subscriptionDvlaId);
+            return client.fetchByMotTestNumber(motTestNumber).orElseThrow(() -> {
+                logger.debug("no vehicle found for mot_test_number {}", motTestNumber);
+                return new VehicleNotFoundException("no vehicle found for mot_test_number: " + motTestNumber);
             });
         }
 
-        logger.trace("going to fetch by mot test number");
+        if ((vehicleType == VehicleType.HGV || vehicleType == VehicleType.PSV) && vrm != null) {
+            logger.trace("going to fetch HGV/PSV data by vrm");
 
-        return client.fetchByMotTestNumber(subscriptionMotTestNumber).orElseThrow(() -> {
-            logger.debug("no vehicle found for mot_test_number {}", subscriptionMotTestNumber);
-            return new VehicleNotFoundException("no vehicle found for mot_test_number: " + subscriptionMotTestNumber);
-        });
+            return client.fetchHgvPsvByVrm(vrm).orElseThrow(() -> {
+                logger.debug("no HGV/PSV vehicle found for vrm {}", vrm);
+                return new VehicleNotFoundException("no HGV/PSV vehicle found for vrm " + vrm);
+            });
+        }
+
+        if (dvlaId != null) {
+            logger.trace("going to fetch by dvla id");
+
+            return client.fetchByDvlaId(dvlaId).orElseThrow(() -> {
+                logger.debug("no vehicle found for dvla id {}", dvlaId);
+                return new VehicleNotFoundException("no vehicle found for dvlaid: " + dvlaId);
+            });
+        }
+
+        logger.debug("no attribute to search for subscription {}", subscriptionQueueItem);
+        throw new VehicleNotFoundException("no data to search for subscription " + subscriptionQueueItem.getId());
     }
 }

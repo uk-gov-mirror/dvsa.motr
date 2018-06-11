@@ -49,6 +49,7 @@ import static org.apache.log4j.Level.toLevel;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.CHECKSUM_SALT;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.DB_TABLE_SUBSCRIPTION;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.EU_GO_LIVE_DATE;
+import static uk.gov.dvsa.motr.notifier.SystemVariable.FEATURE_TOGGLE_HGV_PSV_VEHICLES;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.GOV_NOTIFY_API_TOKEN;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.HGV_PSV_ONE_MONTH_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.HGV_PSV_TWO_MONTH_NOTIFICATION_TEMPLATE_ID;
@@ -57,7 +58,10 @@ import static uk.gov.dvsa.motr.notifier.SystemVariable.MESSAGE_RECEIVE_TIMEOUT;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MESSAGE_VISIBILITY_TIMEOUT;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MOTH_DIRECT_URL_PREFIX;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_API_DVLA_ID_URI;
+import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_API_HGV_PSV_URI;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_API_MOT_TEST_NUMBER_URI;
+import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_API_V1_DVLA_ID_URI;
+import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_API_V1_MOT_TEST_NUMBER_URI;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_TEST_REMINDER_INFO_TOKEN;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID_POST_EU;
@@ -158,9 +162,16 @@ public class ConfigModule extends AbstractModule {
         clientConfig = clientConfig.property(ClientProperties.CONNECT_TIMEOUT, timeoutInMs);
         clientConfig = clientConfig.property(ClientProperties.READ_TIMEOUT, timeoutInMs);
 
-        return new VehicleDetailsClient(clientConfig, config.getValue(MOT_TEST_REMINDER_INFO_TOKEN))
-            .withByMotTestNumberUri(config.getValue(MOT_API_MOT_TEST_NUMBER_URI))
-            .withByDvlaIdUri(config.getValue(MOT_API_DVLA_ID_URI));
+        if (Boolean.parseBoolean(config.getValue(FEATURE_TOGGLE_HGV_PSV_VEHICLES))) {
+            return new VehicleDetailsClient(clientConfig, config.getValue(MOT_TEST_REMINDER_INFO_TOKEN))
+                    .withByMotTestNumberUri(config.getValue(MOT_API_MOT_TEST_NUMBER_URI))
+                    .withByDvlaIdUri(config.getValue(MOT_API_DVLA_ID_URI))
+                    .withHgvPsvByVrmUri(config.getValue(MOT_API_HGV_PSV_URI));
+        } else {
+            return new VehicleDetailsClient(clientConfig, config.getValue(MOT_TEST_REMINDER_INFO_TOKEN))
+                    .withByMotTestNumberUri(config.getValue(MOT_API_V1_MOT_TEST_NUMBER_URI))
+                    .withByDvlaIdUri(config.getValue(MOT_API_V1_DVLA_ID_URI));
+        }
     }
 
     @Provides
