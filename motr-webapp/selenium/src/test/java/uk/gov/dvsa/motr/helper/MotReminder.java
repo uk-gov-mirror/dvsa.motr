@@ -7,7 +7,6 @@ import uk.gov.dvsa.motr.ui.page.EmailConfirmationPendingPage;
 import uk.gov.dvsa.motr.ui.page.EmailPage;
 import uk.gov.dvsa.motr.ui.page.PhoneConfirmPage;
 import uk.gov.dvsa.motr.ui.page.PhoneNumberEntryPage;
-import uk.gov.dvsa.motr.ui.page.PrivacyPage;
 import uk.gov.dvsa.motr.ui.page.ReviewPage;
 import uk.gov.dvsa.motr.ui.page.SubscriptionConfirmationErrorPage;
 import uk.gov.dvsa.motr.ui.page.SubscriptionConfirmationPage;
@@ -139,11 +138,5 @@ public class MotReminder {
     public SubscriptionConfirmationErrorPage navigateToEmailConfirmationExpectingErrorPage(String confirmationId) {
 
         return PageNavigator.goTo(SubscriptionConfirmationErrorPage.class, confirmationId);
-    }
-
-    public PrivacyPage clickPrivacyPolicyLink() {
-
-        VrmPage page = PageNavigator.goTo(VrmPage.class);
-        return page.clickPrivacyPolicyLink();
     }
 }
