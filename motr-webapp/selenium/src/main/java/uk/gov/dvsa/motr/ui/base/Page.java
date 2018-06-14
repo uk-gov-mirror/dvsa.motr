@@ -25,9 +25,6 @@ public abstract class Page {
     @FindBy(id = "terms-and-conditions-link")
     protected WebElement termsAndConditionsLink;
 
-    @FindBy(id = "privacy-policy-link")
-    protected WebElement privacyPolicyLink;
-
     public Page() {
 
         this.driver = WebDriverConfiguratorRegistry.get().getDriver();
