@@ -25,6 +25,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
+import static uk.gov.dvsa.motr.vehicledetails.VehicleType.isHgvOrPsv;
 import static uk.gov.dvsa.motr.web.analytics.DataLayerHelper.ERROR_KEY;
 import static uk.gov.dvsa.motr.web.analytics.DataLayerHelper.VRM_KEY;
 import static uk.gov.dvsa.motr.web.resource.RedirectResponseBuilder.redirect;
@@ -103,6 +104,10 @@ public class VrmResource {
         if (validator.isValid(vrm)) {
             try {
                 Optional<VehicleDetails> vehicle = this.client.fetchByVrm(vrm);
+                if (isFirstAnnualTestDateUnknown(vehicle)) {
+                    motrSession.setVehicleDetails(vehicle.get());
+                    return redirect(UnknownTestDueDateResource.UNKNOWN_TEST_DATE_PATH);
+                }
                 if (vehicleDataIsValid(vehicle)) {
                     motrSession.setVrm(vrm);
                     motrSession.setVehicleDetails(vehicle.get());
@@ -134,6 +139,13 @@ public class VrmResource {
         dataLayerHelper.clear();
 
         return Response.ok(renderer.render(VRM_TEMPLATE_NAME, modelMap)).build();
+    }
+
+    private boolean isFirstAnnualTestDateUnknown(Optional<VehicleDetails> vehicleDetails) {
+        return vehicleDetails.filter(details ->
+                details.getMotExpiryDate() == null
+                && isHgvOrPsv(details.getVehicleType())
+        ).isPresent();
     }
 
     private void addVehicleNotFoundErrorMessageToViewModel(Map<String, Object> modelMap) {

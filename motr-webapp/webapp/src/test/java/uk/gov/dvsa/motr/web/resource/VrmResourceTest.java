@@ -12,6 +12,7 @@ import uk.gov.dvsa.motr.web.test.render.TemplateEngineStub;
 import uk.gov.dvsa.motr.web.validator.MotDueDateValidator;
 import uk.gov.dvsa.motr.web.validator.VrmValidator;
 
+import java.net.URI;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
@@ -179,6 +180,24 @@ public class VrmResourceTest {
         Response response = resource.vrmPagePost(VALID_REG_NUMBER, HONEY_POT);
 
         assertEquals(302, response.getStatus());
+    }
+
+    @Test
+    public void whenHgvPsvExpiryDateIsUnknown_thenShouldRedirect() throws Exception {
+
+        VehicleDetails vehicle = new VehicleDetails()
+                .setMotExpiryDate(null)
+                .setVehicleType(VehicleType.HGV);
+
+        when(client.fetchByVrm(eq(VALID_REG_NUMBER))).thenReturn(Optional.of(vehicle));
+
+        Response response = resource.vrmPagePost(VALID_REG_NUMBER, HONEY_POT);
+
+        // vehicleDetails are used by MotrSession.isAllowedOnUnknownTestDatePage()
+        verify(motrSession, times(1)).setVehicleDetails(eq(vehicle));
+
+        assertEquals(302, response.getStatus());
+        assertEquals(URI.create(UnknownTestDueDateResource.UNKNOWN_TEST_DATE_PATH), response.getLocation());
     }
 
     @Test

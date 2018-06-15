@@ -5,6 +5,8 @@ import org.junit.Test;
 
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 
+import java.time.LocalDate;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -285,6 +287,20 @@ public class MotrSessionTest {
         motrSession.setVrm(VRM);
 
         assertTrue(motrSession.isAllowedOnChannelSelectionPage());
+    }
+
+    @Test
+    public void isAllowedOnUnknownTestDatePage_trueIfExpiryDateNull() {
+        motrSession.setVehicleDetails(new VehicleDetails().setMotExpiryDate(null));
+
+        assertTrue(motrSession.isAllowedOnUnknownTestDatePage());
+    }
+
+    @Test
+    public void isAllowedOnUnknownTestDatePage_falseIfExpiryDateSet() {
+        motrSession.setVehicleDetails(new VehicleDetails().setMotExpiryDate(LocalDate.parse("2018-06-14")));
+
+        assertFalse(motrSession.isAllowedOnUnknownTestDatePage());
     }
 
     @Test

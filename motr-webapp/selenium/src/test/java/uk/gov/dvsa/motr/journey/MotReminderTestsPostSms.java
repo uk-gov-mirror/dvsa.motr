@@ -12,6 +12,7 @@ import uk.gov.dvsa.motr.ui.page.PhoneNumberEntryPage;
 import uk.gov.dvsa.motr.ui.page.ReviewPage;
 import uk.gov.dvsa.motr.ui.page.SubscriptionConfirmationPage;
 import uk.gov.dvsa.motr.ui.page.TestExpiredPage;
+import uk.gov.dvsa.motr.ui.page.UnknownTestDueDatePage;
 import uk.gov.dvsa.motr.ui.page.UnsubscribeConfirmationPage;
 import uk.gov.dvsa.motr.ui.page.UnsubscribeErrorPage;
 import uk.gov.dvsa.motr.ui.page.VrmPage;
@@ -236,6 +237,18 @@ public class MotReminderTestsPostSms extends BaseTest {
 
         // Then I do not need to confirm my mobile number again and am taken directly to the subscription confirmed page
         assertEquals(subscriptionConfirmationPage.getHeaderTitle(), CONFIRMATION_PAGE_TITLE);
+    }
+
+    @Test(description = "If we were unable to determine first annual test due date of HGV or PSV, we should redirect " +
+            "to a page that informs about it", groups = {"PostSms"})
+    public void searchingForHgvPsvWithUnknownTestDueDateRedirectsToProperInformationPage() {
+        // Given I am an owner of HGV or PSV
+        // And due date of its first annual test is unknown
+        UnknownTestDueDatePage unknownDatePage = motReminder.enterVrmWithUnknownExpiryDate("PSV-UNKNEXP");
+
+        //Then I should be redirected to UnknownTestDueDatePage
+        //And a link pointing to DVSA contact info should be displayed
+        assertEquals(unknownDatePage.getContactDvsaLink().getText(), "Contact DVSA");
     }
 
     @DataProvider(name = "dataProviderCreateEmailMotReminderForMyVehicle")
