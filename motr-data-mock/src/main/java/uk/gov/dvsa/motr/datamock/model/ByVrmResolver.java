@@ -150,7 +150,7 @@ public class ByVrmResolver {
                     .manufactureYear("1999")
                     .dueDate("2015-01-09")
                     .dvlaId("245439");
-        } else if (vrm.contains("HGV-FIRST-EXP")) {
+        } else if (vrm.contains("HGV-FIRSTEXP")) {
             response.make("Mercedes-Benz")
                     .model("HGVTestModel")
                     .primaryColour("White")
