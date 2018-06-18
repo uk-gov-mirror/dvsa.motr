@@ -142,6 +142,22 @@ public class ByVrmResolver {
                     .dueDate("2016-01-09")
                     .dvlaId("245437")
                     .testNumber("2325326");
+        } else if (vrm.contains("FIRST-EXP")) {
+            response.make("Mercedes-Benz")
+                    .model("MOTTestModel")
+                    .primaryColour("White")
+                    .vehicleType(MOT)
+                    .manufactureYear("1999")
+                    .dueDate("2015-01-09")
+                    .dvlaId("245439");
+        } else if (vrm.contains("HGV-FIRST-EXP")) {
+            response.make("Mercedes-Benz")
+                    .model("HGVTestModel")
+                    .primaryColour("White")
+                    .vehicleType(HGV)
+                    .manufactureYear("1999")
+                    .dueDate("2014-01-09")
+                    .dvlaId("245440");
         } else {
             response.make("testMake")
                     .model("testModel")
