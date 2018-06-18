@@ -11,6 +11,7 @@ import uk.gov.dvsa.motr.ui.page.ReviewPage;
 import uk.gov.dvsa.motr.ui.page.SubscriptionConfirmationErrorPage;
 import uk.gov.dvsa.motr.ui.page.SubscriptionConfirmationPage;
 import uk.gov.dvsa.motr.ui.page.TermsAndConditionsPage;
+import uk.gov.dvsa.motr.ui.page.TestExpiredPage;
 import uk.gov.dvsa.motr.ui.page.UnsubscribeConfirmationPage;
 import uk.gov.dvsa.motr.ui.page.UnsubscribeErrorPage;
 import uk.gov.dvsa.motr.ui.page.UnsubscribePage;
@@ -138,5 +139,11 @@ public class MotReminder {
     public SubscriptionConfirmationErrorPage navigateToEmailConfirmationExpectingErrorPage(String confirmationId) {
 
         return PageNavigator.goTo(SubscriptionConfirmationErrorPage.class, confirmationId);
+    }
+
+    public TestExpiredPage enterVrmAndTryToSubscribe(String vrm) {
+
+        VrmPage vrmPage = PageNavigator.goTo(VrmPage.class);
+        return vrmPage.enterVrmAndGoToTestExpiredPage(vrm);
     }
 }

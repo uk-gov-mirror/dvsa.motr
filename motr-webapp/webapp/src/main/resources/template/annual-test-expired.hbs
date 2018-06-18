@@ -1,0 +1,26 @@
+{{#partial "content" }}
+
+    <div class="grid-row">
+
+        <div class="column-two-thirds">
+
+            {{#if isTestExpired}}
+                <h1 class="heading heading-large heading--large">This vehicle’s annual test expired on {{testExpiryDate}}</h1>
+            {{else}}
+                <h1 class="heading heading-large heading--large">First annual test was due {{testExpiryDate}}</h1>
+            {{/if}}
+
+            <p>You must get the annual test done before you can sign up to get free reminders</p>
+
+            <p>You can get a court imposed fine for driving without a valid annual test</p>
+
+            <p>If the vehicle has been tested recently, it can take up to 10 working days for us to update our records</p>
+
+            <p><a href="https://www.gov.uk/government/publications/exemption-from-heavy-goods-vehicle-hgv-annual-testing-v112g" id="publications-link">Check if your vehicle doesn't need an annual test</a></p>
+            <br/>
+            <p><a href="https://www.gov.uk/mot-reminder" id="reminders-link">Sign up a different vehicle</a></p>
+        </div>
+
+    </div>
+{{/partial}}
+{{> master pageTitle="MOT reminders"}}

@@ -6,6 +6,11 @@ public class MotDueDateValidator {
 
     public boolean isDueDateValid(LocalDate motDueDate) {
 
+        return motDueDate != null;
+    }
+
+    public boolean isDueDateInTheFuture(LocalDate motDueDate) {
+
         LocalDate now = getNow();
         return (motDueDate != null) && (motDueDate.isAfter(now) || motDueDate.isEqual(now));
     }

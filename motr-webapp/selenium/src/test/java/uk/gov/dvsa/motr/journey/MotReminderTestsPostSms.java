@@ -11,6 +11,7 @@ import uk.gov.dvsa.motr.ui.page.PhoneConfirmPage;
 import uk.gov.dvsa.motr.ui.page.PhoneNumberEntryPage;
 import uk.gov.dvsa.motr.ui.page.ReviewPage;
 import uk.gov.dvsa.motr.ui.page.SubscriptionConfirmationPage;
+import uk.gov.dvsa.motr.ui.page.TestExpiredPage;
 import uk.gov.dvsa.motr.ui.page.UnsubscribeConfirmationPage;
 import uk.gov.dvsa.motr.ui.page.UnsubscribeErrorPage;
 import uk.gov.dvsa.motr.ui.page.VrmPage;
@@ -18,12 +19,25 @@ import uk.gov.dvsa.motr.ui.page.VrmPage;
 import java.io.IOException;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;
 
 public class MotReminderTestsPostSms extends BaseTest {
 
     public static final String CONFIRMATION_PAGE_TITLE = "You’ve signed up for an MOT reminder";
+
+    @Test(description = "Owner of a vehicle with a expired test cannot subscribe to reminder and is redirected to TestExpired error page",
+             groups = {"PostSms"})
+    public void tryToSubscribeWithExpiredTest() throws IOException, InterruptedException {
+
+        //Given I am a MOTR user
+        //When I enter the vehicle vrm which test has already expired
+        TestExpiredPage testExpiredPage = motReminder.enterVrmAndTryToSubscribe("TEST-EXPIRED");
+
+        //Then I should be redirected to TestExpired page
+        //And proper elements are displayed
+        assertEquals(testExpiredPage.getRemindersLink().getText(), "Sign up a different vehicle");
+        assertEquals(testExpiredPage.getPublicationsLink().getText(), "Check if your vehicle doesn't need an annual test");
+    }
 
     @Test(dataProvider = "dataProviderCreateEmailMotReminderForMyVehicle",
             description = "Owner of a vehicle with a mot is able to set up an email MOT reminder with their VRM and email and " +
