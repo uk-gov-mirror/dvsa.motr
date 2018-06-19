@@ -33,6 +33,13 @@ public class VrmPage extends Page {
         return new EmailPage();
     }
 
+    public UnknownTestDueDatePage enterVrmWhereTestDueDateIsUnknown(String vrm) {
+
+        vrmField.sendKeys(vrm);
+        continueButton.click();
+        return new UnknownTestDueDatePage();
+    }
+
     public ChannelSelectionPage enterVrmSmsToggleOn(String vrm) {
 
         vrmField.sendKeys(vrm);

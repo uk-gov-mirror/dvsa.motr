@@ -185,6 +185,10 @@ public class MotrSession {
         return isAllowedOnSmsConfirmationCodePage() && (!getConfirmationIdFromSession().isEmpty());
     }
 
+    public boolean isAllowedOnUnknownTestDatePage() {
+        return getVehicleDetailsFromSession().getMotExpiryDate() == null;
+    }
+
     public boolean isAllowedOnTestExpiredPage() {
         return getVehicleDetailsFromSession() != null;
     }

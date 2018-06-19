@@ -133,6 +133,18 @@ public class ByVrmResolver {
                     .manufactureYear("1999")
                     .dueDate("2026-01-09")
                     .dvlaId("245436");
+        } else if (vrm.contains("PSV-UNKNEXP")) {
+            response.make("Mercedes-Benz")
+                    .model("PSV-UNKN-1999")
+                    .primaryColour("White")
+                    .vehicleType(PSV)
+                    .manufactureYear("1999");
+        } else if (vrm.contains("HGV-UNKNEXP")) {
+            response.make("Mercedes-Benz")
+                    .model("HGV-UNKN-1999")
+                    .primaryColour("White")
+                    .vehicleType(HGV)
+                    .manufactureYear("1999");
         } else if (vrm.contains("TEST-EXPIRED")) {
             response.make("Mercedes-Benz")
                     .model("PSVTestModel")
@@ -172,3 +184,4 @@ public class ByVrmResolver {
         return Response.ok(response.vrm(vrm)).build();
     }
 }
+

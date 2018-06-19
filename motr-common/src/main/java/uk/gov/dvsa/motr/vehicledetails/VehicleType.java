@@ -31,4 +31,8 @@ public enum VehicleType {
     public static VehicleType getDefault() {
         return MOT;
     }
+
+    public static boolean isHgvOrPsv(VehicleType vehicleType) {
+        return vehicleType.equals(HGV) || vehicleType.equals(PSV);
+    }
 }
