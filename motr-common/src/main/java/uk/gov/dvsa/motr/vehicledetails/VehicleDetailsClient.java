@@ -28,6 +28,7 @@ public class VehicleDetailsClient {
     private String uriByMotTestNumber;
     private String uriByDvlaId;
     private String uriByRegNumber;
+    private String uriHgvPsvByVrm;
     private String apiKey;
 
     public VehicleDetailsClient(ClientConfig clientConfig, String apiKey) {
@@ -37,7 +38,8 @@ public class VehicleDetailsClient {
     }
 
     /**
-     * Method to fetch vehicle information
+     * Fetch vehicle information for given registration mark.
+     *
      * @param vrm vehicle registration mark
      * @return vehicle data {@link VehicleDetailsClient}
      * @throws VehicleDetailsClientException thrown when unexpected response (5XX, garbled response, timeout, etc)
@@ -48,8 +50,9 @@ public class VehicleDetailsClient {
     }
 
     /**
-     * Method to fetchByMotTestNumber vehicle information with custom api key
-     * @param motTestNumber vehicle registration mark
+     * Fetch vehicle information based on the MOT test number.
+     *
+     * @param motTestNumber MOT test number
      * @return vehicle data {@link VehicleDetailsClient}
      * @throws VehicleDetailsClientException thrown when unexpected response (5XX, garbled response, timeout, etc)
      */
@@ -59,14 +62,26 @@ public class VehicleDetailsClient {
     }
 
     /**
-     * Method to fetchByDvlaId vehicle information with custom api key
-     * @param dvlaId vehicle registration mark
+     * Fetch vehicle information, when the previous MOT test number isn't known.
+     *
+     * @param dvlaId id of Vehicle imported from DVLA
      * @return vehicle data {@link VehicleDetailsClient}
      * @throws VehicleDetailsClientException thrown when unexpected response (5XX, garbled response, timeout, etc)
      */
     public Optional<VehicleDetails> fetchByDvlaId(String dvlaId) throws VehicleDetailsClientException {
 
         return fetch(dvlaId, uriByDvlaId, DVLA_ID_PATH_PARAM);
+    }
+
+    /**
+     * Fetch HGV or PSV vehicle information.
+     *
+     * @param vrm vehicle registration mark
+     * @return vehicle data {@link VehicleDetailsClient}
+     * @throws VehicleDetailsClientException thrown when unexpected response (5XX, garbled response, timeout, etc)
+     */
+    public Optional<VehicleDetails> fetchHgvPsvByVrm(String vrm) throws VehicleDetailsClientException {
+        return fetch(vrm, uriHgvPsvByVrm, REG_NUMBER_PATH_PARAM);
     }
 
     private Optional<VehicleDetails> fetch(String val, String uri, String pathParam) throws VehicleDetailsClientException {
@@ -140,6 +155,12 @@ public class VehicleDetailsClient {
     public VehicleDetailsClient withByRegNumberUri(String uriByRegNumber) {
 
         this.uriByRegNumber = uriByRegNumber;
+        return this;
+    }
+
+    public VehicleDetailsClient withHgvPsvByVrmUri(String hgvPsvByVrmUri) {
+
+        this.uriHgvPsvByVrm = hgvPsvByVrmUri;
         return this;
     }
 }

@@ -4,47 +4,29 @@ import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
 import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
-import com.amazonaws.services.lambda.runtime.ClientContext;
-import com.amazonaws.services.lambda.runtime.CognitoIdentity;
-import com.amazonaws.services.lambda.runtime.Context;
-import com.amazonaws.services.lambda.runtime.LambdaLogger;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 
-import uk.gov.dvsa.motr.notifier.component.subscription.persistence.DynamoDbSubscriptionRepository;
 import uk.gov.dvsa.motr.notifier.component.subscription.persistence.SubscriptionDbItem;
-import uk.gov.dvsa.motr.notifier.handler.EventHandler;
 import uk.gov.dvsa.motr.notifier.processing.model.SubscriptionQueueItem;
-import uk.gov.dvsa.motr.notifier.processing.unloader.NotifierReport;
 import uk.gov.dvsa.motr.test.environmant.variables.TestEnvironmentVariables;
-import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.core.DynamoDbFixture;
 import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.model.SubscriptionItem;
-import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.model.SubscriptionTable;
-import uk.gov.dvsa.motr.test.integration.lambda.LoaderHelper;
-import uk.gov.dvsa.motr.test.integration.lambda.LoaderInvocationEvent;
 import uk.gov.service.notify.NotificationClientException;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import static uk.gov.dvsa.motr.test.environmant.variables.TestEnvironmentVariables.region;
 import static uk.gov.dvsa.motr.test.environmant.variables.TestEnvironmentVariables.subscriptionTableName;
 import static uk.gov.dvsa.motr.test.integration.dynamodb.DynamoDbIntegrationHelper.dynamoDbClient;
 
-public class SubscriptionDbItemQueueItemUnloaderTest {
+public class SubscriptionDbItemQueueItemUnloaderTest extends SubscriptionDbItemQueueItemUnloaderAbstractTest {
 
     @Rule
     public final EnvironmentVariables environmentVariables = new TestEnvironmentVariables();
@@ -53,28 +35,6 @@ public class SubscriptionDbItemQueueItemUnloaderTest {
     private static final LocalDate DATE_NOT_MATCHING_VEHICLE_MOCK = LocalDate.of(2015, 5, 15);
     private static final LocalDate MOCK_API_SPECIFIC_VEHICLE_DATE = LocalDate.of(2016, 11, 26);
     private static final LocalDate MOCK_DELETE_SUBSCRIPTION_DATE = LocalDate.of(2021, 11, 26);
-
-    private ObjectMapper jsonMapper = new ObjectMapper();
-    private LoaderHelper loaderHelper;
-    private EventHandler eventHandler;
-    private SubscriptionItem subscriptionItem;
-    private DynamoDbFixture fixture;
-    private DynamoDbSubscriptionRepository repo;
-
-    @Before
-    public void setUp() {
-
-        repo = new DynamoDbSubscriptionRepository(subscriptionTableName(), region());
-        loaderHelper = new LoaderHelper();
-        eventHandler = new EventHandler();
-        fixture = new DynamoDbFixture(dynamoDbClient());
-    }
-
-    @After
-    public void cleanUp() {
-
-        fixture.removeItem(subscriptionItem);
-    }
 
     @Test
     public void whenAnEmailItemIsInTheDb_TheLoaderAddsToQueue_ThenTheNotifierSuccessfullyProcessesIt()
@@ -256,101 +216,5 @@ public class SubscriptionDbItemQueueItemUnloaderTest {
         assertEquals("vrm is changed when it wasn't meant too", "SUP4R", changedSubscriptionDbItem.getVrm());
         assertNull("mot_test_number is not null, when it is meant to be", savedItem.getString("mot_test_number"));
         assertNotNull("dvla_id is null even though it is meant to be kept", savedItem.getString("dvla_id"));
-    }
-
-    private String buildLoaderRequest(String testTime) throws JsonProcessingException {
-
-        LoaderInvocationEvent loaderInvocationEvent = new LoaderInvocationEvent(testTime);
-        return jsonMapper.writeValueAsString(loaderInvocationEvent);
-    }
-
-    /**
-     * Processes a subscriptionItem. Saves to db, processes, returns updated version (or null if was deleted).
-     * @param subscriptionItem The subscription item to save.
-     */
-    private SubscriptionDbItem saveAndProcessSubscriptionItem(SubscriptionItem subscriptionItem)
-            throws IOException, InterruptedException, ExecutionException, NotificationClientException {
-
-        // Save the subscription to db.
-        fixture.table(new SubscriptionTable().item(subscriptionItem)).run();
-
-        // Invoke the subscription loader with correct date to load items from db into queue.
-        String testTime = subscriptionItem.getMotDueDate().minusDays(30) + "T12:00:00Z";
-        loaderHelper.invokeLoader(buildLoaderRequest(testTime));
-
-        // Invoke the notifiers handle event with correct date to read items from the queue.
-        NotifierReport report = eventHandler.handle(new Object(), buildContext());
-        assertEquals(1, report.getSuccessfullyProcessed());
-
-        Optional<SubscriptionDbItem> subscriptionContainer = repo.findById(subscriptionItem.getId());
-        if (!subscriptionContainer.isPresent()) {
-            return null;
-        }
-
-        SubscriptionDbItem changedSubscriptionDbItem = subscriptionContainer.get();
-
-        // Update vrm in subscriptionItem to match changeSubscriptionDbItem so cleanUp() will find it in the db.
-        subscriptionItem.setVrm(changedSubscriptionDbItem.getVrm());
-        return changedSubscriptionDbItem;
-    }
-
-    private Context buildContext() {
-        return new Context() {
-            @Override
-            public String getAwsRequestId() {
-                return UUID.randomUUID().toString();
-            }
-
-            @Override
-            public String getLogGroupName() {
-                return null;
-            }
-
-            @Override
-            public String getLogStreamName() {
-                return null;
-            }
-
-            @Override
-            public String getFunctionName() {
-                return null;
-            }
-
-            @Override
-            public String getFunctionVersion() {
-                return null;
-            }
-
-            @Override
-            public String getInvokedFunctionArn() {
-                return null;
-            }
-
-            @Override
-            public CognitoIdentity getIdentity() {
-                return null;
-            }
-
-            @Override
-            public ClientContext getClientContext() {
-                return null;
-            }
-
-            @Override
-            public int getRemainingTimeInMillis() {
-
-                return 400000;
-            }
-
-            @Override
-            public int getMemoryLimitInMB() {
-                return 0;
-            }
-
-            @Override
-            public LambdaLogger getLogger() {
-                return null;
-            }
-        };
     }
 }
