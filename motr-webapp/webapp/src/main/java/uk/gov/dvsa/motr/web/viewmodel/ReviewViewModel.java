@@ -24,9 +24,9 @@ public class ReviewViewModel {
     private boolean dvlaVehicle;
     private boolean emailChannel;
     private boolean mobileChannel;
-    private VehicleType vehicleType;
     private boolean hasTests;
     private boolean hgvPsvToggle;
+    private VehicleType vehicleType;
 
     public String getRegistration() {
 
@@ -52,12 +52,16 @@ public class ReviewViewModel {
 
     public String getColour() {
 
+        if (vehicleType != null && !VehicleType.MOT.equals(vehicleType)) {
+            return UNKNOWN_STRING;
+        }
+
         return colour;
     }
 
     public ReviewViewModel setColour(String colour, String colourSecondary) {
 
-        if (colour == null || "".equals(colour) || !VehicleType.MOT.equals(vehicleType)) {
+        if (StringUtils.isNullOrEmpty(colour)) {
             this.colour = UNKNOWN_STRING;
             return this;
         }

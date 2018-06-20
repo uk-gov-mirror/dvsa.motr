@@ -59,6 +59,14 @@ public class ReviewViewModelTest {
     }
 
     @Test
+    public void whenVehicleTypeIsNotSetColorIsVisible() {
+
+        ReviewViewModel viewModel = new ReviewViewModel();
+        viewModel.setColour("black", "");
+        assertEquals("BLACK", viewModel.getColour());
+    }
+
+    @Test
     public void whenColourSetForPsvVehicleItIsSetToUnknown() {
 
         ReviewViewModel viewModel = new ReviewViewModel();
