@@ -1,6 +1,7 @@
 package uk.gov.dvsa.motr.web.resource;
 
 import uk.gov.dvsa.motr.vehicledetails.MotIdentification;
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
 import uk.gov.dvsa.motr.web.analytics.SmartSurveyHelper;
 import uk.gov.dvsa.motr.web.component.subscription.exception.InvalidConfirmationIdException;
@@ -115,6 +116,7 @@ public class SubscriptionConfirmedResource {
             dataLayerHelper.putAttribute(CONTACT_TYPE, subscription.getContactType());
             smartSurveyHelperFeedback.putAttribute(SmartSurveyHelper.CONTACT_TYPE, subscription.getContactType());
             smartSurveyHelperSatisfaction.putAttribute(SmartSurveyHelper.CONTACT_TYPE, subscription.getContactType());
+            modelMap.put("isMotVehicle", isMotVehicle(subscription));
 
             if (subscription.getContactType().equals(Subscription.ContactType.MOBILE.getValue())) {
                 modelMap.put("usingSms", true);
@@ -155,6 +157,11 @@ public class SubscriptionConfirmedResource {
         params.setDvlaId(motIdentification.getDvlaId().orElse(""));
         params.setMotTestNumber(motIdentification.getMotTestNumber().orElse(""));
         params.setContactType(subscription.getContactDetail().getContactType().getValue());
+        params.setVehicleType(subscription.getVehicleType());
         motrSession.setSubscriptionConfirmationParams(params);
+    }
+
+    private boolean isMotVehicle(SubscriptionConfirmationParams subscription) {
+        return subscription.getVehicleType() == VehicleType.MOT;
     }
 }

@@ -118,8 +118,7 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
                 .withString("mot_due_date", subscription.getMotDueDate().format(DateTimeFormatter.ISO_LOCAL_DATE))
                 .withString("mot_due_date_md", subscription.getMotDueDate().format(DateTimeFormatter.ofPattern("MM-dd")))
                 .withString("created_at", ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT))
-                .withString("contact_type", subscription.getContactDetail().getContactType().getValue())
-                .withString("vehicle_type", subscription.getVehicleType().name());
+                .withString("contact_type", subscription.getContactDetail().getContactType().getValue());
 
         subscription.getMotIdentification().getMotTestNumber().ifPresent(
                 motTestNumber -> item.withString("mot_test_number", motTestNumber)
@@ -157,7 +156,6 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
         subscription.setMotDueDate(LocalDate.parse(item.getString("mot_due_date")));
         subscription.setMotIdentification(new MotIdentification(item.getString("mot_test_number"), item.getString("dvla_id")));
         subscription.setContactDetail(contactDetail);
-        subscription.setVehicleType(VehicleType.getFromString(item.getString("vehicle_type")));
         return subscription;
     }
 

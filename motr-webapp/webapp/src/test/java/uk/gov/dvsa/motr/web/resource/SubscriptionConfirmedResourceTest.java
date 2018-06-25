@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
 import uk.gov.dvsa.motr.vehicledetails.MotIdentification;
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 import uk.gov.dvsa.motr.web.component.subscription.exception.InvalidConfirmationIdException;
 import uk.gov.dvsa.motr.web.component.subscription.exception.SubscriptionAlreadyConfirmedException;
 import uk.gov.dvsa.motr.web.component.subscription.exception.SubscriptionAlreadyExistsException;
@@ -23,6 +24,9 @@ import java.util.Map;
 import javax.ws.rs.core.Response;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -59,6 +63,8 @@ public class SubscriptionConfirmedResourceTest {
         );
 
         when(urlHelper.subscriptionConfirmedFirstTimeLink()).thenReturn("confirm-subscription/confirmed");
+        when(urlHelper.subscriptionConfirmedNthTimeLink(any(Subscription.ContactType.class)))
+                .thenReturn("confirm-subscription/already-confirmed");
     }
 
     @Test
@@ -115,10 +121,9 @@ public class SubscriptionConfirmedResourceTest {
     @Test
     public void dataLayerIsPopulatedWithDvlaIdWhenMotTestNumberNotPresent() throws Exception {
 
-        SubscriptionConfirmationParams confirmationParams = new SubscriptionConfirmationParams();
-        confirmationParams.setRegistration(VRM);
+        SubscriptionConfirmationParams confirmationParams = createSubscriptionConfirmationParams(CONTACT_TYPE_EMAIL);
+        confirmationParams.setMotTestNumber(null);
         confirmationParams.setDvlaId(DVLA_ID);
-        confirmationParams.setContactType(CONTACT_TYPE_EMAIL);
         when(motrSession.getSubscriptionConfirmationParams()).thenReturn(confirmationParams);
 
         resource.confirmSubscriptionFirstTimeGet();
@@ -129,10 +134,7 @@ public class SubscriptionConfirmedResourceTest {
     @Test
     public void dataLayerIsPopulatedWithMotTestNumberWhenMotTestNumberIsPresent() throws Exception {
 
-        SubscriptionConfirmationParams confirmationParams = new SubscriptionConfirmationParams();
-        confirmationParams.setRegistration(VRM);
-        confirmationParams.setMotTestNumber(MOT_TEST_NUMBER);
-        confirmationParams.setContactType(CONTACT_TYPE_EMAIL);
+        SubscriptionConfirmationParams confirmationParams = createSubscriptionConfirmationParams(CONTACT_TYPE_EMAIL);
         when(motrSession.getSubscriptionConfirmationParams()).thenReturn(confirmationParams);
 
         resource.confirmSubscriptionFirstTimeGet();
@@ -143,10 +145,7 @@ public class SubscriptionConfirmedResourceTest {
     @Test
     public void modelIsPopulatedWithSmsRelatedDataWhenConfirmedSignUpSms() throws Exception {
 
-        SubscriptionConfirmationParams confirmationParams = new SubscriptionConfirmationParams();
-        confirmationParams.setRegistration(VRM);
-        confirmationParams.setMotTestNumber(MOT_TEST_NUMBER);
-        confirmationParams.setContactType(CONTACT_TYPE_MOBILE);
+        SubscriptionConfirmationParams confirmationParams = createSubscriptionConfirmationParams(CONTACT_TYPE_MOBILE);
         when(motrSession.getSubscriptionConfirmationParams()).thenReturn(confirmationParams);
 
         Map<String, Object> expectedMap = new HashMap<>();
@@ -160,7 +159,56 @@ public class SubscriptionConfirmedResourceTest {
         assertEquals(expectedMap.get("usingSms"), engine.getContext(Map.class).get("usingSms"));
         assertEquals(expectedMap.get("replyNumber"), engine.getContext(Map.class).get("replyNumber"));
         assertEquals(expectedMap.get("registration"), engine.getContext(Map.class).get("registration"));
+    }
 
+    @Test
+    public void isMotVehicleIsSetToFalseInModelMapWhenSubscriptionIsForHgvVehicle() throws Exception {
+
+        SubscriptionConfirmationParams confirmationParams = createSubscriptionConfirmationParams(CONTACT_TYPE_MOBILE);
+        confirmationParams.setVehicleType(VehicleType.HGV);
+
+        when(motrSession.getSubscriptionConfirmationParams()).thenReturn(confirmationParams);
+
+        resource.confirmSubscriptionFirstTimeGet();
+
+        assertFalse((boolean) engine.getContext(Map.class).get("isMotVehicle"));
+    }
+
+    @Test
+    public void isMotVehicleIsSetToTrueInModelMapWhenSubscriptionIsForMotVehicle() throws Exception {
+
+        SubscriptionConfirmationParams confirmationParams = createSubscriptionConfirmationParams(CONTACT_TYPE_MOBILE);
+        confirmationParams.setVehicleType(VehicleType.MOT);
+
+        when(motrSession.getSubscriptionConfirmationParams()).thenReturn(confirmationParams);
+
+        resource.confirmSubscriptionFirstTimeGet();
+
+        assertTrue((boolean) engine.getContext(Map.class).get("isMotVehicle"));
+    }
+
+    @Test
+    public void userIsRedirectedWhenSubscriptionIsForMotVehicleAndSubscriptionAlreadyConfirmed() throws Exception {
+        MotIdentification motIdentification = new MotIdentification(MOT_TEST_NUMBER, DVLA_ID);
+        Subscription subscription = new Subscription();
+        subscription.setVrm(VRM);
+        subscription.setVehicleType(VehicleType.MOT);
+        subscription.setUnsubscribeId(UNSUBSCRIBE_ID);
+        subscription.setContactDetail(new ContactDetail(EMAIL, Subscription.ContactType.EMAIL));
+        subscription.setMotDueDate(DATE);
+        subscription.setMotIdentification(motIdentification);
+        when(pendingSubscriptionActivatorService.confirmSubscription(CONFIRMATION_ID))
+                .thenThrow(new SubscriptionAlreadyConfirmedException(subscription));
+
+        ArgumentCaptor<SubscriptionConfirmationParams> paramsArgumentCaptor = ArgumentCaptor.forClass(SubscriptionConfirmationParams.class);
+
+        Response response = resource.confirmSubscriptionGet(CONFIRMATION_ID);
+
+        verify(pendingSubscriptionActivatorService, times(1)).confirmSubscription(CONFIRMATION_ID);
+        verify(motrSession, times(1)).setSubscriptionConfirmationParams(paramsArgumentCaptor.capture());
+        assertEquals(302, response.getStatus());
+        assertEquals("confirm-subscription/already-confirmed", response.getLocation().toString());
+        assertEquals(VehicleType.MOT, paramsArgumentCaptor.getValue().getVehicleType());
     }
 
     @Test
@@ -191,13 +239,21 @@ public class SubscriptionConfirmedResourceTest {
 
     private void motrSessionWillReturnValidPageParams() {
 
-        SubscriptionConfirmationParams confirmationParams = new SubscriptionConfirmationParams();
-        confirmationParams.setRegistration(VRM);
-        confirmationParams.setMotTestNumber(TEST_NUMBER);
-        confirmationParams.setContactType(CONTACT_TYPE_EMAIL);
+        SubscriptionConfirmationParams confirmationParams = createSubscriptionConfirmationParams(CONTACT_TYPE_EMAIL);
         when(motrSession.getSubscriptionConfirmationParams()).thenReturn(confirmationParams);
         when(motrSession.isAllowedOnChannelSelectionPage()).thenReturn(false);
         when(motrSession.isUsingSmsChannel()).thenReturn(false);
+    }
+
+    private SubscriptionConfirmationParams createSubscriptionConfirmationParams(String contactType) {
+
+        SubscriptionConfirmationParams confirmationParams = new SubscriptionConfirmationParams();
+
+        confirmationParams.setRegistration(VRM);
+        confirmationParams.setMotTestNumber(MOT_TEST_NUMBER);
+        confirmationParams.setContactType(contactType);
+
+        return confirmationParams;
     }
 
     private String getDataLayer() {

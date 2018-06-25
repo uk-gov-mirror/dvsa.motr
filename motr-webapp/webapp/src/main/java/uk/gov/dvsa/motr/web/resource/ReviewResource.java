@@ -3,6 +3,7 @@ package uk.gov.dvsa.motr.web.resource;
 import com.amazonaws.util.StringUtils;
 
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
 import uk.gov.dvsa.motr.web.component.subscription.response.PendingSubscriptionServiceResponse;
 import uk.gov.dvsa.motr.web.component.subscription.service.PendingSubscriptionService;
@@ -131,19 +132,20 @@ public class ReviewResource {
                         pendingSubscriptionResponse.getConfirmationId());
             }
 
-            return redirectToNextScreen(redirectUri, contactDetail, vrm);
+            return redirectToNextScreen(redirectUri, contactDetail, vrm, vehicle.getVehicleType());
         } else {
             logger.debug("detailsAreValid() {} or vehicle is null: {}", detailsAreValid(vrm, contactDetail), vehicle);
             throw new NotFoundException();
         }
     }
 
-    private Response redirectToNextScreen(String redirectUri, ContactDetail contactDetail, String vrm) {
+    private Response redirectToNextScreen(String redirectUri, ContactDetail contactDetail, String vrm, VehicleType vehicleType) {
 
         SubscriptionConfirmationParams params = new SubscriptionConfirmationParams();
         params.setRegistration(vrm);
         params.setContact(contactDetail.getValue());
         params.setContactType(contactDetail.getContactType().getValue());
+        params.setVehicleType(vehicleType);
         motrSession.setSubscriptionConfirmationParams(params);
 
         return redirect(redirectUri);

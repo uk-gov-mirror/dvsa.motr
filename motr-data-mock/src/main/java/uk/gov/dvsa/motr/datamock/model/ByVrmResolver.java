@@ -175,7 +175,7 @@ public class ByVrmResolver {
                     .model("testModel")
                     .primaryColour("testPrimaryColour")
                     .secondaryColour("testSecondaryColour")
-                    .vehicleType(PSV)
+                    .vehicleType(MOT)
                     .manufactureYear("1998")
                     .dueDate("2026-03-09")
                     .testNumber("2325325");

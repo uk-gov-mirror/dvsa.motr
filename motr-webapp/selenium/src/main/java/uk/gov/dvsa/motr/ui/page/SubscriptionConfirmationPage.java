@@ -28,7 +28,8 @@ public class SubscriptionConfirmationPage extends Page {
     @Override
     protected void selfVerify() {
 
-        if (!getHeaderTitle().contains(getContentHeader()) || !this.driver.getTitle().equals(getPageTitle())) {
+        if (!(getHeaderTitle().contains(getContentHeader()) || getHeaderTitle().contains(getContentHeaderWhenHgvPsv()))
+                || !this.driver.getTitle().equals(getPageTitle())) {
 
             throw new PageIdentityVerificationException("Page identity verification failed: " +
                     String.format("\n Expected: %s page, \n Found: %s page", getContentHeader(), getHeaderTitle())
@@ -51,5 +52,10 @@ public class SubscriptionConfirmationPage extends Page {
     public String getHeaderTitle() {
 
         return headerTitle.getText();
+    }
+
+    private String getContentHeaderWhenHgvPsv() {
+
+        return "You’ve signed up for annual test (MOT) reminders";
     }
 }

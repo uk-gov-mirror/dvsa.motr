@@ -25,6 +25,7 @@ import static org.testng.Assert.assertTrue;
 public class MotReminderTestsPostSms extends BaseTest {
 
     public static final String CONFIRMATION_PAGE_TITLE = "You’ve signed up for an MOT reminder";
+    public static final String CONFIRMATION_PAGE_TITLE_FOR_HGV_PSV = "You’ve signed up for annual test (MOT) reminders";
 
     @Test(description = "Owner of a vehicle with a expired test cannot subscribe to reminder and is redirected to TestExpired error page",
              groups = {"PostSms"})
@@ -197,6 +198,21 @@ public class MotReminderTestsPostSms extends BaseTest {
 
         //Then the confirmation page is displayed confirming my active reminder subscription
         assertEquals(subscriptionConfirmationPage.getHeaderTitle(), CONFIRMATION_PAGE_TITLE);
+    }
+
+    @Test(description = "Owner of a new vehicle with a mot is able to set up a MOT reminder for HGV vehicle with their VRM and mobile number",
+            groups = {"PostSms"})
+    public void canCreateSmsReminderForHgvVehicleWhenVehicleDoesNotHaveAnMotYet() {
+
+        //Given I am an owner of a new HGV vehicle
+        //When I enter the new vehicle vrm and my mobile number
+        //And I confirm my mobile number
+        SubscriptionConfirmationPage subscriptionConfirmationPage =
+                motReminder.subscribeToReminderAndConfirmMobileNumber(
+                        "HGV-NOTEST", RandomGenerator.generateMobileNumber());
+
+        //Then the confirmation page is displayed with correct header confirming my active reminder subscription
+        assertEquals(subscriptionConfirmationPage.getHeaderTitle(), CONFIRMATION_PAGE_TITLE_FOR_HGV_PSV);
     }
 
     @Test(description = "Owner of a vehicle with a mot can change their mobile number when creating MOT reminder",
