@@ -78,10 +78,14 @@ public class VehicleDetailsClient {
      *
      * @param vrm vehicle registration mark
      * @return vehicle data {@link VehicleDetailsClient}
-     * @throws VehicleDetailsClientException thrown when unexpected response (5XX, garbled response, timeout, etc)
+     * @throws HgvPsvDetailsClientException thrown when unexpected response (5XX, garbled response, timeout, etc)
      */
-    public Optional<VehicleDetails> fetchHgvPsvByVrm(String vrm) throws VehicleDetailsClientException {
-        return fetch(vrm, uriHgvPsvByVrm, REG_NUMBER_PATH_PARAM);
+    public Optional<VehicleDetails> fetchHgvPsvByVrm(String vrm) throws HgvPsvDetailsClientException {
+        try {
+            return fetch(vrm, uriHgvPsvByVrm, REG_NUMBER_PATH_PARAM);
+        } catch (VehicleDetailsClientException e) {
+            throw new HgvPsvDetailsClientException(e); // used to create HGV/PSV related metrics
+        }
     }
 
     private Optional<VehicleDetails> fetch(String val, String uri, String pathParam) throws VehicleDetailsClientException {

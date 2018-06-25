@@ -1,6 +1,7 @@
 package uk.gov.dvsa.motr.notifier.processing.unloader;
 
 import uk.gov.dvsa.motr.eventlog.EventLogger;
+import uk.gov.dvsa.motr.notifier.events.HgvPsvDetailsRetrievalFailedEvent;
 import uk.gov.dvsa.motr.notifier.events.NotifyEvent;
 import uk.gov.dvsa.motr.notifier.events.NotifyReminderFailedEvent;
 import uk.gov.dvsa.motr.notifier.events.SubscriptionProcessedEvent;
@@ -14,6 +15,7 @@ import uk.gov.dvsa.motr.notifier.processing.queue.QueueItemRemover;
 import uk.gov.dvsa.motr.notifier.processing.queue.RemoveSubscriptionFromQueueException;
 import uk.gov.dvsa.motr.notifier.processing.service.ProcessSubscriptionService;
 import uk.gov.dvsa.motr.notifier.processing.service.VehicleNotFoundException;
+import uk.gov.dvsa.motr.vehicledetails.HgvPsvDetailsClientException;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClientException;
 import uk.gov.service.notify.NotificationClientException;
 
@@ -71,6 +73,11 @@ public class ProcessSubscriptionTask implements Runnable {
             EventLogger.logErrorEvent(event, e);
             report.incrementFailedToProcess();
 
+        } catch (HgvPsvDetailsClientException e) {
+
+            SubscriptionProcessedEvent event = populateEvent(new HgvPsvDetailsRetrievalFailedEvent());
+            EventLogger.logErrorEvent(event, e);
+            report.incrementFailedToProcess();
         } catch (NotificationClientException e) {
 
             NotifyEvent event = populateEvent(new NotifyReminderFailedEvent());

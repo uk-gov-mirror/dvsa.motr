@@ -1,10 +1,14 @@
 package uk.gov.dvsa.motr.datamock.model;
 
+import java.time.LocalDate;
+
 import javax.ws.rs.core.Response;
 
 import static uk.gov.dvsa.motr.datamock.model.MockResponse.VehicleType.HGV;
 import static uk.gov.dvsa.motr.datamock.model.MockResponse.VehicleType.MOT;
 import static uk.gov.dvsa.motr.datamock.model.MockResponse.VehicleType.PSV;
+
+import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
 
 public class ByVrmResolver {
 
@@ -24,6 +28,34 @@ public class ByVrmResolver {
                     .manufactureYear("2006")
                     .dueDate("2020-11-26")
                     .testNumber("42343234");
+        } else if (vrm.equals("HGV1MO")) {
+            response.make("DAF")
+                    .model("XF 105")
+                    .vehicleType(HGV)
+                    .manufactureYear("2008")
+                    .dvlaId("42343234")
+                    .dueDate(daysFromToday(30));
+        } else if (vrm.equals("HGV2MO")) {
+            response.make("DAF")
+                    .model("XF 105")
+                    .vehicleType(HGV)
+                    .manufactureYear("2009")
+                    .dvlaId("42343234")
+                    .dueDate(daysFromToday(60));
+        } else if (vrm.equals("PSV1MO")) {
+            response.make("DAF")
+                    .model("XF 105")
+                    .vehicleType(PSV)
+                    .manufactureYear("2009")
+                    .testNumber("42343234")
+                    .dueDate(daysFromToday(30));
+        } else if (vrm.equals("PSV2MO")) {
+            response.make("DAF")
+                    .model("XF 105")
+                    .vehicleType(PSV)
+                    .manufactureYear("2008")
+                    .testNumber("42343234")
+                    .dueDate(daysFromToday(60));
         } else if (vrm.contains("YN13NTX")) {
             response.make("HARLEY-DAVIDSON CVO ROAD GLIDE FLTRXSE2 ANV 13")
                     .model("")
@@ -182,6 +214,10 @@ public class ByVrmResolver {
         }
 
         return Response.ok(response.vrm(vrm)).build();
+    }
+
+    private String daysFromToday(long days) {
+        return LocalDate.now().plusDays(days).format(ISO_LOCAL_DATE);
     }
 }
 

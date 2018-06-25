@@ -7,6 +7,7 @@ import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.notifier.component.subscription.persistence.SubscriptionRepository;
 import uk.gov.dvsa.motr.notifier.events.DeleteSubscriptionSuccessfulEvent;
 import uk.gov.dvsa.motr.notifier.events.DvlaIdUpdatedToMotTestNumberEvent;
+import uk.gov.dvsa.motr.notifier.events.HgvPsvDetailsRetrievalSuccessfulEvent;
 import uk.gov.dvsa.motr.notifier.events.UpdateMotExpiryDateFailedEvent;
 import uk.gov.dvsa.motr.notifier.events.UpdateMotExpiryDateSuccessfulEvent;
 import uk.gov.dvsa.motr.notifier.events.UpdateVrmFailedEvent;
@@ -17,6 +18,7 @@ import uk.gov.dvsa.motr.notifier.processing.factory.SendableNotificationFactory;
 import uk.gov.dvsa.motr.notifier.processing.model.SubscriptionQueueItem;
 import uk.gov.dvsa.motr.notifier.processing.model.notification.email.SendableEmailNotification;
 import uk.gov.dvsa.motr.notifier.processing.model.notification.sms.SendableSmsNotification;
+import uk.gov.dvsa.motr.vehicledetails.HgvPsvDetailsClientException;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClientException;
@@ -56,7 +58,7 @@ public class ProcessSubscriptionService {
     }
 
     public void processSubscription(SubscriptionQueueItem subscription) throws NotificationClientException,
-            VehicleDetailsClientException, VehicleNotFoundException {
+            VehicleDetailsClientException, VehicleNotFoundException, HgvPsvDetailsClientException {
 
         VehicleDetails vehicleDetails = getVehicleDetails(subscription);
 
@@ -148,7 +150,7 @@ public class ProcessSubscriptionService {
     }
 
     private VehicleDetails getVehicleDetails(SubscriptionQueueItem subscriptionQueueItem) throws VehicleDetailsClientException,
-            VehicleNotFoundException {
+            VehicleNotFoundException, HgvPsvDetailsClientException {
 
         final String dvlaId = subscriptionQueueItem.getDvlaId();
         final String motTestNumber = subscriptionQueueItem.getMotTestNumber();
@@ -169,10 +171,12 @@ public class ProcessSubscriptionService {
         if ((vehicleType == VehicleType.HGV || vehicleType == VehicleType.PSV) && vrm != null) {
             logger.trace("going to fetch HGV/PSV data by vrm");
 
-            return client.fetchHgvPsvByVrm(vrm).orElseThrow(() -> {
+            VehicleDetails vehicleDetails = client.fetchHgvPsvByVrm(vrm).orElseThrow(() -> {
                 logger.debug("no HGV/PSV vehicle found for vrm {}", vrm);
                 return new VehicleNotFoundException("no HGV/PSV vehicle found for vrm " + vrm);
             });
+            EventLogger.logEvent(new HgvPsvDetailsRetrievalSuccessfulEvent());
+            return vehicleDetails;
         }
 
         if (dvlaId != null) {
