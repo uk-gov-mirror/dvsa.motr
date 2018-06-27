@@ -170,6 +170,32 @@ public class ByVrmResolver {
                     .manufactureYear("1999")
                     .dueDate("2014-01-09")
                     .dvlaId("245440");
+        } else if (vrm.contains("HGVVAL")) {
+            response.make("Mercedes-Benz")
+                    .model("Antos")
+                    .primaryColour("White")
+                    .vehicleType(HGV)
+                    .manufactureYear("2015")
+                    .dueDate("2018-09-09")
+                    .dvlaId("344541")
+                    .testNumber("124524");
+        } else if (vrm.contains("HGVEXP")) {
+            response.make("Mercedes-Benz")
+                    .model("Antos")
+                    .primaryColour("Red")
+                    .vehicleType(HGV)
+                    .manufactureYear("2015")
+                    .dueDate("2018-01-09")
+                    .dvlaId("344541")
+                    .testNumber("124524");
+        } else if (vrm.contains("HGVOVD")) {
+            response.make("Mercedes-Benz")
+                    .model("Antos")
+                    .primaryColour("Yellow")
+                    .vehicleType(HGV)
+                    .manufactureYear("2017")
+                    .dueDate("2018-05-20")
+                    .dvlaId("344541");
         } else {
             response.make("testMake")
                     .model("testModel")
