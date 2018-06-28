@@ -64,6 +64,7 @@ public class UnsubscribeConfirmedResource {
 
         DataLayerHelper helper = new DataLayerHelper();
         helper.putAttribute(VRM_KEY, params.getRegistration());
+        helper.setVehicleDataOrigin(vehicleDetails);
 
         Map<String, Object> map = new HashMap<>();
         map.putAll(helper.formatAttributes());

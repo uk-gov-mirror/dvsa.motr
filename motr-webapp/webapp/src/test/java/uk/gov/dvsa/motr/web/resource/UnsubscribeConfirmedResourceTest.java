@@ -68,6 +68,6 @@ public class UnsubscribeConfirmedResourceTest {
         assertEquals("test@this-is-a-test-123", viewModel.getEmail());
         assertEquals("10 July 2015", viewModel.getExpiryDate());
         assertEquals("TEST-VRM", viewModel.getRegistration());
-        assertEquals("{\"vrm\":\"TEST-VRM\"}", dataLayerString);
+        assertEquals("{\"vrm\":\"TEST-VRM\",\"vehicle-data-origin\":\"MOT\"}", dataLayerString);
     }
 }

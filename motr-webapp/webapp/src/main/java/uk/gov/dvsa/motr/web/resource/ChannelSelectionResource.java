@@ -1,6 +1,8 @@
 package uk.gov.dvsa.motr.web.resource;
 
 import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
+import uk.gov.dvsa.motr.web.analytics.DataLayerMessageId;
+import uk.gov.dvsa.motr.web.analytics.DataLayerMessageType;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 import uk.gov.dvsa.motr.web.validator.ChannelSelectionValidator;
@@ -17,7 +19,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
-import static uk.gov.dvsa.motr.web.analytics.DataLayerHelper.ERROR_KEY;
 import static uk.gov.dvsa.motr.web.resource.RedirectResponseBuilder.redirect;
 
 
@@ -82,7 +83,9 @@ public class ChannelSelectionResource {
         Map<String, Object> modelMap = new HashMap<>();
 
         modelMap.put(MESSAGE_MODEL_KEY, channelSelectionValidator.getMessage());
-        dataLayerHelper.putAttribute(ERROR_KEY, channelSelectionValidator.getMessage());
+        dataLayerHelper.setMessage(DataLayerMessageId.CHANNEL_SELECTION_VALIDATION_ERROR,
+                DataLayerMessageType.USER_INPUT_ERROR,
+                channelSelectionValidator.getMessage());
 
         modelMap.put("isEmailChecked", (motrSession.getChannelFromSession().equals("email")));
         modelMap.put("isTextChecked", (motrSession.getChannelFromSession().equals("text")));

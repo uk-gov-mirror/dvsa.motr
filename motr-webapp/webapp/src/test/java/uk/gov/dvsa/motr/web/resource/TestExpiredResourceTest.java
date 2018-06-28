@@ -1,17 +1,22 @@
 package uk.gov.dvsa.motr.web.resource;
 
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.vehicledetails.VehicleType;
+import uk.gov.dvsa.motr.web.analytics.DataLayerMessageId;
+import uk.gov.dvsa.motr.web.analytics.DataLayerMessageType;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.test.render.TemplateEngineStub;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 
 import javax.ws.rs.core.Response;
 
@@ -21,9 +26,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import static uk.gov.dvsa.motr.web.resource.TestExpiredResource.IS_TEST_EXPIRED_KEY;
+import static uk.gov.dvsa.motr.web.resource.TestExpiredResource.CONTENT_TEXT_ARRAY_KEY;
+import static uk.gov.dvsa.motr.web.resource.TestExpiredResource.HEADER_TEXT_KEY;
 import static uk.gov.dvsa.motr.web.resource.TestExpiredResource.TEST_EXPIRY_DATE_FORMAT;
-import static uk.gov.dvsa.motr.web.resource.TestExpiredResource.TEST_EXPIRY_DATE_KEY;
 
 public class TestExpiredResourceTest {
 
@@ -68,9 +73,15 @@ public class TestExpiredResourceTest {
         when(motrSession.getVehicleDetailsFromSession()).thenReturn(vehicle);
 
         HashMap<String, Object> expectedContext = new HashMap<>();
-        expectedContext.put(IS_TEST_EXPIRED_KEY, false);
-        expectedContext.put(TEST_EXPIRY_DATE_KEY, formatDate(testExpiryDate));
-        expectedContext.put("dataLayer", "{\"vrm\":\"" + VRM + "\"}");
+        String headerOutput = "First MOT test was due " + formatDate(testExpiryDate);
+        expectedContext.put(HEADER_TEXT_KEY, headerOutput);
+        expectedContext.put(CONTENT_TEXT_ARRAY_KEY, TestExpiredResource.MOT_EXPIRED_CONTENT);
+        expectedContext.put("dataLayer",
+                getExpectedDataLayerJsonString(VRM,
+                        VehicleType.MOT,
+                        DataLayerMessageId.VEHICLE_MOT_TEST_DUE,
+                        DataLayerMessageType.INELIGIBLE_FOR_REMINDER,
+                        getMessageText(headerOutput, TestExpiredResource.MOT_EXPIRED_CONTENT)));
 
         Response response = resource.testExpiredPageGet();
 
@@ -89,9 +100,15 @@ public class TestExpiredResourceTest {
         when(motrSession.getVehicleDetailsFromSession()).thenReturn(vehicle);
 
         HashMap<String, Object> expectedContext = new HashMap<>();
-        expectedContext.put(IS_TEST_EXPIRED_KEY, true);
-        expectedContext.put(TEST_EXPIRY_DATE_KEY, formatDate(testExpiryDate));
-        expectedContext.put("dataLayer", "{\"vrm\":\"" + VRM + "\"}");
+        String headerOutput = "This vehicle’s MOT test expired on " + formatDate(testExpiryDate);
+        expectedContext.put(HEADER_TEXT_KEY, headerOutput);
+        expectedContext.put(CONTENT_TEXT_ARRAY_KEY, TestExpiredResource.MOT_EXPIRED_CONTENT);
+        expectedContext.put("dataLayer",
+                getExpectedDataLayerJsonString(VRM,
+                        VehicleType.MOT,
+                        DataLayerMessageId.VEHICLE_MOT_TEST_EXPIRED,
+                        DataLayerMessageType.INELIGIBLE_FOR_REMINDER,
+                        getMessageText(headerOutput, TestExpiredResource.MOT_EXPIRED_CONTENT)));
 
         Response response = resource.testExpiredPageGet();
 
@@ -110,9 +127,15 @@ public class TestExpiredResourceTest {
         when(motrSession.getVehicleDetailsFromSession()).thenReturn(vehicle);
 
         HashMap<String, Object> expectedContext = new HashMap<>();
-        expectedContext.put(IS_TEST_EXPIRED_KEY, false);
-        expectedContext.put(TEST_EXPIRY_DATE_KEY, formatDate(testExpiryDate));
-        expectedContext.put("dataLayer", "{\"vrm\":\"" + VRM + "\"}");
+        String headerOutput = "First annual test was due " + formatDate(testExpiryDate);
+        expectedContext.put(HEADER_TEXT_KEY, headerOutput);
+        expectedContext.put(CONTENT_TEXT_ARRAY_KEY, TestExpiredResource.ANNUAL_EXPIRED_CONTENT);
+        expectedContext.put("dataLayer",
+                getExpectedDataLayerJsonString(VRM,
+                        VehicleType.HGV,
+                        DataLayerMessageId.VEHICLE_ANNUAL_TEST_DUE,
+                        DataLayerMessageType.INELIGIBLE_FOR_REMINDER,
+                        getMessageText(headerOutput, TestExpiredResource.ANNUAL_EXPIRED_CONTENT)));
 
         Response response = resource.testExpiredPageGet();
 
@@ -131,9 +154,15 @@ public class TestExpiredResourceTest {
         when(motrSession.getVehicleDetailsFromSession()).thenReturn(vehicle);
 
         HashMap<String, Object> expectedContext = new HashMap<>();
-        expectedContext.put(IS_TEST_EXPIRED_KEY, true);
-        expectedContext.put(TEST_EXPIRY_DATE_KEY, formatDate(testExpiryDate));
-        expectedContext.put("dataLayer", "{\"vrm\":\"" + VRM + "\"}");
+        String headerOutput = "This vehicle’s annual test expired on " + formatDate(testExpiryDate);
+        expectedContext.put(HEADER_TEXT_KEY, headerOutput);
+        expectedContext.put(CONTENT_TEXT_ARRAY_KEY, TestExpiredResource.ANNUAL_EXPIRED_CONTENT);
+        expectedContext.put("dataLayer",
+                getExpectedDataLayerJsonString(VRM,
+                        VehicleType.HGV,
+                        DataLayerMessageId.VEHICLE_ANNUAL_TEST_EXPIRED,
+                        DataLayerMessageType.INELIGIBLE_FOR_REMINDER,
+                        getMessageText(headerOutput, TestExpiredResource.ANNUAL_EXPIRED_CONTENT)));
 
         Response response = resource.testExpiredPageGet();
 
@@ -146,5 +175,30 @@ public class TestExpiredResourceTest {
 
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(TEST_EXPIRY_DATE_FORMAT);
         return date.format(dateTimeFormatter);
+    }
+
+    private String getExpectedDataLayerJsonString(String vrm, VehicleType vehicleOrigin,
+                                                  DataLayerMessageId messageId,
+                                                  DataLayerMessageType messageType,
+                                                  String messageText) {
+
+        JSONObject content = new JSONObject();
+        content.put("vrm", vrm);
+        content.put("vehicle-data-origin", vehicleOrigin);
+        if (messageId != null) {
+            content.put("message-id", messageId);
+            content.put("message-type", messageType);
+            content.put("message-text", messageText);
+        }
+
+        return content.toString();
+    }
+
+    private String getMessageText(String header, List<String> contentList) {
+        StringJoiner stringJoiner = new StringJoiner("\n");
+        stringJoiner.add(header);
+        contentList.forEach(stringJoiner::add);
+
+        return stringJoiner.toString();
     }
 }

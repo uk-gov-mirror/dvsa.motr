@@ -113,6 +113,7 @@ public class SubscriptionConfirmedResource {
 
         if (null != subscription) {
             dataLayerHelper.putAttribute(VRM_KEY, subscription.getRegistration());
+            dataLayerHelper.putAttribute(DataLayerHelper.VEHICLE_DATA_ORIGIN_KEY, String.valueOf(subscription.getVehicleType()));
             dataLayerHelper.putAttribute(CONTACT_TYPE, subscription.getContactType());
             smartSurveyHelperFeedback.putAttribute(SmartSurveyHelper.CONTACT_TYPE, subscription.getContactType());
             smartSurveyHelperSatisfaction.putAttribute(SmartSurveyHelper.CONTACT_TYPE, subscription.getContactType());

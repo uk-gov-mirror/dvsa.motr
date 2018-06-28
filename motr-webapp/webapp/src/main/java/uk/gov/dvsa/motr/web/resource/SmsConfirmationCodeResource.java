@@ -1,6 +1,8 @@
 package uk.gov.dvsa.motr.web.resource;
 
 import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
+import uk.gov.dvsa.motr.web.analytics.DataLayerMessageId;
+import uk.gov.dvsa.motr.web.analytics.DataLayerMessageType;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.component.subscription.service.SmsConfirmationService;
 import uk.gov.dvsa.motr.web.component.subscription.service.SmsConfirmationService.Confirmation;
@@ -22,7 +24,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
-import static uk.gov.dvsa.motr.web.analytics.DataLayerHelper.ERROR_KEY;
 import static uk.gov.dvsa.motr.web.resource.RedirectResponseBuilder.redirect;
 
 @Singleton
@@ -77,7 +78,9 @@ public class SmsConfirmationCodeResource {
             modelMap.put(MESSAGE_AT_FIELD_MODEL_KEY, false);
             modelMap.put("showInLIne", false);
             modelMap.put(INPUT_FIELD_ID_MODEL_KEY, INPUT_FIELD_ID);
-            dataLayerHelper.putAttribute(ERROR_KEY, SmsConfirmationCodeValidator.CODE_ALREADY_RESENT);
+            dataLayerHelper.setMessage(DataLayerMessageId.CODE_ALREADY_RESENT,
+                    DataLayerMessageType.USER_INPUT_ERROR,
+                    SmsConfirmationCodeValidator.CODE_ALREADY_RESENT);
             modelMap.putAll(dataLayerHelper.formatAttributes());
             dataLayerHelper.clear();
         }
@@ -108,23 +111,32 @@ public class SmsConfirmationCodeResource {
                 case CODE_NOT_VALID_MAX_ATTEMPTS_REACHED:
                     validator.setMessage(SmsConfirmationCodeValidator.CODE_INCORRECT_3_TIMES);
                     showInLine = false;
+                    dataLayerHelper.setMessage(DataLayerMessageId.CODE_INCORRECT_3_TIMES,
+                            DataLayerMessageType.USER_INPUT_ERROR,
+                            validator.getMessage());
                     break;
                 case CODE_NOT_VALID:
                     validator.setMessage(SmsConfirmationCodeValidator.INVALID_CONFIRMATION_CODE_MESSAGE);
                     validator.setMessageAtField(SmsConfirmationCodeValidator.INVALID_CONFIRMATION_CODE_MESSAGE_AT_FIELD);
                     showInLine = true;
+                    dataLayerHelper.setMessage(DataLayerMessageId.CONFIRMATION_CODE_DOESNT_EXIST_MESSAGE,
+                            DataLayerMessageType.USER_INPUT_ERROR,
+                            validator.getMessage());
                     break;
                 case CODE_VALID:
                     return redirect(urlHelper.confirmSubscriptionLink(confirmationId));
                 default:
                     break;
             }
+        } else {
+            dataLayerHelper.setMessage(DataLayerMessageId.INVALID_CONFIRMATION_CODE_MESSAGE,
+                    DataLayerMessageType.USER_INPUT_ERROR,
+                    validator.getMessage());
         }
 
         Map<String, Object> modelMap = new HashMap<>();
         modelMap.put(MESSAGE_MODEL_KEY, validator.getMessage());
         modelMap.put(MESSAGE_AT_FIELD_MODEL_KEY, validator.getMessageAtField());
-        dataLayerHelper.putAttribute(ERROR_KEY, validator.getMessage());
 
         SmsConfirmationCodeViewModel viewModel = new SmsConfirmationCodeViewModel().setPhoneNumber(motrSession.getPhoneNumberFromSession());
         modelMap.put("viewModel", viewModel);

@@ -128,7 +128,8 @@ public class SubscriptionConfirmedResourceTest {
 
         resource.confirmSubscriptionFirstTimeGet();
 
-        assertEquals("{\"vrm\":\"vrm\",\"dvla-id\":\"54321\",\"contact-type\":\"EMAIL\"}", getDataLayer());
+        assertEquals("{\"vrm\":\"vrm\",\"vehicle-data-origin\":\"MOT\",\"dvla-id\":\"54321\",\"contact-type\":\"EMAIL\"}",
+                getDataLayer());
     }
 
     @Test
@@ -139,7 +140,7 @@ public class SubscriptionConfirmedResourceTest {
 
         resource.confirmSubscriptionFirstTimeGet();
 
-        assertEquals("{\"vrm\":\"vrm\",\"mot-test-number\":\"12345\",\"contact-type\":\"EMAIL\"}", getDataLayer());
+        verifyDataLayer(getDataLayer());
     }
 
     @Test
@@ -155,7 +156,8 @@ public class SubscriptionConfirmedResourceTest {
 
         resource.confirmSubscriptionFirstTimeGet();
 
-        assertEquals("{\"vrm\":\"vrm\",\"mot-test-number\":\"12345\",\"contact-type\":\"MOBILE\"}", getDataLayer());
+        assertEquals("{\"vrm\":\"vrm\",\"vehicle-data-origin\":\"MOT\",\"mot-test-number\":\"12345\",\"contact-type\":\"MOBILE\"}",
+                getDataLayer());
         assertEquals(expectedMap.get("usingSms"), engine.getContext(Map.class).get("usingSms"));
         assertEquals(expectedMap.get("replyNumber"), engine.getContext(Map.class).get("replyNumber"));
         assertEquals(expectedMap.get("registration"), engine.getContext(Map.class).get("registration"));
@@ -252,6 +254,7 @@ public class SubscriptionConfirmedResourceTest {
         confirmationParams.setRegistration(VRM);
         confirmationParams.setMotTestNumber(MOT_TEST_NUMBER);
         confirmationParams.setContactType(contactType);
+        confirmationParams.setVehicleType(VehicleType.MOT);
 
         return confirmationParams;
     }
@@ -263,7 +266,8 @@ public class SubscriptionConfirmedResourceTest {
 
     private void verifyDataLayer(String dataLayer) {
 
-        assertEquals("{\"vrm\":\"vrm\",\"mot-test-number\":\"12345\",\"contact-type\":\"EMAIL\"}", dataLayer);
+        assertEquals("{\"vrm\":\"vrm\",\"vehicle-data-origin\":\"MOT\",\"mot-test-number\":\"12345\",\"contact-type\":\"EMAIL\"}",
+                dataLayer);
     }
 
     private void mockSubscription(String motTestNumber, String dvlaId) throws SubscriptionAlreadyConfirmedException,

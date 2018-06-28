@@ -200,7 +200,8 @@ public class MotReminderTestsPostSms extends BaseTest {
         assertEquals(subscriptionConfirmationPage.getHeaderTitle(), CONFIRMATION_PAGE_TITLE);
     }
 
-    @Test(description = "Owner of a new vehicle with a mot is able to set up a MOT reminder for HGV vehicle with their VRM and mobile number",
+    @Test(description = "Owner of a new vehicle with a mot is able to set up a MOT reminder for " +
+            "HGV vehicle with their VRM and mobile number",
             groups = {"PostSms"})
     public void canCreateSmsReminderForHgvVehicleWhenVehicleDoesNotHaveAnMotYet() {
 

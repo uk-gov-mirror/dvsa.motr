@@ -4,17 +4,11 @@
 
         <div class="column-two-thirds">
 
-            {{#if isTestExpired}}
-                <h1 class="heading heading-large heading--large">This vehicle’s annual test expired on {{testExpiryDate}}</h1>
-            {{else}}
-                <h1 class="heading heading-large heading--large">First annual test was due {{testExpiryDate}}</h1>
-            {{/if}}
+            <h1 class="heading heading-large heading--large">{{headerText}}</h1>
 
-            <p>You must get the annual test done before you can sign up to get free reminders</p>
-
-            <p>You can get a court imposed fine for driving without a valid annual test</p>
-
-            <p>If the vehicle has been tested recently, it can take up to 10 working days for us to update our records</p>
+            {{#each contentTextArray}}
+                <p>{{this}}</p>
+            {{/each}}
 
             <p><a href="https://www.gov.uk/government/publications/exemption-from-heavy-goods-vehicle-hgv-annual-testing-v112g" id="publications-link">Check if your vehicle doesn't need an annual test</a></p>
             <br/>

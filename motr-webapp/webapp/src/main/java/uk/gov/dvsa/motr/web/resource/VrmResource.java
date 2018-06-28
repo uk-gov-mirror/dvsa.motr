@@ -5,6 +5,8 @@ import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClientException;
 import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
+import uk.gov.dvsa.motr.web.analytics.DataLayerMessageId;
+import uk.gov.dvsa.motr.web.analytics.DataLayerMessageType;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.eventlog.HoneyPotTriggeredEvent;
 import uk.gov.dvsa.motr.web.eventlog.vehicle.VehicleDetailsExceptionEvent;
@@ -26,7 +28,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import static uk.gov.dvsa.motr.vehicledetails.VehicleType.isHgvOrPsv;
-import static uk.gov.dvsa.motr.web.analytics.DataLayerHelper.ERROR_KEY;
 import static uk.gov.dvsa.motr.web.analytics.DataLayerHelper.VRM_KEY;
 import static uk.gov.dvsa.motr.web.resource.RedirectResponseBuilder.redirect;
 
@@ -104,6 +105,7 @@ public class VrmResource {
         if (validator.isValid(vrm)) {
             try {
                 Optional<VehicleDetails> vehicle = this.client.fetchByVrm(vrm);
+                vehicle.ifPresent(dataLayerHelper::setVehicleDataOrigin);
                 if (isFirstAnnualTestDateUnknown(vehicle)) {
                     motrSession.setVehicleDetails(vehicle.get());
                     return redirect(UnknownTestDueDateResource.UNKNOWN_TEST_DATE_PATH);
@@ -123,13 +125,17 @@ public class VrmResource {
             } catch (VehicleDetailsClientException exception) {
 
                 EventLogger.logErrorEvent(new VehicleDetailsExceptionEvent().setVrm(vrm), exception);
-                dataLayerHelper.putAttribute(ERROR_KEY, "Trade API error");
+                dataLayerHelper.setMessage(DataLayerMessageId.TRADE_API_CLIENT_EXCEPTION,
+                        DataLayerMessageType.PUBLIC_API_REQUEST_ERROR,
+                        "Something went wrong with the search. Try again later.");
                 motrSession.setVrm(vrm);
                 modelMap.put(SHOW_SYSTEM_ERROR, true);
             }
 
         } else {
-            dataLayerHelper.putAttribute(ERROR_KEY, validator.getMessage());
+            dataLayerHelper.setMessage(DataLayerMessageId.VRM_VALIDATION_ERROR,
+                    DataLayerMessageType.USER_INPUT_ERROR,
+                    validator.getMessage());
             modelMap.put(MESSAGE_KEY, validator.getMessage());
         }
 
@@ -150,7 +156,9 @@ public class VrmResource {
 
     private void addVehicleNotFoundErrorMessageToViewModel(Map<String, Object> modelMap) {
 
-        dataLayerHelper.putAttribute(ERROR_KEY, "Vehicle not found");
+        dataLayerHelper.setMessage(DataLayerMessageId.VEHICLE_NOT_FOUND,
+                DataLayerMessageType.USER_INPUT_ERROR,
+                VEHICLE_NOT_FOUND_MESSAGE);
         modelMap.put(MESSAGE_KEY, VEHICLE_NOT_FOUND_MESSAGE);
         modelMap.put(SHOW_INLINE_KEY, false);
     }

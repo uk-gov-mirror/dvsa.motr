@@ -63,7 +63,8 @@ public class EmailResourceTest {
         expectedContext.put("email", "invalidEmail");
         expectedContext.put("continue_button_text", "Continue");
         expectedContext.put("back_button_text", "Back");
-        expectedContext.put("dataLayer", "{\"error\":\"" + EmailValidator.EMAIL_INVALID_MESSAGE + "\"}");
+        expectedContext.put("dataLayer", "{\"message-text\":\"Enter a valid email address\",\"message-type\":" +
+                "\"USER_INPUT_ERROR\",\"message-id\":\"EMAIL_VALIDATION_ERROR\"}");
 
         Response response = resource.emailPagePost("invalidEmail");
         assertEquals(200, response.getStatus());
@@ -81,7 +82,8 @@ public class EmailResourceTest {
         expectedContext.put("email", "");
         expectedContext.put("continue_button_text", "Continue");
         expectedContext.put("back_button_text", "Back");
-        expectedContext.put("dataLayer", "{\"error\":\"" + EmailValidator.EMAIL_EMPTY_MESSAGE + "\"}");
+        expectedContext.put("dataLayer", "{\"message-text\":\"Enter your email address\",\"message-type\":" +
+                "\"USER_INPUT_ERROR\",\"message-id\":\"EMAIL_VALIDATION_ERROR\"}");
 
         Response response = resource.emailPagePost("");
         assertEquals(200, response.getStatus());

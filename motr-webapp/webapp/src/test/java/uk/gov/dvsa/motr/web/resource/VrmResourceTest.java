@@ -1,5 +1,6 @@
 package uk.gov.dvsa.motr.web.resource;
 
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -7,6 +8,8 @@ import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClientException;
 import uk.gov.dvsa.motr.vehicledetails.VehicleType;
+import uk.gov.dvsa.motr.web.analytics.DataLayerMessageId;
+import uk.gov.dvsa.motr.web.analytics.DataLayerMessageType;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.test.render.TemplateEngineStub;
 import uk.gov.dvsa.motr.web.validator.MotDueDateValidator;
@@ -37,6 +40,8 @@ public class VrmResourceTest {
     private static final String VALID_REG_NUMBER = "FP12345";
     private static final String SYSTEM_ERROR_VRM = "ABC123";
     private static final String HONEY_POT = "";
+    private static final String VEHICLE_NOT_FOUND = "We don't hold information about this vehicle.<br/><br/>" +
+            "Check that you've typed in the correct registration number.";
 
     private VehicleDetailsClient client;
     private MotDueDateValidator motDueDateValidator;
@@ -91,8 +96,11 @@ public class VrmResourceTest {
         expectedContext.put("showInLine", "true");
         expectedContext.put("back_button_text", "Back");
         expectedContext.put("showSystemError", false);
-        expectedContext.put("dataLayer", "{\"vrm\":\"" + INVALID_REG_NUMBER + "\",\"error\":\"" +
-                VrmValidator.REGISTRATION_CAN_ONLY_CONTAIN_LETTERS_NUMBERS_AND_HYPHENS_MESSAGE + "\"}");
+        expectedContext.put("dataLayer",
+                getExpectedDataLayerJsonString(INVALID_REG_NUMBER,
+                        DataLayerMessageId.VRM_VALIDATION_ERROR,
+                        DataLayerMessageType.USER_INPUT_ERROR,
+                        VrmValidator.REGISTRATION_CAN_ONLY_CONTAIN_LETTERS_NUMBERS_AND_HYPHENS_MESSAGE));
 
         assertEquals(expectedContext.toString(), templateEngine.getContext(Map.class).toString());
     }
@@ -113,7 +121,11 @@ public class VrmResourceTest {
         expectedContext.put("showInLine", "true");
         expectedContext.put("back_button_text", "Back");
         expectedContext.put("showSystemError", true);
-        expectedContext.put("dataLayer", "{\"vrm\":\"ABC123\",\"error\":\"Trade API error\"}");
+        expectedContext.put("dataLayer",
+                getExpectedDataLayerJsonString("ABC123",
+                        DataLayerMessageId.TRADE_API_CLIENT_EXCEPTION,
+                        DataLayerMessageType.PUBLIC_API_REQUEST_ERROR,
+                        "Something went wrong with the search. Try again later."));
 
         assertEquals(expectedContext.toString(), templateEngine.getContext(Map.class).toString());
     }
@@ -135,7 +147,11 @@ public class VrmResourceTest {
         expectedContext.put("showSystemError", false);
         expectedContext.put("showInLine", "false");
         expectedContext.put("back_button_text", "Back");
-        expectedContext.put("dataLayer", "{\"vrm\":\"FP12345\",\"error\":\"Vehicle not found\"}");
+        expectedContext.put("dataLayer",
+                getExpectedDataLayerJsonString("FP12345",
+                        DataLayerMessageId.VEHICLE_NOT_FOUND,
+                        DataLayerMessageType.USER_INPUT_ERROR,
+                        VEHICLE_NOT_FOUND));
 
         assertEquals(expectedContext.toString(), templateEngine.getContext(Map.class).toString());
         assertEquals("vrm", templateEngine.getTemplate());
@@ -159,7 +175,11 @@ public class VrmResourceTest {
         expectedContext.put("showSystemError", false);
         expectedContext.put("showInLine", "false");
         expectedContext.put("back_button_text", "Back");
-        expectedContext.put("dataLayer", "{\"vrm\":\"FP12345\",\"error\":\"Vehicle not found\"}");
+        expectedContext.put("dataLayer",
+                getExpectedDataLayerJsonString("FP12345",
+                        DataLayerMessageId.VEHICLE_NOT_FOUND,
+                        DataLayerMessageType.USER_INPUT_ERROR,
+                        VEHICLE_NOT_FOUND));
 
         assertEquals(expectedContext.toString(), templateEngine.getContext(Map.class).toString());
         assertEquals("vrm", templateEngine.getTemplate());
@@ -239,5 +259,21 @@ public class VrmResourceTest {
 
         assertEquals("email-confirmation-pending", response.getHeaders().get("Location").get(0).toString());
         assertEquals(302, response.getStatus());
+    }
+
+    private String getExpectedDataLayerJsonString(String vrm,
+                                                  DataLayerMessageId messageId,
+                                                  DataLayerMessageType messageType,
+                                                  String messageText) {
+
+        JSONObject content = new JSONObject();
+        content.put("vrm", vrm);
+        if (messageId != null) {
+            content.put("message-id", messageId);
+            content.put("message-type", messageType);
+            content.put("message-text", messageText);
+        }
+
+        return content.toString();
     }
 }

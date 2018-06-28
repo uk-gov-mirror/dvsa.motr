@@ -1,6 +1,8 @@
 package uk.gov.dvsa.motr.web.resource;
 
 import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
+import uk.gov.dvsa.motr.web.analytics.DataLayerMessageId;
+import uk.gov.dvsa.motr.web.analytics.DataLayerMessageType;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.formatting.PhoneNumberFormatter;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
@@ -18,7 +20,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
-import static uk.gov.dvsa.motr.web.analytics.DataLayerHelper.ERROR_KEY;
 import static uk.gov.dvsa.motr.web.resource.RedirectResponseBuilder.redirect;
 
 @Singleton
@@ -93,7 +94,9 @@ public class PhoneNumberResource {
 
         modelMap.put(MESSAGE_MODEL_KEY, validator.getMessage());
         modelMap.put(MESSAGE_AT_FIELD_MODEL_KEY, validator.getMessageAtField());
-        dataLayerHelper.putAttribute(ERROR_KEY, validator.getMessage());
+        dataLayerHelper.setMessage(DataLayerMessageId.PHONE_NUMBER_VALIDATION_ERROR,
+                DataLayerMessageType.USER_INPUT_ERROR,
+                validator.getMessage());
         ReviewFlowUpdater.updateMapBasedOnReviewFlow(
                 modelMap,
                 motrSession.visitingFromContactEntryPage(),

@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.test.render.TemplateEngineStub;
 
@@ -37,6 +38,7 @@ public class UnknownTestDateResourceTestDue {
         motrSession = mock(MotrSession.class);
         resource = new UnknownTestDueDateResource(motrSession, templateEngine);
         vehicle = new VehicleDetails();
+        vehicle.setVehicleType(VehicleType.PSV);
 
         when(motrSession.getVrmFromSession()).thenReturn(VRM);
     }
@@ -60,7 +62,9 @@ public class UnknownTestDateResourceTestDue {
 
         HashMap<String, Object> expectedContext = new HashMap<>();
         expectedContext.put("back_url", HOMEPAGE_URL);
-        expectedContext.put("dataLayer", "{\"vrm\":\"" + VRM + "\"}");
+        expectedContext.put("dataLayer", "{\"vrm\":\"" + VRM +
+                "\",\"vehicle-data-origin\":\"PSV\",\"message-text\":\"We don't know when this vehicle's first annual test is due\"," +
+                "\"message-type\":\"INELIGIBLE_FOR_REMINDER\",\"message-id\":\"ANNUAL_TEST_DATE_UNKNOWN\"}");
 
         Response response = resource.testExpiryUnknownPageGet();
 

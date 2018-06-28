@@ -1,6 +1,9 @@
 package uk.gov.dvsa.motr.web.resource;
 
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
+import uk.gov.dvsa.motr.web.analytics.DataLayerMessageId;
+import uk.gov.dvsa.motr.web.analytics.DataLayerMessageType;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 
@@ -46,7 +49,12 @@ public class UnknownTestDueDateResource {
             return redirect(HomepageResource.HOMEPAGE_URL);
         }
 
+        VehicleDetails vehicleDetails = motrSession.getVehicleDetailsFromSession();
         dataLayerHelper.putAttribute(VRM_KEY, motrSession.getVrmFromSession());
+        dataLayerHelper.setVehicleDataOrigin(vehicleDetails);
+        dataLayerHelper.setMessage(DataLayerMessageId.ANNUAL_TEST_DATE_UNKNOWN,
+                DataLayerMessageType.INELIGIBLE_FOR_REMINDER,
+                "We don't know when this vehicle's first annual test is due");
 
         Map<String, Object> modelMap = new HashMap<>();
 
