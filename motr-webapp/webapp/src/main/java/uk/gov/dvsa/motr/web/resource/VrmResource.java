@@ -159,6 +159,7 @@ public class VrmResource {
         dataLayerHelper.setMessage(DataLayerMessageId.VEHICLE_NOT_FOUND,
                 DataLayerMessageType.USER_INPUT_ERROR,
                 VEHICLE_NOT_FOUND_MESSAGE);
+        dataLayerHelper.clearVehicleDataOrigin();
         modelMap.put(MESSAGE_KEY, VEHICLE_NOT_FOUND_MESSAGE);
         modelMap.put(SHOW_INLINE_KEY, false);
     }
