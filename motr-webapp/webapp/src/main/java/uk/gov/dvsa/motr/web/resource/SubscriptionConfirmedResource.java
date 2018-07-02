@@ -144,6 +144,7 @@ public class SubscriptionConfirmedResource {
         dataLayerHelper.clear();
         smartSurveyHelperFeedback.clear();
         smartSurveyHelperSatisfaction.clear();
+        motrSession.clear();
 
         return map;
     }

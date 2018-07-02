@@ -59,4 +59,10 @@ public class DataLayerHelper {
             attributes.put(VEHICLE_DATA_ORIGIN_KEY, vehicleDetails.getVehicleType().toString());
         }
     }
+
+    public void clearVehicleDataOrigin() {
+        if (attributes.containsKey(VEHICLE_DATA_ORIGIN_KEY)) {
+            attributes.remove(VEHICLE_DATA_ORIGIN_KEY);
+        }
+    }
 }
