@@ -1,14 +1,15 @@
 package uk.gov.dvsa.motr.web.resource;
 
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
+import uk.gov.dvsa.motr.conversion.DataAnonymizer;
 import uk.gov.dvsa.motr.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 import uk.gov.dvsa.motr.web.component.subscription.exception.InvalidConfirmationIdException;
 import uk.gov.dvsa.motr.web.component.subscription.exception.SubscriptionAlreadyConfirmedException;
-import uk.gov.dvsa.motr.web.component.subscription.exception.SubscriptionAlreadyExistsException;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
@@ -23,10 +24,13 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response;
 
+import joptsimple.internal.Strings;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -44,6 +48,7 @@ public class SubscriptionConfirmedResourceTest {
     private static final String DVLA_ID = "54321";
     private static final String MOT_TEST_NUMBER = "12345";
     private static final String REPLY_PHONE_NUMBER = "07491163045";
+    private static final String ANONYMIZED_CONTACT_DATA = "abcdefghijk";
 
     public static final LocalDate DATE = LocalDate.now();
     private TemplateEngineStub engine = new TemplateEngineStub();
@@ -51,20 +56,23 @@ public class SubscriptionConfirmedResourceTest {
     private SubscriptionConfirmationService pendingSubscriptionActivatorService = mock(SubscriptionConfirmationService.class);
     private UrlHelper urlHelper = mock(UrlHelper.class);
     private MotrSession motrSession = mock(MotrSession.class);
+    private DataAnonymizer anonymizer = mock(DataAnonymizer.class);
 
     @Before
-    public void setup() throws SubscriptionAlreadyExistsException, InvalidConfirmationIdException {
+    public void setup() {
+
+        when(urlHelper.subscriptionConfirmedFirstTimeLink()).thenReturn("confirm-subscription/confirmed");
+        when(urlHelper.subscriptionConfirmedNthTimeLink(any(Subscription.ContactType.class)))
+                .thenReturn("confirm-subscription/already-confirmed");
+        when(anonymizer.anonymizeContactData(anyString())).thenReturn(ANONYMIZED_CONTACT_DATA);
 
         resource = new SubscriptionConfirmedResource(
                 engine,
                 pendingSubscriptionActivatorService,
                 motrSession,
-                urlHelper
+                urlHelper,
+                anonymizer
         );
-
-        when(urlHelper.subscriptionConfirmedFirstTimeLink()).thenReturn("confirm-subscription/confirmed");
-        when(urlHelper.subscriptionConfirmedNthTimeLink(any(Subscription.ContactType.class)))
-                .thenReturn("confirm-subscription/already-confirmed");
     }
 
     @Test
@@ -97,7 +105,7 @@ public class SubscriptionConfirmedResourceTest {
         motrSessionWillReturnValidPageParams();
 
         resource.confirmSubscriptionFirstTimeGet();
-        verifyDataLayer(getDataLayer());
+        verifyDataLayer(getDataLayer(), MOT_TEST_NUMBER, null, CONTACT_TYPE_EMAIL);
     }
 
     @Test
@@ -106,7 +114,7 @@ public class SubscriptionConfirmedResourceTest {
         motrSessionWillReturnValidPageParams();
 
         resource.confirmSubscriptionFirstTimeGet();
-        verifyDataLayer(getDataLayer());
+        verifyDataLayer(getDataLayer(), MOT_TEST_NUMBER, null, CONTACT_TYPE_EMAIL);
     }
 
     @Test
@@ -115,7 +123,7 @@ public class SubscriptionConfirmedResourceTest {
         motrSessionWillReturnValidPageParams();
 
         resource.confirmSubscriptionNthTimeGet();
-        verifyDataLayer(getDataLayer());
+        verifyDataLayer(getDataLayer(), MOT_TEST_NUMBER, null, CONTACT_TYPE_EMAIL);
     }
 
     @Test
@@ -128,8 +136,7 @@ public class SubscriptionConfirmedResourceTest {
 
         resource.confirmSubscriptionFirstTimeGet();
 
-        assertEquals("{\"vrm\":\"vrm\",\"vehicle-data-origin\":\"MOT\",\"dvla-id\":\"54321\",\"contact-type\":\"EMAIL\"}",
-                getDataLayer());
+        verifyDataLayer(getDataLayer(), null, DVLA_ID, CONTACT_TYPE_EMAIL);
     }
 
     @Test
@@ -140,7 +147,7 @@ public class SubscriptionConfirmedResourceTest {
 
         resource.confirmSubscriptionFirstTimeGet();
 
-        verifyDataLayer(getDataLayer());
+        verifyDataLayer(getDataLayer(), MOT_TEST_NUMBER, null, CONTACT_TYPE_EMAIL);
     }
 
     @Test
@@ -156,8 +163,7 @@ public class SubscriptionConfirmedResourceTest {
 
         resource.confirmSubscriptionFirstTimeGet();
 
-        assertEquals("{\"vrm\":\"vrm\",\"vehicle-data-origin\":\"MOT\",\"mot-test-number\":\"12345\",\"contact-type\":\"MOBILE\"}",
-                getDataLayer());
+        verifyDataLayer(getDataLayer(), MOT_TEST_NUMBER, null, CONTACT_TYPE_MOBILE);
         assertEquals(expectedMap.get("usingSms"), engine.getContext(Map.class).get("usingSms"));
         assertEquals(expectedMap.get("replyNumber"), engine.getContext(Map.class).get("replyNumber"));
         assertEquals(expectedMap.get("registration"), engine.getContext(Map.class).get("registration"));
@@ -254,6 +260,7 @@ public class SubscriptionConfirmedResourceTest {
         confirmationParams.setRegistration(VRM);
         confirmationParams.setMotTestNumber(MOT_TEST_NUMBER);
         confirmationParams.setContactType(contactType);
+        confirmationParams.setContact("contact");
         confirmationParams.setVehicleType(VehicleType.MOT);
 
         return confirmationParams;
@@ -264,10 +271,10 @@ public class SubscriptionConfirmedResourceTest {
         return engine.getContext(Map.class).get("dataLayer").toString();
     }
 
-    private void verifyDataLayer(String dataLayer) {
+    private void verifyDataLayer(String dataLayer, String motTestNumber, String dvlaId, String contactType) {
 
-        assertEquals("{\"vrm\":\"vrm\",\"vehicle-data-origin\":\"MOT\",\"mot-test-number\":\"12345\",\"contact-type\":\"EMAIL\"}",
-                dataLayer);
+        assertEquals(getExpectedDataLayerJsonString(VRM, VehicleType.MOT, "subscribe", motTestNumber, contactType, ANONYMIZED_CONTACT_DATA,
+                dvlaId), dataLayer);
     }
 
     private void mockSubscription(String motTestNumber, String dvlaId) throws SubscriptionAlreadyConfirmedException,
@@ -281,5 +288,24 @@ public class SubscriptionConfirmedResourceTest {
                 .setMotDueDate(DATE)
                 .setMotIdentification(motIdentification);
         when(pendingSubscriptionActivatorService.confirmSubscription(CONFIRMATION_ID)).thenReturn(subscription);
+    }
+
+    private String getExpectedDataLayerJsonString(String vrm, VehicleType vehicleOrigin, String eventType, String motTestNumber,
+                                                  String contactType, String contactId, String dvlaId) {
+
+        JSONObject content = new JSONObject();
+        content.put("vrm", vrm);
+        content.put("vehicle-data-origin", vehicleOrigin);
+        content.put("event-type", eventType);
+        content.put("contact-type", contactType);
+        if (!Strings.isNullOrEmpty(motTestNumber)) {
+            content.put("mot-test-number", motTestNumber);
+        }
+        if (!Strings.isNullOrEmpty(dvlaId)) {
+            content.put("dvla-id", dvlaId);
+        }
+        content.put("contact-id", contactId);
+
+        return content.toString();
     }
 }

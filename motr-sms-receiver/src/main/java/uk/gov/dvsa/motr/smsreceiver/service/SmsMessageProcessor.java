@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.apache.commons.lang3.StringUtils;
 
+import uk.gov.dvsa.motr.client.GoogleAnalyticsClient;
 import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.exception.InvalidNotifyCredentialsException;
 import uk.gov.dvsa.motr.smsreceiver.events.FailedToFindSubscriptionEvent;
@@ -36,6 +37,7 @@ public class SmsMessageProcessor {
     private VrmValidator vrmValidator;
     private MessageExtractor messageExtractor;
     private NotifySmsService notifySmsService;
+    private GoogleAnalyticsClient googleAnalyticsClient;
 
     @Inject
     public SmsMessageProcessor(
@@ -45,7 +47,8 @@ public class SmsMessageProcessor {
             String token,
             VrmValidator vrmValidator,
             MessageExtractor messageExtractor,
-            NotifySmsService notifySmsService
+            NotifySmsService notifySmsService,
+            GoogleAnalyticsClient googleAnalyticsClient
     ) {
         this.subscriptionRepository = subscriptionRepository;
         this.smsMessageValidator = smsMessageValidator;
@@ -54,6 +57,7 @@ public class SmsMessageProcessor {
         this.vrmValidator = vrmValidator;
         this.messageExtractor = messageExtractor;
         this.notifySmsService = notifySmsService;
+        this.googleAnalyticsClient = googleAnalyticsClient;
     }
 
     public void run(AwsProxyRequest request) {
@@ -85,6 +89,7 @@ public class SmsMessageProcessor {
                 cancelledSubscriptionHelper.createANewCancelledSubscriptionEntry(subscriptionToProcess);
                 subscriptionRepository.delete(subscriptionToProcess);
                 notifySmsService.sendUnsubscriptionConfirmationSms(mobileNumber, vrm, subscriptionToProcess.getVehicleType());
+                sendUnsubscribeEventToGa(subscription.get().getContactDetail());
                 EventLogger.logEvent(new SmsUnsubscribedConfirmationEvent().setVrm(vrm));
             } else if (cancelledSubscriptionHelper.foundMatchingCancelledSubscription(vrm, mobileNumber)) {
                 EventLogger.logEvent(new UserAlreadyUnsubscribedEvent().setVrm(vrm));
@@ -109,5 +114,10 @@ public class SmsMessageProcessor {
 
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(request.getBody(), Message.class);
+    }
+
+    private void sendUnsubscribeEventToGa(String phoneNumber) {
+
+        googleAnalyticsClient.sendUnsubscribeEvent(phoneNumber);
     }
 }

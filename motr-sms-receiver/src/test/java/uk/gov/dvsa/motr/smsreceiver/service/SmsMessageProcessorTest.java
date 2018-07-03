@@ -11,6 +11,7 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import uk.gov.dvsa.motr.client.GoogleAnalyticsClient;
 import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.smsreceiver.events.FailedToFindSubscriptionEvent;
 import uk.gov.dvsa.motr.smsreceiver.events.InvalidVrmSentEvent;
@@ -54,6 +55,7 @@ public class SmsMessageProcessorTest {
     private SmsMessageProcessor smsMessageProcessor;
     private SmsMessageValidator smsMessageValidator = mock(SmsMessageValidator.class);
     private NotifySmsService notifySmsService = mock(NotifySmsService.class);
+    private GoogleAnalyticsClient googleAnalyticsClient = mock(GoogleAnalyticsClient.class);
 
     @Before
     public void setup() {
@@ -181,12 +183,12 @@ public class SmsMessageProcessorTest {
     private SmsMessageProcessor initialiseProcessorWithBadToken() {
 
         return new SmsMessageProcessor(subscriptionRepository, smsMessageValidator, cancelledSubscriptionHelper, BAD_TEST_TOKEN,
-                vrmValidator, new MessageExtractor(), notifySmsService);
+                vrmValidator, new MessageExtractor(), notifySmsService, googleAnalyticsClient);
     }
 
     private SmsMessageProcessor initialiseProcessor() {
 
         return new SmsMessageProcessor(subscriptionRepository, smsMessageValidator, cancelledSubscriptionHelper, TEST_TOKEN,
-                vrmValidator, new MessageExtractor(), notifySmsService);
+                vrmValidator, new MessageExtractor(), notifySmsService, googleAnalyticsClient);
     }
 }

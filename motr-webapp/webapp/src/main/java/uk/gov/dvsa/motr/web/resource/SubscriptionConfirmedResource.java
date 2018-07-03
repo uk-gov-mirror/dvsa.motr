@@ -1,5 +1,6 @@
 package uk.gov.dvsa.motr.web.resource;
 
+import uk.gov.dvsa.motr.conversion.DataAnonymizer;
 import uk.gov.dvsa.motr.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
@@ -24,8 +25,10 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
+import static uk.gov.dvsa.motr.web.analytics.DataLayerHelper.CONTACT_ID;
 import static uk.gov.dvsa.motr.web.analytics.DataLayerHelper.CONTACT_TYPE;
 import static uk.gov.dvsa.motr.web.analytics.DataLayerHelper.DLVA_ID_KEY;
+import static uk.gov.dvsa.motr.web.analytics.DataLayerHelper.EVENT_TYPE;
 import static uk.gov.dvsa.motr.web.analytics.DataLayerHelper.MOT_TEST_NUMBER_KEY;
 import static uk.gov.dvsa.motr.web.analytics.DataLayerHelper.VRM_KEY;
 
@@ -46,6 +49,7 @@ public class SubscriptionConfirmedResource {
     private final SubscriptionConfirmationService subscriptionConfirmationService;
     private final MotrSession motrSession;
     private final UrlHelper urlHelper;
+    private final DataAnonymizer anonymizer;
 
 
     @Inject
@@ -53,7 +57,8 @@ public class SubscriptionConfirmedResource {
             TemplateEngine renderer,
             SubscriptionConfirmationService pendingSubscriptionActivatorService,
             MotrSession motrSession,
-            UrlHelper urlHelper
+            UrlHelper urlHelper,
+            DataAnonymizer anonymizer
     ) {
 
         this.renderer = renderer;
@@ -61,6 +66,7 @@ public class SubscriptionConfirmedResource {
         this.motrSession = motrSession;
         this.urlHelper = urlHelper;
         this.dataLayerHelper = new DataLayerHelper();
+        this.anonymizer = anonymizer;
         this.smartSurveyHelperSatisfaction = new SmartSurveyHelper(
                 "http://www.smartsurvey.co.uk/s/YN642/",
                 "smartSurveySatisfaction"
@@ -114,7 +120,9 @@ public class SubscriptionConfirmedResource {
         if (null != subscription) {
             dataLayerHelper.putAttribute(VRM_KEY, subscription.getRegistration());
             dataLayerHelper.putAttribute(DataLayerHelper.VEHICLE_DATA_ORIGIN_KEY, String.valueOf(subscription.getVehicleType()));
+            dataLayerHelper.putAttribute(EVENT_TYPE, "subscribe");
             dataLayerHelper.putAttribute(CONTACT_TYPE, subscription.getContactType());
+            dataLayerHelper.putAttribute(CONTACT_ID, anonymizer.anonymizeContactData(subscription.getContact()));
             smartSurveyHelperFeedback.putAttribute(SmartSurveyHelper.CONTACT_TYPE, subscription.getContactType());
             smartSurveyHelperSatisfaction.putAttribute(SmartSurveyHelper.CONTACT_TYPE, subscription.getContactType());
             modelMap.put("isMotVehicle", isMotVehicle(subscription));
@@ -159,6 +167,7 @@ public class SubscriptionConfirmedResource {
         params.setDvlaId(motIdentification.getDvlaId().orElse(""));
         params.setMotTestNumber(motIdentification.getMotTestNumber().orElse(""));
         params.setContactType(subscription.getContactDetail().getContactType().getValue());
+        params.setContact(subscription.getContactDetail().getValue());
         params.setVehicleType(subscription.getVehicleType());
         motrSession.setSubscriptionConfirmationParams(params);
     }

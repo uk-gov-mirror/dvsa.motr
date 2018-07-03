@@ -1,5 +1,6 @@
 package uk.gov.dvsa.motr.web.resource;
 
+import uk.gov.dvsa.motr.conversion.DataAnonymizer;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsService;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
@@ -21,6 +22,9 @@ import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
+import static uk.gov.dvsa.motr.web.analytics.DataLayerHelper.CONTACT_ID;
+import static uk.gov.dvsa.motr.web.analytics.DataLayerHelper.CONTACT_TYPE;
+import static uk.gov.dvsa.motr.web.analytics.DataLayerHelper.EVENT_TYPE;
 import static uk.gov.dvsa.motr.web.analytics.DataLayerHelper.VRM_KEY;
 
 @Singleton
@@ -31,18 +35,20 @@ public class UnsubscribeConfirmedResource {
     private final TemplateEngine renderer;
     private final MotrSession motrSession;
     private final VehicleDetailsClient client;
+    private final DataAnonymizer anonymizer;
 
     @Inject
     public UnsubscribeConfirmedResource(
             TemplateEngine renderer,
             MotrSession motrSession,
-            VehicleDetailsClient client
-
+            VehicleDetailsClient client,
+            DataAnonymizer anonymizer
     ) {
 
         this.renderer = renderer;
         this.motrSession = motrSession;
         this.client = client;
+        this.anonymizer = anonymizer;
     }
 
     @GET
@@ -65,6 +71,9 @@ public class UnsubscribeConfirmedResource {
         DataLayerHelper helper = new DataLayerHelper();
         helper.putAttribute(VRM_KEY, params.getRegistration());
         helper.setVehicleDataOrigin(vehicleDetails);
+        helper.putAttribute(EVENT_TYPE, "unsubscribe");
+        helper.putAttribute(CONTACT_TYPE, params.getContactType());
+        helper.putAttribute(CONTACT_ID, anonymizer.anonymizeContactData(params.getContact()));
 
         Map<String, Object> map = new HashMap<>();
         map.putAll(helper.formatAttributes());

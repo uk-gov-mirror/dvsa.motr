@@ -18,6 +18,8 @@ public class DataLayerHelper {
     public static final String DLVA_ID_KEY = "dvla-id";
     public static final String MOT_TEST_NUMBER_KEY = "mot-test-number";
     public static final String CONTACT_TYPE = "contact-type";
+    public static final String CONTACT_ID = "contact-id";
+    public static final String EVENT_TYPE = "event-type";
     public static final String VEHICLE_DATA_ORIGIN_KEY = "vehicle-data-origin";
 
     private Map<String, String> attributes;

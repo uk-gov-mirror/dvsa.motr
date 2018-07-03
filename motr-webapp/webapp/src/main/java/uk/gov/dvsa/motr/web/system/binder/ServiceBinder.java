@@ -2,6 +2,7 @@ package uk.gov.dvsa.motr.web.system.binder;
 
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 
+import uk.gov.dvsa.motr.conversion.DataAnonymizer;
 import uk.gov.dvsa.motr.notifications.service.NotifyService;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.component.subscription.service.PendingSubscriptionService;
@@ -26,5 +27,6 @@ public class ServiceBinder extends AbstractBinder {
         bind(UnsubscribeService.class).to(UnsubscribeService.class);
         bind(UrlHelper.class).to(UrlHelper.class);
         bind(SubscriptionsValidationService.class).to(SubscriptionsValidationService.class);
+        bind(DataAnonymizer.class).to(DataAnonymizer.class);
     }
 }

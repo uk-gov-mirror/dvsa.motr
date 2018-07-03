@@ -6,11 +6,13 @@ import com.google.inject.Provides;
 
 import org.apache.log4j.Logger;
 
+import uk.gov.dvsa.motr.client.GoogleAnalyticsClient;
 import uk.gov.dvsa.motr.config.CachedConfig;
 import uk.gov.dvsa.motr.config.Config;
 import uk.gov.dvsa.motr.config.ConfigKey;
 import uk.gov.dvsa.motr.config.EncryptionAwareConfig;
 import uk.gov.dvsa.motr.config.EnvironmentVariableConfig;
+import uk.gov.dvsa.motr.conversion.DataAnonymizer;
 import uk.gov.dvsa.motr.encryption.AwsKmsDecryptor;
 import uk.gov.dvsa.motr.encryption.Decryptor;
 import uk.gov.dvsa.motr.notify.NotifyTemplateEngine;
@@ -36,6 +38,7 @@ import static org.apache.log4j.Level.toLevel;
 
 import static uk.gov.dvsa.motr.smsreceiver.system.SystemVariable.DB_TABLE_CANCELLED_SUBSCRIPTION;
 import static uk.gov.dvsa.motr.smsreceiver.system.SystemVariable.DB_TABLE_SUBSCRIPTION;
+import static uk.gov.dvsa.motr.smsreceiver.system.SystemVariable.GA_TRACING_ID;
 import static uk.gov.dvsa.motr.smsreceiver.system.SystemVariable.GOV_NOTIFY_API_TOKEN;
 import static uk.gov.dvsa.motr.smsreceiver.system.SystemVariable.LOG_LEVEL;
 import static uk.gov.dvsa.motr.smsreceiver.system.SystemVariable.NOTIFY_BEARER_TOKEN;
@@ -43,6 +46,8 @@ import static uk.gov.dvsa.motr.smsreceiver.system.SystemVariable.REGION;
 import static uk.gov.dvsa.motr.smsreceiver.system.SystemVariable.SMS_UNSUBSCRIPTION_CONFIRMATION_TEMPLATE_ID;
 
 public class ConfigModule extends AbstractModule {
+
+    private static final String GOOGLE_ANALYTICS_URL = "http://google-analytics.com/collect?v=1&tid=%s&cid=NOT-AVAILABLE";
 
     @Override
     protected void configure() {
@@ -118,6 +123,13 @@ public class ConfigModule extends AbstractModule {
         String smsUnsubscriptionConfirmationTemplateId = config.getValue(SMS_UNSUBSCRIPTION_CONFIRMATION_TEMPLATE_ID);
         NotifyTemplateEngine notifyTemplateEngine = new NotifyTemplateEngine();
         return new NotifySmsService(notificationClient, smsUnsubscriptionConfirmationTemplateId, notifyTemplateEngine);
+    }
+
+    @Provides
+    public GoogleAnalyticsClient provideGoogleAnalyticsClient(Config config) {
+
+        DataAnonymizer dataAnonymizer = new DataAnonymizer();
+        return new GoogleAnalyticsClient(config.getValue(GA_TRACING_ID), dataAnonymizer, GOOGLE_ANALYTICS_URL);
     }
 
     private static Set<ConfigKey> secretVariables() {

@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import static uk.gov.dvsa.motr.smsreceiver.system.SystemVariable.DB_TABLE_CANCELLED_SUBSCRIPTION;
 import static uk.gov.dvsa.motr.smsreceiver.system.SystemVariable.DB_TABLE_SUBSCRIPTION;
+import static uk.gov.dvsa.motr.smsreceiver.system.SystemVariable.GA_TRACING_ID;
 import static uk.gov.dvsa.motr.smsreceiver.system.SystemVariable.GOV_NOTIFY_API_TOKEN;
 import static uk.gov.dvsa.motr.smsreceiver.system.SystemVariable.LOG_LEVEL;
 import static uk.gov.dvsa.motr.smsreceiver.system.SystemVariable.NOTIFY_BEARER_TOKEN;
@@ -26,6 +27,7 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
         set(NOTIFY_BEARER_TOKEN, lambdaEncryptedToken());
         set(GOV_NOTIFY_API_TOKEN, govNotifyApiToken());
         set(SMS_UNSUBSCRIPTION_CONFIRMATION_TEMPLATE_ID, notifySmsUnsubscriptionConfirmationTemplateId());
+        set(GA_TRACING_ID, gaTracingId());
     }
 
     private void set(SystemVariable var, String value) {
@@ -71,6 +73,10 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
     public static String handlerFunctionName() {
 
         return lookupProperty("test.lambda.integration.handlerFunctionName");
+    }
+
+    public static String gaTracingId() {
+        return lookupProperty("test.notify.ga.tracking.id");
     }
 
     private static String lookupProperty(String property) {
