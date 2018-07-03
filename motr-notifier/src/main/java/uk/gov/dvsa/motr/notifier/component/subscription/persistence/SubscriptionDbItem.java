@@ -1,5 +1,7 @@
 package uk.gov.dvsa.motr.notifier.component.subscription.persistence;
 
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
+
 import java.time.LocalDate;
 
 public class SubscriptionDbItem {
@@ -15,6 +17,8 @@ public class SubscriptionDbItem {
     private LocalDate motDueDate;
 
     private String dvlaId;
+
+    private VehicleType vehicleType;
 
     public SubscriptionDbItem(String id) {
         this.id = id;
@@ -68,6 +72,15 @@ public class SubscriptionDbItem {
     public SubscriptionDbItem setDvlaId(String dvlaId) {
 
         this.dvlaId = dvlaId;
+        return this;
+    }
+
+    public VehicleType getVehicleType() {
+        return vehicleType;
+    }
+
+    public SubscriptionDbItem setVehicleType(VehicleType vehicleType) {
+        this.vehicleType = vehicleType;
         return this;
     }
 }

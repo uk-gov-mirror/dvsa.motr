@@ -13,6 +13,7 @@ import uk.gov.dvsa.motr.notifier.component.subscription.persistence.Subscription
 import uk.gov.dvsa.motr.notifier.processing.model.SubscriptionQueueItem;
 import uk.gov.dvsa.motr.test.environmant.variables.TestEnvironmentVariables;
 import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.model.SubscriptionItem;
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 import uk.gov.service.notify.NotificationClientException;
 
 import java.io.IOException;
@@ -98,14 +99,19 @@ public class SubscriptionDbItemQueueItemUnloaderTest extends SubscriptionDbItemQ
 
         subscriptionItem = new SubscriptionItem()
                 .setMotDueDate(MOCK_API_SPECIFIC_VEHICLE_DATE)
-                .setMotTestNumber("987654321012");
+                .setMotTestNumber("987654321012")
+                .setVehicleType(VehicleType.MOT);
 
         SubscriptionDbItem changedSubscriptionDbItem = saveAndProcessSubscriptionItem(subscriptionItem);
 
         QuerySpec spec = new QuerySpec()
                 .withKeyConditionExpression("vrm = :vrm AND email = :email")
-                .withValueMap(new ValueMap().withString(":vrm", changedSubscriptionDbItem.getVrm()).withString(":email",
-                changedSubscriptionDbItem.getEmail()));
+                .withValueMap(
+                        new ValueMap()
+                                .withString(":vrm", changedSubscriptionDbItem.getVrm())
+                                .withString(":email", changedSubscriptionDbItem.getEmail()
+                        )
+                );
 
         Item savedItem = new DynamoDB(dynamoDbClient()).getTable(subscriptionTableName()).query(spec).iterator().next();
 
@@ -115,6 +121,7 @@ public class SubscriptionDbItemQueueItemUnloaderTest extends SubscriptionDbItemQ
 
         // Assert the db vrm now is equal to the mock api vrm.
         assertEquals("XXXYYY", changedSubscriptionDbItem.getVrm());
+        assertEquals(VehicleType.MOT.name(), savedItem.getString("vehicle_type"));
         assertNotNull("created_at cannot be null when updating vrm", savedItem.getString("created_at"));
         assertNotNull("updated_at cannot be null when updating vrm", savedItem.getString("updated_at"));
         assertNotNull("contact_type cannot be null when updating vrm", savedItem.getString("contact_type"));

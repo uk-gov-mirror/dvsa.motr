@@ -14,6 +14,8 @@ import com.amazonaws.services.dynamodbv2.document.spec.UpdateItemSpec;
 import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 import com.amazonaws.services.dynamodbv2.model.ReturnValue;
 
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
+
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -62,6 +64,8 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
             subscriptionDbItem.setMotTestNumber(item.getString("mot_test_number"));
         }
 
+        subscriptionDbItem.setVehicleType(VehicleType.getFromString(item.getString("vehicle_type")));
+
         return Optional.of(subscriptionDbItem);
     }
 
@@ -109,7 +113,8 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
                     .withString("mot_due_date_md", originalItem.getString("mot_due_date_md"))
                     .withString("created_at", originalItem.getString("created_at"))
                     .withString("updated_at", ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT))
-                    .withString("contact_type", originalItem.getString("contact_type"));
+                    .withString("contact_type", originalItem.getString("contact_type"))
+                    .withString("vehicle_type", originalItem.getString("vehicle_type"));
 
             if (originalItem.isPresent("dvla_id")) {
                 item.withString("dvla_id", originalItem.getString("dvla_id"));
