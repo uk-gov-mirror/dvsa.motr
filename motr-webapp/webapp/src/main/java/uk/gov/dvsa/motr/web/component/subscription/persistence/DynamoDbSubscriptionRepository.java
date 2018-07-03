@@ -32,6 +32,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import static uk.gov.dvsa.motr.web.system.SystemVariable.DB_TABLE_SUBSCRIPTION;
+import static uk.gov.dvsa.motr.web.system.SystemVariable.FEATURE_TOGGLE_HGV_PSV_VEHICLES;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.REGION;
 
 @Singleton
@@ -39,15 +40,18 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
 
     private final DynamoDB dynamoDb;
     private final String tableName;
+    private final String idIndexName;
 
     @Inject
     public DynamoDbSubscriptionRepository(
             @SystemVariableParam(DB_TABLE_SUBSCRIPTION) String tableName,
-            @SystemVariableParam(REGION) String region) {
+            @SystemVariableParam(REGION) String region,
+            @SystemVariableParam(FEATURE_TOGGLE_HGV_PSV_VEHICLES) Boolean featureToggleHgvPsvVehicle) {
 
         AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard().withRegion(region).build();
         this.dynamoDb = new DynamoDB(client);
         this.tableName = tableName;
+        idIndexName = featureToggleHgvPsvVehicle ? "id-vt-gsi" : "id-gsi";
     }
 
     @Override
@@ -56,7 +60,7 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
                 .withKeyConditionExpression("id = :id")
                 .withValueMap(new ValueMap().withString(":id", id));
 
-        Index table = dynamoDb.getTable(tableName).getIndex("id-gsi");
+        Index table = dynamoDb.getTable(tableName).getIndex(idIndexName);
 
         ItemCollection<QueryOutcome> items = table.query(query);
         Iterator<Item> resultIterator = items.iterator();
