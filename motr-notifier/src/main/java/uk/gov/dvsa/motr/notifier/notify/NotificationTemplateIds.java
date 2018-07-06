@@ -4,39 +4,9 @@ public class NotificationTemplateIds {
 
     private String oneMonthHgvPsvNotificationTemplateId;
     private String twoMonthHgvPsvNotificationTemplateId;
-    private String twoWeekNotificationTemplateIdPreEu;
-    private String oneDayAfterNotificationTemplateIdPreEu;
-    private String oneMonthNotificationTemplateIdPreEu;
     private String twoWeekNotificationTemplateId;
     private String oneDayAfterNotificationTemplateId;
     private String oneMonthNotificationTemplateId;
-
-    public String getTwoWeekNotificationTemplateIdPreEu() {
-        return twoWeekNotificationTemplateIdPreEu;
-    }
-
-    public NotificationTemplateIds setTwoWeekNotificationTemplateIdPreEu(String twoWeekNotificationTemplateIdPreEu) {
-        this.twoWeekNotificationTemplateIdPreEu = twoWeekNotificationTemplateIdPreEu;
-        return this;
-    }
-
-    public String getOneDayAfterNotificationTemplateIdPreEu() {
-        return oneDayAfterNotificationTemplateIdPreEu;
-    }
-
-    public NotificationTemplateIds setOneDayAfterNotificationTemplateIdPreEu(String oneDayAfterNotificationTemplateIdPreEu) {
-        this.oneDayAfterNotificationTemplateIdPreEu = oneDayAfterNotificationTemplateIdPreEu;
-        return this;
-    }
-
-    public String getOneMonthNotificationTemplateIdPreEu() {
-        return oneMonthNotificationTemplateIdPreEu;
-    }
-
-    public NotificationTemplateIds setOneMonthNotificationTemplateIdPreEu(String oneMonthNotificationTemplateIdPreEu) {
-        this.oneMonthNotificationTemplateIdPreEu = oneMonthNotificationTemplateIdPreEu;
-        return this;
-    }
 
     public String getOneMonthHgvPsvNotificationTemplateId() {
         return oneMonthHgvPsvNotificationTemplateId;

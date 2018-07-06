@@ -1,6 +1,5 @@
 package uk.gov.dvsa.motr.notifier.processing.factory;
 
-import uk.gov.dvsa.motr.notifier.helpers.EuRoadworthinessToggle;
 import uk.gov.dvsa.motr.notifier.notify.NotificationTemplateIds;
 import uk.gov.dvsa.motr.notifier.processing.model.SubscriptionQueueItem;
 import uk.gov.dvsa.motr.notifier.processing.model.notification.email.HgvPsvOneMonthEmailNotification;
@@ -31,23 +30,19 @@ public class SendableNotificationFactory {
     private NotificationTemplateIds emailNotificationTemplateIds;
     private NotificationTemplateIds smsNotificationTemplateIds;
 
-    private static final String PRE_EU = "pre-eu/";
-
     private String webBaseUrl;
     private String vehicleDataUrl;
     private String checksumSalt;
-    private EuRoadworthinessToggle euRoadworthinessToggle;
 
     public SendableNotificationFactory(NotificationTemplateIds emailNotificationTemplateIds,
                                        NotificationTemplateIds smsNotificationTemplateIds, String webBaseUrl, String vehicleDataUrl,
-                                       String checksumSalt, EuRoadworthinessToggle euRoadworthinessToggle) {
+                                       String checksumSalt) {
 
         this.emailNotificationTemplateIds = emailNotificationTemplateIds;
         this.smsNotificationTemplateIds = smsNotificationTemplateIds;
         this.webBaseUrl = webBaseUrl;
         this.vehicleDataUrl = vehicleDataUrl;
         this.checksumSalt = checksumSalt;
-        this.euRoadworthinessToggle = euRoadworthinessToggle;
     }
 
     public Optional<SendableEmailNotification> getEmailNotification(LocalDate requestDate, SubscriptionQueueItem subscription,
@@ -58,27 +53,21 @@ public class SendableNotificationFactory {
         if (subscription.getVehicleType() == VehicleType.MOT) {
             if (oneMonthNotificationRequired(requestDate, vehicleDetails.getMotExpiryDate())) {
 
-                String templateId = euRoadworthinessToggle.isEuRoadworthinessLive()
-                        ? emailNotificationTemplateIds.getOneMonthNotificationTemplateId()
-                        : emailNotificationTemplateIds.getOneMonthNotificationTemplateIdPreEu();
+                String templateId = emailNotificationTemplateIds.getOneMonthNotificationTemplateId();
 
                 notification = Optional.of(new MotOneMonthEmailNotification(webBaseUrl, vehicleDataUrl, checksumSalt)
                         .setTemplateId(templateId)
                 );
 
             } else if (twoWeekNotificationRequired(requestDate, vehicleDetails.getMotExpiryDate())) {
-                String templateId = euRoadworthinessToggle.isEuRoadworthinessLive()
-                        ? emailNotificationTemplateIds.getTwoWeekNotificationTemplateId()
-                        : emailNotificationTemplateIds.getTwoWeekNotificationTemplateIdPreEu();
+                String templateId = emailNotificationTemplateIds.getTwoWeekNotificationTemplateId();
 
                 notification = Optional.of(new MotTwoWeekEmailNotification(webBaseUrl)
                         .setTemplateId(templateId)
                 );
 
             } else if (oneDayAfterNotificationRequired(requestDate, vehicleDetails.getMotExpiryDate())) {
-                String templateId = euRoadworthinessToggle.isEuRoadworthinessLive()
-                        ? emailNotificationTemplateIds.getOneDayAfterNotificationTemplateId()
-                        : emailNotificationTemplateIds.getOneDayAfterNotificationTemplateIdPreEu();
+                String templateId =  emailNotificationTemplateIds.getOneDayAfterNotificationTemplateId();
 
                 notification = Optional.of(new MotOneDayAfterEmailNotification(webBaseUrl)
                         .setTemplateId(templateId)
@@ -98,7 +87,6 @@ public class SendableNotificationFactory {
 
         notification.ifPresent(n -> {
             n.personalise(subscription, vehicleDetails);
-            usePreEuTemplateIfRequired(n);
         });
 
         return notification;
@@ -142,19 +130,6 @@ public class SendableNotificationFactory {
 
         notification.ifPresent(n -> n.personalise(subscription));
 
-        return notification;
-    }
-
-    private SendableEmailNotification usePreEuTemplateIfRequired(SendableEmailNotification notification) {
-        if (!euRoadworthinessToggle.isEuRoadworthinessLive()) {
-            notification.setNotificationPathSubject(
-                    PRE_EU + notification.getNotificationPathSubject()
-            );
-
-            notification.setNotificationPathBody(
-                    PRE_EU + notification.getNotificationPathBody()
-            );
-        }
         return notification;
     }
 }
