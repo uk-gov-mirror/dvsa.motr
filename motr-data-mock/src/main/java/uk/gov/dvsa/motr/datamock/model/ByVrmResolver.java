@@ -7,6 +7,7 @@ import javax.ws.rs.core.Response;
 import static uk.gov.dvsa.motr.datamock.model.MockResponse.VehicleType.HGV;
 import static uk.gov.dvsa.motr.datamock.model.MockResponse.VehicleType.MOT;
 import static uk.gov.dvsa.motr.datamock.model.MockResponse.VehicleType.PSV;
+import static uk.gov.dvsa.motr.datamock.model.MockResponse.VehicleType.Trailer;
 
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
 
@@ -202,6 +203,26 @@ public class ByVrmResolver {
                     .manufactureYear("1999")
                     .dueDate("2014-01-09")
                     .dvlaId("245440");
+        } else if (vrm.contains("A112233")) {
+            response.make("TrailerMake")
+                    .model("TrailerTestModel")
+                    .primaryColour("White")
+                    .vehicleType(Trailer)
+                    .manufactureYear("1999")
+                    .dueDate("2014-01-09");
+        } else if (vrm.contains("C123456")) {
+            response.make("TrailerMake")
+                    .model("TrailerTestModel")
+                    .vehicleType(Trailer)
+                    .manufactureYear("1999")
+                    .dueDate("2026-01-09");
+        } else if (vrm.contains("A111111")) {
+            response.make("TrailerMake")
+                    .model("TrailerTestModel")
+                    .vehicleType(Trailer)
+                    .primaryColour("Green")
+                    .manufactureYear("2011")
+                    .dueDate("2026-01-09");
         } else {
             response.make("testMake")
                     .model("testModel")

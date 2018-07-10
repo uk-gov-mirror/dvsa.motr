@@ -10,6 +10,7 @@ import static uk.gov.dvsa.motr.notifier.SystemVariable.CHECKSUM_SALT;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.DB_TABLE_SUBSCRIPTION;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.EU_GO_LIVE_DATE;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.FEATURE_TOGGLE_HGV_PSV_VEHICLES;
+import static uk.gov.dvsa.motr.notifier.SystemVariable.FEATURE_TOGGLE_TRAILERS;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.GOV_NOTIFY_API_TOKEN;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.HGV_PSV_ONE_MONTH_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.HGV_PSV_TWO_MONTH_NOTIFICATION_TEMPLATE_ID;
@@ -79,6 +80,7 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
 
         set(EU_GO_LIVE_DATE, euGoLiveDate());
         set(FEATURE_TOGGLE_HGV_PSV_VEHICLES, featureToggleHgvPsvVehicles());
+        set(FEATURE_TOGGLE_TRAILERS, featureToggleTrailers());
 
         set(GOV_NOTIFY_API_TOKEN, govNotifyApiToken());
         set(WORKER_COUNT, "1");
@@ -238,6 +240,10 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
 
     private String featureToggleHgvPsvVehicles() {
         return lookupProperty("test.feature.hgvpsv.toggle");
+    }
+
+    private String featureToggleTrailers() {
+        return lookupProperty("test.feature.trailers.toggle");
     }
 
     private static String lookupProperty(String property) {

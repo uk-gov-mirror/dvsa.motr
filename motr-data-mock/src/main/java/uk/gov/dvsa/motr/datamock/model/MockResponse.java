@@ -88,6 +88,6 @@ import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
     }
 
     public enum VehicleType {
-        MOT, PSV, HGV
+        MOT, PSV, HGV, Trailer
     }
 }

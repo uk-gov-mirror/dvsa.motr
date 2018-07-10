@@ -25,7 +25,7 @@ public class MotrSessionTest {
 
     @Before
     public void setUp() {
-        motrSession = new MotrSession(true);
+        motrSession = new MotrSession(true, false);
     }
 
     @Test
@@ -310,7 +310,7 @@ public class MotrSessionTest {
 
     @Test
     public void getHgvPsvVehiclesFeatureToggleValueReturnsFalseWithToggleOff() {
-        motrSession = new MotrSession(false);
+        motrSession = new MotrSession(false, false);
 
         assertFalse(motrSession.isHgvPsvVehiclesFeatureToggleOn());
     }

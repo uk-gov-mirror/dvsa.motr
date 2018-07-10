@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.inject.Singleton;
 
 import static uk.gov.dvsa.motr.web.system.SystemVariable.FEATURE_TOGGLE_HGV_PSV_VEHICLES;
+import static uk.gov.dvsa.motr.web.system.SystemVariable.FEATURE_TOGGLE_TRAILERS;
 
 /**
  * Singleton session object that will be used across different Lambda container invocations from different users.
@@ -35,16 +36,20 @@ public class MotrSession {
 
     // Set when session singleton is instantiated (container creation).
     private boolean hgvPsvVehiclesFeatureToggle;
+    private boolean featureToggleTrailers;
 
     // Set during runtime for each container invocation.
     private Map<String, Object> attributes;
     private boolean shouldClearCookies;
     private boolean smsConfirmResendLimited;
 
-    public MotrSession(@SystemVariableParam(FEATURE_TOGGLE_HGV_PSV_VEHICLES) Boolean featureToggleHgvPsvVehicle) {
-
+    public MotrSession(
+            @SystemVariableParam(FEATURE_TOGGLE_HGV_PSV_VEHICLES) Boolean featureToggleHgvPsvVehicle,
+            @SystemVariableParam(FEATURE_TOGGLE_TRAILERS) Boolean featureToggleTrailers
+    ) {
         this.attributes = new HashMap<>();
         this.hgvPsvVehiclesFeatureToggle = featureToggleHgvPsvVehicle;
+        this.featureToggleTrailers = featureToggleTrailers;
     }
 
     public void setShouldClearCookies(boolean shouldClearCookies) {
@@ -263,6 +268,10 @@ public class MotrSession {
         return hgvPsvVehiclesFeatureToggle;
     }
 
+    public boolean isTrailersFeatureToggleOn() {
+        return featureToggleTrailers;
+    }
+
     protected void setAttribute(String attributeKey, Object attributeValue) {
 
         this.attributes.put(attributeKey, attributeValue);
@@ -297,6 +306,7 @@ public class MotrSession {
                 "attributes=" + attributes +
                 ", shouldClearCookies=" + shouldClearCookies +
                 ", hgvPsvVehiclesFeatureToggle=" + hgvPsvVehiclesFeatureToggle +
+                ", featureToggleTrailers=" + featureToggleTrailers +
                 ", smsConfirmResendLimited=" + smsConfirmResendLimited +
                 '}';
     }

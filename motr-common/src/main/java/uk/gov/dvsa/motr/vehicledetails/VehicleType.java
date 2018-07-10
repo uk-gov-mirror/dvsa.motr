@@ -9,6 +9,8 @@ public enum VehicleType {
     HGV,
     @JsonProperty("PSV")
     PSV,
+    @JsonProperty("Trailer")
+    TRAILER,
     @JsonProperty("MOT")
     MOT;
 
@@ -34,5 +36,9 @@ public enum VehicleType {
 
     public static boolean isHgvOrPsv(VehicleType vehicleType) {
         return vehicleType.equals(HGV) || vehicleType.equals(PSV);
+    }
+
+    public static boolean isTrailer(VehicleType vehicleType) {
+        return vehicleType.equals(TRAILER);
     }
 }

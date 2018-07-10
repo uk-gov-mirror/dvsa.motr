@@ -42,6 +42,8 @@ public class VrmResourceTest {
     private static final String HONEY_POT = "";
     private static final String VEHICLE_NOT_FOUND = "We don't hold information about this vehicle.<br/><br/>" +
             "Check that you've typed in the correct registration number.";
+    private static final String TRAILER_NOT_FOUND = "We don't hold information about this trailer.<br/><br/>" +
+            "Check that you've typed in the correct trailer ID.";
 
     private VehicleDetailsClient client;
     private MotDueDateValidator motDueDateValidator;
@@ -158,6 +160,63 @@ public class VrmResourceTest {
     }
 
     @Test
+    public void whenSearchForTrailerButTrailerFunctionalityToggledOffShowErrorMessage() throws Exception {
+        String trailerVrm = "A112131";
+
+        when(motrSession.isTrailersFeatureToggleOn()).thenReturn(false);
+
+        resource.vrmPagePost(trailerVrm, HONEY_POT);
+
+        HashMap<String, Object> expectedContext = new HashMap<>();
+        expectedContext.put("inputFieldId", "reg-number-input");
+        expectedContext.put("message", "We don't hold information about this vehicle.<br/>" +
+                "<br/>Check that you've typed in the correct registration number.");
+        expectedContext.put("back_url", HomepageResource.HOMEPAGE_URL);
+        expectedContext.put("vrm", trailerVrm);
+        expectedContext.put("continue_button_text", "Continue");
+        expectedContext.put("showSystemError", false);
+        expectedContext.put("showInLine", "false");
+        expectedContext.put("back_button_text", "Back");
+        expectedContext.put("dataLayer",
+                getExpectedDataLayerJsonString(trailerVrm,
+                        DataLayerMessageId.VEHICLE_NOT_FOUND,
+                        DataLayerMessageType.USER_INPUT_ERROR,
+                        VEHICLE_NOT_FOUND));
+
+        assertEquals(expectedContext.toString(), templateEngine.getContext(Map.class).toString());
+
+    }
+
+    @Test
+    public void whenVehicleDetailsForTrailerNotFoundShowErrorMessage() throws Exception {
+        String trailerVrm = "A112131";
+
+        when(motrSession.isTrailersFeatureToggleOn()).thenReturn(true);
+        when(client.fetchByVrm(eq(trailerVrm))).thenReturn(Optional.empty());
+
+        resource.vrmPagePost(trailerVrm, HONEY_POT);
+
+        HashMap<String, Object> expectedContext = new HashMap<>();
+        expectedContext.put("inputFieldId", "reg-number-input");
+        expectedContext.put("message", "We don't hold information about this trailer.<br/>" +
+                "<br/>Check that you've typed in the correct trailer ID.");
+        expectedContext.put("back_url", HomepageResource.HOMEPAGE_URL);
+        expectedContext.put("vrm", trailerVrm);
+        expectedContext.put("continue_button_text", "Continue");
+        expectedContext.put("showSystemError", false);
+        expectedContext.put("showInLine", "false");
+        expectedContext.put("back_button_text", "Back");
+        expectedContext.put("dataLayer",
+                getExpectedDataLayerJsonString(trailerVrm,
+                        DataLayerMessageId.TRAILER_NOT_FOUND,
+                        DataLayerMessageType.USER_INPUT_ERROR,
+                        TRAILER_NOT_FOUND));
+
+        assertEquals(expectedContext.toString(), templateEngine.getContext(Map.class).toString());
+        assertEquals("vrm", templateEngine.getTemplate());
+    }
+
+    @Test
     public void whenVehicleDetailsNotFoundHgvShowErrorMessage() throws Exception {
 
         when(client.fetchByVrm(eq(VALID_REG_NUMBER))).thenReturn(Optional.empty());
@@ -218,6 +277,25 @@ public class VrmResourceTest {
 
         assertEquals(302, response.getStatus());
         assertEquals(URI.create(UnknownTestDueDateResource.UNKNOWN_TEST_DATE_PATH), response.getLocation());
+    }
+
+    @Test
+    public void whenTrailerExpiryDateIsUnknown_thenShouldRedirect() throws Exception {
+        String trailerVrm = "A112233";
+        VehicleDetails vehicle = new VehicleDetails()
+                .setMotExpiryDate(null)
+                .setVehicleType(VehicleType.TRAILER);
+
+        when(motrSession.isTrailersFeatureToggleOn()).thenReturn(true);
+        when(client.fetchByVrm(eq(trailerVrm))).thenReturn(Optional.of(vehicle));
+
+        Response response = resource.vrmPagePost(trailerVrm, HONEY_POT);
+
+        // vehicleDetails are used by MotrSession.isAllowedOnUnknownTestDatePage()
+        verify(motrSession, times(1)).setVehicleDetails(eq(vehicle));
+
+        assertEquals(302, response.getStatus());
+        assertEquals(URI.create(TrailerWithoutFirstAnnualTestResource.TRAILER_WITHOUT_FIRST_ANNUAL_TEST_PATH), response.getLocation());
     }
 
     @Test

@@ -11,6 +11,7 @@ import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -37,14 +38,18 @@ public class TestExpiredResource {
             "You can be fined up to £1,000 for driving a vehicle without a valid MOT"
     );
 
-    public static final List<String> ANNUAL_EXPIRED_CONTENT = Arrays.asList(
+    public static List<String> ANNUAL_EXPIRED_CONTENT = new ArrayList<>(Arrays.asList(
             "You must get the annual test done before you can sign up to get free reminders",
-            "You can get a court imposed fine for driving without a valid annual test",
-            "If the vehicle has been tested recently, it can take up to 10 working days for us to update our records"
-    );
+            "You can get a court imposed fine for driving without a valid annual test"
+    ));
+
+    public static String ANNUAL_EXPIRED_SUMMARY_CONTENT =
+            "If the %s has been tested recently, it can take up to 10 working days for us to update our records";
+
 
     public static final String HEADER_TEXT_KEY = "headerText";
     public static final String CONTENT_TEXT_ARRAY_KEY = "contentTextArray";
+    public static final String VEHICLE_DESCRIPTIVE_TYPE_KEY = "vehicleDescriptiveType";
     public static final String TEST_EXPIRY_DATE_FORMAT = "dd MMMM yyyy";
 
     private final TemplateEngine renderer;
@@ -80,6 +85,7 @@ public class TestExpiredResource {
 
         modelMap.put(HEADER_TEXT_KEY, getHeaderText(vehicle));
         modelMap.put(CONTENT_TEXT_ARRAY_KEY, getPageContent(vehicle));
+        modelMap.put(VEHICLE_DESCRIPTIVE_TYPE_KEY, getVehicleDescriptiveType(vehicle));
         modelMap.putAll(dataLayerHelper.formatAttributes());
         dataLayerHelper.clear();
 
@@ -101,21 +107,32 @@ public class TestExpiredResource {
     }
 
     private String determineTemplateName(VehicleDetails vehicle) {
+        if (vehicle.getVehicleType() == VehicleType.MOT) {
+            return "mot-test-expired";
+        }
 
-        return vehicle.getVehicleType() == VehicleType.MOT ? "mot-test-expired" : "annual-test-expired";
+        return "annual-test-expired";
     }
 
     private DataLayerMessageId getDataLayerMessageId(VehicleDetails vehicle) {
 
         if (determineIsTestExpired(vehicle)) {
-            return vehicle.getVehicleType() == VehicleType.MOT
-                    ? DataLayerMessageId.VEHICLE_MOT_TEST_EXPIRED
-                    : DataLayerMessageId.VEHICLE_ANNUAL_TEST_EXPIRED;
+            if (vehicle.getVehicleType() == VehicleType.MOT) {
+                return DataLayerMessageId.VEHICLE_MOT_TEST_EXPIRED;
+            } else if (VehicleType.isTrailer(vehicle.getVehicleType())) {
+                return DataLayerMessageId.TRAILER_ANNUAL_TEST_EXPIRED;
+            }
+
+            return DataLayerMessageId.VEHICLE_ANNUAL_TEST_EXPIRED;
         }
 
-        return vehicle.getVehicleType() == VehicleType.MOT
-                ? DataLayerMessageId.VEHICLE_MOT_TEST_DUE
-                : DataLayerMessageId.VEHICLE_ANNUAL_TEST_DUE;
+        if (vehicle.getVehicleType() == VehicleType.MOT) {
+            return DataLayerMessageId.VEHICLE_MOT_TEST_DUE;
+        } else if (VehicleType.isTrailer(vehicle.getVehicleType())) {
+            return DataLayerMessageId.TRAILER_ANNUAL_TEST_DUE;
+        }
+
+        return DataLayerMessageId.VEHICLE_ANNUAL_TEST_DUE;
     }
 
     private String getDataLayerMessageText(VehicleDetails vehicle) {
@@ -132,7 +149,19 @@ public class TestExpiredResource {
             return MOT_EXPIRED_CONTENT;
         }
 
-        return ANNUAL_EXPIRED_CONTENT;
+        List<String> annualExpiredFullContent = new ArrayList<>(ANNUAL_EXPIRED_CONTENT);
+        annualExpiredFullContent.add(
+                String.format(ANNUAL_EXPIRED_SUMMARY_CONTENT, getVehicleDescriptiveType(vehicle)));
+
+        return annualExpiredFullContent;
+    }
+
+    private String getVehicleDescriptiveType(VehicleDetails vehicle) {
+        if (VehicleType.isTrailer(vehicle.getVehicleType())) {
+            return "trailer";
+        }
+
+        return "vehicle";
     }
 
     private String getHeaderText(VehicleDetails vehicle) {
@@ -140,7 +169,8 @@ public class TestExpiredResource {
         String testType = vehicle.getVehicleType() == VehicleType.MOT ? "MOT" : "annual";
 
         return determineIsTestExpired(vehicle)
-                ? String.format("This vehicle’s %s test expired on %s", testType, formatTestExpiryDate(vehicle))
+                ? String.format("This %s’s %s test expired on %s",
+                getVehicleDescriptiveType(vehicle), testType, formatTestExpiryDate(vehicle))
                 : String.format("First %s test was due %s", testType, formatTestExpiryDate(vehicle));
     }
 

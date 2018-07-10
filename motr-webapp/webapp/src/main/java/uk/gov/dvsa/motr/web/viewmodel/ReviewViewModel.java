@@ -12,6 +12,7 @@ public class ReviewViewModel {
     private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(ReviewViewModel.class);
 
     private static String UNKNOWN_STRING = "UNKNOWN";
+    private static String UNAVAILABLE_STRING = "Unavailable";
 
     private String registration;
     private String contact;
@@ -52,8 +53,12 @@ public class ReviewViewModel {
 
     public String getColour() {
 
-        if (vehicleType != null && !VehicleType.MOT.equals(vehicleType)) {
-            return UNKNOWN_STRING;
+        if (vehicleType != null) {
+            if (VehicleType.isTrailer(vehicleType)) {
+                return UNAVAILABLE_STRING;
+            } else if (!VehicleType.MOT.equals(vehicleType)) {
+                return UNKNOWN_STRING;
+            }
         }
 
         return colour;

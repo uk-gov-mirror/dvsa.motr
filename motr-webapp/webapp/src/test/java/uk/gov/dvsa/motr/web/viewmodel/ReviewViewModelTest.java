@@ -19,6 +19,7 @@ import static org.junit.Assert.assertTrue;
 public class ReviewViewModelTest {
 
     private static String UNKNOWN_STRING = "UNKNOWN";
+    private static String UNAVAILABLE_STRING = "Unavailable";
     private static String ANNUAL_EXPIRE_LABEL = "Annual test expiry date";
     private static String MOT_EXPIRE_LABEL = "MOT expiry date";
     private static String ANNUAL_DUE_LABEL = "Annual test due date";
@@ -38,6 +39,15 @@ public class ReviewViewModelTest {
         ReviewViewModel viewModel = new ReviewViewModel();
         viewModel.setColour("", null);
         assertEquals(UNKNOWN_STRING, viewModel.getColour());
+    }
+
+    @Test
+    public void whenColourIsEmptyForTrailerItIsSetToUnknown() {
+
+        ReviewViewModel viewModel = new ReviewViewModel();
+        viewModel.setVehicleType(VehicleType.TRAILER);
+        viewModel.setColour("", null);
+        assertEquals(UNAVAILABLE_STRING, viewModel.getColour());
     }
 
     @Test

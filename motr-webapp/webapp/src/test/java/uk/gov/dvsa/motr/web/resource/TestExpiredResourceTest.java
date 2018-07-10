@@ -13,6 +13,7 @@ import uk.gov.dvsa.motr.web.test.render.TemplateEngineStub;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,9 +27,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import static uk.gov.dvsa.motr.web.resource.TestExpiredResource.ANNUAL_EXPIRED_CONTENT;
 import static uk.gov.dvsa.motr.web.resource.TestExpiredResource.CONTENT_TEXT_ARRAY_KEY;
 import static uk.gov.dvsa.motr.web.resource.TestExpiredResource.HEADER_TEXT_KEY;
 import static uk.gov.dvsa.motr.web.resource.TestExpiredResource.TEST_EXPIRY_DATE_FORMAT;
+import static uk.gov.dvsa.motr.web.resource.TestExpiredResource.VEHICLE_DESCRIPTIVE_TYPE_KEY;
 
 public class TestExpiredResourceTest {
 
@@ -76,6 +79,7 @@ public class TestExpiredResourceTest {
         String headerOutput = "First MOT test was due " + formatDate(testExpiryDate);
         expectedContext.put(HEADER_TEXT_KEY, headerOutput);
         expectedContext.put(CONTENT_TEXT_ARRAY_KEY, TestExpiredResource.MOT_EXPIRED_CONTENT);
+        expectedContext.put(VEHICLE_DESCRIPTIVE_TYPE_KEY, "vehicle");
         expectedContext.put("dataLayer",
                 getExpectedDataLayerJsonString(VRM,
                         VehicleType.MOT,
@@ -102,6 +106,7 @@ public class TestExpiredResourceTest {
         HashMap<String, Object> expectedContext = new HashMap<>();
         String headerOutput = "This vehicle’s MOT test expired on " + formatDate(testExpiryDate);
         expectedContext.put(HEADER_TEXT_KEY, headerOutput);
+        expectedContext.put(VEHICLE_DESCRIPTIVE_TYPE_KEY, "vehicle");
         expectedContext.put(CONTENT_TEXT_ARRAY_KEY, TestExpiredResource.MOT_EXPIRED_CONTENT);
         expectedContext.put("dataLayer",
                 getExpectedDataLayerJsonString(VRM,
@@ -129,13 +134,14 @@ public class TestExpiredResourceTest {
         HashMap<String, Object> expectedContext = new HashMap<>();
         String headerOutput = "First annual test was due " + formatDate(testExpiryDate);
         expectedContext.put(HEADER_TEXT_KEY, headerOutput);
-        expectedContext.put(CONTENT_TEXT_ARRAY_KEY, TestExpiredResource.ANNUAL_EXPIRED_CONTENT);
+        expectedContext.put(CONTENT_TEXT_ARRAY_KEY, getVehicleDescriptionType(VehicleType.HGV));
+        expectedContext.put(VEHICLE_DESCRIPTIVE_TYPE_KEY, "vehicle");
         expectedContext.put("dataLayer",
                 getExpectedDataLayerJsonString(VRM,
                         VehicleType.HGV,
                         DataLayerMessageId.VEHICLE_ANNUAL_TEST_DUE,
                         DataLayerMessageType.INELIGIBLE_FOR_REMINDER,
-                        getMessageText(headerOutput, TestExpiredResource.ANNUAL_EXPIRED_CONTENT)));
+                        getMessageText(headerOutput, getVehicleDescriptionType(VehicleType.HGV))));
 
         Response response = resource.testExpiredPageGet();
 
@@ -156,13 +162,42 @@ public class TestExpiredResourceTest {
         HashMap<String, Object> expectedContext = new HashMap<>();
         String headerOutput = "This vehicle’s annual test expired on " + formatDate(testExpiryDate);
         expectedContext.put(HEADER_TEXT_KEY, headerOutput);
-        expectedContext.put(CONTENT_TEXT_ARRAY_KEY, TestExpiredResource.ANNUAL_EXPIRED_CONTENT);
+        expectedContext.put(CONTENT_TEXT_ARRAY_KEY, getVehicleDescriptionType(VehicleType.HGV));
+        expectedContext.put(VEHICLE_DESCRIPTIVE_TYPE_KEY, "vehicle");
         expectedContext.put("dataLayer",
                 getExpectedDataLayerJsonString(VRM,
                         VehicleType.HGV,
                         DataLayerMessageId.VEHICLE_ANNUAL_TEST_EXPIRED,
                         DataLayerMessageType.INELIGIBLE_FOR_REMINDER,
-                        getMessageText(headerOutput, TestExpiredResource.ANNUAL_EXPIRED_CONTENT)));
+                        getMessageText(headerOutput, getVehicleDescriptionType(VehicleType.HGV))));
+
+        Response response = resource.testExpiredPageGet();
+
+        assertEquals(200, response.getStatus());
+        assertEquals("annual-test-expired", templateEngine.getTemplate());
+        assertEquals(expectedContext.toString(), templateEngine.getContext(Map.class).toString());
+    }
+
+    @Test
+    public void getWithTrailerVehicleDetailsWithMotTestNumberResultsInAnnualTestExpiredViewAndIsTestExpiredEqualsTrue() throws Exception {
+
+        vehicle.setVehicleType(VehicleType.TRAILER);
+        vehicle.setMotTestNumber("1234");
+
+        when(motrSession.isAllowedOnTestExpiredPage()).thenReturn(true);
+        when(motrSession.getVehicleDetailsFromSession()).thenReturn(vehicle);
+
+        HashMap<String, Object> expectedContext = new HashMap<>();
+        String headerOutput = "This trailer’s annual test expired on " + formatDate(testExpiryDate);
+        expectedContext.put(HEADER_TEXT_KEY, headerOutput);
+        expectedContext.put(CONTENT_TEXT_ARRAY_KEY, getVehicleDescriptionType(VehicleType.TRAILER));
+        expectedContext.put(VEHICLE_DESCRIPTIVE_TYPE_KEY, "trailer");
+        expectedContext.put("dataLayer",
+                getExpectedDataLayerJsonString(VRM,
+                        VehicleType.TRAILER,
+                        DataLayerMessageId.TRAILER_ANNUAL_TEST_EXPIRED,
+                        DataLayerMessageType.INELIGIBLE_FOR_REMINDER,
+                        getMessageText(headerOutput, getVehicleDescriptionType(VehicleType.TRAILER))));
 
         Response response = resource.testExpiredPageGet();
 
@@ -200,5 +235,25 @@ public class TestExpiredResourceTest {
         contentList.forEach(stringJoiner::add);
 
         return stringJoiner.toString();
+    }
+
+    private List<String> getVehicleDescriptionType(VehicleType vehicleType) {
+        List<String> list = new ArrayList<>(ANNUAL_EXPIRED_CONTENT);
+        list.add(
+                String.format(
+                        "If the %s has been tested recently, it can take up to 10 working days for us to update our records",
+                        getDescriptiveVehicleType(vehicleType)
+            )
+        );
+
+        return list;
+    }
+
+    private String getDescriptiveVehicleType(VehicleType vehicleType) {
+        if (VehicleType.isTrailer(vehicleType)) {
+            return "trailer";
+        }
+
+        return "vehicle";
     }
 }

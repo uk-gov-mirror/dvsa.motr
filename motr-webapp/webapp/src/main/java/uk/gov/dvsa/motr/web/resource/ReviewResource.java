@@ -76,7 +76,8 @@ public class ReviewResource {
             logger.info("review page resource vehicle.getMotIdentification().getDvlaId().isPresent() has value: " +
                     vehicle.getMotIdentification().getDvlaId().isPresent());
 
-            viewModel.setColour(vehicle.getPrimaryColour(), vehicle.getSecondaryColour())
+            viewModel.setVehicleType(vehicle.getVehicleType())
+                    .setColour(vehicle.getPrimaryColour(), vehicle.getSecondaryColour())
                     .setContact(contactDetail.getValue())
                     .setExpiryDate(vehicle.getMotExpiryDate())
                     .setMake(vehicle.getMake())
@@ -87,7 +88,6 @@ public class ReviewResource {
                     .setMobileChannel(motrSession.isUsingSmsChannel())
                     .setDvlaVehicle(vehicle.getMotIdentification().getDvlaId().isPresent())
                     .setYearOfManufacture(vehicle.getYearOfManufacture() == null ? null : vehicle.getYearOfManufacture().toString())
-                    .setVehicleType(vehicle.getVehicleType())
                     .setHgvPsvToggle(motrSession.isHgvPsvVehiclesFeatureToggleOn())
                     .setHasTests(vehicle.getMotTestNumber() != null && !vehicle.getMotTestNumber().isEmpty());
 
