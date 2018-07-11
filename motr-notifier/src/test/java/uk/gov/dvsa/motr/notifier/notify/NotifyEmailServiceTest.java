@@ -49,10 +49,6 @@ public class NotifyEmailServiceTest {
 
     private NotificationClient notificationClient = mock(NotificationClient.class);
     private NotificationTemplateIds notificationTemplateIds = new NotificationTemplateIds()
-            .setOneMonthNotificationTemplateIdPreEu("TEMPLATE-ONE-MONTH")
-            .setOneMonthNotificationTemplateIdPreEu("TEMPLATE-TWO-MONTH-HGV-PSV")
-            .setTwoWeekNotificationTemplateIdPreEu("TEMPLATE-TWO-WEEK")
-            .setOneDayAfterNotificationTemplateIdPreEu("TEMPLATE-ONE-DAY-AFTER")
             .setOneMonthNotificationTemplateId("TEMPLATE-ONE-MONTH-POST-EU")
             .setTwoWeekNotificationTemplateId("TEMPLATE-TWO-WEEK-POST-EU")
             .setOneDayAfterNotificationTemplateId("TEMPLATE-ONE-DAY-AFTER-POST-EU");
@@ -81,7 +77,7 @@ public class NotifyEmailServiceTest {
             NotifyTemplateEngineException, NoSuchAlgorithmException {
 
         SendableEmailNotification notification = new MotOneMonthEmailNotification(UNSUBSCRIBE_LINK, MOTH_DIRECT_URL_PREFIX, CHECKSUM)
-                .setTemplateId(notificationTemplateIds.getOneMonthNotificationTemplateIdPreEu());
+                .setTemplateId(notificationTemplateIds.getOneMonthNotificationTemplateId());
 
         VehicleDetails vehicleDetails = vehicleDetailsStub(EXPIRY_DATE).setMotTestNumber("123123");
 
@@ -103,7 +99,7 @@ public class NotifyEmailServiceTest {
                 eq("one-month-notification-email-subject.txt"), eq("one-month-notification-email-body.txt"), eq(personalisation));
 
         verify(notificationClient, times(1)).sendEmail(
-                notificationTemplateIds.getOneMonthNotificationTemplateIdPreEu(),
+                notificationTemplateIds.getOneMonthNotificationTemplateId(),
                 EMAIL,
                 body,
                 ""
@@ -115,7 +111,7 @@ public class NotifyEmailServiceTest {
             NotifyTemplateEngineException, NoSuchAlgorithmException {
 
         SendableEmailNotification notification = new MotOneMonthEmailNotification(UNSUBSCRIBE_LINK, MOTH_DIRECT_URL_PREFIX, CHECKSUM)
-                .setTemplateId(notificationTemplateIds.getOneMonthNotificationTemplateIdPreEu());
+                .setTemplateId(notificationTemplateIds.getOneMonthNotificationTemplateId());
 
 
         notification.personalise(stubSubscriptionQueueItem(), vehicleDetailsStub(EXPIRY_DATE));
@@ -132,7 +128,7 @@ public class NotifyEmailServiceTest {
                 eq("one-month-notification-email-subject.txt"), eq("one-month-notification-email-body.txt"), eq(personalisation));
 
         verify(notificationClient, times(1)).sendEmail(
-                notificationTemplateIds.getOneMonthNotificationTemplateIdPreEu(),
+                notificationTemplateIds.getOneMonthNotificationTemplateId(),
                 EMAIL,
                 body,
                 ""
@@ -274,7 +270,7 @@ public class NotifyEmailServiceTest {
             NotifyTemplateEngineException {
 
         SendableEmailNotification notification = new MotTwoWeekEmailNotification(UNSUBSCRIBE_LINK)
-                .setTemplateId(notificationTemplateIds.getTwoWeekNotificationTemplateIdPreEu());
+                .setTemplateId(notificationTemplateIds.getTwoWeekNotificationTemplateId());
 
         VehicleDetails vehicleDetails = vehicleDetailsStub(EXPIRY_DATE).setMotTestNumber("123123");
         notification.personalise(stubSubscriptionQueueItem(), vehicleDetails);
@@ -290,7 +286,7 @@ public class NotifyEmailServiceTest {
                 eq(personalisation));
 
         verify(notificationClient, times(1)).sendEmail(
-                notificationTemplateIds.getTwoWeekNotificationTemplateIdPreEu(),
+                notificationTemplateIds.getTwoWeekNotificationTemplateId(),
                 EMAIL,
                 body,
                 ""
@@ -301,7 +297,7 @@ public class NotifyEmailServiceTest {
     public void twoWeekNotificationIsSentWithCorrectDetails_whenNoMotTest()
             throws NotificationClientException, NotifyTemplateEngineException {
         SendableEmailNotification notification = new MotTwoWeekEmailNotification(UNSUBSCRIBE_LINK)
-                .setTemplateId(notificationTemplateIds.getTwoWeekNotificationTemplateIdPreEu());
+                .setTemplateId(notificationTemplateIds.getTwoWeekNotificationTemplateId());
 
         VehicleDetails vehicleDetails = vehicleDetailsStub(EXPIRY_DATE);
         notification.personalise(stubSubscriptionQueueItem(), vehicleDetails);
@@ -317,7 +313,7 @@ public class NotifyEmailServiceTest {
                 eq(personalisation));
 
         verify(notificationClient, times(1)).sendEmail(
-                notificationTemplateIds.getTwoWeekNotificationTemplateIdPreEu(),
+                notificationTemplateIds.getTwoWeekNotificationTemplateId(),
                 EMAIL,
                 body,
                 ""
@@ -329,7 +325,7 @@ public class NotifyEmailServiceTest {
             throws NotificationClientException, NotifyTemplateEngineException {
 
         SendableEmailNotification notification = new MotOneDayAfterEmailNotification(UNSUBSCRIBE_LINK)
-                .setTemplateId(notificationTemplateIds.getOneDayAfterNotificationTemplateIdPreEu());
+                .setTemplateId(notificationTemplateIds.getOneDayAfterNotificationTemplateId());
         VehicleDetails vehicleDetails = vehicleDetailsStub(EXPIRY_DATE).setMotTestNumber("123123");
         notification.personalise(stubSubscriptionQueueItem(), vehicleDetails);
         notifyEmailService.sendEmail(EMAIL, notification, vehicleDetails);
@@ -343,7 +339,7 @@ public class NotifyEmailServiceTest {
                 eq(personalisation));
 
         verify(notificationClient, times(1)).sendEmail(
-                notificationTemplateIds.getOneDayAfterNotificationTemplateIdPreEu(),
+                notificationTemplateIds.getOneDayAfterNotificationTemplateId(),
                 EMAIL,
                 body,
                 "");
@@ -355,7 +351,7 @@ public class NotifyEmailServiceTest {
 
 
         SendableEmailNotification notification = new MotOneDayAfterEmailNotification(UNSUBSCRIBE_LINK)
-                .setTemplateId(notificationTemplateIds.getOneDayAfterNotificationTemplateIdPreEu());
+                .setTemplateId(notificationTemplateIds.getOneDayAfterNotificationTemplateId());
 
         VehicleDetails vehicleDetails = vehicleDetailsStub(EXPIRY_DATE);
         notification.personalise(stubSubscriptionQueueItem(), vehicleDetails);
@@ -370,7 +366,7 @@ public class NotifyEmailServiceTest {
                 eq(personalisation));
 
         verify(notificationClient, times(1)).sendEmail(
-                notificationTemplateIds.getOneDayAfterNotificationTemplateIdPreEu(),
+                notificationTemplateIds.getOneDayAfterNotificationTemplateId(),
                 EMAIL,
                 body,
                 "");

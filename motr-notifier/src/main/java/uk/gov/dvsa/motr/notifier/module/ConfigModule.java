@@ -25,7 +25,6 @@ import uk.gov.dvsa.motr.executor.BlockingExecutor;
 import uk.gov.dvsa.motr.notifier.SystemVariable;
 import uk.gov.dvsa.motr.notifier.component.subscription.persistence.DynamoDbSubscriptionRepository;
 import uk.gov.dvsa.motr.notifier.component.subscription.persistence.SubscriptionRepository;
-import uk.gov.dvsa.motr.notifier.helpers.EuRoadworthinessToggle;
 import uk.gov.dvsa.motr.notifier.notify.NotificationTemplateIds;
 import uk.gov.dvsa.motr.notifier.notify.NotifyEmailService;
 import uk.gov.dvsa.motr.notifier.notify.NotifySmsService;
@@ -48,7 +47,6 @@ import static org.apache.log4j.Level.toLevel;
 
 import static uk.gov.dvsa.motr.notifier.SystemVariable.CHECKSUM_SALT;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.DB_TABLE_SUBSCRIPTION;
-import static uk.gov.dvsa.motr.notifier.SystemVariable.EU_GO_LIVE_DATE;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.FEATURE_TOGGLE_HGV_PSV_VEHICLES;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.GOV_NOTIFY_API_TOKEN;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.HGV_PSV_ONE_MONTH_NOTIFICATION_TEMPLATE_ID;
@@ -63,22 +61,16 @@ import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_API_MOT_TEST_NUMBER_U
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_API_V1_DVLA_ID_URI;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_API_V1_MOT_TEST_NUMBER_URI;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_TEST_REMINDER_INFO_TOKEN;
-import static uk.gov.dvsa.motr.notifier.SystemVariable.ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID_POST_EU;
-import static uk.gov.dvsa.motr.notifier.SystemVariable.ONE_MONTH_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.ONE_MONTH_NOTIFICATION_TEMPLATE_ID_POST_EU;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.REGION;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.REMAINING_TIME_THRESHOLD;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.SMS_HGV_PSV_ONE_MONTH_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.SMS_HGV_PSV_TWO_MONTH_NOTIFICATION_TEMPLATE_ID;
-import static uk.gov.dvsa.motr.notifier.SystemVariable.SMS_ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.SMS_ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID_POST_EU;
-import static uk.gov.dvsa.motr.notifier.SystemVariable.SMS_ONE_MONTH_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.SMS_ONE_MONTH_NOTIFICATION_TEMPLATE_ID_POST_EU;
-import static uk.gov.dvsa.motr.notifier.SystemVariable.SMS_TWO_WEEK_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.SMS_TWO_WEEK_NOTIFICATION_TEMPLATE_ID_POST_EU;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.SUBSCRIPTIONS_QUEUE_URL;
-import static uk.gov.dvsa.motr.notifier.SystemVariable.TWO_WEEK_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.TWO_WEEK_NOTIFICATION_TEMPLATE_ID_POST_EU;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.VEHICLE_API_CLIENT_TIMEOUT;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.WEB_BASE_URL;
@@ -198,38 +190,27 @@ public class ConfigModule extends AbstractModule {
     }
 
     @Provides
-    public EuRoadworthinessToggle provideEuRoadworthinessToggle(Config config) {
-        return new EuRoadworthinessToggle(config.getValue(EU_GO_LIVE_DATE));
-    }
-
-    @Provides
-    public SendableNotificationFactory provideSendableNotificationFactory(Config config, EuRoadworthinessToggle euRoadworthinessToggle) {
+    public SendableNotificationFactory provideSendableNotificationFactory(Config config) {
         String webBaseUrl = config.getValue(WEB_BASE_URL);
         String mothDirectUrlPrefix = config.getValue(MOTH_DIRECT_URL_PREFIX);
         String checksumSalt = config.getValue(CHECKSUM_SALT);
 
         NotificationTemplateIds emailNotificationTemplateIds = new NotificationTemplateIds()
-                .setOneMonthNotificationTemplateIdPreEu(config.getValue(ONE_MONTH_NOTIFICATION_TEMPLATE_ID))
                 .setTwoMonthHgvPsvNotificationTemplateId(config.getValue(HGV_PSV_TWO_MONTH_NOTIFICATION_TEMPLATE_ID))
                 .setOneMonthHgvPsvNotificationTemplateId(config.getValue(HGV_PSV_ONE_MONTH_NOTIFICATION_TEMPLATE_ID))
-                .setTwoWeekNotificationTemplateIdPreEu(config.getValue(TWO_WEEK_NOTIFICATION_TEMPLATE_ID))
-                .setOneDayAfterNotificationTemplateIdPreEu(config.getValue(ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID))
                 .setOneDayAfterNotificationTemplateId(config.getValue(ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID_POST_EU))
                 .setTwoWeekNotificationTemplateId(config.getValue(TWO_WEEK_NOTIFICATION_TEMPLATE_ID_POST_EU))
                 .setOneMonthNotificationTemplateId(config.getValue(ONE_MONTH_NOTIFICATION_TEMPLATE_ID_POST_EU));
 
         NotificationTemplateIds smsNotificationTemplateIds = new NotificationTemplateIds()
-                .setOneMonthNotificationTemplateIdPreEu(config.getValue(SMS_ONE_MONTH_NOTIFICATION_TEMPLATE_ID))
                 .setTwoMonthHgvPsvNotificationTemplateId(config.getValue(SMS_HGV_PSV_TWO_MONTH_NOTIFICATION_TEMPLATE_ID))
                 .setOneMonthHgvPsvNotificationTemplateId(config.getValue(SMS_HGV_PSV_ONE_MONTH_NOTIFICATION_TEMPLATE_ID))
-                .setTwoWeekNotificationTemplateIdPreEu(config.getValue(SMS_TWO_WEEK_NOTIFICATION_TEMPLATE_ID))
-                .setOneDayAfterNotificationTemplateIdPreEu(config.getValue(SMS_ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID))
                 .setOneDayAfterNotificationTemplateId(config.getValue(SMS_ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID_POST_EU))
                 .setTwoWeekNotificationTemplateId(config.getValue(SMS_TWO_WEEK_NOTIFICATION_TEMPLATE_ID_POST_EU))
                 .setOneMonthNotificationTemplateId(config.getValue(SMS_ONE_MONTH_NOTIFICATION_TEMPLATE_ID_POST_EU));
 
         return new SendableNotificationFactory(emailNotificationTemplateIds, smsNotificationTemplateIds, webBaseUrl, mothDirectUrlPrefix,
-                checksumSalt, euRoadworthinessToggle);
+                checksumSalt);
     }
 
     @Provides

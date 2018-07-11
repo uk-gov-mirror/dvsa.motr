@@ -5,7 +5,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import uk.gov.dvsa.motr.notifier.helpers.EuRoadworthinessToggle;
 import uk.gov.dvsa.motr.notifier.notify.NotificationTemplateIds;
 import uk.gov.dvsa.motr.notifier.processing.model.ContactDetail;
 import uk.gov.dvsa.motr.notifier.processing.model.SubscriptionQueueItem;
@@ -30,10 +29,8 @@ import java.util.Optional;
 import static org.mockito.Mockito.mock;
 
 public class SendableNotificationFactoryTest {
+
     private SendableNotificationFactory notificationFactory;
-
-    private EuRoadworthinessToggle euRoadworthinessToggle = mock(EuRoadworthinessToggle.class);
-
     private static final String BASE_URL = "http://gov.uk/";
     private static final String VEHICLE_DATA_URL = "http://gov.uk/mot-history/";
     private static final String CHECKSUM_SALT = "salt";
@@ -42,9 +39,6 @@ public class SendableNotificationFactoryTest {
     private static final String MOT_TEST_NUMBER = "test-mot-number-123";
     private static final String TEST_MAKE = "TEST-MAKE";
     private static final String TEST_MODEL = "TEST-MODEL";
-    private static final String ONE_MONTH_TEMPLATE_ID = "ONE_MONTH_TEMPLATE_ID";
-    private static final String TWO_WEEKS_TEMPLATE_ID = "TWO_WEEKS_TEMPLATE_ID";
-    private static final String ONE_DAY_AGO_TEMPLATE_ID = "ONE_DAY_AGO_TEMPLATE_ID";
     private static final String ONE_MONTH_TEMPLATE_ID_POST_EU = "ONE_MONTH_TEMPLATE_ID_POST_EU";
     private static final String TWO_WEEKS_TEMPLATE_ID_POST_EU = "TWO_WEEKS_TEMPLATE_ID_POST_EU";
     private static final String ONE_DAY_AGO_TEMPLATE_ID_POST_EU = "ONE_DAY_AGO_TEMPLATE_ID_POST_EU";
@@ -59,7 +53,7 @@ public class SendableNotificationFactoryTest {
     @Before
     public void setUp() {
         notificationFactory = new SendableNotificationFactory(emailNotificationTemplateIdsStub(), smsNotificationTemplateIdsStub(),
-                BASE_URL, VEHICLE_DATA_URL, CHECKSUM_SALT, euRoadworthinessToggle);
+                BASE_URL, VEHICLE_DATA_URL, CHECKSUM_SALT);
     }
 
     @Test
@@ -77,54 +71,17 @@ public class SendableNotificationFactoryTest {
     }
 
     @Test
-    public void whenVehicleExpiryDateIsInOneMonth_EmailNotificationIsCreated_preEu() {
-        LocalDate requestDate = LocalDate.of(2018, 9, 10);
-        LocalDate vehicleExpiryDate = LocalDate.of(2018, 10, 10);
-        SubscriptionQueueItem subscription = subscriptionStub(vehicleExpiryDate, requestDate, VehicleType.MOT)
-                .setMotTestNumber(MOT_TEST_NUMBER);
-        VehicleDetails vehicleDetails = vehicleDetailsStub(vehicleExpiryDate);
-
-        Mockito.when(euRoadworthinessToggle.isEuRoadworthinessLive()).thenReturn(false);
-
-        SendableNotification notification = notificationFactory.getEmailNotification(requestDate, subscription, vehicleDetails).get();
-
-        Assert.assertEquals(MotOneMonthEmailNotification.class, notification.getClass());
-        Assert.assertEquals(ONE_MONTH_TEMPLATE_ID, notification.getTemplateId());
-        Assert.assertNotNull(notification.getPersonalisation().get(MotOneMonthEmailNotification. MOT_EXPIRY_DATE_KEY));
-    }
-
-    @Test
     public void whenVehicleExpiryDateIsInOneMonth_EmailNotificationIsCreated_postEu() {
         LocalDate requestDate = LocalDate.of(2018, 9, 10);
         LocalDate vehicleExpiryDate = LocalDate.of(2018, 10, 10);
         SubscriptionQueueItem subscription = subscriptionStub(vehicleExpiryDate, requestDate, VehicleType.MOT)
                 .setMotTestNumber(MOT_TEST_NUMBER);
         VehicleDetails vehicleDetails = vehicleDetailsStub(vehicleExpiryDate);
-
-        Mockito.when(euRoadworthinessToggle.isEuRoadworthinessLive()).thenReturn(true);
-
         SendableNotification notification = notificationFactory.getEmailNotification(requestDate, subscription, vehicleDetails).get();
 
         Assert.assertEquals(MotOneMonthEmailNotification.class, notification.getClass());
         Assert.assertEquals(ONE_MONTH_TEMPLATE_ID_POST_EU, notification.getTemplateId());
         Assert.assertNotNull(notification.getPersonalisation().get(MotOneMonthEmailNotification. MOT_EXPIRY_DATE_KEY));
-    }
-
-    @Test
-    public void whenVehicleExpiryDateIsInTwoWeeks_EmailNotificationIsCreated_preEu() {
-        LocalDate requestDate = LocalDate.of(2018, 10, 10);
-        LocalDate vehicleExpiryDate = LocalDate.of(2018, 10, 24);
-        SubscriptionQueueItem subscription = subscriptionStub(vehicleExpiryDate, requestDate, VehicleType.MOT)
-                .setMotTestNumber(MOT_TEST_NUMBER);
-        VehicleDetails vehicleDetails = vehicleDetailsStub(vehicleExpiryDate);
-
-        Mockito.when(euRoadworthinessToggle.isEuRoadworthinessLive()).thenReturn(false);
-
-        SendableNotification notification = notificationFactory.getEmailNotification(requestDate, subscription, vehicleDetails).get();
-
-        Assert.assertEquals(MotTwoWeekEmailNotification.class, notification.getClass());
-        Assert.assertEquals(TWO_WEEKS_TEMPLATE_ID, notification.getTemplateId());
-        Assert.assertNotNull(notification.getPersonalisation().get(MotTwoWeekEmailNotification.MOT_EXPIRY_DATE_KEY));
     }
 
     @Test
@@ -134,30 +91,11 @@ public class SendableNotificationFactoryTest {
         SubscriptionQueueItem subscription = subscriptionStub(vehicleExpiryDate, requestDate, VehicleType.MOT)
                 .setMotTestNumber(MOT_TEST_NUMBER);
         VehicleDetails vehicleDetails = vehicleDetailsStub(vehicleExpiryDate);
-
-        Mockito.when(euRoadworthinessToggle.isEuRoadworthinessLive()).thenReturn(true);
-
         SendableNotification notification = notificationFactory.getEmailNotification(requestDate, subscription, vehicleDetails).get();
 
         Assert.assertEquals(MotTwoWeekEmailNotification.class, notification.getClass());
         Assert.assertEquals(TWO_WEEKS_TEMPLATE_ID_POST_EU, notification.getTemplateId());
         Assert.assertNotNull(notification.getPersonalisation().get(MotOneMonthEmailNotification. MOT_EXPIRY_DATE_KEY));
-    }
-
-    @Test
-    public void whenVehicleExpiryDateIsOneDayAgo_EmailNotificationIsCreated_preEu() {
-        LocalDate requestDate = LocalDate.of(2018, 10, 11);
-        LocalDate vehicleExpiryDate = LocalDate.of(2018, 10, 10);
-        SubscriptionQueueItem subscription = subscriptionStub(vehicleExpiryDate, requestDate, VehicleType.MOT)
-                .setMotTestNumber(MOT_TEST_NUMBER);
-        VehicleDetails vehicleDetails = vehicleDetailsStub(vehicleExpiryDate);
-
-        Mockito.when(euRoadworthinessToggle.isEuRoadworthinessLive()).thenReturn(false);
-
-        SendableNotification notification = notificationFactory.getEmailNotification(requestDate, subscription, vehicleDetails).get();
-
-        Assert.assertEquals(MotOneDayAfterEmailNotification.class, notification.getClass());
-        Assert.assertEquals(ONE_DAY_AGO_TEMPLATE_ID, notification.getTemplateId());
     }
 
     @Test
@@ -167,9 +105,6 @@ public class SendableNotificationFactoryTest {
         SubscriptionQueueItem subscription = subscriptionStub(vehicleExpiryDate, requestDate, VehicleType.MOT)
                 .setMotTestNumber(MOT_TEST_NUMBER);
         VehicleDetails vehicleDetails = vehicleDetailsStub(vehicleExpiryDate);
-
-        Mockito.when(euRoadworthinessToggle.isEuRoadworthinessLive()).thenReturn(true);
-
         SendableNotification notification = notificationFactory.getEmailNotification(requestDate, subscription, vehicleDetails).get();
 
         Assert.assertEquals(MotOneDayAfterEmailNotification.class, notification.getClass());
@@ -292,9 +227,6 @@ public class SendableNotificationFactoryTest {
 
     private NotificationTemplateIds emailNotificationTemplateIdsStub() {
         return new NotificationTemplateIds()
-                .setOneDayAfterNotificationTemplateIdPreEu(ONE_DAY_AGO_TEMPLATE_ID)
-                .setTwoWeekNotificationTemplateIdPreEu(TWO_WEEKS_TEMPLATE_ID)
-                .setOneMonthNotificationTemplateIdPreEu(ONE_MONTH_TEMPLATE_ID)
                 .setOneDayAfterNotificationTemplateId(ONE_DAY_AGO_TEMPLATE_ID_POST_EU)
                 .setTwoWeekNotificationTemplateId(TWO_WEEKS_TEMPLATE_ID_POST_EU)
                 .setOneMonthNotificationTemplateId(ONE_MONTH_TEMPLATE_ID_POST_EU)

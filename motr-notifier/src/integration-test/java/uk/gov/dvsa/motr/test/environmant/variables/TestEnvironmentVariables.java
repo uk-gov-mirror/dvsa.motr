@@ -24,22 +24,16 @@ import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_API_MOT_TEST_NUMBER_U
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_API_V1_DVLA_ID_URI;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_API_V1_MOT_TEST_NUMBER_URI;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_TEST_REMINDER_INFO_TOKEN;
-import static uk.gov.dvsa.motr.notifier.SystemVariable.ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID_POST_EU;
-import static uk.gov.dvsa.motr.notifier.SystemVariable.ONE_MONTH_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.ONE_MONTH_NOTIFICATION_TEMPLATE_ID_POST_EU;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.REGION;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.REMAINING_TIME_THRESHOLD;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.SMS_HGV_PSV_ONE_MONTH_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.SMS_HGV_PSV_TWO_MONTH_NOTIFICATION_TEMPLATE_ID;
-import static uk.gov.dvsa.motr.notifier.SystemVariable.SMS_ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.SMS_ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID_POST_EU;
-import static uk.gov.dvsa.motr.notifier.SystemVariable.SMS_ONE_MONTH_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.SMS_ONE_MONTH_NOTIFICATION_TEMPLATE_ID_POST_EU;
-import static uk.gov.dvsa.motr.notifier.SystemVariable.SMS_TWO_WEEK_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.SMS_TWO_WEEK_NOTIFICATION_TEMPLATE_ID_POST_EU;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.SUBSCRIPTIONS_QUEUE_URL;
-import static uk.gov.dvsa.motr.notifier.SystemVariable.TWO_WEEK_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.TWO_WEEK_NOTIFICATION_TEMPLATE_ID_POST_EU;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.VEHICLE_API_CLIENT_TIMEOUT;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.WEB_BASE_URL;
@@ -62,13 +56,6 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
         set(MOT_API_HGV_PSV_URI, hgvPsvApiEndpoint());
         set(HGV_PSV_TWO_MONTH_NOTIFICATION_TEMPLATE_ID, notifyHgvPsvTwoMonthTemplateId());
         set(HGV_PSV_ONE_MONTH_NOTIFICATION_TEMPLATE_ID, notifyHgvPsvOneMonthTemplateId());
-        set(ONE_MONTH_NOTIFICATION_TEMPLATE_ID, notifyOneMonthTemplateId());
-        set(TWO_WEEK_NOTIFICATION_TEMPLATE_ID, notifyTwoWeekTemplateId());
-        set(ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID, notifyOneDayAfterTemplateId());
-        set(SMS_ONE_MONTH_NOTIFICATION_TEMPLATE_ID, notifySmsOneMonthTemplateId());
-        set(SMS_TWO_WEEK_NOTIFICATION_TEMPLATE_ID, notifySmsTwoWeekTemplateId());
-        set(SMS_ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID, notifySmsOneDayAfterTemplateId());
-
         set(ONE_MONTH_NOTIFICATION_TEMPLATE_ID_POST_EU, notifyOneMonthTemplateIdPostEu());
         set(TWO_WEEK_NOTIFICATION_TEMPLATE_ID_POST_EU, notifyTwoWeekTemplateIdPostEu());
         set(ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID_POST_EU, notifyOneDayAfterTemplateIdPostEu());
