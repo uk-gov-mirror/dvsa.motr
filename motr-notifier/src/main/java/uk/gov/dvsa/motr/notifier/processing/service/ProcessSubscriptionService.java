@@ -168,11 +168,11 @@ public class ProcessSubscriptionService {
             });
         }
 
-        if ((vehicleType == VehicleType.HGV || vehicleType == VehicleType.PSV) && vrm != null) {
-            logger.trace("going to fetch HGV/PSV data by vrm");
+        if (VehicleType.isCommercialVehicle(vehicleType) && vrm != null) {
+            logger.trace("going to fetch HGV/PSV/trailer data by vrm");
 
             VehicleDetails vehicleDetails = client.fetchHgvPsvByVrm(vrm).orElseThrow(() -> {
-                logger.debug("no HGV/PSV vehicle found for vrm {}", vrm);
+                logger.debug("no HGV/PSV/trailer vehicle found for vrm {}", vrm);
                 return new VehicleNotFoundException("no HGV/PSV vehicle found for vrm " + vrm);
             });
             EventLogger.logEvent(new HgvPsvDetailsRetrievalSuccessfulEvent());

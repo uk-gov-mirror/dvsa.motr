@@ -95,8 +95,8 @@ public class SubscriptionLoaderDvlaVehicleTests extends SubscriptionLoaderBase {
 
     private void assertReportIsUpdatedCorrectly(LoadReport loadReport, boolean isDvlaVehicle) {
         assertEquals(1, loadReport.getSubmittedForProcessing());
-        assertEquals(isDvlaVehicle ? 1 : 0, loadReport.getDvlaVehiclesProcessed());
-        assertEquals(isDvlaVehicle ? 0 : 1, loadReport.getNonDvlaVehiclesProcessed());
+        assertEquals(isDvlaVehicle ? 1 : 0, loadReport.getMotDvlaVehiclesProcessed());
+        assertEquals(isDvlaVehicle ? 0 : 1, loadReport.getMotNonDvlaVehiclesProcessed());
         assertEquals(1, loadReport.getTotalProcessed());
     }
 

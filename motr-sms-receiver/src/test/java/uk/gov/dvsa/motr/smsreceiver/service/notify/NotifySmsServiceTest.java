@@ -52,7 +52,28 @@ public class NotifySmsServiceTest {
         Map<String, String> personalisation = new HashMap<>();
         personalisation.put("vehicle_vrm", VRM);
 
-        verify(notifyTemplateEngine, times(1)).getNotifyParameters(any(), eq(personalisation));
+        verify(notifyTemplateEngine)
+                .getNotifyParameters(eq("unsubscription-confirm-sms.txt"), eq(personalisation));
+
+        verify(notificationClient, times(1)).sendSms(
+                smsUnsubscriptionConfirmationTemplateId,
+                PHONE_NUMBER,
+                Collections.emptyMap(),
+                ""
+        );
+    }
+
+    @Test
+    public void smsUnsubscriptionConfirmationForTrailerIsSentWithCorrectDetailsAndTemplate()
+            throws NotificationClientException, NotifyTemplateEngineException {
+
+        notifySmsService.sendUnsubscriptionConfirmationSms(PHONE_NUMBER, VRM, VehicleType.TRAILER);
+
+        Map<String, String> personalisation = new HashMap<>();
+        personalisation.put("vehicle_vrm", VRM);
+
+        verify(notifyTemplateEngine)
+                .getNotifyParameters(eq("hgv-psv-unsubscription-confirm-sms.txt"), eq(personalisation));
 
         verify(notificationClient, times(1)).sendSms(
                 smsUnsubscriptionConfirmationTemplateId,

@@ -35,14 +35,14 @@ public class LoadReportTest {
     public void whenIncrementDvlaVehiclesProcessed_thenDvlaVehiclesProcessedIsIncremented() {
 
         this.loadReport.incrementDvlaVehiclesProcessed();
-        assertEquals(1, loadReport.getDvlaVehiclesProcessed());
+        assertEquals(1, loadReport.getMotDvlaVehiclesProcessed());
     }
 
     @Test
     public void whenIncrementNonDvlaVehiclesProcessed_thenNonDvlaVehiclesProcessedIsIncremented() {
 
         this.loadReport.incrementNonDvlaVehiclesProcessed();
-        assertEquals(1, loadReport.getNonDvlaVehiclesProcessed());
+        assertEquals(1, loadReport.getMotNonDvlaVehiclesProcessed());
     }
 
     @Test
@@ -55,6 +55,7 @@ public class LoadReportTest {
         this.loadReport.incrementNonDvlaVehiclesProcessed();
 
         assertTrue(loadReport.toString().contains("LoadReport{submittedForProcessing=2, totalProcessed=1, " +
-                "dvlaVehiclesProcessed=1, nonDvlaVehiclesProcessed=1, startedTime="));
+                "motDvlaVehiclesProcessed=1, motNonDvlaVehiclesProcessed=1, " +
+                "hgvVehiclesProcessed=0, psvVehiclesProcessed=0, hgvTrailersProcessed=0, startedTime="));
     }
 }

@@ -42,7 +42,7 @@ public class SubscriptionLoaderHgvPsvTests extends SubscriptionLoaderBase {
         LoadReport loadReport = eventHandler.handle(buildRequest(testTime), buildContext());
 
         assertSubscriptionIsAddedToQueue();
-        assertReportIsUpdatedCorrectly(loadReport);
+        assertReportIsUpdatedCorrectly(loadReport, subscriptionItem.getVehicleType());
     }
 
     @Test
@@ -54,7 +54,20 @@ public class SubscriptionLoaderHgvPsvTests extends SubscriptionLoaderBase {
         LoadReport loadReport = eventHandler.handle(buildRequest(testTime), buildContext());
 
         assertSubscriptionIsAddedToQueue();
-        assertReportIsUpdatedCorrectly(loadReport);
+        assertReportIsUpdatedCorrectly(loadReport, subscriptionItem.getVehicleType());
+    }
+
+    @Test
+    public void runLoaderForTwoMonthsTrailerReminderThenEnsureItemsAddedToQueue() throws Exception {
+        subscriptionItem.setVehicleType(VehicleType.TRAILER);
+        subscriptionItem.setDvlaId(null);
+        fixture.table(new SubscriptionTable().item(subscriptionItem)).run();
+        String testTime = subscriptionItem.getMotDueDate().minusDays(60) + "T12:00:00Z";
+
+        LoadReport loadReport = eventHandler.handle(buildRequest(testTime), buildContext());
+
+        assertSubscriptionIsAddedToQueue();
+        assertReportIsUpdatedCorrectly(loadReport, subscriptionItem.getVehicleType());
     }
 
     private void assertSubscriptionIsAddedToQueue() throws java.io.IOException {
@@ -69,11 +82,14 @@ public class SubscriptionLoaderHgvPsvTests extends SubscriptionLoaderBase {
         assertEquals(subscriptionItem.getId(), subscription.getId());
     }
 
-    private void assertReportIsUpdatedCorrectly(LoadReport loadReport) {
+    private void assertReportIsUpdatedCorrectly(LoadReport loadReport, VehicleType vehicleType) {
 
         assertEquals(1, loadReport.getSubmittedForProcessing());
-        assertEquals(1, loadReport.getDvlaVehiclesProcessed());
-        assertEquals(0, loadReport.getNonDvlaVehiclesProcessed());
+        assertEquals(0, loadReport.getMotDvlaVehiclesProcessed());
+        assertEquals(0, loadReport.getMotNonDvlaVehiclesProcessed());
+        assertEquals(vehicleType == VehicleType.HGV ? 1 : 0, loadReport.getHgvVehiclesProcessed());
+        assertEquals(vehicleType == VehicleType.PSV ? 1 : 0, loadReport.getPsvVehiclesProcessed());
+        assertEquals(vehicleType == VehicleType.TRAILER ? 1 : 0, loadReport.getHgvTrailersProcessed());
         assertEquals(1, loadReport.getTotalProcessed());
     }
 }

@@ -223,6 +223,14 @@ public class ByVrmResolver {
                     .primaryColour("Green")
                     .manufactureYear("2011")
                     .dueDate("2026-01-09");
+        } else if (vrm.contains("A222222")) {
+            response.make("TrailerMake")
+                    .model("TrailerTestModel")
+                    .vehicleType(Trailer)
+                    .primaryColour("Yellow")
+                    .manufactureYear("2011")
+                    .testNumber("12345678")
+                    .dueDate("2026-01-09");
         } else {
             response.make("testMake")
                     .model("testModel")

@@ -38,6 +38,10 @@ public enum VehicleType {
         return vehicleType.equals(HGV) || vehicleType.equals(PSV);
     }
 
+    public static boolean isCommercialVehicle(VehicleType vehicleType) {
+        return vehicleType == HGV || vehicleType == PSV || vehicleType == TRAILER;
+    }
+
     public static boolean isTrailer(VehicleType vehicleType) {
         return vehicleType.equals(TRAILER);
     }

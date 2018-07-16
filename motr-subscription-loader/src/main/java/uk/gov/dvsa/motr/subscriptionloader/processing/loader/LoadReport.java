@@ -4,8 +4,12 @@ public class LoadReport {
 
     private int submittedForProcessing = 0;
     private int totalProcessed = 0;
-    private int dvlaVehiclesProcessed = 0;
-    private int nonDvlaVehiclesProcessed = 0;
+    private int motDvlaVehiclesProcessed = 0;
+    private int motNonDvlaVehiclesProcessed = 0;
+    private int hgvVehiclesProcessed = 0;
+    private int psvVehiclesProcessed = 0;
+    private int hgvTrailersProcessed = 0;
+    private int otherVehcilesProcessed = 0;
     private long startedTime = 0;
 
     public void incrementTotalProcessed() {
@@ -15,12 +19,28 @@ public class LoadReport {
 
     public void incrementDvlaVehiclesProcessed() {
 
-        dvlaVehiclesProcessed++;
+        motDvlaVehiclesProcessed++;
     }
 
     public void incrementNonDvlaVehiclesProcessed() {
 
-        nonDvlaVehiclesProcessed++;
+        motNonDvlaVehiclesProcessed++;
+    }
+
+    public void incrementHgvVehiclesProcessed() {
+        hgvVehiclesProcessed++;
+    }
+
+    public void incrementPsvVehiclesProcessed() {
+        psvVehiclesProcessed++;
+    }
+
+    public void incrementHgvTrailersProcessed() {
+        hgvTrailersProcessed++;
+    }
+
+    public void incrementOtherVehiclesPorcessed() {
+        otherVehcilesProcessed++;
     }
 
     public void incrementSubmittedForProcessing() {
@@ -38,14 +58,30 @@ public class LoadReport {
         return submittedForProcessing;
     }
 
-    public int getDvlaVehiclesProcessed() {
+    public int getMotDvlaVehiclesProcessed() {
 
-        return dvlaVehiclesProcessed;
+        return motDvlaVehiclesProcessed;
     }
 
-    public int getNonDvlaVehiclesProcessed() {
+    public int getMotNonDvlaVehiclesProcessed() {
 
-        return nonDvlaVehiclesProcessed;
+        return motNonDvlaVehiclesProcessed;
+    }
+
+    public int getHgvVehiclesProcessed() {
+        return hgvVehiclesProcessed;
+    }
+
+    public int getPsvVehiclesProcessed() {
+        return psvVehiclesProcessed;
+    }
+
+    public int getHgvTrailersProcessed() {
+        return hgvTrailersProcessed;
+    }
+
+    public int getOtherVehcilesProcessed() {
+        return otherVehcilesProcessed;
     }
 
     public void startProcessing() {
@@ -63,8 +99,11 @@ public class LoadReport {
         return "LoadReport{" +
                 "submittedForProcessing=" + submittedForProcessing +
                 ", totalProcessed=" + totalProcessed +
-                ", dvlaVehiclesProcessed=" + dvlaVehiclesProcessed +
-                ", nonDvlaVehiclesProcessed=" + nonDvlaVehiclesProcessed +
+                ", motDvlaVehiclesProcessed=" + motDvlaVehiclesProcessed +
+                ", motNonDvlaVehiclesProcessed=" + motNonDvlaVehiclesProcessed +
+                ", hgvVehiclesProcessed=" + hgvVehiclesProcessed +
+                ", psvVehiclesProcessed=" + psvVehiclesProcessed +
+                ", hgvTrailersProcessed=" + hgvTrailersProcessed +
                 ", startedTime=" + startedTime +
                 '}';
     }

@@ -76,7 +76,7 @@ public class DefaultLoaderTest {
         verify(producer, times(1))
                 .searchSubscriptions(criteriaCaptor.capture());
         List<SubscriptionCriteria> criteria = criteriaCaptor.getValue();
-        assertEquals(7, criteria.size());
+        assertEquals(9, criteria.size());
         assertThat(criteria, containsSubscription(VehicleType.MOT, 30));
         assertThat(criteria, containsSubscription(VehicleType.MOT, 14));
         assertThat(criteria, containsSubscription(VehicleType.MOT, -1));
@@ -84,6 +84,8 @@ public class DefaultLoaderTest {
         assertThat(criteria, containsSubscription(VehicleType.HGV, 60));
         assertThat(criteria, containsSubscription(VehicleType.PSV, 30));
         assertThat(criteria, containsSubscription(VehicleType.PSV, 60));
+        assertThat(criteria, containsSubscription(VehicleType.TRAILER, 30));
+        assertThat(criteria, containsSubscription(VehicleType.TRAILER, 60));
     }
 
     @Test
@@ -98,12 +100,14 @@ public class DefaultLoaderTest {
 
         verify(dispatcher, times(2)).dispatch(subscription);
         assertEquals(2, report.getSubmittedForProcessing());
-        assertEquals(2, report.getNonDvlaVehiclesProcessed());
+        assertEquals(2, report.getMotNonDvlaVehiclesProcessed());
+
     }
 
     @Test
     public void whenThereAreDispatchedItems_thenTheResultsAreProcessedForTheReportWithDvlaVehicles() throws Exception {
-        Subscription subscription = getTestSubscription().setDvlaId("123456");;
+        Subscription subscription = getTestSubscription()
+                .setDvlaId("123456");;
         when(this.producer.searchSubscriptions(any()))
                 .thenReturn(createIterator(subscription, 3));
         when(this.dispatcher.dispatch(any()))
@@ -113,8 +117,31 @@ public class DefaultLoaderTest {
 
         verify(dispatcher, times(3)).dispatch(subscription);
         assertEquals(3, report.getSubmittedForProcessing());
-        assertEquals(3, report.getDvlaVehiclesProcessed());
-        assertEquals(0, report.getNonDvlaVehiclesProcessed());
+        assertEquals(3, report.getMotDvlaVehiclesProcessed());
+        assertEquals(0, report.getMotNonDvlaVehiclesProcessed());
+        assertEquals(0, report.getHgvVehiclesProcessed());
+        assertEquals(0, report.getPsvVehiclesProcessed());
+        assertEquals(0, report.getHgvTrailersProcessed());
+    }
+
+    @Test
+    public void whenThereAreDispatchedItems_thenTheResultsAreProcessedForTheReportWithHgvTrailers() throws Exception {
+        Subscription subscription = getTestSubscription()
+                .setVehicleType(VehicleType.TRAILER);
+        when(this.producer.searchSubscriptions(any()))
+                .thenReturn(createIterator(subscription, 3));
+        when(this.dispatcher.dispatch(any()))
+                .thenReturn(createDispatchResult(subscription));
+
+        LoadReport report = loader.run(TEST_DATE, context);
+
+        verify(dispatcher, times(3)).dispatch(subscription);
+        assertEquals(3, report.getSubmittedForProcessing());
+        assertEquals(0, report.getMotDvlaVehiclesProcessed());
+        assertEquals(0, report.getMotNonDvlaVehiclesProcessed());
+        assertEquals(0, report.getHgvVehiclesProcessed());
+        assertEquals(0, report.getPsvVehiclesProcessed());
+        assertEquals(3, report.getHgvTrailersProcessed());
     }
 
     @Test(expected = LoadingException.class)

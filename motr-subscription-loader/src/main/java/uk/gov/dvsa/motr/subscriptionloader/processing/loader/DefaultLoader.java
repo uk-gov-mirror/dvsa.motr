@@ -101,7 +101,9 @@ public class DefaultLoader implements Loader {
                 new SubscriptionCriteria(inTwoMonths, VehicleType.HGV),
                 new SubscriptionCriteria(inOneMonth, VehicleType.HGV),
                 new SubscriptionCriteria(inTwoMonths, VehicleType.PSV),
-                new SubscriptionCriteria(inOneMonth, VehicleType.PSV)
+                new SubscriptionCriteria(inOneMonth, VehicleType.PSV),
+                new SubscriptionCriteria(inTwoMonths, VehicleType.TRAILER),
+                new SubscriptionCriteria(inOneMonth, VehicleType.TRAILER)
         );
 
         return producer.searchSubscriptions(criteria);
@@ -127,7 +129,6 @@ public class DefaultLoader implements Loader {
     private void processResults(Iterator<DispatchResult> dispatchResultIterator, LoadReport report) throws LoadingException {
 
         while (dispatchResultIterator.hasNext()) {
-
             DispatchResult dispatchResult = dispatchResultIterator.next();
             if (dispatchResult.isDone()) {
                 if (!dispatchResult.isFailed()) {
@@ -135,29 +136,8 @@ public class DefaultLoader implements Loader {
                     dispatchResultIterator.remove();
                     Subscription subscription = dispatchResult.getSubscription();
 
-                    if (Strings.isNullOrEmpty(subscription.getMotTestNumber())) {
-                        report.incrementDvlaVehiclesProcessed();
-                        EventLogger.logEvent(new ItemSuccess()
-                                .setVrm(subscription.getVrm())
-                                .setEmail(subscription.getContactDetail().getValue())
-                                .setContactType(subscription.getContactDetail().getContactType().getValue())
-                                .setDvlaId(subscription.getDvlaId())
-                                .setDueDate(subscription.getMotDueDate())
-                                .setId(subscription.getId())
-                                .setVehicleType(subscription.getVehicleType())
-                        );
-                    } else {
-                        report.incrementNonDvlaVehiclesProcessed();
-                        EventLogger.logEvent(new ItemSuccess()
-                                .setVrm(subscription.getVrm())
-                                .setEmail(subscription.getContactDetail().getValue())
-                                .setContactType(subscription.getContactDetail().getContactType().getValue())
-                                .setMotTestNumber(subscription.getMotTestNumber())
-                                .setDueDate(subscription.getMotDueDate())
-                                .setId(subscription.getId())
-                                .setVehicleType(subscription.getVehicleType())
-                        );
-                    }
+                    updateReport(report, subscription);
+                    logSuccess(subscription);
                 } else {
                     throw new LoadingException(dispatchResult.getError());
                 }
@@ -174,5 +154,46 @@ public class DefaultLoader implements Loader {
                     .setDuration(report.getDuration()));
             throw new LoadingException(new Exception("Ran out of time. Unable to process all subscriptions"));
         }
+    }
+
+    private void updateReport(LoadReport report, Subscription subscription) {
+        switch (subscription.getVehicleType()) {
+            case MOT:
+                if (Strings.isNullOrEmpty(subscription.getMotTestNumber())) {
+                    report.incrementDvlaVehiclesProcessed();
+                } else {
+                    report.incrementNonDvlaVehiclesProcessed();
+                }
+                break;
+            case HGV:
+                report.incrementHgvVehiclesProcessed();
+                break;
+            case PSV:
+                report.incrementPsvVehiclesProcessed();
+                break;
+            case TRAILER:
+                report.incrementHgvTrailersProcessed();
+                break;
+            default:
+                report.incrementOtherVehiclesPorcessed();
+        }
+    }
+
+    private void logSuccess(Subscription subscription) {
+        ItemSuccess event = new ItemSuccess()
+                .setVrm(subscription.getVrm())
+                .setEmail(subscription.getContactDetail().getValue())
+                .setContactType(subscription.getContactDetail().getContactType().getValue())
+                .setDueDate(subscription.getMotDueDate())
+                .setId(subscription.getId())
+                .setVehicleType(subscription.getVehicleType());
+
+        if (!Strings.isNullOrEmpty(subscription.getMotTestNumber())) {
+            event.setMotTestNumber(subscription.getMotTestNumber());
+        }
+        if (!Strings.isNullOrEmpty(subscription.getDvlaId())) {
+            event.setDvlaId(subscription.getDvlaId());
+        }
+        EventLogger.logEvent(event);
     }
 }

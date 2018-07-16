@@ -438,7 +438,30 @@ public class ProcessSubscriptionServiceTest {
         LocalDate requestDate = LocalDate.of(2017, 8, 12);
         SubscriptionQueueItem subscriptionQueueItem = emailSubscriptionStub(testExpiryDate)
                 .setLoadedOnDate(requestDate)
-                .setVehicleType(VehicleType.HGV)
+                .setVehicleType(VehicleType.PSV)
+                .setMotTestNumber(MOT_TEST_NUMBER);
+        VehicleDetails vehicleDetails = vehicleDetailsStub(testExpiryDate);
+
+        when(vehicleDetailsClient.fetchHgvPsvByVrm(TEST_VRM)).thenReturn(Optional.of(vehicleDetails));
+        when(notificationFactory.getEmailNotification(requestDate, subscriptionQueueItem, vehicleDetails))
+                .thenReturn(Optional.of(sendableEmailNotificationStub()));
+
+        processSubscriptionService.processSubscription(subscriptionQueueItem);
+
+        verify(subscriptionRepository, never()).updateExpiryDate(any(), any(), any());
+        verify(notifyEmailService).sendEmail(
+                eq("test@this-is-a-test-123"), isA(SendableEmailNotification.class), eq(vehicleDetails)
+        );
+    }
+
+    @Test
+    public void whenTrailerTestExpiryDateIsInTwoMonthsEmailReminderIsSent() throws Exception {
+
+        LocalDate testExpiryDate = LocalDate.of(2017, 10, 10);
+        LocalDate requestDate = LocalDate.of(2017, 8, 12);
+        SubscriptionQueueItem subscriptionQueueItem = emailSubscriptionStub(testExpiryDate)
+                .setLoadedOnDate(requestDate)
+                .setVehicleType(VehicleType.TRAILER)
                 .setMotTestNumber(MOT_TEST_NUMBER);
         VehicleDetails vehicleDetails = vehicleDetailsStub(testExpiryDate);
 

@@ -52,7 +52,7 @@ public class NotifySmsService {
     }
 
     private String getTemplateForVehicle(VehicleType vehicleType) {
-        if (vehicleType == VehicleType.HGV || vehicleType == VehicleType.PSV) {
+        if (VehicleType.isCommercialVehicle(vehicleType)) {
             return HGV_PSV_UNSUBSCRIPTION_CONFIRM_SMS;
         }
         return UNSUBSCRIPTION_CONFIRM_SMS;

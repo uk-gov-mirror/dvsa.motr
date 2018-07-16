@@ -194,7 +194,7 @@ public class NotifyService {
     }
 
     private String modifyTemplatePathForVehicleType(String templatePath, VehicleType vehicleType) {
-        if (vehicleType == VehicleType.HGV || vehicleType == VehicleType.PSV) {
+        if (VehicleType.isCommercialVehicle(vehicleType)) {
             templatePath = HGV_PSV_TEMPLATES_DIRECTORY + templatePath;
         }
         return templatePath;
