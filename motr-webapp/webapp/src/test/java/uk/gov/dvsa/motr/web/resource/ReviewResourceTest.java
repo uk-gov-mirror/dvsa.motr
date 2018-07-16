@@ -7,6 +7,7 @@ import org.mockito.ArgumentCaptor;
 import uk.gov.dvsa.motr.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.vehicledetails.VehicleType;
+import uk.gov.dvsa.motr.web.analytics.SmartSurveyFeedback;
 import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.response.PendingSubscriptionServiceResponse;
@@ -60,21 +61,23 @@ public class ReviewResourceTest {
     public void setUp() {
 
         contactDetailValidator = mock(ContactDetailValidator.class);
-
         motrSession = mock(MotrSession.class);
+        SmartSurveyFeedback smartSurveyHelper = new SmartSurveyFeedback();
 
         this.resource = new ReviewResource(
                 motrSession,
                 TEMPLATE_ENGINE_STUB,
                 PENDING_SUBSCRIPTION_SERVICE,
                 contactDetailValidator,
-                PENDING_SMS_CONFIRMATION_SERVICE
+                PENDING_SMS_CONFIRMATION_SERVICE,
+                smartSurveyHelper
         );
 
         when(motrSession.getVrmFromSession()).thenReturn(VRM);
         when(motrSession.getEmailFromSession()).thenReturn(EMAIL);
         when(motrSession.getPhoneNumberFromSession()).thenReturn(MOBILE);
         when(motrSession.getContactDetailFromSession()).thenReturn(CONTACT_EMAIL);
+        when(motrSession.getContactTypeFromSession()).thenReturn(CONTACT_TYPE_EMAIL);
     }
 
     @Test
@@ -229,6 +232,7 @@ public class ReviewResourceTest {
         vehicleDetails.setMotExpiryDate(LocalDate.now());
         vehicleDetails.setMotTestNumber(TEST_MOT_TEST_NUMBER);
         vehicleDetails.setVehicleType(VehicleType.MOT);
+        vehicleDetails.setRegNumber(VRM);
 
         return vehicleDetails;
     }

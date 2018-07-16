@@ -7,6 +7,7 @@ import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
 import uk.gov.dvsa.motr.web.analytics.DataLayerMessageId;
 import uk.gov.dvsa.motr.web.analytics.DataLayerMessageType;
+import uk.gov.dvsa.motr.web.analytics.SmartSurveyFeedback;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 
@@ -46,7 +47,6 @@ public class TestExpiredResource {
     public static String ANNUAL_EXPIRED_SUMMARY_CONTENT =
             "If the %s has been tested recently, it can take up to 10 working days for us to update our records";
 
-
     public static final String HEADER_TEXT_KEY = "headerText";
     public static final String CONTENT_TEXT_ARRAY_KEY = "contentTextArray";
     public static final String VEHICLE_DESCRIPTIVE_TYPE_KEY = "vehicleDescriptiveType";
@@ -55,16 +55,19 @@ public class TestExpiredResource {
     private final TemplateEngine renderer;
     private final MotrSession motrSession;
     private final DataLayerHelper dataLayerHelper;
+    private final SmartSurveyFeedback smartSurveyHelperFeedback;
 
     @Inject
     public TestExpiredResource(
             MotrSession motrSession,
-            TemplateEngine renderer
+            TemplateEngine renderer,
+            SmartSurveyFeedback smartSurveyHelperFeedback
     ) {
 
         this.motrSession = motrSession;
         this.renderer = renderer;
         this.dataLayerHelper = new DataLayerHelper();
+        this.smartSurveyHelperFeedback = smartSurveyHelperFeedback;
     }
 
     @GET
@@ -74,20 +77,26 @@ public class TestExpiredResource {
             return redirect(HomepageResource.HOMEPAGE_URL);
         }
 
-        dataLayerHelper.putAttribute(VRM_KEY, motrSession.getVrmFromSession());
-
         VehicleDetails vehicle = motrSession.getVehicleDetailsFromSession();
         Map<String, Object> modelMap = new HashMap<>();
+
+        dataLayerHelper.putAttribute(VRM_KEY, motrSession.getVrmFromSession());
         dataLayerHelper.setVehicleDataOrigin(vehicle);
         dataLayerHelper.setMessage(getDataLayerMessageId(vehicle),
                 DataLayerMessageType.INELIGIBLE_FOR_REMINDER,
                 getDataLayerMessageText(vehicle));
 
+        smartSurveyHelperFeedback.addVrm(vehicle.getRegNumber());
+        smartSurveyHelperFeedback.addVehicleType(vehicle.getVehicleType());
+        smartSurveyHelperFeedback.addIsSigningBeforeFirstMotDue(vehicle.hasNoMotYet());
+
         modelMap.put(HEADER_TEXT_KEY, getHeaderText(vehicle));
         modelMap.put(CONTENT_TEXT_ARRAY_KEY, getPageContent(vehicle));
         modelMap.put(VEHICLE_DESCRIPTIVE_TYPE_KEY, getVehicleDescriptiveType(vehicle));
         modelMap.putAll(dataLayerHelper.formatAttributes());
+        modelMap.putAll(smartSurveyHelperFeedback.formatAttributes());
         dataLayerHelper.clear();
+        smartSurveyHelperFeedback.clear();
 
         String templateName = determineTemplateName(vehicle);
 

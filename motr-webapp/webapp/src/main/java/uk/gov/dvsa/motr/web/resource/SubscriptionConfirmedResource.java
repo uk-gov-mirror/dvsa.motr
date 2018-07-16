@@ -1,10 +1,13 @@
 package uk.gov.dvsa.motr.web.resource;
 
+import org.apache.commons.lang3.StringUtils;
+
 import uk.gov.dvsa.motr.conversion.DataAnonymizer;
 import uk.gov.dvsa.motr.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
-import uk.gov.dvsa.motr.web.analytics.SmartSurveyHelper;
+import uk.gov.dvsa.motr.web.analytics.SmartSurveyFeedback;
+import uk.gov.dvsa.motr.web.analytics.SmartSurveySatisfactionSubscribe;
 import uk.gov.dvsa.motr.web.component.subscription.exception.InvalidConfirmationIdException;
 import uk.gov.dvsa.motr.web.component.subscription.exception.SubscriptionAlreadyConfirmedException;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
@@ -44,8 +47,8 @@ public class SubscriptionConfirmedResource {
 
     private final TemplateEngine renderer;
     private final DataLayerHelper dataLayerHelper;
-    private final SmartSurveyHelper smartSurveyHelperSatisfaction;
-    private final SmartSurveyHelper smartSurveyHelperFeedback;
+    private final SmartSurveySatisfactionSubscribe smartSurveyHelperSatisfaction;
+    private final SmartSurveyFeedback smartSurveyHelperFeedback;
     private final SubscriptionConfirmationService subscriptionConfirmationService;
     private final MotrSession motrSession;
     private final UrlHelper urlHelper;
@@ -58,7 +61,9 @@ public class SubscriptionConfirmedResource {
             SubscriptionConfirmationService pendingSubscriptionActivatorService,
             MotrSession motrSession,
             UrlHelper urlHelper,
-            DataAnonymizer anonymizer
+            DataAnonymizer anonymizer,
+            SmartSurveySatisfactionSubscribe smartSurveyHelperSatisfaction,
+            SmartSurveyFeedback smartSurveyHelperFeedback
     ) {
 
         this.renderer = renderer;
@@ -67,14 +72,8 @@ public class SubscriptionConfirmedResource {
         this.urlHelper = urlHelper;
         this.dataLayerHelper = new DataLayerHelper();
         this.anonymizer = anonymizer;
-        this.smartSurveyHelperSatisfaction = new SmartSurveyHelper(
-                "http://www.smartsurvey.co.uk/s/YN642/",
-                "smartSurveySatisfaction"
-        );
-        this.smartSurveyHelperFeedback = new SmartSurveyHelper(
-                "http://www.smartsurvey.co.uk/s/MKVXI/",
-                "smartSurveyFeedback"
-        );
+        this.smartSurveyHelperSatisfaction = smartSurveyHelperSatisfaction;
+        this.smartSurveyHelperFeedback = smartSurveyHelperFeedback;
     }
 
     @GET
@@ -123,8 +122,16 @@ public class SubscriptionConfirmedResource {
             dataLayerHelper.putAttribute(EVENT_TYPE, "subscribe");
             dataLayerHelper.putAttribute(CONTACT_TYPE, subscription.getContactType());
             dataLayerHelper.putAttribute(CONTACT_ID, anonymizer.anonymizeContactData(subscription.getContact()));
-            smartSurveyHelperFeedback.putAttribute(SmartSurveyHelper.CONTACT_TYPE, subscription.getContactType());
-            smartSurveyHelperSatisfaction.putAttribute(SmartSurveyHelper.CONTACT_TYPE, subscription.getContactType());
+
+            smartSurveyHelperFeedback.addContactType(subscription.getContactType());
+            smartSurveyHelperFeedback.addVrm(subscription.getRegistration());
+            smartSurveyHelperFeedback.addVehicleType(subscription.getVehicleType());
+            smartSurveyHelperFeedback.addIsSigningBeforeFirstMotDue(StringUtils.isEmpty(subscription.getMotTestNumber()));
+            smartSurveyHelperSatisfaction.addContactType(subscription.getContactType());
+            smartSurveyHelperSatisfaction.addVrm(subscription.getRegistration());
+            smartSurveyHelperSatisfaction.addVehicleType(subscription.getVehicleType());
+            smartSurveyHelperSatisfaction.addIsSigningBeforeFirstMotDue(StringUtils.isEmpty(subscription.getMotTestNumber()));
+
             modelMap.put("isMotVehicle", isMotVehicle(subscription));
 
             if (subscription.getContactType().equals(Subscription.ContactType.MOBILE.getValue())) {

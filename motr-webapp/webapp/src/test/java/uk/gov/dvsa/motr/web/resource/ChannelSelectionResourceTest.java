@@ -3,6 +3,9 @@ package uk.gov.dvsa.motr.web.resource;
 import org.junit.Before;
 import org.junit.Test;
 
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
+import uk.gov.dvsa.motr.web.analytics.SmartSurveyFeedback;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.test.render.TemplateEngineStub;
 
@@ -23,12 +26,17 @@ public class ChannelSelectionResourceTest {
 
         motrSession = mock(MotrSession.class);
         engine = new TemplateEngineStub();
-        resource = new ChannelSelectionResource(motrSession, engine);
+        SmartSurveyFeedback smartSurveyHelper = new SmartSurveyFeedback();
+        resource = new ChannelSelectionResource(motrSession, engine, smartSurveyHelper);
     }
 
     @Test
     public void channelSelectionTemplateIsRenderedOnGet() throws Exception {
 
+        VehicleDetails vehicleDetails = new VehicleDetails();
+        vehicleDetails.setVehicleType(VehicleType.MOT);
+        vehicleDetails.setRegNumber("12345");
+        when(motrSession.getVehicleDetailsFromSession()).thenReturn(vehicleDetails);
         when(motrSession.getChannelFromSession()).thenReturn("text");
         when(motrSession.isAllowedOnChannelSelectionPage()).thenReturn(true);
         assertEquals(200, resource.channelSelectionPageGet().getStatus());

@@ -10,6 +10,7 @@ import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClientException;
 import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 import uk.gov.dvsa.motr.web.analytics.DataLayerMessageId;
 import uk.gov.dvsa.motr.web.analytics.DataLayerMessageType;
+import uk.gov.dvsa.motr.web.analytics.SmartSurveyFeedback;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.test.render.TemplateEngineStub;
 import uk.gov.dvsa.motr.web.validator.MotDueDateValidator;
@@ -30,6 +31,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -50,6 +52,7 @@ public class VrmResourceTest {
     private TemplateEngineStub templateEngine;
     private VrmResource resource;
     private MotrSession motrSession;
+    private SmartSurveyFeedback smartSurveyHelper;
 
     @Before
     public void setUp() {
@@ -58,7 +61,8 @@ public class VrmResourceTest {
         client = mock(VehicleDetailsClient.class);
         motrSession = mock(MotrSession.class);
         motDueDateValidator = mock(MotDueDateValidator.class);
-        resource = new VrmResource(motrSession, templateEngine, client, motDueDateValidator);
+        smartSurveyHelper = new SmartSurveyFeedback();
+        resource = new VrmResource(motrSession, templateEngine, client, motDueDateValidator, spy(smartSurveyHelper));
         when(motrSession.getVrmFromSession()).thenReturn("VRZ");
     }
 
@@ -103,6 +107,7 @@ public class VrmResourceTest {
                         DataLayerMessageId.VRM_VALIDATION_ERROR,
                         DataLayerMessageType.USER_INPUT_ERROR,
                         VrmValidator.REGISTRATION_CAN_ONLY_CONTAIN_LETTERS_NUMBERS_AND_HYPHENS_MESSAGE));
+        expectedContext.put("smartSurveyFeedback", "http://www.smartsurvey.co.uk/s/MKVXI/?vrm=" + INVALID_REG_NUMBER);
 
         assertEquals(expectedContext.toString(), templateEngine.getContext(Map.class).toString());
     }
@@ -128,6 +133,7 @@ public class VrmResourceTest {
                         DataLayerMessageId.TRADE_API_CLIENT_EXCEPTION,
                         DataLayerMessageType.PUBLIC_API_REQUEST_ERROR,
                         "Something went wrong with the search. Try again later."));
+        expectedContext.put("smartSurveyFeedback", "http://www.smartsurvey.co.uk/s/MKVXI/?vrm=" + SYSTEM_ERROR_VRM);
 
         assertEquals(expectedContext.toString(), templateEngine.getContext(Map.class).toString());
     }
@@ -154,6 +160,7 @@ public class VrmResourceTest {
                         DataLayerMessageId.VEHICLE_NOT_FOUND,
                         DataLayerMessageType.USER_INPUT_ERROR,
                         VEHICLE_NOT_FOUND));
+        expectedContext.put("smartSurveyFeedback", "http://www.smartsurvey.co.uk/s/MKVXI/?vrm=" + VALID_REG_NUMBER);
 
         assertEquals(expectedContext.toString(), templateEngine.getContext(Map.class).toString());
         assertEquals("vrm", templateEngine.getTemplate());
@@ -182,6 +189,7 @@ public class VrmResourceTest {
                         DataLayerMessageId.VEHICLE_NOT_FOUND,
                         DataLayerMessageType.USER_INPUT_ERROR,
                         VEHICLE_NOT_FOUND));
+        expectedContext.put("smartSurveyFeedback", "http://www.smartsurvey.co.uk/s/MKVXI/?vrm=" + trailerVrm);
 
         assertEquals(expectedContext.toString(), templateEngine.getContext(Map.class).toString());
 
@@ -211,6 +219,7 @@ public class VrmResourceTest {
                         DataLayerMessageId.TRAILER_NOT_FOUND,
                         DataLayerMessageType.USER_INPUT_ERROR,
                         TRAILER_NOT_FOUND));
+        expectedContext.put("smartSurveyFeedback", "http://www.smartsurvey.co.uk/s/MKVXI/?vrm=" + trailerVrm);
 
         assertEquals(expectedContext.toString(), templateEngine.getContext(Map.class).toString());
         assertEquals("vrm", templateEngine.getTemplate());
@@ -239,6 +248,7 @@ public class VrmResourceTest {
                         DataLayerMessageId.VEHICLE_NOT_FOUND,
                         DataLayerMessageType.USER_INPUT_ERROR,
                         VEHICLE_NOT_FOUND));
+        expectedContext.put("smartSurveyFeedback", "http://www.smartsurvey.co.uk/s/MKVXI/?vrm=FP12345");
 
         assertEquals(expectedContext.toString(), templateEngine.getContext(Map.class).toString());
         assertEquals("vrm", templateEngine.getTemplate());
@@ -306,7 +316,7 @@ public class VrmResourceTest {
         when(motDueDateValidator.isDueDateValid(any())).thenReturn(true);
         when(motDueDateValidator.isDueDateInTheFuture(any())).thenReturn(true);
 
-        resource = new VrmResource(motrSession, templateEngine, client, motDueDateValidator);
+        resource = new VrmResource(motrSession, templateEngine, client, motDueDateValidator, spy(smartSurveyHelper));
         Response response = resource.vrmPagePost(VALID_REG_NUMBER, HONEY_POT);
 
         assertEquals("review", response.getHeaders().get("Location").get(0).toString());
@@ -332,7 +342,7 @@ public class VrmResourceTest {
         when(motDueDateValidator.isDueDateValid(any())).thenReturn(true);
         when(motDueDateValidator.isDueDateInTheFuture(any())).thenReturn(true);
 
-        resource = new VrmResource(motrSession, templateEngine, client, motDueDateValidator);
+        resource = new VrmResource(motrSession, templateEngine, client, motDueDateValidator, spy(smartSurveyHelper));
         Response response = resource.vrmPagePost(VALID_REG_NUMBER, "Honey");
 
         assertEquals("email-confirmation-pending", response.getHeaders().get("Location").get(0).toString());

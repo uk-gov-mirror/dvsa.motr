@@ -4,6 +4,9 @@ import org.glassfish.hk2.utilities.binding.AbstractBinder;
 
 import uk.gov.dvsa.motr.conversion.DataAnonymizer;
 import uk.gov.dvsa.motr.notifications.service.NotifyService;
+import uk.gov.dvsa.motr.web.analytics.SmartSurveyFeedback;
+import uk.gov.dvsa.motr.web.analytics.SmartSurveySatisfactionSubscribe;
+import uk.gov.dvsa.motr.web.analytics.SmartSurveySatisfactionUnsubscribe;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.component.subscription.service.PendingSubscriptionService;
 import uk.gov.dvsa.motr.web.component.subscription.service.SmsConfirmationService;
@@ -28,5 +31,8 @@ public class ServiceBinder extends AbstractBinder {
         bind(UrlHelper.class).to(UrlHelper.class);
         bind(SubscriptionsValidationService.class).to(SubscriptionsValidationService.class);
         bind(DataAnonymizer.class).to(DataAnonymizer.class);
+        bind(SmartSurveySatisfactionSubscribe.class).to(SmartSurveySatisfactionSubscribe.class);
+        bind(SmartSurveySatisfactionUnsubscribe.class).to(SmartSurveySatisfactionUnsubscribe.class);
+        bind(SmartSurveyFeedback.class).to(SmartSurveyFeedback.class);
     }
 }

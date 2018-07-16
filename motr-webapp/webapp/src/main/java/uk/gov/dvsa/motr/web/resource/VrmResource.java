@@ -8,6 +8,7 @@ import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
 import uk.gov.dvsa.motr.web.analytics.DataLayerMessageId;
 import uk.gov.dvsa.motr.web.analytics.DataLayerMessageType;
+import uk.gov.dvsa.motr.web.analytics.SmartSurveyFeedback;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.eventlog.HoneyPotTriggeredEvent;
 import uk.gov.dvsa.motr.web.eventlog.vehicle.VehicleDetailsExceptionEvent;
@@ -57,13 +58,15 @@ public class VrmResource {
     private final MotDueDateValidator motDueDateValidator;
     private final MotrSession motrSession;
     private final DataLayerHelper dataLayerHelper;
+    private final SmartSurveyFeedback smartSurveyFeedback;
 
     @Inject
     public VrmResource(
             MotrSession motrSession,
             TemplateEngine renderer,
             VehicleDetailsClient client,
-            MotDueDateValidator motDueDateValidator
+            MotDueDateValidator motDueDateValidator,
+            SmartSurveyFeedback smartSurveyFeedback
     ) {
 
         this.motrSession = motrSession;
@@ -71,6 +74,7 @@ public class VrmResource {
         this.client = client;
         this.motDueDateValidator = motDueDateValidator;
         this.dataLayerHelper = new DataLayerHelper();
+        this.smartSurveyFeedback = smartSurveyFeedback;
     }
 
     @GET
@@ -81,8 +85,12 @@ public class VrmResource {
         Map<String, Object> modelMap = new HashMap<>();
         updateMapBasedOnReviewFlow(modelMap);
 
+        smartSurveyFeedback.addVrm(vrm);
+
         modelMap.put(VRM_MODEL_KEY, vrm);
         modelMap.put(TRAILER_FEATURE_TOGGLE, motrSession.isTrailersFeatureToggleOn());
+        modelMap.putAll(smartSurveyFeedback.formatAttributes());
+        smartSurveyFeedback.clear();
 
         return renderer.render("vrm", modelMap);
     }
@@ -107,6 +115,8 @@ public class VrmResource {
         modelMap.put(SHOW_INLINE_KEY, true);
         modelMap.put(SHOW_SYSTEM_ERROR, false);
 
+        smartSurveyFeedback.addVrm(vrm);
+
         VrmValidator validator = new VrmValidator();
         TrailerVrmValidator trailerVrmValidator = new TrailerVrmValidator();
         if (validator.isValid(vrm)) {
@@ -118,6 +128,9 @@ public class VrmResource {
                 try {
                     Optional<VehicleDetails> vehicle = this.client.fetchByVrm(vrm);
                     vehicle.ifPresent(dataLayerHelper::setVehicleDataOrigin);
+
+                    smartSurveyFeedback.addVrm(vrm);
+
                     if (isFirstAnnualTestDateUnknown(vehicle)) {
                         motrSession.setVehicleDetails(vehicle.get());
                         if (isTrailer(vehicle)) {
@@ -160,7 +173,9 @@ public class VrmResource {
         modelMap.put(VRM_MODEL_KEY, vrm);
         modelMap.put(INPUT_FIELD_ID_MODEL_KEY, INPUT_FIELD_ID);
         modelMap.putAll(dataLayerHelper.formatAttributes());
+        modelMap.putAll(smartSurveyFeedback.formatAttributes());
         dataLayerHelper.clear();
+        smartSurveyFeedback.clear();
 
         return Response.ok(renderer.render(VRM_TEMPLATE_NAME, modelMap)).build();
     }

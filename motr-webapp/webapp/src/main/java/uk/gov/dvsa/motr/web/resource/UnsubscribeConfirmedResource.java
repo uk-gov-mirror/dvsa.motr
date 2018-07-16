@@ -1,10 +1,14 @@
 package uk.gov.dvsa.motr.web.resource;
 
+import org.apache.commons.lang3.StringUtils;
+
 import uk.gov.dvsa.motr.conversion.DataAnonymizer;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsService;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
+import uk.gov.dvsa.motr.web.analytics.SmartSurveyFeedback;
+import uk.gov.dvsa.motr.web.analytics.SmartSurveySatisfactionUnsubscribe;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.cookie.UnsubscribeConfirmationParams;
 import uk.gov.dvsa.motr.web.formatting.MakeModelFormatter;
@@ -36,19 +40,25 @@ public class UnsubscribeConfirmedResource {
     private final MotrSession motrSession;
     private final VehicleDetailsClient client;
     private final DataAnonymizer anonymizer;
+    private final SmartSurveySatisfactionUnsubscribe smartSurveyHelperSatisfaction;
+    private final SmartSurveyFeedback smartSurveyHelperFeedback;
 
     @Inject
     public UnsubscribeConfirmedResource(
             TemplateEngine renderer,
             MotrSession motrSession,
             VehicleDetailsClient client,
-            DataAnonymizer anonymizer
+            DataAnonymizer anonymizer,
+            SmartSurveyFeedback smartSurveyHelperFeedback,
+            SmartSurveySatisfactionUnsubscribe smartSurveyHelperSatisfaction
     ) {
 
         this.renderer = renderer;
         this.motrSession = motrSession;
         this.client = client;
         this.anonymizer = anonymizer;
+        this.smartSurveyHelperSatisfaction = smartSurveyHelperSatisfaction;
+        this.smartSurveyHelperFeedback = smartSurveyHelperFeedback;
     }
 
     @GET
@@ -62,12 +72,6 @@ public class UnsubscribeConfirmedResource {
 
         VehicleDetails vehicleDetails = VehicleDetailsService.getVehicleDetails(params.getRegistration(), client);
 
-        UnsubscribeViewModel viewModel = new UnsubscribeViewModel()
-                .setRegistration(params.getRegistration())
-                .setExpiryDate(LocalDate.parse(params.getExpiryDate()))
-                .setEmail(params.getContact())
-                .setMakeModel(MakeModelFormatter.getMakeModelDisplayStringFromVehicleDetails(vehicleDetails, ", "));
-
         DataLayerHelper helper = new DataLayerHelper();
         helper.putAttribute(VRM_KEY, params.getRegistration());
         helper.setVehicleDataOrigin(vehicleDetails);
@@ -75,9 +79,31 @@ public class UnsubscribeConfirmedResource {
         helper.putAttribute(CONTACT_TYPE, params.getContactType());
         helper.putAttribute(CONTACT_ID, anonymizer.anonymizeContactData(params.getContact()));
 
+        smartSurveyHelperFeedback.addContactType(params.getContactType());
+        smartSurveyHelperFeedback.addVrm(params.getRegistration());
+        smartSurveyHelperFeedback.addIsSigningBeforeFirstMotDue(StringUtils.isEmpty(params.getMotTestNumber()));
+        smartSurveyHelperSatisfaction.addContactType(params.getContactType());
+        smartSurveyHelperSatisfaction.addVrm(params.getRegistration());
+        smartSurveyHelperSatisfaction.addIsSigningBeforeFirstMotDue(StringUtils.isEmpty(params.getMotTestNumber()));
+
+        if (vehicleDetails.getVehicleType() != null) {
+            smartSurveyHelperFeedback.addVehicleType(vehicleDetails.getVehicleType());
+            smartSurveyHelperSatisfaction.addVehicleType(vehicleDetails.getVehicleType());
+        }
+
+        UnsubscribeViewModel viewModel = new UnsubscribeViewModel()
+                .setRegistration(params.getRegistration())
+                .setExpiryDate(LocalDate.parse(params.getExpiryDate()))
+                .setEmail(params.getContact())
+                .setMakeModel(MakeModelFormatter.getMakeModelDisplayStringFromVehicleDetails(vehicleDetails, ", "));
+
         Map<String, Object> map = new HashMap<>();
         map.putAll(helper.formatAttributes());
+        map.putAll(smartSurveyHelperFeedback.formatAttributes());
+        map.putAll(smartSurveyHelperSatisfaction.formatAttributes());
         map.put("viewModel", viewModel);
+        smartSurveyHelperFeedback.clear();
+        smartSurveyHelperSatisfaction.clear();
         return renderer.render("unsubscribe-confirmation", map);
     }
 }

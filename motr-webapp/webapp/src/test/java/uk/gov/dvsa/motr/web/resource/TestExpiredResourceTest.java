@@ -8,6 +8,7 @@ import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 import uk.gov.dvsa.motr.web.analytics.DataLayerMessageId;
 import uk.gov.dvsa.motr.web.analytics.DataLayerMessageType;
+import uk.gov.dvsa.motr.web.analytics.SmartSurveyFeedback;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.test.render.TemplateEngineStub;
 
@@ -23,6 +24,7 @@ import javax.ws.rs.core.Response;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -48,10 +50,12 @@ public class TestExpiredResourceTest {
 
         templateEngine = new TemplateEngineStub();
         motrSession = mock(MotrSession.class);
-        resource = new TestExpiredResource(motrSession, templateEngine);
+        SmartSurveyFeedback smartSurveyHelper = new SmartSurveyFeedback();
+        resource = new TestExpiredResource(motrSession, templateEngine, spy(smartSurveyHelper));
         testExpiryDate = LocalDate.now().minusDays(2);
         vehicle = new VehicleDetails();
         vehicle.setMotExpiryDate(testExpiryDate);
+        vehicle.setRegNumber(VRM);
 
         when(motrSession.getVrmFromSession()).thenReturn(VRM);
     }
@@ -86,6 +90,8 @@ public class TestExpiredResourceTest {
                         DataLayerMessageId.VEHICLE_MOT_TEST_DUE,
                         DataLayerMessageType.INELIGIBLE_FOR_REMINDER,
                         getMessageText(headerOutput, TestExpiredResource.MOT_EXPIRED_CONTENT)));
+        expectedContext.put("smartSurveyFeedback", "http://www.smartsurvey.co.uk/s/MKVXI/?vrm=VRZ5555&vehicle_type=MOT" +
+                "&is_signing_before_first_mot_due=true");
 
         Response response = resource.testExpiredPageGet();
 
@@ -114,6 +120,8 @@ public class TestExpiredResourceTest {
                         DataLayerMessageId.VEHICLE_MOT_TEST_EXPIRED,
                         DataLayerMessageType.INELIGIBLE_FOR_REMINDER,
                         getMessageText(headerOutput, TestExpiredResource.MOT_EXPIRED_CONTENT)));
+        expectedContext.put("smartSurveyFeedback", "http://www.smartsurvey.co.uk/s/MKVXI/?vrm=VRZ5555&vehicle_type=MOT" +
+                "&is_signing_before_first_mot_due=false");
 
         Response response = resource.testExpiredPageGet();
 
@@ -142,6 +150,8 @@ public class TestExpiredResourceTest {
                         DataLayerMessageId.VEHICLE_ANNUAL_TEST_DUE,
                         DataLayerMessageType.INELIGIBLE_FOR_REMINDER,
                         getMessageText(headerOutput, getVehicleDescriptionType(VehicleType.HGV))));
+        expectedContext.put("smartSurveyFeedback", "http://www.smartsurvey.co.uk/s/MKVXI/?vrm=VRZ5555&vehicle_type=HGV" +
+                "&is_signing_before_first_mot_due=true");
 
         Response response = resource.testExpiredPageGet();
 
@@ -170,6 +180,8 @@ public class TestExpiredResourceTest {
                         DataLayerMessageId.VEHICLE_ANNUAL_TEST_EXPIRED,
                         DataLayerMessageType.INELIGIBLE_FOR_REMINDER,
                         getMessageText(headerOutput, getVehicleDescriptionType(VehicleType.HGV))));
+        expectedContext.put("smartSurveyFeedback", "http://www.smartsurvey.co.uk/s/MKVXI/?vrm=VRZ5555&vehicle_type=HGV" +
+                "&is_signing_before_first_mot_due=false");
 
         Response response = resource.testExpiredPageGet();
 
@@ -198,6 +210,8 @@ public class TestExpiredResourceTest {
                         DataLayerMessageId.TRAILER_ANNUAL_TEST_EXPIRED,
                         DataLayerMessageType.INELIGIBLE_FOR_REMINDER,
                         getMessageText(headerOutput, getVehicleDescriptionType(VehicleType.TRAILER))));
+        expectedContext.put("smartSurveyFeedback", "http://www.smartsurvey.co.uk/s/MKVXI/?vrm=VRZ5555&vehicle_type=TRAILER" +
+                "&is_signing_before_first_mot_due=false");
 
         Response response = resource.testExpiredPageGet();
 

@@ -4,6 +4,7 @@ import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsService;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
+import uk.gov.dvsa.motr.web.analytics.SmartSurveyFeedback;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.service.UnsubscribeService;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
@@ -36,19 +37,22 @@ public class UnsubscribeResource {
     private final TemplateEngine renderer;
     private final MotrSession motrSession;
     private final VehicleDetailsClient client;
+    private final SmartSurveyFeedback smartSurveyFeedback;
 
     @Inject
     public UnsubscribeResource(
             UnsubscribeService unsubscribeService,
             TemplateEngine renderer,
             MotrSession motrSession,
-            VehicleDetailsClient client
+            VehicleDetailsClient client,
+            SmartSurveyFeedback smartSurveyFeedback
     ) {
 
         this.unsubscribeService = unsubscribeService;
         this.renderer = renderer;
         this.motrSession = motrSession;
         this.client = client;
+        this.smartSurveyFeedback = smartSurveyFeedback;
     }
 
     @GET
@@ -58,8 +62,12 @@ public class UnsubscribeResource {
         return unsubscribeService.findSubscriptionForUnsubscribe(unsubscribeId).map(subscription -> {
 
             UnsubscribeViewModel viewModel = populateViewModelFromSubscription(subscription);
+            populateSmartSurvey(subscription);
             Map<String, Object> map = new HashMap<>();
             map.put("viewModel", viewModel);
+            map.putAll(smartSurveyFeedback.formatAttributes());
+            smartSurveyFeedback.clear();
+
             return renderer.render("unsubscribe", map);
         }).orElseGet(() -> {
             DataLayerHelper helper = new DataLayerHelper();
@@ -80,6 +88,7 @@ public class UnsubscribeResource {
         params.setContact(removedSubscription.getContactDetail().getValue());
         params.setExpiryDate(removedSubscription.getMotDueDate().toString());
         params.setRegistration(removedSubscription.getVrm());
+        params.setContactType(removedSubscription.getContactDetail().getContactType().getValue());
 
         motrSession.setUnsubscribeConfirmationParams(params);
 
@@ -95,5 +104,15 @@ public class UnsubscribeResource {
                 .setExpiryDate(subscription.getMotDueDate())
                 .setRegistration(subscription.getVrm())
                 .setMakeModel(MakeModelFormatter.getMakeModelDisplayStringFromVehicleDetails(vehicleDetails, ", "));
+    }
+
+    private void populateSmartSurvey(Subscription subscription) {
+
+        VehicleDetails vehicleDetails = VehicleDetailsService.getVehicleDetails(subscription.getVrm(), client);
+
+        smartSurveyFeedback.addContactType(Subscription.ContactType.EMAIL.getValue());
+        smartSurveyFeedback.addVrm(subscription.getVrm());
+        smartSurveyFeedback.addVehicleType(subscription.getVehicleType());
+        smartSurveyFeedback.addIsSigningBeforeFirstMotDue(vehicleDetails.hasNoMotYet());
     }
 }

@@ -4,7 +4,9 @@ import com.amazonaws.util.StringUtils;
 
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.vehicledetails.VehicleType;
+import uk.gov.dvsa.motr.web.analytics.SmartSurveyFeedback;
 import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
+import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.response.PendingSubscriptionServiceResponse;
 import uk.gov.dvsa.motr.web.component.subscription.service.PendingSubscriptionService;
 import uk.gov.dvsa.motr.web.component.subscription.service.SmsConfirmationService;
@@ -41,6 +43,7 @@ public class ReviewResource {
     private final SmsConfirmationService smsConfirmationService;
     private final MotrSession motrSession;
     private final ContactDetailValidator contactDetailValidator;
+    private final SmartSurveyFeedback smartSurveyHelperFeedback;
 
     @Inject
     public ReviewResource(
@@ -48,7 +51,8 @@ public class ReviewResource {
             TemplateEngine renderer,
             PendingSubscriptionService pendingSubscriptionService,
             ContactDetailValidator contactDetailValidator,
-            SmsConfirmationService smsConfirmationService
+            SmsConfirmationService smsConfirmationService,
+            SmartSurveyFeedback smartSurveyHelperFeedback
     ) {
 
         this.renderer = renderer;
@@ -56,6 +60,7 @@ public class ReviewResource {
         this.smsConfirmationService = smsConfirmationService;
         this.motrSession = motrSession;
         this.contactDetailValidator = contactDetailValidator;
+        this.smartSurveyHelperFeedback = smartSurveyHelperFeedback;
     }
 
     @GET
@@ -98,6 +103,8 @@ public class ReviewResource {
 
         this.motrSession.setVisitingFromReview(true);
 
+        addDetailsForSurvey(map, vehicle);
+
         map.put("viewModel", viewModel);
 
         return Response.ok(renderer.render("review", map)).build();
@@ -132,20 +139,22 @@ public class ReviewResource {
                         pendingSubscriptionResponse.getConfirmationId());
             }
 
-            return redirectToNextScreen(redirectUri, contactDetail, vrm, vehicle.getVehicleType());
+            return redirectToNextScreen(redirectUri, contactDetail, vrm, vehicle.getVehicleType(), vehicle.getMotTestNumber());
         } else {
             logger.debug("detailsAreValid() {} or vehicle is null: {}", detailsAreValid(vrm, contactDetail), vehicle);
             throw new NotFoundException();
         }
     }
 
-    private Response redirectToNextScreen(String redirectUri, ContactDetail contactDetail, String vrm, VehicleType vehicleType) {
+    private Response redirectToNextScreen(String redirectUri, ContactDetail contactDetail, String vrm, VehicleType vehicleType,
+                                          String motTestNumber) {
 
         SubscriptionConfirmationParams params = new SubscriptionConfirmationParams();
         params.setRegistration(vrm);
         params.setContact(contactDetail.getValue());
         params.setContactType(contactDetail.getContactType().getValue());
         params.setVehicleType(vehicleType);
+        params.setMotTestNumber(motTestNumber);
         motrSession.setSubscriptionConfirmationParams(params);
 
         return redirect(redirectUri);
@@ -155,5 +164,16 @@ public class ReviewResource {
 
         VrmValidator vrmValidator = new VrmValidator();
         return vrmValidator.isValid(vrm) && contactDetailValidator.isValid(contactDetail);
+    }
+
+    private void addDetailsForSurvey(Map<String, Object> modelMap, VehicleDetails vehicle) {
+
+        smartSurveyHelperFeedback.addContactType(motrSession.getContactTypeFromSession().getValue());
+        smartSurveyHelperFeedback.addVrm(vehicle.getRegNumber());
+        smartSurveyHelperFeedback.addVehicleType(vehicle.getVehicleType());
+        smartSurveyHelperFeedback.addIsSigningBeforeFirstMotDue(vehicle.hasNoMotYet());
+
+        modelMap.putAll(smartSurveyHelperFeedback.formatAttributes());
+        smartSurveyHelperFeedback.clear();
     }
 }

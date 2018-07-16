@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
+import uk.gov.dvsa.motr.web.analytics.SmartSurveyFeedback;
 import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.service.UnsubscribeService;
@@ -39,10 +40,10 @@ public class UnsubscribeResourceTest {
     private UnsubscribeService unsubscribeService;
     private VehicleDetailsClient client = mock(VehicleDetailsClient.class);
     private MotrSession motrSession = mock(MotrSession.class);
+    private SmartSurveyFeedback smartSurveyHelper = new SmartSurveyFeedback();
 
     @Before
     public void setUp() {
-
 
         UnsubscribeConfirmationParams params = new UnsubscribeConfirmationParams();
 
@@ -55,7 +56,7 @@ public class UnsubscribeResourceTest {
         when(motrSession.getVehicleDetailsFromSession()).thenReturn(vehicleDetails);
 
         this.unsubscribeService = mock(UnsubscribeService.class);
-        this.resource = new UnsubscribeResource(unsubscribeService, TEMPLATE_ENGINE_STUB, motrSession, client);
+        this.resource = new UnsubscribeResource(unsubscribeService, TEMPLATE_ENGINE_STUB, motrSession, client, smartSurveyHelper);
     }
 
     @Test

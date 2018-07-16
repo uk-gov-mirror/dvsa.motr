@@ -8,6 +8,7 @@ import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 import uk.gov.dvsa.motr.web.analytics.DataLayerMessageId;
 import uk.gov.dvsa.motr.web.analytics.DataLayerMessageType;
+import uk.gov.dvsa.motr.web.analytics.SmartSurveyFeedback;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.test.render.TemplateEngineStub;
 
@@ -19,6 +20,7 @@ import javax.ws.rs.core.Response;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -44,8 +46,10 @@ public class TrailerWithoutFirstAnnualTestResourceTest {
 
         templateEngine = new TemplateEngineStub();
         motrSession = mock(MotrSession.class);
-        resource = new TrailerWithoutFirstAnnualTestResource(motrSession, templateEngine);
+        SmartSurveyFeedback smartSurveyHelper = new SmartSurveyFeedback();
+        resource = new TrailerWithoutFirstAnnualTestResource(motrSession, templateEngine, spy(smartSurveyHelper));
         vehicle = new VehicleDetails();
+        vehicle.setRegNumber(VRM);
 
         when(motrSession.getVrmFromSession()).thenReturn(VRM);
     }
@@ -90,6 +94,7 @@ public class TrailerWithoutFirstAnnualTestResourceTest {
                         getDataLayerMessageText(TRAILER_WITHOUT_FIRST_ANNUAL_TEST_HEADER, TRAILER_WITHOUT_FIRST_ANNUAL_TEST_CONTENT)));
 
         expectedContext.put("back_url", HOMEPAGE_URL);
+        expectedContext.put("smartSurveyFeedback", "http://www.smartsurvey.co.uk/s/MKVXI/?vrm=" + VRM + "&vehicle_type=MOT");
 
         Response response = resource.trailerTestExpiryUnknownPageGet();
 

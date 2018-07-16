@@ -8,6 +8,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
+import uk.gov.dvsa.motr.web.analytics.SmartSurveyFeedback;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.formatting.PhoneNumberFormatter;
 import uk.gov.dvsa.motr.web.test.render.TemplateEngineStub;
@@ -33,7 +36,13 @@ public class PhoneNumberResourceTest {
         validator = mock(PhoneNumberValidator.class);
         motrSession = mock(MotrSession.class);
         engine = new TemplateEngineStub();
-        resource = new PhoneNumberResource(motrSession, engine, validator);
+        SmartSurveyFeedback smartSurveyHelper = new SmartSurveyFeedback();
+        resource = new PhoneNumberResource(motrSession, engine, validator, smartSurveyHelper);
+
+        VehicleDetails vehicleDetails = new VehicleDetails();
+        vehicleDetails.setVehicleType(VehicleType.MOT);
+        vehicleDetails.setRegNumber("12345");
+        when(motrSession.getVehicleDetailsFromSession()).thenReturn(vehicleDetails);
     }
 
     @Test

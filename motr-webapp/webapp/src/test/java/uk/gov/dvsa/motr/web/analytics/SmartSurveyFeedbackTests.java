@@ -3,31 +3,36 @@ package uk.gov.dvsa.motr.web.analytics;
 import org.junit.Before;
 import org.junit.Test;
 
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
+
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class SmartSurveyHelperTests {
+public class SmartSurveyFeedbackTests {
 
-    private SmartSurveyHelper smartSurveyHelper;
+    private SmartSurveyFeedback smartSurveyHelper;
 
     @Before
     public void setUp() {
 
-        smartSurveyHelper = new SmartSurveyHelper("http://www.test.com/", "testTemplateVariable");
+        smartSurveyHelper = new SmartSurveyFeedback();
     }
 
     @Test
     public void smartSurveyAttributesFormattedInCorrectFormat() {
 
-        smartSurveyHelper.putAttribute("key1", "value1");
-        smartSurveyHelper.putAttribute("key2", "value2");
+        smartSurveyHelper.addVrm("value1");
+        smartSurveyHelper.addVehicleType(VehicleType.MOT);
+        smartSurveyHelper.addContactType("value3");
+        smartSurveyHelper.addIsSigningBeforeFirstMotDue(true);
 
         Map<String, String> map = smartSurveyHelper.formatAttributes();
 
-        assertTrue(map.containsKey("testTemplateVariable"));
-        assertEquals("http://www.test.com/?key1=value1&key2=value2", map.get("testTemplateVariable"));
+        assertTrue(map.containsKey("smartSurveyFeedback"));
+        assertEquals("http://www.smartsurvey.co.uk/s/MKVXI/?vrm=value1&contact_type=value3&vehicle_type=MOT" +
+                        "&is_signing_before_first_mot_due=true", map.get("smartSurveyFeedback"));
     }
 
     @Test
@@ -40,7 +45,7 @@ public class SmartSurveyHelperTests {
     @Test
     public void smartSurveyHelperThatHasBeenClearedReturnsEmptyMap() {
 
-        smartSurveyHelper.putAttribute("key1", "value1");
+        smartSurveyHelper.addVrm("value1");
         smartSurveyHelper.clear();
 
         Map<String, String> map = smartSurveyHelper.formatAttributes();

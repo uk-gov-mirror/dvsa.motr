@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
+import org.apache.commons.lang3.StringUtils;
+
 import uk.gov.dvsa.motr.serialisation.LocalDateDeserialiser;
 
 import java.io.Serializable;
@@ -173,6 +175,10 @@ public class VehicleDetails implements Serializable {
     public VehicleDetails setVehicleType(VehicleType vehicleType) {
         this.vehicleType = vehicleType;
         return this;
+    }
+
+    public boolean hasNoMotYet() {
+        return StringUtils.isEmpty(this.getMotTestNumber());
     }
 
     @Override

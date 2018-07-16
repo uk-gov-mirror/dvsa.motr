@@ -1,9 +1,12 @@
 package uk.gov.dvsa.motr.web.resource;
 
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
 import uk.gov.dvsa.motr.web.analytics.DataLayerMessageId;
 import uk.gov.dvsa.motr.web.analytics.DataLayerMessageType;
+import uk.gov.dvsa.motr.web.analytics.SmartSurveyFeedback;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
+import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.service.SmsConfirmationService;
 import uk.gov.dvsa.motr.web.component.subscription.service.SmsConfirmationService.Confirmation;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
@@ -43,19 +46,22 @@ public class SmsConfirmationCodeResource {
     private final DataLayerHelper dataLayerHelper;
     private final SmsConfirmationService smsConfirmationService;
     private final UrlHelper urlHelper;
+    private final SmartSurveyFeedback smartSurveyHelperFeedback;
 
     @Inject
     public SmsConfirmationCodeResource(
             MotrSession motrSession,
             TemplateEngine renderer,
             SmsConfirmationService smsConfirmationService,
-            UrlHelper urlHelper
+            UrlHelper urlHelper,
+            SmartSurveyFeedback smartSurveyHelperFeedback
     ) {
         this.motrSession = motrSession;
         this.renderer = renderer;
         this.dataLayerHelper = new DataLayerHelper();
         this.smsConfirmationService = smsConfirmationService;
         this.urlHelper = urlHelper;
+        this.smartSurveyHelperFeedback = smartSurveyHelperFeedback;
     }
 
     @GET
@@ -72,6 +78,8 @@ public class SmsConfirmationCodeResource {
         modelMap.put("continue_button_text", "Continue");
         modelMap.put("resendUrl", "resend");
         modelMap.put("viewModel", viewModel);
+
+        addDetailsForSurveyFromSession(modelMap);
 
         if (motrSession.isSmsConfirmResendLimited()) {
             modelMap.put(MESSAGE_MODEL_KEY, SmsConfirmationCodeValidator.CODE_ALREADY_RESENT);
@@ -149,6 +157,20 @@ public class SmsConfirmationCodeResource {
         modelMap.putAll(dataLayerHelper.formatAttributes());
         dataLayerHelper.clear();
 
+        addDetailsForSurveyFromSession(modelMap);
+
         return Response.ok(renderer.render(SMS_CONFIRMATION_CODE_TEMPLATE, modelMap)).build();
+    }
+
+    private void addDetailsForSurveyFromSession(Map<String, Object> modelMap) {
+
+        VehicleDetails vehicle = motrSession.getVehicleDetailsFromSession();
+        smartSurveyHelperFeedback.addContactType(Subscription.ContactType.MOBILE.getValue());
+        smartSurveyHelperFeedback.addVrm(vehicle.getRegNumber());
+        smartSurveyHelperFeedback.addVehicleType(vehicle.getVehicleType());
+        smartSurveyHelperFeedback.addIsSigningBeforeFirstMotDue(vehicle.hasNoMotYet());
+
+        modelMap.putAll(smartSurveyHelperFeedback.formatAttributes());
+        smartSurveyHelperFeedback.clear();
     }
 }

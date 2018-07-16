@@ -4,6 +4,7 @@ import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
 import uk.gov.dvsa.motr.web.analytics.DataLayerMessageId;
 import uk.gov.dvsa.motr.web.analytics.DataLayerMessageType;
+import uk.gov.dvsa.motr.web.analytics.SmartSurveyFeedback;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 
@@ -30,16 +31,19 @@ public class UnknownTestDueDateResource {
     private final TemplateEngine renderer;
     private final MotrSession motrSession;
     private final DataLayerHelper dataLayerHelper;
+    private final SmartSurveyFeedback smartSurveyHelperFeedback;
 
     @Inject
     public UnknownTestDueDateResource(
             MotrSession motrSession,
-            TemplateEngine renderer
+            TemplateEngine renderer,
+            SmartSurveyFeedback smartSurveyHelperFeedback
     ) {
 
         this.motrSession = motrSession;
         this.renderer = renderer;
         this.dataLayerHelper = new DataLayerHelper();
+        this.smartSurveyHelperFeedback = smartSurveyHelperFeedback;
     }
 
     @GET
@@ -55,12 +59,16 @@ public class UnknownTestDueDateResource {
         dataLayerHelper.setMessage(DataLayerMessageId.ANNUAL_TEST_DATE_UNKNOWN,
                 DataLayerMessageType.INELIGIBLE_FOR_REMINDER,
                 "We don't know when this vehicle's first annual test is due");
+        smartSurveyHelperFeedback.addVrm(vehicleDetails.getRegNumber());
+        smartSurveyHelperFeedback.addVehicleType(vehicleDetails.getVehicleType());
 
         Map<String, Object> modelMap = new HashMap<>();
 
         modelMap.put("back_url", HomepageResource.HOMEPAGE_URL);
         modelMap.putAll(dataLayerHelper.formatAttributes());
+        modelMap.putAll(smartSurveyHelperFeedback.formatAttributes());
         dataLayerHelper.clear();
+        smartSurveyHelperFeedback.clear();
 
         return Response.ok(renderer.render(UNKNOWN_TEST_DATE_TEMPLATE, modelMap)).build();
     }

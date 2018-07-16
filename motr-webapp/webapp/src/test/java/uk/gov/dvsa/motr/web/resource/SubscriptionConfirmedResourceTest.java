@@ -8,6 +8,8 @@ import org.mockito.ArgumentCaptor;
 import uk.gov.dvsa.motr.conversion.DataAnonymizer;
 import uk.gov.dvsa.motr.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.vehicledetails.VehicleType;
+import uk.gov.dvsa.motr.web.analytics.SmartSurveyFeedback;
+import uk.gov.dvsa.motr.web.analytics.SmartSurveySatisfactionSubscribe;
 import uk.gov.dvsa.motr.web.component.subscription.exception.InvalidConfirmationIdException;
 import uk.gov.dvsa.motr.web.component.subscription.exception.SubscriptionAlreadyConfirmedException;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
@@ -57,6 +59,8 @@ public class SubscriptionConfirmedResourceTest {
     private UrlHelper urlHelper = mock(UrlHelper.class);
     private MotrSession motrSession = mock(MotrSession.class);
     private DataAnonymizer anonymizer = mock(DataAnonymizer.class);
+    private SmartSurveyFeedback smartSurveyFeedback = new SmartSurveyFeedback();
+    private SmartSurveySatisfactionSubscribe smartSurveySatisfactionSubscribe = new SmartSurveySatisfactionSubscribe();
 
     @Before
     public void setup() {
@@ -71,7 +75,9 @@ public class SubscriptionConfirmedResourceTest {
                 pendingSubscriptionActivatorService,
                 motrSession,
                 urlHelper,
-                anonymizer
+                anonymizer,
+                smartSurveySatisfactionSubscribe,
+                smartSurveyFeedback
         );
     }
 

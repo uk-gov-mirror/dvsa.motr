@@ -1,8 +1,13 @@
 package uk.gov.dvsa.motr.web.resource;
 
+import org.apache.commons.lang3.StringUtils;
+
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
 import uk.gov.dvsa.motr.web.analytics.DataLayerMessageId;
 import uk.gov.dvsa.motr.web.analytics.DataLayerMessageType;
+import uk.gov.dvsa.motr.web.analytics.SmartSurveyFeedback;
+import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 import uk.gov.dvsa.motr.web.validator.ChannelSelectionValidator;
@@ -35,15 +40,18 @@ public class ChannelSelectionResource {
     private final TemplateEngine renderer;
     private final MotrSession motrSession;
     private final DataLayerHelper dataLayerHelper;
+    private final SmartSurveyFeedback smartSurveyFeedback;
 
     @Inject
     public ChannelSelectionResource(
             MotrSession motrSession,
-            TemplateEngine renderer
+            TemplateEngine renderer,
+            SmartSurveyFeedback smartSurveyFeedback
     ) {
         this.motrSession = motrSession;
         this.renderer = renderer;
         this.dataLayerHelper = new DataLayerHelper();
+        this.smartSurveyFeedback = smartSurveyFeedback;
     }
 
     @GET
@@ -59,6 +67,8 @@ public class ChannelSelectionResource {
         modelMap.put("continue_button_text", "Continue");
         modelMap.put("back_button_text", "Back");
         modelMap.put("back_url", "vrm");
+
+        addDetailsForSurveyFromSession(modelMap);
 
         return Response.ok(renderer.render(CHANNEL_SELECTION_TEMPLATE, modelMap)).build();
     }
@@ -97,6 +107,24 @@ public class ChannelSelectionResource {
         modelMap.putAll(dataLayerHelper.formatAttributes());
         dataLayerHelper.clear();
 
+        addDetailsForSurveyFromSession(modelMap);
+
         return Response.ok(renderer.render(CHANNEL_SELECTION_TEMPLATE, modelMap)).build();
+    }
+
+    private void addDetailsForSurveyFromSession(Map<String, Object> modelMap) {
+
+        VehicleDetails vehicle = motrSession.getVehicleDetailsFromSession();
+
+        if (!StringUtils.isEmpty(motrSession.getChannelFromSession())) {
+            smartSurveyFeedback.addContactType(motrSession.getChannelFromSession().equals("email")
+                    ? Subscription.ContactType.EMAIL.getValue() : Subscription.ContactType.MOBILE.getValue());
+        }
+        smartSurveyFeedback.addVrm(vehicle.getRegNumber());
+        smartSurveyFeedback.addVehicleType(vehicle.getVehicleType());
+        smartSurveyFeedback.addIsSigningBeforeFirstMotDue(vehicle.hasNoMotYet());
+
+        modelMap.putAll(smartSurveyFeedback.formatAttributes());
+        smartSurveyFeedback.clear();
     }
 }

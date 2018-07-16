@@ -4,6 +4,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
+import uk.gov.dvsa.motr.web.analytics.SmartSurveyFeedback;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.test.render.TemplateEngineStub;
 import uk.gov.dvsa.motr.web.viewmodel.EmailConfirmationPendingViewModel;
@@ -31,7 +34,12 @@ public class EmailConfirmationPendingResourceTest {
 
         motrSession = mock(MotrSession.class);
         engine = new TemplateEngineStub();
-        resource = new EmailConfirmationPendingResource(engine, motrSession);
+        SmartSurveyFeedback smartSurveyHelper = new SmartSurveyFeedback();
+        resource = new EmailConfirmationPendingResource(engine, motrSession, smartSurveyHelper);
+        VehicleDetails vehicle = new VehicleDetails();
+        vehicle.setRegNumber("AB12345");
+        vehicle.setVehicleType(VehicleType.HGV);
+        when(motrSession.getVehicleDetailsFromSession()).thenReturn(vehicle);
     }
 
     @After

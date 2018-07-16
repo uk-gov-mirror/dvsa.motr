@@ -6,6 +6,9 @@ import org.junit.Test;
 import uk.gov.dvsa.motr.conversion.DataAnonymizer;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
+import uk.gov.dvsa.motr.web.analytics.SmartSurveyFeedback;
+import uk.gov.dvsa.motr.web.analytics.SmartSurveySatisfactionUnsubscribe;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.cookie.UnsubscribeConfirmationParams;
 import uk.gov.dvsa.motr.web.test.render.TemplateEngineStub;
@@ -33,6 +36,9 @@ public class UnsubscribeConfirmedResourceTest {
     private VehicleDetailsClient client = mock(VehicleDetailsClient.class);
     private MotrSession motrSession = mock(MotrSession.class);
     private DataAnonymizer anonymizer = mock(DataAnonymizer.class);
+    private SmartSurveyFeedback smartSurveyFeedback = new SmartSurveyFeedback();
+    private SmartSurveySatisfactionUnsubscribe smartSurveySatisfactionSubscribe = new SmartSurveySatisfactionUnsubscribe();
+
 
     @Before
     public void setUp() {
@@ -41,6 +47,7 @@ public class UnsubscribeConfirmedResourceTest {
         params.setExpiryDate(LocalDate.of(2015, 7, 10).toString());
         params.setRegistration("TEST-VRM");
         params.setContact("test@this-is-a-test-123");
+        params.setContactType("email");
 
         VehicleDetails vehicleDetails = new VehicleDetails();
         vehicleDetails.setMotTestNumber(MOT_TEST_NUMBER);
@@ -49,20 +56,27 @@ public class UnsubscribeConfirmedResourceTest {
         when(motrSession.getVehicleDetailsFromSession()).thenReturn(vehicleDetails);
         when(anonymizer.anonymizeContactData(anyString())).thenReturn(ANONYMIZED_CONTACT_DATA);
 
-        this.resource = new UnsubscribeConfirmedResource(TEMPLATE_ENGINE_STUB, motrSession, client, anonymizer);
+        this.resource = new UnsubscribeConfirmedResource(TEMPLATE_ENGINE_STUB, motrSession, client, anonymizer, smartSurveyFeedback,
+                smartSurveySatisfactionSubscribe);
     }
 
     @Test(expected = NotFoundException.class)
     public void unsubscribeConfirmedWillThrow404WhenSessionIsEmpty() throws Exception {
 
-        resource = new UnsubscribeConfirmedResource(TEMPLATE_ENGINE_STUB, new MotrSession(true, false), client, anonymizer);
+        resource = new UnsubscribeConfirmedResource(TEMPLATE_ENGINE_STUB, new MotrSession(true, false), client, anonymizer,
+                smartSurveyFeedback, smartSurveySatisfactionSubscribe);
         resource.unsubscribeConfirmed();
     }
 
     @Test
     public void unsubscribeConfirmedDisplaysPage() throws Exception {
 
-        when(client.fetchByVrm(eq("TEST-VRM"))).thenReturn(Optional.of(new VehicleDetails()));
+        VehicleDetails vehicleDetails = new VehicleDetails();
+        vehicleDetails.setRegNumber("TEST-VRM");
+        vehicleDetails.setMotTestNumber(MOT_TEST_NUMBER);
+        vehicleDetails.setVehicleType(VehicleType.MOT);
+
+        when(client.fetchByVrm(eq("TEST-VRM"))).thenReturn(Optional.of(vehicleDetails));
         resource.unsubscribeConfirmed();
 
         assertEquals(UnsubscribeViewModel.class, TEMPLATE_ENGINE_STUB.getContext(Map.class).get("viewModel").getClass());
@@ -71,7 +85,7 @@ public class UnsubscribeConfirmedResourceTest {
         assertEquals("test@this-is-a-test-123", viewModel.getEmail());
         assertEquals("10 July 2015", viewModel.getExpiryDate());
         assertEquals("TEST-VRM", viewModel.getRegistration());
-        assertEquals("{\"vrm\":\"TEST-VRM\",\"vehicle-data-origin\":\"MOT\",\"event-type\":\"unsubscribe\",\"contact-id\":\"abcdefghijk\"}",
-                dataLayerString);
+        assertEquals("{\"vrm\":\"TEST-VRM\",\"vehicle-data-origin\":\"MOT\",\"event-type\":\"unsubscribe\",\"contact-type\":\"email\"," +
+                        "\"contact-id\":\"abcdefghijk\"}", dataLayerString);
     }
 }

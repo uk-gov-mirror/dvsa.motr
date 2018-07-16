@@ -1,8 +1,11 @@
 package uk.gov.dvsa.motr.web.resource;
 
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
 import uk.gov.dvsa.motr.web.analytics.DataLayerMessageId;
 import uk.gov.dvsa.motr.web.analytics.DataLayerMessageType;
+import uk.gov.dvsa.motr.web.analytics.SmartSurveyFeedback;
+import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.formatting.PhoneNumberFormatter;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
@@ -38,17 +41,20 @@ public class PhoneNumberResource {
     private final MotrSession motrSession;
     private final PhoneNumberValidator validator;
     private final DataLayerHelper dataLayerHelper;
+    private final SmartSurveyFeedback smartSurveyFeedback;
 
     @Inject
     public PhoneNumberResource(
             MotrSession motrSession,
             TemplateEngine renderer,
-            PhoneNumberValidator validator
+            PhoneNumberValidator validator,
+            SmartSurveyFeedback smartSurveyFeedback
     ) {
         this.motrSession = motrSession;
         this.renderer = renderer;
         this.dataLayerHelper = new DataLayerHelper();
         this.validator = validator;
+        this.smartSurveyFeedback = smartSurveyFeedback;
     }
 
     @GET
@@ -71,6 +77,8 @@ public class PhoneNumberResource {
 
         String phoneNumber = motrSession.getUnnormalizedPhoneNumberFromSession();
         modelMap.put(PHONE_NUMBER_MODEL_KEY, phoneNumber);
+
+        addDetailsForSurveyFromSession(modelMap);
 
         return Response.ok(renderer.render(PHONE_NUMBER_TEMPLATE, modelMap)).build();
     }
@@ -108,6 +116,20 @@ public class PhoneNumberResource {
         modelMap.putAll(dataLayerHelper.formatAttributes());
         dataLayerHelper.clear();
 
+        addDetailsForSurveyFromSession(modelMap);
+
         return Response.ok(renderer.render(PHONE_NUMBER_TEMPLATE, modelMap)).build();
+    }
+
+    private void addDetailsForSurveyFromSession(Map<String, Object> modelMap) {
+
+        VehicleDetails vehicle = motrSession.getVehicleDetailsFromSession();
+        smartSurveyFeedback.addContactType(Subscription.ContactType.MOBILE.getValue());
+        smartSurveyFeedback.addVrm(vehicle.getRegNumber());
+        smartSurveyFeedback.addVehicleType(vehicle.getVehicleType());
+        smartSurveyFeedback.addIsSigningBeforeFirstMotDue(vehicle.hasNoMotYet());
+
+        modelMap.putAll(smartSurveyFeedback.formatAttributes());
+        smartSurveyFeedback.clear();
     }
 }

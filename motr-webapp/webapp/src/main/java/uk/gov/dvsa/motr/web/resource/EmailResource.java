@@ -1,8 +1,11 @@
 package uk.gov.dvsa.motr.web.resource;
 
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
 import uk.gov.dvsa.motr.web.analytics.DataLayerMessageId;
 import uk.gov.dvsa.motr.web.analytics.DataLayerMessageType;
+import uk.gov.dvsa.motr.web.analytics.SmartSurveyFeedback;
+import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 import uk.gov.dvsa.motr.web.validator.EmailValidator;
@@ -35,13 +38,15 @@ public class EmailResource {
     private final TemplateEngine renderer;
     private final MotrSession motrSession;
     private final DataLayerHelper dataLayerHelper;
+    private final SmartSurveyFeedback smartSurveyFeedback;
 
     @Inject
-    public EmailResource(MotrSession motrSession, TemplateEngine renderer) {
+    public EmailResource(MotrSession motrSession, TemplateEngine renderer, SmartSurveyFeedback smartSurveyFeedback) {
 
         this.motrSession = motrSession;
         this.renderer = renderer;
         this.dataLayerHelper = new DataLayerHelper();
+        this.smartSurveyFeedback = smartSurveyFeedback;
     }
 
     @GET
@@ -63,6 +68,8 @@ public class EmailResource {
                 motrSession.visitingFromReviewPage());
 
         modelMap.put(EMAIL_MODEL_KEY, email);
+
+        addDetailsForSurveyFromSession(modelMap);
 
         return Response.ok(renderer.render(EMAIL_TEMPLATE_NAME, modelMap)).build();
     }
@@ -99,6 +106,20 @@ public class EmailResource {
         modelMap.putAll(dataLayerHelper.formatAttributes());
         dataLayerHelper.clear();
 
+        addDetailsForSurveyFromSession(modelMap);
+
         return Response.ok(renderer.render(EMAIL_TEMPLATE_NAME, modelMap)).build();
+    }
+
+    private void addDetailsForSurveyFromSession(Map<String, Object> modelMap) {
+
+        VehicleDetails vehicle = motrSession.getVehicleDetailsFromSession();
+        smartSurveyFeedback.addContactType(Subscription.ContactType.EMAIL.getValue());
+        smartSurveyFeedback.addVrm(vehicle.getRegNumber());
+        smartSurveyFeedback.addVehicleType(vehicle.getVehicleType());
+        smartSurveyFeedback.addIsSigningBeforeFirstMotDue(vehicle.hasNoMotYet());
+
+        modelMap.putAll(smartSurveyFeedback.formatAttributes());
+        smartSurveyFeedback.clear();
     }
 }

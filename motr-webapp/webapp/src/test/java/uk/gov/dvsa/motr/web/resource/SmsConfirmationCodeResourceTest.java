@@ -3,6 +3,9 @@ package uk.gov.dvsa.motr.web.resource;
 import org.junit.Before;
 import org.junit.Test;
 
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
+import uk.gov.dvsa.motr.vehicledetails.VehicleType;
+import uk.gov.dvsa.motr.web.analytics.SmartSurveyFeedback;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.component.subscription.service.SmsConfirmationService;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
@@ -48,12 +51,19 @@ public class SmsConfirmationCodeResourceTest {
 
         smsConfirmationService = mock(SmsConfirmationService.class);
         motrSession = mock(MotrSession.class);
-        this.resource = new SmsConfirmationCodeResource(motrSession, TEMPLATE_ENGINE_STUB, smsConfirmationService, URL_HELPER);
+        SmartSurveyFeedback smartSurveyHelper = new SmartSurveyFeedback();
+        this.resource = new SmsConfirmationCodeResource(motrSession, TEMPLATE_ENGINE_STUB, smsConfirmationService, URL_HELPER,
+                smartSurveyHelper);
+
+        VehicleDetails vehicleDetails = new VehicleDetails();
+        vehicleDetails.setVehicleType(VehicleType.MOT);
+        vehicleDetails.setRegNumber(VRM);
 
         when(URL_HELPER.confirmSubscriptionLink(CONFIRMATION_ID)).thenReturn(CONFIRMATION_LINK);
         when(motrSession.getPhoneNumberFromSession()).thenReturn(PHONE_NUMBER);
         when(motrSession.getVrmFromSession()).thenReturn(VRM);
         when(motrSession.getConfirmationIdFromSession()).thenReturn(CONFIRMATION_ID);
+        when(motrSession.getVehicleDetailsFromSession()).thenReturn(vehicleDetails);
     }
 
     @Test

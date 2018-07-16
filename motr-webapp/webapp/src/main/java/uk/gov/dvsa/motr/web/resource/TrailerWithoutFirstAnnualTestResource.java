@@ -4,6 +4,7 @@ import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
 import uk.gov.dvsa.motr.web.analytics.DataLayerMessageId;
 import uk.gov.dvsa.motr.web.analytics.DataLayerMessageType;
+import uk.gov.dvsa.motr.web.analytics.SmartSurveyFeedback;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 
@@ -39,16 +40,19 @@ public class TrailerWithoutFirstAnnualTestResource {
     private final TemplateEngine renderer;
     private final MotrSession motrSession;
     private final DataLayerHelper dataLayerHelper;
+    private final SmartSurveyFeedback smartSurveyHelperFeedback;
 
     @Inject
     public TrailerWithoutFirstAnnualTestResource(
             MotrSession motrSession,
-            TemplateEngine renderer
+            TemplateEngine renderer,
+            SmartSurveyFeedback smartSurveyHelperFeedback
     ) {
 
         this.motrSession = motrSession;
         this.renderer = renderer;
         this.dataLayerHelper = new DataLayerHelper();
+        this.smartSurveyHelperFeedback = smartSurveyHelperFeedback;
     }
 
     @GET
@@ -64,6 +68,8 @@ public class TrailerWithoutFirstAnnualTestResource {
         dataLayerHelper.setMessage(DataLayerMessageId.TRAILER_WITHOUT_FIRST_ANNUAL_TEST,
                 DataLayerMessageType.INELIGIBLE_FOR_REMINDER,
                 getDataLayerMessageText());
+        smartSurveyHelperFeedback.addVrm(vehicleDetails.getRegNumber());
+        smartSurveyHelperFeedback.addVehicleType(vehicleDetails.getVehicleType());
 
         Map<String, Object> modelMap = new HashMap<>();
 
@@ -71,7 +77,9 @@ public class TrailerWithoutFirstAnnualTestResource {
         modelMap.put(HEADER_TEXT_KEY, TRAILER_WITHOUT_FIRST_ANNUAL_TEST_HEADER);
         modelMap.put(CONTENT_TEXT_ARRAY_KEY, TRAILER_WITHOUT_FIRST_ANNUAL_TEST_CONTENT);
         modelMap.putAll(dataLayerHelper.formatAttributes());
+        modelMap.putAll(smartSurveyHelperFeedback.formatAttributes());
         dataLayerHelper.clear();
+        smartSurveyHelperFeedback.clear();
 
         return Response.ok(renderer.render(TRAILER_WITHOUT_FIRST_ANNUAL_TEST_TEMPLATE, modelMap)).build();
     }
@@ -83,5 +91,4 @@ public class TrailerWithoutFirstAnnualTestResource {
 
         return stringJoiner.toString();
     }
-
 }
