@@ -9,8 +9,6 @@ import java.util.Optional;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.CHECKSUM_SALT;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.DB_TABLE_SUBSCRIPTION;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.EU_GO_LIVE_DATE;
-import static uk.gov.dvsa.motr.notifier.SystemVariable.FEATURE_TOGGLE_HGV_PSV_VEHICLES;
-import static uk.gov.dvsa.motr.notifier.SystemVariable.FEATURE_TOGGLE_TRAILERS;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.GOV_NOTIFY_API_TOKEN;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.HGV_PSV_ONE_MONTH_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.HGV_PSV_TWO_MONTH_NOTIFICATION_TEMPLATE_ID;
@@ -21,8 +19,6 @@ import static uk.gov.dvsa.motr.notifier.SystemVariable.MOTH_DIRECT_URL_PREFIX;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_API_DVLA_ID_URI;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_API_HGV_PSV_URI;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_API_MOT_TEST_NUMBER_URI;
-import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_API_V1_DVLA_ID_URI;
-import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_API_V1_MOT_TEST_NUMBER_URI;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_TEST_REMINDER_INFO_TOKEN;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID_POST_EU;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.ONE_MONTH_NOTIFICATION_TEMPLATE_ID_POST_EU;
@@ -49,8 +45,6 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
         set(DB_TABLE_SUBSCRIPTION, subscriptionTableName());
         set(SUBSCRIPTIONS_QUEUE_URL, sqsEndpoint());
         set(MOT_TEST_REMINDER_INFO_TOKEN, motTestReminderInfoToken());
-        set(MOT_API_V1_MOT_TEST_NUMBER_URI, motTestNumberApiV1Endpoint());
-        set(MOT_API_V1_DVLA_ID_URI, dvlaIdApiV1Endpoint());
         set(MOT_API_MOT_TEST_NUMBER_URI, motTestNumberApiEndpoint());
         set(MOT_API_DVLA_ID_URI, dvlaIdApiEndpoint());
         set(MOT_API_HGV_PSV_URI, hgvPsvApiEndpoint());
@@ -66,8 +60,6 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
         set(SMS_HGV_PSV_ONE_MONTH_NOTIFICATION_TEMPLATE_ID, notifySmsHgvPsvOneMonthTemplateId());
 
         set(EU_GO_LIVE_DATE, euGoLiveDate());
-        set(FEATURE_TOGGLE_HGV_PSV_VEHICLES, featureToggleHgvPsvVehicles());
-        set(FEATURE_TOGGLE_TRAILERS, featureToggleTrailers());
 
         set(GOV_NOTIFY_API_TOKEN, govNotifyApiToken());
         set(WORKER_COUNT, "1");
@@ -80,16 +72,8 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
         set(CHECKSUM_SALT, checksumSalt());
     }
 
-    public static String motTestNumberApiV1Endpoint() {
-        return lookupProperty("test.mottestnumber.api.v1.integration.endpoint");
-    }
-
     public static String motTestNumberApiEndpoint() {
         return lookupProperty("test.mottestnumber.api.integration.endpoint");
-    }
-
-    public static String dvlaIdApiV1Endpoint() {
-        return lookupProperty("test.dvlaId.api.v1.integration.endpoint");
     }
 
     public static String dvlaIdApiEndpoint() {
@@ -223,14 +207,6 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
     public static String euGoLiveDate() {
 
         return lookupProperty("test.eu.go.live.date");
-    }
-
-    private String featureToggleHgvPsvVehicles() {
-        return lookupProperty("test.feature.hgvpsv.toggle");
-    }
-
-    private String featureToggleTrailers() {
-        return lookupProperty("test.feature.trailers.toggle");
     }
 
     private static String lookupProperty(String property) {

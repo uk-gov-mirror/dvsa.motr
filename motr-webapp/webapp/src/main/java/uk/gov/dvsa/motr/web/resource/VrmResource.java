@@ -51,7 +51,6 @@ public class VrmResource {
     private static final String SHOW_SYSTEM_ERROR = "showSystemError";
     private static final String INPUT_FIELD_ID = "reg-number-input";
     private static final String INPUT_FIELD_ID_MODEL_KEY = "inputFieldId";
-    private static final String TRAILER_FEATURE_TOGGLE = "isTrailerToggleOn";
 
     private final TemplateEngine renderer;
     private final VehicleDetailsClient client;
@@ -88,7 +87,6 @@ public class VrmResource {
         smartSurveyFeedback.addVrm(vrm);
 
         modelMap.put(VRM_MODEL_KEY, vrm);
-        modelMap.put(TRAILER_FEATURE_TOGGLE, motrSession.isTrailersFeatureToggleOn());
         modelMap.putAll(smartSurveyFeedback.formatAttributes());
         smartSurveyFeedback.clear();
 
@@ -122,46 +120,42 @@ public class VrmResource {
         if (validator.isValid(vrm)) {
             Boolean isTrailerSearch = trailerVrmValidator.isValid(vrm);
 
-            if (!motrSession.isTrailersFeatureToggleOn() && isTrailerSearch) {
-                addVehicleNotFoundErrorMessageToViewModel(modelMap);
-            } else {
-                try {
-                    Optional<VehicleDetails> vehicle = this.client.fetchByVrm(vrm);
-                    vehicle.ifPresent(dataLayerHelper::setVehicleDataOrigin);
+            try {
+                Optional<VehicleDetails> vehicle = this.client.fetchByVrm(vrm);
+                vehicle.ifPresent(dataLayerHelper::setVehicleDataOrigin);
 
-                    smartSurveyFeedback.addVrm(vrm);
+                smartSurveyFeedback.addVrm(vrm);
 
-                    if (isFirstAnnualTestDateUnknown(vehicle)) {
-                        motrSession.setVehicleDetails(vehicle.get());
-                        if (isTrailer(vehicle)) {
-                            return redirect(TrailerWithoutFirstAnnualTestResource.TRAILER_WITHOUT_FIRST_ANNUAL_TEST_PATH);
-                        } else {
-                            return redirect(UnknownTestDueDateResource.UNKNOWN_TEST_DATE_PATH);
-                        }
-                    }
-                    if (vehicleDataIsValid(vehicle)) {
-                        motrSession.setVrm(vrm);
-                        motrSession.setVehicleDetails(vehicle.get());
-
-                        if (testDateIsExpired(vehicle.get())) {
-                            return redirect("test-expired");
-                        }
-
-                        return getRedirectAfterSuccessfulEdit();
-                    } else if (isTrailerSearch) {
-                        addTrailerNotFoundErrorMessageToViewModel(modelMap);
+                if (isFirstAnnualTestDateUnknown(vehicle)) {
+                    motrSession.setVehicleDetails(vehicle.get());
+                    if (isTrailer(vehicle)) {
+                        return redirect(TrailerWithoutFirstAnnualTestResource.TRAILER_WITHOUT_FIRST_ANNUAL_TEST_PATH);
                     } else {
-                        addVehicleNotFoundErrorMessageToViewModel(modelMap);
+                        return redirect(UnknownTestDueDateResource.UNKNOWN_TEST_DATE_PATH);
                     }
-                } catch (VehicleDetailsClientException exception) {
-
-                    EventLogger.logErrorEvent(new VehicleDetailsExceptionEvent().setVrm(vrm), exception);
-                    dataLayerHelper.setMessage(DataLayerMessageId.TRADE_API_CLIENT_EXCEPTION,
-                            DataLayerMessageType.PUBLIC_API_REQUEST_ERROR,
-                            "Something went wrong with the search. Try again later.");
-                    motrSession.setVrm(vrm);
-                    modelMap.put(SHOW_SYSTEM_ERROR, true);
                 }
+                if (vehicleDataIsValid(vehicle)) {
+                    motrSession.setVrm(vrm);
+                    motrSession.setVehicleDetails(vehicle.get());
+
+                    if (testDateIsExpired(vehicle.get())) {
+                        return redirect("test-expired");
+                    }
+
+                    return getRedirectAfterSuccessfulEdit();
+                } else if (isTrailerSearch) {
+                    addTrailerNotFoundErrorMessageToViewModel(modelMap);
+                } else {
+                    addVehicleNotFoundErrorMessageToViewModel(modelMap);
+                }
+            } catch (VehicleDetailsClientException exception) {
+
+                EventLogger.logErrorEvent(new VehicleDetailsExceptionEvent().setVrm(vrm), exception);
+                dataLayerHelper.setMessage(DataLayerMessageId.TRADE_API_CLIENT_EXCEPTION,
+                        DataLayerMessageType.PUBLIC_API_REQUEST_ERROR,
+                        "Something went wrong with the search. Try again later.");
+                motrSession.setVrm(vrm);
+                modelMap.put(SHOW_SYSTEM_ERROR, true);
             }
         } else {
             dataLayerHelper.setMessage(DataLayerMessageId.VRM_VALIDATION_ERROR,
@@ -249,7 +243,6 @@ public class VrmResource {
 
     private boolean isTrailer(Optional<VehicleDetails> vehicle) {
         return vehicle.isPresent()
-                && motrSession.isTrailersFeatureToggleOn()
                 && VehicleType.isTrailer(vehicle.get().getVehicleType());
     }
 }

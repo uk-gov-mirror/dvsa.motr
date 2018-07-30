@@ -86,7 +86,7 @@ public class EventHandlerTest {
     private AwsProxyRequest legacyDvlaIdRequest(String value) {
 
         AwsProxyRequest request = new AwsProxyRequest();
-        request.setPath("/mot-test-reminder-mock/mot-tests-by-dvla-id/" + value);
+        request.setPath("/mot-test-reminder-mock/motr/v2/search/dvla-id/" + value);
         request.setHttpMethod("GET");
         return request;
     }
@@ -94,7 +94,7 @@ public class EventHandlerTest {
     private AwsProxyRequest legacyTestNumberRequest(String value) {
 
         AwsProxyRequest request = new AwsProxyRequest();
-        request.setPath("/mot-test-reminder-mock/mot-tests/" + value);
+        request.setPath("/mot-test-reminder-mock/motr/v2/search/mot-test/" + value);
         request.setHttpMethod("GET");
         return request;
     }
@@ -102,7 +102,7 @@ public class EventHandlerTest {
     private AwsProxyRequest legacyVrmRequest(String value) {
 
         AwsProxyRequest request = new AwsProxyRequest();
-        request.setPath("/mot-test-reminder-mock/vehicles/" + value);
+        request.setPath("/mot-test-reminder-mock/motr/v2/search/commercial/registration/" + value);
         request.setHttpMethod("GET");
         return request;
     }

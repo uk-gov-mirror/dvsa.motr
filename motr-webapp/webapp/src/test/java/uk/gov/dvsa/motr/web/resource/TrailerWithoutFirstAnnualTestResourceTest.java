@@ -66,21 +66,9 @@ public class TrailerWithoutFirstAnnualTestResourceTest {
     }
 
     @Test
-    public void getWhenTrailerToggleOff_ResultsInRedirectToHomePage() {
-
-        when(motrSession.isTrailersFeatureToggleOn()).thenReturn(false);
-
-        Response response = resource.trailerTestExpiryUnknownPageGet();
-
-        verify(motrSession, times(0)).getVehicleDetailsFromSession();
-        assertEquals(302, response.getStatus());
-    }
-
-    @Test
     public void getIsSuccessful_whenUserIsAllowedToAccessIt() {
 
         when(motrSession.isAllowedOnUnknownTestDatePage()).thenReturn(true);
-        when(motrSession.isTrailersFeatureToggleOn()).thenReturn(true);
         when(motrSession.getVehicleDetailsFromSession()).thenReturn(vehicle);
 
         HashMap<String, Object> expectedContext = new HashMap<>();

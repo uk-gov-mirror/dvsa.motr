@@ -216,13 +216,11 @@ public class ReviewViewModelTest {
     @Test
     @UseDataProvider("dataProviderExpiryDateLabel")
     public void whenToggleTypeAndHasTestsAreSet_AppropriateLabelIsReturned(
-            boolean hgvPsvToggle,
             VehicleType vehicleType,
             boolean hasTests,
             String expectedLabel) {
 
         ReviewViewModel viewModel = new ReviewViewModel();
-        viewModel.setHgvPsvToggle(hgvPsvToggle);
         viewModel.setVehicleType(vehicleType);
         viewModel.setHasTests(hasTests);
         viewModel.setDvlaVehicle(!hasTests);
@@ -233,16 +231,12 @@ public class ReviewViewModelTest {
     public static Object[][] dataProviderExpiryDateLabel() throws IOException {
 
         return new Object[][]{
-                {true, VehicleType.HGV, true, ANNUAL_EXPIRE_LABEL},
-                {true, VehicleType.PSV, true, ANNUAL_EXPIRE_LABEL},
-                {true, VehicleType.MOT, true, MOT_EXPIRE_LABEL},
-                {false, VehicleType.HGV, true, MOT_EXPIRE_LABEL},
-                {false, VehicleType.MOT, true, MOT_EXPIRE_LABEL},
-                {true, VehicleType.HGV, false, ANNUAL_DUE_LABEL},
-                {true, VehicleType.PSV, false, ANNUAL_DUE_LABEL},
-                {true, VehicleType.MOT, false, MOT_DUE_LABEL},
-                {false, VehicleType.HGV, false, MOT_DUE_LABEL},
-                {false, VehicleType.MOT, false, MOT_DUE_LABEL}
+                {VehicleType.HGV, true, ANNUAL_EXPIRE_LABEL},
+                {VehicleType.PSV, true, ANNUAL_EXPIRE_LABEL},
+                {VehicleType.MOT, true, MOT_EXPIRE_LABEL},
+                {VehicleType.HGV, false, ANNUAL_DUE_LABEL},
+                {VehicleType.PSV, false, ANNUAL_DUE_LABEL},
+                {VehicleType.MOT, false, MOT_DUE_LABEL}
         };
     }
 }

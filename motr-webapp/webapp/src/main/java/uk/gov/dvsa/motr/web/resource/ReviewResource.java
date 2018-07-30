@@ -93,7 +93,6 @@ public class ReviewResource {
                     .setMobileChannel(motrSession.isUsingSmsChannel())
                     .setDvlaVehicle(vehicle.getMotIdentification().getDvlaId().isPresent())
                     .setYearOfManufacture(vehicle.getYearOfManufacture() == null ? null : vehicle.getYearOfManufacture().toString())
-                    .setHgvPsvToggle(motrSession.isHgvPsvVehiclesFeatureToggleOn())
                     .setHasTests(vehicle.getMotTestNumber() != null && !vehicle.getMotTestNumber().isEmpty());
 
         } else {

@@ -26,7 +26,6 @@ public class ReviewViewModel {
     private boolean emailChannel;
     private boolean mobileChannel;
     private boolean hasTests;
-    private boolean hgvPsvToggle;
     private VehicleType vehicleType;
 
     public String getRegistration() {
@@ -217,13 +216,8 @@ public class ReviewViewModel {
         return this;
     }
 
-    public ReviewViewModel setHgvPsvToggle(boolean hgvPsvToggle) {
-        this.hgvPsvToggle = hgvPsvToggle;
-        return this;
-    }
-
     public String getExpiryDateLabelText() {
-        if (VehicleType.MOT.equals(vehicleType) || !hgvPsvToggle) {
+        if (VehicleType.MOT.equals(vehicleType)) {
             if (this.isDvlaVehicle()) {
                 return "MOT due date";
             }

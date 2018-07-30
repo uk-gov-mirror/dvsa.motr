@@ -167,39 +167,9 @@ public class VrmResourceTest {
     }
 
     @Test
-    public void whenSearchForTrailerButTrailerFunctionalityToggledOffShowErrorMessage() throws Exception {
-        String trailerVrm = "A112131";
-
-        when(motrSession.isTrailersFeatureToggleOn()).thenReturn(false);
-
-        resource.vrmPagePost(trailerVrm, HONEY_POT);
-
-        HashMap<String, Object> expectedContext = new HashMap<>();
-        expectedContext.put("inputFieldId", "reg-number-input");
-        expectedContext.put("message", "We don't hold information about this vehicle.<br/>" +
-                "<br/>Check that you've typed in the correct registration number.");
-        expectedContext.put("back_url", HomepageResource.HOMEPAGE_URL);
-        expectedContext.put("vrm", trailerVrm);
-        expectedContext.put("continue_button_text", "Continue");
-        expectedContext.put("showSystemError", false);
-        expectedContext.put("showInLine", "false");
-        expectedContext.put("back_button_text", "Back");
-        expectedContext.put("dataLayer",
-                getExpectedDataLayerJsonString(trailerVrm,
-                        DataLayerMessageId.VEHICLE_NOT_FOUND,
-                        DataLayerMessageType.USER_INPUT_ERROR,
-                        VEHICLE_NOT_FOUND));
-        expectedContext.put("smartSurveyFeedback", "http://www.smartsurvey.co.uk/s/MKVXI/?vrm=" + trailerVrm);
-
-        assertEquals(expectedContext.toString(), templateEngine.getContext(Map.class).toString());
-
-    }
-
-    @Test
     public void whenVehicleDetailsForTrailerNotFoundShowErrorMessage() throws Exception {
         String trailerVrm = "A112131";
 
-        when(motrSession.isTrailersFeatureToggleOn()).thenReturn(true);
         when(client.fetchByVrm(eq(trailerVrm))).thenReturn(Optional.empty());
 
         resource.vrmPagePost(trailerVrm, HONEY_POT);
@@ -229,7 +199,6 @@ public class VrmResourceTest {
     public void whenVehicleDetailsNotFoundHgvShowErrorMessage() throws Exception {
 
         when(client.fetchByVrm(eq(VALID_REG_NUMBER))).thenReturn(Optional.empty());
-        when(motrSession.isHgvPsvVehiclesFeatureToggleOn()).thenReturn(true);
 
         resource.vrmPagePost(VALID_REG_NUMBER, HONEY_POT);
 
@@ -296,7 +265,6 @@ public class VrmResourceTest {
                 .setMotExpiryDate(null)
                 .setVehicleType(VehicleType.TRAILER);
 
-        when(motrSession.isTrailersFeatureToggleOn()).thenReturn(true);
         when(client.fetchByVrm(eq(trailerVrm))).thenReturn(Optional.of(vehicle));
 
         Response response = resource.vrmPagePost(trailerVrm, HONEY_POT);

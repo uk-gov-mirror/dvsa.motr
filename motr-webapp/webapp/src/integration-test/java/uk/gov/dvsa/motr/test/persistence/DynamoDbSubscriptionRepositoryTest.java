@@ -37,7 +37,7 @@ public class DynamoDbSubscriptionRepositoryTest {
 
     @Before
     public void setUp() {
-        repo = new DynamoDbSubscriptionRepository(subscriptionTableName(), region(), true);
+        repo = new DynamoDbSubscriptionRepository(subscriptionTableName(), region());
         fixture = new DynamoDbFixture(client());
     }
 

@@ -58,7 +58,7 @@ public class TrailerWithoutFirstAnnualTestResource {
     @GET
     public Response trailerTestExpiryUnknownPageGet() {
 
-        if (!motrSession.isAllowedOnUnknownTestDatePage() || !motrSession.isTrailersFeatureToggleOn()) {
+        if (!motrSession.isAllowedOnUnknownTestDatePage()) {
             return redirect(HomepageResource.HOMEPAGE_URL);
         }
 

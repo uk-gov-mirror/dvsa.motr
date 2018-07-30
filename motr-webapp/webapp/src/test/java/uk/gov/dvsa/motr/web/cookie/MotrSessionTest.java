@@ -25,7 +25,7 @@ public class MotrSessionTest {
 
     @Before
     public void setUp() {
-        motrSession = new MotrSession(true, false);
+        motrSession = new MotrSession();
     }
 
     @Test
@@ -301,17 +301,5 @@ public class MotrSessionTest {
         motrSession.setVehicleDetails(new VehicleDetails().setMotExpiryDate(LocalDate.parse("2018-06-14")));
 
         assertFalse(motrSession.isAllowedOnUnknownTestDatePage());
-    }
-
-    @Test
-    public void getHgvPsvVehiclesFeatureToggleValueReturnsTrueWithToggleOn() {
-        assertTrue(motrSession.isHgvPsvVehiclesFeatureToggleOn());
-    }
-
-    @Test
-    public void getHgvPsvVehiclesFeatureToggleValueReturnsFalseWithToggleOff() {
-        motrSession = new MotrSession(false, false);
-
-        assertFalse(motrSession.isHgvPsvVehiclesFeatureToggleOn());
     }
 }

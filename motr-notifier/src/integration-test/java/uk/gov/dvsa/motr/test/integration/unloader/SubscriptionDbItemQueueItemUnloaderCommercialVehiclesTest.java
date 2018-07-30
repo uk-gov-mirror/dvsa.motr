@@ -5,7 +5,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 
-import uk.gov.dvsa.motr.test.environmant.variables.TestEnvironmentWithCommercialVehiclesVariables;
+import uk.gov.dvsa.motr.test.environmant.variables.TestEnvironmentVariables;
 import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.model.SubscriptionItem;
 import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 import uk.gov.service.notify.NotificationClientException;
@@ -17,7 +17,7 @@ import java.util.concurrent.ExecutionException;
 public class SubscriptionDbItemQueueItemUnloaderCommercialVehiclesTest extends SubscriptionDbItemQueueItemUnloaderAbstractTest {
 
     @Rule
-    public final EnvironmentVariables environmentVariables = new TestEnvironmentWithCommercialVehiclesVariables();
+    public final EnvironmentVariables environmentVariables = new TestEnvironmentVariables();
 
     private static final LocalDate VEHICLE_TEST_EXPIRY_DATE = LocalDate.of(2026, 3, 9);
 

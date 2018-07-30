@@ -6,8 +6,6 @@ import uk.gov.dvsa.motr.web.system.SystemVariable;
 
 import static uk.gov.dvsa.motr.web.system.SystemVariable.BASE_URL;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.DO_WARM_UP;
-import static uk.gov.dvsa.motr.web.system.SystemVariable.FEATURE_TOGGLE_HGV_PSV_VEHICLES;
-import static uk.gov.dvsa.motr.web.system.SystemVariable.FEATURE_TOGGLE_TRAILERS;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.LOG_LEVEL;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.MOT_TEST_REMINDER_INFO_API_URI;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.MOT_TEST_REMINDER_INFO_TOKEN;
@@ -28,8 +26,6 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
         doWarmUp(false);
         warmUpTimeoutSec(10);
         motTestReminderInfoToken("test-token");
-        featureToggleHgvPsvVehicles(true);
-        featureToggleTrailers(true);
         releaseVersion("releaseVersion");
     }
 
@@ -63,14 +59,6 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
 
     public TestEnvironmentVariables motTestReminderInfoToken(String value) {
         return set(MOT_TEST_REMINDER_INFO_TOKEN, value);
-    }
-
-    public TestEnvironmentVariables featureToggleHgvPsvVehicles(boolean value) {
-        return set(FEATURE_TOGGLE_HGV_PSV_VEHICLES, String.valueOf(value));
-    }
-
-    public TestEnvironmentVariables featureToggleTrailers(boolean value) {
-        return set(FEATURE_TOGGLE_TRAILERS, String.valueOf(value));
     }
 
     public TestEnvironmentVariables releaseVersion(String value) {

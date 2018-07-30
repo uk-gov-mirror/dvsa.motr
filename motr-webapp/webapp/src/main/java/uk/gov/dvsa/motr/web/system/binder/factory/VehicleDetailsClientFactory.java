@@ -8,11 +8,9 @@ import uk.gov.dvsa.motr.web.helper.SystemVariableParam;
 
 import javax.inject.Inject;
 
-import static uk.gov.dvsa.motr.web.system.SystemVariable.FEATURE_TOGGLE_HGV_PSV_VEHICLES;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.MOT_TEST_REMINDER_BY_VRM_API_URI;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.MOT_TEST_REMINDER_INFO_API_CLIENT_CONNECTION_TIMEOUT;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.MOT_TEST_REMINDER_INFO_API_CLIENT_READ_TIMEOUT;
-import static uk.gov.dvsa.motr.web.system.SystemVariable.MOT_TEST_REMINDER_INFO_API_URI;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.MOT_TEST_REMINDER_INFO_TOKEN;
 
 public class VehicleDetailsClientFactory implements BaseFactory<VehicleDetailsClient> {
@@ -24,20 +22,13 @@ public class VehicleDetailsClientFactory implements BaseFactory<VehicleDetailsCl
 
     @Inject
     public VehicleDetailsClientFactory(
-            @SystemVariableParam(MOT_TEST_REMINDER_INFO_API_URI) String motOnlyUri,
             @SystemVariableParam(MOT_TEST_REMINDER_BY_VRM_API_URI) String uri,
             @SystemVariableParam(MOT_TEST_REMINDER_INFO_TOKEN) String apiKey,
             @SystemVariableParam(MOT_TEST_REMINDER_INFO_API_CLIENT_READ_TIMEOUT) String readTimeout,
-            @SystemVariableParam(MOT_TEST_REMINDER_INFO_API_CLIENT_CONNECTION_TIMEOUT) String connectTimeout,
-            @SystemVariableParam(FEATURE_TOGGLE_HGV_PSV_VEHICLES) String hgvPsvToggle
+            @SystemVariableParam(MOT_TEST_REMINDER_INFO_API_CLIENT_CONNECTION_TIMEOUT) String connectTimeout
     ) {
 
-        if (Boolean.parseBoolean(hgvPsvToggle)) {
-            this.uri = uri;
-        } else {
-            this.uri = motOnlyUri;
-        }
-
+        this.uri = uri;
         this.apiKey = apiKey;
         this.readTimeout = readTimeout;
         this.connectTimeout = connectTimeout;
