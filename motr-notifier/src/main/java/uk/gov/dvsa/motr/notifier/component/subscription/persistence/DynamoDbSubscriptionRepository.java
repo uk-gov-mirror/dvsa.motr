@@ -42,7 +42,7 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
                 .withKeyConditionExpression("id = :id")
                 .withValueMap(new ValueMap().withString(":id", subscriptionId));
 
-        Index table = dynamoDb.getTable(tableName).getIndex("id-gsi");
+        Index table = dynamoDb.getTable(tableName).getIndex("id-vt-gsi");
 
         ItemCollection<QueryOutcome> items = table.query(query);
         Iterator<Item> resultIterator = items.iterator();

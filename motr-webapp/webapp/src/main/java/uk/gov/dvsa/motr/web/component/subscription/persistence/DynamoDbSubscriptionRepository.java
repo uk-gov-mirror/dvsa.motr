@@ -40,7 +40,6 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
 
     private final DynamoDB dynamoDb;
     private final String tableName;
-    private final String idIndexName;
 
     @Inject
     public DynamoDbSubscriptionRepository(
@@ -51,7 +50,6 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
         AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard().withRegion(region).build();
         this.dynamoDb = new DynamoDB(client);
         this.tableName = tableName;
-        idIndexName = featureToggleHgvPsvVehicle ? "id-vt-gsi" : "id-gsi";
     }
 
     @Override
@@ -60,7 +58,7 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
                 .withKeyConditionExpression("id = :id")
                 .withValueMap(new ValueMap().withString(":id", id));
 
-        Index table = dynamoDb.getTable(tableName).getIndex(idIndexName);
+        Index table = dynamoDb.getTable(tableName).getIndex("id-vt-gsi");
 
         ItemCollection<QueryOutcome> items = table.query(query);
         Iterator<Item> resultIterator = items.iterator();
