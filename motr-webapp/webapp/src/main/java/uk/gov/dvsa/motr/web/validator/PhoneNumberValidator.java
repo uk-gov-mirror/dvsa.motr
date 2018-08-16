@@ -9,6 +9,13 @@ import javax.inject.Inject;
 
 public class PhoneNumberValidator implements Validator {
 
+    private static final Pattern UK_PHONE_NUM_VALIDATION_REGEX = Pattern.compile(
+            "^(\\(?07\\d{3}\\)?|" +
+                    "\\+447\\d{3}|447\\d{3}|" +
+                    "00447\\d{3}|\\(44\\)7\\d{3}|" +
+                    "\\(\\+44\\)7\\d{3})\\d{3}\\d{3}$"
+    );
+
     private static final String EMPTY_PHONE_NUMBER_MESSAGE = "Enter your mobile number";
     private static final String INVALID_PHONE_NUMBER_MESSAGE_HEADING = "The number you entered is not a UK mobile phone " +
             "number";
@@ -44,28 +51,18 @@ public class PhoneNumberValidator implements Validator {
 
             return false;
         }
-
         return true;
     }
 
     private boolean isPhoneNumberAValidUkNumber(String phoneNumber) {
 
-        Pattern validationRegex = Pattern.compile(
-                "^(\\(?07\\d{3}\\)?|" +
-                "\\+447\\d{3}|447\\d{3}|" +
-                "00447\\d{3}|\\(44\\)7\\d{3}|" +
-                "\\(\\+44\\)7\\d{3})\\d{3}\\d{3}$"
-        );
-
-        Matcher matcher = validationRegex.matcher(phoneNumber);
-
+        Matcher matcher = UK_PHONE_NUM_VALIDATION_REGEX.matcher(phoneNumber);
         if (!matcher.matches()) {
             message = INVALID_PHONE_NUMBER_MESSAGE_HEADING;
             messageAtField = INVALID_PHONE_NUMBER_MESSAGE_FIELD;
 
             return false;
         }
-
         return true;
     }
 
@@ -77,7 +74,6 @@ public class PhoneNumberValidator implements Validator {
 
             return false;
         }
-
         return true;
     }
 
