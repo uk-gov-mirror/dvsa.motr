@@ -10,7 +10,7 @@ public class EmailValidator implements Validator {
     private static final int MAX_LENGTH = 255;
 
     private static final String VALID_LOCAL_CHARS = "a-zA-Z0-9.!#$%&'*+/=?^_`{|}~\\-";
-    private static final String EMAIL_REGEX = String.format("^[%s]+@([^.@][^@\\s]+)$", VALID_LOCAL_CHARS);
+    private static final String EMAIL_REGEX = String.format("^([%s]+)@([^.@][^@\\s]+)$", VALID_LOCAL_CHARS);
 
     private static final Pattern EMAIL_REGEX_PATTERN = Pattern.compile(EMAIL_REGEX);
     private static final Pattern HOSTNAME_PART_PATTERN = Pattern.compile("^(xn-|[a-z0-9]+)(-[a-z0-9]+)*$", Pattern.CASE_INSENSITIVE);
@@ -58,11 +58,16 @@ public class EmailValidator implements Validator {
             return false;
         }
 
-        String hostname = emailMatcher.group(1);
-        if (hostname.contains("..")) {
+        if (email.contains("..")) {
             return false;
         }
 
+        String localPart = emailMatcher.group(1);
+        if (localPart.startsWith(".") || localPart.endsWith(".")) {
+            return false;
+        }
+
+        String hostname = emailMatcher.group(2);
         try {
             // Each part of the hostname must be < 64 chars.
             hostname = java.net.IDN.toASCII(hostname);

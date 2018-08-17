@@ -34,7 +34,9 @@ public class EmailValidatorTest {
                 {"email@domain.0123456789012345678901234567890123456789012345678901234567890123.com"},
                 {"email @domain.com"},
                 {"email,email@domain.com"},
-                {"email.email@domain.com."}
+                {"email.email@domain.com."},
+                {"email.email.@domain.com"},
+                {".email.email@domain.com"}
         };
     }
 
