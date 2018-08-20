@@ -1,13 +1,23 @@
 package uk.gov.dvsa.motr.web.validator;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class EmailValidator implements Validator {
 
+    private static final int MAX_LENGTH = 255;
+
+    private static final String VALID_LOCAL_CHARS = "a-zA-Z0-9.!#$%&'*+/=?^_`{|}~\\-";
+    private static final String EMAIL_REGEX = String.format("^([%s]+)@([^.@][^@\\s]+)$", VALID_LOCAL_CHARS);
+
+    private static final Pattern EMAIL_REGEX_PATTERN = Pattern.compile(EMAIL_REGEX);
+    private static final Pattern HOSTNAME_PART_PATTERN = Pattern.compile("^(xn-|[a-z0-9]+)(-[a-z0-9]+)*$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern TLD_PART_PATTERN = Pattern.compile("^([a-z]{2,63}|xn--([a-z0-9]+-)*[a-z0-9]+)$", Pattern.CASE_INSENSITIVE);
+
     public static final String EMAIL_EMPTY_MESSAGE = "Enter your email address";
     public static final String EMAIL_INVALID_MESSAGE = "Enter a valid email address";
-    public static final int MAX_LENGTH = 255;
 
     private String message;
 
@@ -38,26 +48,26 @@ public class EmailValidator implements Validator {
     }
 
     /**
-     * Java version of the email validator found here:
-     * https://github.com/alphagov/notifications-utils/blob/master/notifications_utils/recipients.py
+     * Java version of the email validator found here: https://github
+     * .com/alphagov/notifications-utils/blob/master/notifications_utils/recipients.py
      */
     private boolean isValidAccordingToGovNotify(String email) {
 
-        Pattern emailRegex = Pattern.compile("^[^\\s\";@]+@([^.@][^@]+)$");
-        Pattern hostnamePart = Pattern.compile("^(xn-|[a-z0-9]+)(-[a-z0-9]+)*$", Pattern.CASE_INSENSITIVE);
-        Pattern tldPart = Pattern.compile("^([a-z]{2,63}|xn--([a-z0-9]+-)*[a-z0-9]+)$", Pattern.CASE_INSENSITIVE);
-
-        Matcher emailMatcher = emailRegex.matcher(email);
+        Matcher emailMatcher = EMAIL_REGEX_PATTERN.matcher(email);
         if (!emailMatcher.matches()) {
             return false;
         }
 
-        String hostname = emailMatcher.group(1);
-
-        if (hostname.contains("..")) {
+        if (email.contains("..")) {
             return false;
         }
 
+        String localPart = emailMatcher.group(1);
+        if (localPart.startsWith(".") || localPart.endsWith(".")) {
+            return false;
+        }
+
+        String hostname = emailMatcher.group(2);
         try {
             // Each part of the hostname must be < 64 chars.
             hostname = java.net.IDN.toASCII(hostname);
@@ -65,24 +75,19 @@ public class EmailValidator implements Validator {
             return false;
         }
 
-        String[] parts = hostname.split(Pattern.quote("."));
-        int partsLength = parts.length;
+        // Use a limit of -1 to include trailing empty strings.
+        String[] hostnameParts = hostname.split(Pattern.quote("."), -1);
 
-        if (hostname.length() > 253 || partsLength < 2) {
+        if (hostname.length() > 253 || hostnameParts.length < 2) {
             return false;
         }
 
-        for (int i = 0; i < partsLength; i++) {
-            String part = parts[i];
-            if (part == null || part.isEmpty() || part.length() > 63 || !hostnamePart.matcher(part).matches()) {
+        for (String part : hostnameParts) {
+            if (StringUtils.isBlank(part) || part.length() > 63 || !HOSTNAME_PART_PATTERN.matcher(part).matches()) {
                 return false;
             }
         }
 
-        if (!tldPart.matcher(parts[partsLength - 1]).matches()) {
-            return false;
-        }
-
-        return true;
+        return TLD_PART_PATTERN.matcher(hostnameParts[hostnameParts.length - 1]).matches();
     }
 }
