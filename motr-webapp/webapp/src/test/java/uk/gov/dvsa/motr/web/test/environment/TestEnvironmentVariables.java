@@ -5,10 +5,12 @@ import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import uk.gov.dvsa.motr.web.system.SystemVariable;
 
 import static uk.gov.dvsa.motr.web.system.SystemVariable.BASE_URL;
+import static uk.gov.dvsa.motr.web.system.SystemVariable.COOKIE_CIPHER_KEY;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.DO_WARM_UP;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.LOG_LEVEL;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.MOT_TEST_REMINDER_INFO_API_URI;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.MOT_TEST_REMINDER_INFO_TOKEN;
+import static uk.gov.dvsa.motr.web.system.SystemVariable.REGION;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.RELEASE_VERSION;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.STATIC_ASSETS_HASH;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.STATIC_ASSETS_URL;
@@ -27,6 +29,8 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
         warmUpTimeoutSec(10);
         motTestReminderInfoToken("test-token");
         releaseVersion("releaseVersion");
+        cookieCipherKey("chocolateChipCookie");
+        region("region");
     }
 
     public TestEnvironmentVariables assetsUrl(String value) {
@@ -64,6 +68,14 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
     public TestEnvironmentVariables releaseVersion(String value) {
 
         return set(RELEASE_VERSION, value);
+    }
+
+    public TestEnvironmentVariables cookieCipherKey(String value) {
+        return set(COOKIE_CIPHER_KEY, value);
+    }
+
+    public TestEnvironmentVariables region(String value) {
+        return set(REGION, value);
     }
 
     private TestEnvironmentVariables set(SystemVariable var, String value) {

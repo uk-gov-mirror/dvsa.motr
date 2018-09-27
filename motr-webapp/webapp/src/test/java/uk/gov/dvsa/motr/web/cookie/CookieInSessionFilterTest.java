@@ -11,6 +11,7 @@ import java.time.Clock;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
@@ -18,6 +19,7 @@ import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MultivaluedMap;
 
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -31,14 +33,10 @@ public class CookieInSessionFilterTest {
 
     private final String attributeKey = "vrm";
     private final String attributeValue = "TEST-VRM";
-    private final String cookieString = "session=rO0ABXNyACl1ay5nb3YuZHZzYS5tb3RyLndlYi5jb29raWUuQ29va2llU2Vzc2lvbsu1QnSCTN" +
-            "+xAgABTAAKYXR0cmlidXRlc3QAD0xqYXZhL3V0aWwvTWFwO3hwc3IAEWphdmEudXRpbC5IYXNoTWFwBQfawcMWYNEDAAJGAApsb2FkRmFjdG9ySQAJ" +
-            "dGhyZXNob2xkeHA/QAAAAAAADHcIAAAAEAAAAAF0AAN2cm10AAhURVNULVZSTXg=;Version=1;Path=/;Max-Age=1200;Secure;HttpOnly;Expires=Sat," +
+    private final String cookieString = "session=%s;Version=1;Path=/;Max-Age=1200;Secure;HttpOnly;Expires=Sat," +
             " 01 Jan 2000 10:20:00 GMT";
 
-    private final String cookieClearString = "session=rO0ABXNyACl1ay5nb3YuZHZzYS5tb3RyLndlYi5jb29raWUuQ29va2llU2Vzc2lvbsu1QnSCTN" +
-            "+xAgABTAAKYXR0cmlidXRlc3QAD0xqYXZhL3V0aWwvTWFwO3hwc3IAEWphdmEudXRpbC5IYXNoTWFwBQfawcMWYNEDAAJGAApsb2FkRmFjdG9ySQAJ" +
-            "dGhyZXNob2xkeHA/QAAAAAAADHcIAAAAEAAAAAF0AAN2cm10AAhURVNULVZSTXg=;Version=1;Path=/;Max-Age=0;Secure;HttpOnly;Expires=Sat," +
+    private final String cookieClearString = "session=%s;Version=1;Path=/;Max-Age=0;Secure;HttpOnly;Expires=Sat," +
             " 01 Jan 2000 10:00:00 GMT";
 
 
@@ -46,12 +44,14 @@ public class CookieInSessionFilterTest {
 
     private MotrSession motrSession;
     private CookieInSessionFilter cookieInSessionFilter;
+    private CookieCipher cookieCipher;
 
     @Before
     public void setUp() {
 
         motrSession = mock(MotrSession.class);
-        cookieInSessionFilter = new CookieInSessionFilter(motrSession);
+        cookieCipher = mock(CookieCipher.class);
+        cookieInSessionFilter = new CookieInSessionFilter(motrSession, cookieCipher);
         cookieInSessionFilter.setClock(clockReference);
     }
 
@@ -86,8 +86,12 @@ public class CookieInSessionFilterTest {
         Map<String, Cookie> cookies = new HashMap<>();
         cookies.put("session", new Cookie("session", setUpCookieString()));
 
+        CookieSession cookieSession = createCookieSession();
+
         ContainerRequestContext containerRequestContext = mock(ContainerRequestContext.class);
         when(containerRequestContext.getCookies()).thenReturn(cookies);
+        when(cookieCipher.encryptCookie(any())).thenReturn(generateCookieBytes(32));
+        when(cookieCipher.decryptCookie(any())).thenReturn(cookieSession);
 
         cookieInSessionFilter.filter(containerRequestContext);
         verify(motrSession, times(1)).clear();
@@ -100,16 +104,21 @@ public class CookieInSessionFilterTest {
         Map<String, Object> hashMap = new HashMap<>();
         hashMap.put(attributeKey, attributeValue);
         MultivaluedMap<String, Object> headerMap = mock(MultivaluedMap.class);
+        CookieSession cookieSession = createCookieSession();
+        byte[] cookieBytes = generateCookieBytes(32);
 
         ContainerRequestContext containerRequestContext = mock(ContainerRequestContext.class);
         ContainerResponseContext containerResponseContext = mock(ContainerResponseContext.class);
         when(motrSession.getAttributes()).thenReturn(hashMap);
         when(containerResponseContext.getHeaders()).thenReturn(headerMap);
+        when(cookieCipher.encryptCookie(any())).thenReturn(cookieBytes);
+        when(cookieCipher.decryptCookie(any())).thenReturn(cookieSession);
 
         cookieInSessionFilter.filter(containerRequestContext, containerResponseContext);
-        verify(headerMap, times(1)).add(eq("Set-Cookie"), eq(cookieString));
+        String expectedCookieString = String.format(cookieString, Base64.getEncoder().encodeToString(cookieBytes));
+        verify(headerMap, times(1)).add(eq("Set-Cookie"), eq(expectedCookieString));
         verify(motrSession, times(1)).clear();
-        verify(motrSession, times(1)).getAttributes();
+        verify(motrSession, times(2)).getAttributes();
     }
 
     @Test
@@ -118,26 +127,38 @@ public class CookieInSessionFilterTest {
         Map<String, Object> hashMap = new HashMap<>();
         hashMap.put(attributeKey, attributeValue);
         MultivaluedMap<String, Object> headerMap = mock(MultivaluedMap.class);
+        CookieSession cookieSession = new CookieSession();
+        byte[] cookieBytes = generateCookieBytes(32);
 
         ContainerRequestContext containerRequestContext = mock(ContainerRequestContext.class);
         ContainerResponseContext containerResponseContext = mock(ContainerResponseContext.class);
         when(motrSession.getAttributes()).thenReturn(hashMap);
         when(motrSession.isShouldClearCookies()).thenReturn(true);
         when(containerResponseContext.getHeaders()).thenReturn(headerMap);
+        when(cookieCipher.encryptCookie(any())).thenReturn(cookieBytes);
+        when(cookieCipher.decryptCookie(any())).thenReturn(cookieSession);
 
         cookieInSessionFilter.filter(containerRequestContext, containerResponseContext);
-        verify(headerMap, times(1)).add(eq("Set-Cookie"), eq(cookieClearString));
+        String expectedCookieString = String.format(cookieClearString, Base64.getEncoder().encodeToString(cookieBytes));
+        verify(headerMap, times(1)).add(eq("Set-Cookie"), eq(expectedCookieString));
         verify(motrSession, times(2)).isShouldClearCookies();
         verify(motrSession, times(1)).clear();
-        verify(motrSession, times(1)).getAttributes();
+        verify(motrSession, times(2)).getAttributes();
     }
 
     private String setUpCookieString() throws IOException {
 
+        CookieSession cookieSession = createCookieSession();
+
+        return toString(cookieSession);
+    }
+
+    private CookieSession createCookieSession() {
+
         CookieSession cookieSession = new CookieSession();
         cookieSession.setAttribute(attributeKey, attributeValue);
 
-        return toString(cookieSession);
+        return cookieSession;
     }
 
     private String toString(Serializable object) throws IOException {
@@ -147,5 +168,12 @@ public class CookieInSessionFilterTest {
         objectOutputStream.writeObject(object);
         objectOutputStream.close();
         return Base64.getEncoder().encodeToString(byteArrayOutputStream.toByteArray());
+    }
+
+    private byte[] generateCookieBytes(int length) {
+        byte[] cookieBytes = new byte[length];
+        new Random().nextBytes(cookieBytes);
+
+        return cookieBytes;
     }
 }
