@@ -17,15 +17,20 @@ import uk.gov.dvsa.motr.web.system.MotrWebApplication;
  */
 public class MotrWebHandler {
 
-    private final JerseyLambdaContainerHandler<AwsProxyRequest, AwsProxyResponse> handler;
+    protected MotrWebApplication application;
+    private JerseyLambdaContainerHandler<AwsProxyRequest, AwsProxyResponse> handler;
 
     /**
      * Executes once per container instance
      */
     public MotrWebHandler() {
 
-        MotrWebApplication application = new MotrWebApplication();
-        handler = JerseyLambdaContainerHandler.getAwsProxyHandler(application);
+        this(new MotrWebApplication());
+    }
+
+    public MotrWebHandler(MotrWebApplication application) {
+
+        this.application = application;
     }
 
     /**
@@ -39,6 +44,9 @@ public class MotrWebHandler {
     public AwsProxyResponse handleRequest(PingAwareAwsProxyRequest request, Context context) {
 
         try {
+            if (handler == null) {
+                handler = JerseyLambdaContainerHandler.getAwsProxyHandler(application);
+            }
 
             if (request.isPing()) {
                 handler.getApplicationHandler().getServiceLocator().getService(LambdaWarmUp.class).warmUp();

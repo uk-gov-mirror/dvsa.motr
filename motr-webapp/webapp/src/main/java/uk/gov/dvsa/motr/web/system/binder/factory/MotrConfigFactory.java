@@ -16,6 +16,7 @@ import javax.inject.Provider;
 import static org.apache.log4j.Level.toLevel;
 import static org.apache.log4j.Logger.getRootLogger;
 
+import static uk.gov.dvsa.motr.web.system.SystemVariable.COOKIE_CIPHER_KEY;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.GOV_NOTIFY_API_TOKEN;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.LOG_LEVEL;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.MOT_TEST_REMINDER_INFO_TOKEN;
@@ -34,6 +35,7 @@ public class MotrConfigFactory implements BaseFactory<Config> {
         Set<ConfigKey> secretVariables = new HashSet<>();
         secretVariables.add(GOV_NOTIFY_API_TOKEN);
         secretVariables.add(MOT_TEST_REMINDER_INFO_TOKEN);
+        secretVariables.add(COOKIE_CIPHER_KEY);
 
         return secretVariables;
     }

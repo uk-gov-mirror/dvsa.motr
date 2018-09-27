@@ -18,6 +18,7 @@ import java.util.concurrent.Callable;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import static uk.gov.dvsa.motr.web.system.SystemVariable.COOKIE_CIPHER_KEY;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.DO_WARM_UP;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.GOV_NOTIFY_API_TOKEN;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.MOT_TEST_REMINDER_INFO_TOKEN;
@@ -102,6 +103,7 @@ public class LambdaWarmUpBinder extends AbstractBinder {
 
                 config.getValue(MOT_TEST_REMINDER_INFO_TOKEN);
                 config.getValue(GOV_NOTIFY_API_TOKEN);
+                config.getValue(COOKIE_CIPHER_KEY);
 
                 logger.debug("Warming up secret keys - end");
 

@@ -1,17 +1,13 @@
 package uk.gov.dvsa.motr.web.cookie;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.web.eventlog.session.SessionMalformedEvent;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.time.Clock;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -40,12 +36,14 @@ public class CookieInSessionFilter implements ContainerResponseFilter, Container
     private static final Logger logger = LoggerFactory.getLogger(CookieInSessionFilter.class);
     private static final int MAX_COOKIE_AGE_IN_SECONDS = 60 * 20;
     private final MotrSession motrSession;
+    private final CookieCipher cookieCipher;
     private Clock clockReference = Clock.system(ZoneId.of("Europe/London"));
 
     @Inject
-    public CookieInSessionFilter(MotrSession motrSession) {
+    public CookieInSessionFilter(MotrSession motrSession, CookieCipher cookieCipher) {
 
         this.motrSession = motrSession;
+        this.cookieCipher = cookieCipher;
     }
 
     public void setClock(Clock clock) {
@@ -66,28 +64,28 @@ public class CookieInSessionFilter implements ContainerResponseFilter, Container
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
 
-        storeSessionInCookie(requestContext, responseContext);
+        storeSessionInCookie(responseContext);
     }
 
     private void getSessionFromCookie(ContainerRequestContext requestContext) throws IOException, ClassNotFoundException {
 
         Cookie sessionCookie = getSessionCookie(requestContext);
         this.motrSession.clear();
-        if (null != sessionCookie) {
-            CookieSession cookieSession = (CookieSession) fromString(sessionCookie.getValue());
+        if (sessionCookie != null && !StringUtils.isBlank(sessionCookie.getValue())) {
+            CookieSession cookieSession = cookieCipher.decryptCookie(fromString(sessionCookie.getValue()));
             if (cookieSession.getAttributes() != null && !cookieSession.getAttributes().isEmpty()) {
                 cookieSession.getAttributes().forEach(this.motrSession::setAttribute);
             }
         }
     }
 
-    private void storeSessionInCookie(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
+    private void storeSessionInCookie(ContainerResponseContext responseContext) throws IOException {
 
         CookieSession cookieSession = new CookieSession();
         this.motrSession.getAttributes().forEach(cookieSession::setAttribute);
-
+        byte[] encryptedCookieSession = cookieCipher.encryptCookie(cookieSession);
         responseContext.getHeaders().add("Set-Cookie",
-                getSecureHttpOnlyCookieHeader("session", toString(cookieSession)));
+                getSecureHttpOnlyCookieHeader("session", toString(encryptedCookieSession)));
         this.motrSession.clear();
     }
 
@@ -127,22 +125,14 @@ public class CookieInSessionFilter implements ContainerResponseFilter, Container
         return null;
     }
 
-    private String toString(Serializable object) throws IOException {
+    private String toString(byte[] object) {
 
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
-        objectOutputStream.writeObject(object);
-        objectOutputStream.close();
-        return Base64.getEncoder().encodeToString(byteArrayOutputStream.toByteArray());
+        return Base64.getEncoder().encodeToString(object);
     }
 
-    private Object fromString(String string) throws IOException, ClassNotFoundException {
+    private byte[] fromString(String string) {
 
-        byte[] data = Base64.getDecoder().decode(string);
-        ObjectInputStream objectInputStream = new ObjectInputStream(new ByteArrayInputStream(data));
-        Object object = objectInputStream.readObject();
-        objectInputStream.close();
-        return object;
+        return Base64.getDecoder().decode(string);
     }
 
 }
