@@ -145,7 +145,7 @@ public class PendingSubscriptionServiceTest {
     }
 
     @Test
-    public void handleSubscriptionWithExistingSubscriptionWillUpdateMotExpiryDate() throws Exception {
+    public void handleSubscriptionWithExistingSubscriptionWillUpdateTestDueDateAndVehicleType() throws Exception {
 
         String originalEmail = EMAIL;
         String newEmailWithDifferentCase = originalEmail.toUpperCase();
@@ -156,10 +156,11 @@ public class PendingSubscriptionServiceTest {
 
         ContactDetail contactDetail = new ContactDetail(newEmailWithDifferentCase, CONTACT_TYPE_EMAIL);
         PendingSubscriptionServiceResponse pendingSubscriptionResponse = this.subscriptionService.handlePendingSubscriptionCreation(
-                TEST_VRM, contactDetail, date, new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID), VehicleType.MOT);
+                TEST_VRM, contactDetail, date, new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID), VehicleType.PSV);
 
         verify(subscriptionRepository, times(1)).save(subscriptionArgumentCaptor.capture());
         assertEquals(subscriptionArgumentCaptor.getValue().getMotDueDate(), date);
+        assertEquals(subscriptionArgumentCaptor.getValue().getVehicleType(), VehicleType.PSV);
         assertEquals(EMAIL_ALREADY_CONFIRMED_LINK, pendingSubscriptionResponse.getRedirectUri());
         assertNull(pendingSubscriptionResponse.getConfirmationId());
         verifyZeroInteractions(pendingSubscriptionRepository);
@@ -173,10 +174,11 @@ public class PendingSubscriptionServiceTest {
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
 
         PendingSubscriptionServiceResponse pendingSubscriptionResponse = this.subscriptionService.handlePendingSubscriptionCreation(
-                TEST_VRM, CONTACT_MOBILE, date, new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID), VehicleType.MOT);
+                TEST_VRM, CONTACT_MOBILE, date, new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID), VehicleType.PSV);
 
         verify(subscriptionRepository, times(1)).save(subscriptionArgumentCaptor.capture());
         assertEquals(subscriptionArgumentCaptor.getValue().getMotDueDate(), date);
+        assertEquals(subscriptionArgumentCaptor.getValue().getVehicleType(), VehicleType.PSV);
         assertEquals(PHONE_ALREADY_CONFIRMED_LINK, pendingSubscriptionResponse.getRedirectUri());
         assertNull(pendingSubscriptionResponse.getConfirmationId());
         verifyZeroInteractions(pendingSubscriptionRepository);

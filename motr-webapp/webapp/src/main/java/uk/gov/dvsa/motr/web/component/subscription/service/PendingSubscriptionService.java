@@ -62,7 +62,8 @@ public class PendingSubscriptionService {
         PendingSubscriptionServiceResponse pendingSubscriptionResponse = new PendingSubscriptionServiceResponse();
 
         if (subscription.isPresent()) {
-            return getRedirectUrlWhenSubscriptionAlreadyExisis(subscription.get(), motDueDate, contactType, pendingSubscriptionResponse);
+            updateSubscriptionVehicleData(subscription.get(), motDueDate, vehicleType);
+            return getRedirectUrlWhenSubscriptionAlreadyExisis(contactType, pendingSubscriptionResponse);
         } else {
             return getRedirectUrlWhenNewSubscription(vrm, contact, motDueDate, motIdentification,
                     contactType, pendingSubscriptionResponse, vehicleType);
@@ -70,11 +71,8 @@ public class PendingSubscriptionService {
     }
 
     private PendingSubscriptionServiceResponse getRedirectUrlWhenSubscriptionAlreadyExisis(
-            Subscription subscription, LocalDate motDueDate,
             Subscription.ContactType contactType,
             PendingSubscriptionServiceResponse pendingSubscriptionResponse) {
-
-        updateSubscriptionMotDueDate(subscription, motDueDate);
 
         String redirectUri = (contactType == Subscription.ContactType.EMAIL
                 ? urlHelper.emailConfirmedNthTimeLink() : urlHelper.phoneConfirmedNthTimeLink());
@@ -155,9 +153,9 @@ public class PendingSubscriptionService {
         }
     }
 
-    private Subscription updateSubscriptionMotDueDate(Subscription subscription, LocalDate motDueDate) {
-
+    private Subscription updateSubscriptionVehicleData(Subscription subscription, LocalDate motDueDate, VehicleType vehicleType) {
         subscription.setMotDueDate(motDueDate);
+        subscription.setVehicleType(vehicleType);
         subscriptionRepository.save(subscription);
 
         return subscription;
