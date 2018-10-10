@@ -37,7 +37,7 @@ public class AesCipher {
 
         byte[] iv = createInitializationVector();
 
-        final Cipher cipher = getCipher(iv, Cipher.ENCRYPT_MODE);
+        cipher = getCipher(iv, Cipher.ENCRYPT_MODE);
 
         byte[] cipherText;
         try {
@@ -55,7 +55,7 @@ public class AesCipher {
         byte[] iv = getInitializationVectorFromCipherMessage(byteBuffer);
         byte[] cipherText = getEncryptedTextFromCipherMessage(byteBuffer);
 
-        final Cipher cipher = getCipher(iv, Cipher.DECRYPT_MODE);
+        cipher = getCipher(iv, Cipher.DECRYPT_MODE);
 
         byte[] decryptedText;
         decryptedText = cipher.doFinal(cipherText);

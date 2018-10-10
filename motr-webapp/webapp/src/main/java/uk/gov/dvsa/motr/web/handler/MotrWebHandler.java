@@ -18,19 +18,14 @@ import uk.gov.dvsa.motr.web.system.MotrWebApplication;
 public class MotrWebHandler {
 
     protected MotrWebApplication application;
-    private JerseyLambdaContainerHandler<AwsProxyRequest, AwsProxyResponse> handler;
+    private static JerseyLambdaContainerHandler<AwsProxyRequest, AwsProxyResponse> handler;
 
     /**
      * Executes once per container instance
      */
     public MotrWebHandler() {
 
-        this(new MotrWebApplication());
-    }
-
-    public MotrWebHandler(MotrWebApplication application) {
-
-        this.application = application;
+        application = new MotrWebApplication();
     }
 
     /**
