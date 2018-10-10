@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import java.nio.ByteBuffer;
 import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.function.Supplier;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -32,10 +33,10 @@ public class AesCipher {
 
     private static final Logger logger = LoggerFactory.getLogger(AesCipher.class);
 
-    public AesCipher(String cipherKey) {
+    public AesCipher(Supplier<String> cipherKey) {
         logger.info("AesCipher - konstruktor");
 
-        byte[] decodedCipherKey = Base64.getDecoder().decode(cipherKey);
+        byte[] decodedCipherKey = Base64.getDecoder().decode(cipherKey.get());
         secretKey = new SecretKeySpec(decodedCipherKey, 0, decodedCipherKey.length, "AES");
         logger.info("AesCipher - konstruktor po utworzeniu secretKey");
     }

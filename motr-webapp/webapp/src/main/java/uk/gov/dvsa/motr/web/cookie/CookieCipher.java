@@ -12,6 +12,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.function.Supplier;
 
 /**
  * Encrypts and decrypts CookieSession object using AES GCM cipher.
@@ -20,7 +21,7 @@ public class CookieCipher extends AesCipher {
 
     private static final Logger logger = LoggerFactory.getLogger(CookieCipher.class);
 
-    public CookieCipher(String secretKey) {
+    public CookieCipher(Supplier<String> secretKey) {
         super(secretKey);
 
         logger.info("CookieCipher - konstruktor");

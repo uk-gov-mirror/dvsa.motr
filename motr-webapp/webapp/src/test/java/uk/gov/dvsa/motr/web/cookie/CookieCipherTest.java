@@ -29,7 +29,7 @@ public class CookieCipherTest {
         SecretKey secretKey = new SecretKeySpec(key, "AES");
         String encodedKey = Base64.getEncoder().encodeToString(secretKey.getEncoded());
 
-        cookieCipher = new CookieCipher(encodedKey);
+        cookieCipher = new CookieCipher(()-> encodedKey);
     }
 
     @Test

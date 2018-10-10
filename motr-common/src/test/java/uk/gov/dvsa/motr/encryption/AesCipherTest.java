@@ -28,7 +28,7 @@ public class AesCipherTest {
         SecretKey secretKey = new SecretKeySpec(key, "AES");
         String encodedKey = Base64.getEncoder().encodeToString(secretKey.getEncoded());
 
-        aesCipher = new AesCipher(encodedKey);
+        aesCipher = new AesCipher(() -> encodedKey);
     }
 
     @Test

@@ -21,6 +21,6 @@ public class MockCookieCipherFactory implements BaseFactory<AesCipher> {
         SecretKey secretKey = new SecretKeySpec(key, "AES");
         String encodedKey = Base64.getEncoder().encodeToString(secretKey.getEncoded());
 
-        return new CookieCipher(encodedKey);
+        return new CookieCipher(()->encodedKey);
     }
 }
