@@ -69,6 +69,8 @@ public class CookieInSessionFilter implements ContainerResponseFilter, Container
 
     private void getSessionFromCookie(ContainerRequestContext requestContext) throws IOException, ClassNotFoundException {
 
+        logger.info("CookieInSessionFilter - getSession");
+
         Cookie sessionCookie = getSessionCookie(requestContext);
         this.motrSession.clear();
         if (sessionCookie != null && !StringUtils.isBlank(sessionCookie.getValue())) {
@@ -77,16 +79,20 @@ public class CookieInSessionFilter implements ContainerResponseFilter, Container
                 cookieSession.getAttributes().forEach(this.motrSession::setAttribute);
             }
         }
+        logger.info("CookieInSessionFilter - getSession koniec");
+
     }
 
     private void storeSessionInCookie(ContainerResponseContext responseContext) throws IOException {
 
+        logger.info("CookieInSessionFilter - storeSession");
         CookieSession cookieSession = new CookieSession();
         this.motrSession.getAttributes().forEach(cookieSession::setAttribute);
         byte[] encryptedCookieSession = cookieCipher.encryptCookie(cookieSession);
         responseContext.getHeaders().add("Set-Cookie",
                 getSecureHttpOnlyCookieHeader("session", toString(encryptedCookieSession)));
         this.motrSession.clear();
+        logger.info("CookieInSessionFilter - storeSession koniec");
     }
 
     private String getSecureHttpOnlyCookieHeader(String key, Object value) {

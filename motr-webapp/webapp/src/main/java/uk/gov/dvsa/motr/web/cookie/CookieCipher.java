@@ -1,5 +1,8 @@
 package uk.gov.dvsa.motr.web.cookie;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import uk.gov.dvsa.motr.encryption.AesCipher;
 import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.web.eventlog.session.SessionDecryptionFailedEvent;
@@ -15,11 +18,17 @@ import java.io.ObjectOutputStream;
  */
 public class CookieCipher extends AesCipher {
 
+    private static final Logger logger = LoggerFactory.getLogger(CookieCipher.class);
+
     public CookieCipher(String secretKey) {
         super(secretKey);
+
+        logger.info("CookieCipher - konstruktor");
     }
 
     public byte[] encryptCookie(CookieSession cookieSession) throws IOException {
+
+        logger.info("CookieCipher - encrypt");
 
         return encrypt(toByteArray(cookieSession));
     }

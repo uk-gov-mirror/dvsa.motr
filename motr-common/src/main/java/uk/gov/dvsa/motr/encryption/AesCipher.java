@@ -1,5 +1,8 @@
 package uk.gov.dvsa.motr.encryption;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.nio.ByteBuffer;
 import java.security.SecureRandom;
 import java.util.Base64;
@@ -27,13 +30,18 @@ public class AesCipher {
     private final SecretKey secretKey;
     private Cipher cipher;
 
+    private static final Logger logger = LoggerFactory.getLogger(AesCipher.class);
+
     public AesCipher(String cipherKey) {
+        logger.info("AesCipher - konstruktor");
 
         byte[] decodedCipherKey = Base64.getDecoder().decode(cipherKey);
         secretKey = new SecretKeySpec(decodedCipherKey, 0, decodedCipherKey.length, "AES");
+        logger.info("AesCipher - konstruktor po utworzeniu secretKey");
     }
 
     public byte[] encrypt(byte[] plainText) {
+        logger.info("AesCipher - encrypt");
 
         byte[] iv = createInitializationVector();
 
@@ -94,6 +102,8 @@ public class AesCipher {
         byteBuffer.putInt(iv.length);
         byteBuffer.put(iv);
         byteBuffer.put(cipherText);
+
+        logger.info("AesCipher - encrypt koniec");
 
         return byteBuffer.array();
     }

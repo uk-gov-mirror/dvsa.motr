@@ -103,7 +103,6 @@ public class LambdaWarmUpBinder extends AbstractBinder {
 
                 config.getValue(MOT_TEST_REMINDER_INFO_TOKEN);
                 config.getValue(GOV_NOTIFY_API_TOKEN);
-                config.getValue(COOKIE_CIPHER_KEY);
 
                 logger.debug("Warming up secret keys - end");
 

@@ -31,14 +31,20 @@ public class AwsKmsDecryptor implements Decryptor {
     @Override
     public String decrypt(String encryptedValue) {
 
+        logger.info("AwsKmsDecryptor - decrypt");
+
         if (!isEncrypted(encryptedValue)) {
             logger.info("Value {} marked as plain-text. Not decrypting.", encryptedValue);
             return encryptedValue.replace(PLAINTEXT_SECRET_PREFIX, "");
         }
+        logger.info("AwsKmsDecryptor - decrypt po ifie");
 
         AWSKMS kms = getKmsClient();
+        logger.info("AwsKmsDecryptor - po getKmsClient");
+
         ByteBuffer encryptedBlob = ByteBuffer.wrap(Base64.getDecoder().decode(encryptedValue));
         DecryptResult result = kms.decrypt(new DecryptRequest().withCiphertextBlob(encryptedBlob));
+        logger.info("AwsKmsDecryptor - po decrypcie");
 
         return new String(result.getPlaintext().array());
     }

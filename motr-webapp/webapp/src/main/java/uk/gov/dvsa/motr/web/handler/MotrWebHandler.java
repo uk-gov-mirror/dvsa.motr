@@ -5,6 +5,9 @@ import com.amazonaws.serverless.proxy.internal.model.AwsProxyResponse;
 import com.amazonaws.serverless.proxy.jersey.JerseyLambdaContainerHandler;
 import com.amazonaws.services.lambda.runtime.Context;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.web.eventlog.PingEvent;
 import uk.gov.dvsa.motr.web.performance.ColdStartMarker;
@@ -17,6 +20,8 @@ import uk.gov.dvsa.motr.web.system.MotrWebApplication;
  */
 public class MotrWebHandler {
 
+    private static final Logger logger = LoggerFactory.getLogger(MotrWebHandler.class);
+
     protected MotrWebApplication application;
     private static JerseyLambdaContainerHandler<AwsProxyRequest, AwsProxyResponse> handler;
 
@@ -24,8 +29,9 @@ public class MotrWebHandler {
      * Executes once per container instance
      */
     public MotrWebHandler() {
-
+        logger.info("MotrWebHandler - konstruktor");
         application = new MotrWebApplication();
+        logger.info("MotrWebHandler - konstruktor po utworzeniu aplikacji");
     }
 
     /**
@@ -39,9 +45,11 @@ public class MotrWebHandler {
     public AwsProxyResponse handleRequest(PingAwareAwsProxyRequest request, Context context) {
 
         try {
+            logger.info("MotrWebHandler - handleRequest");
             if (handler == null) {
                 handler = JerseyLambdaContainerHandler.getAwsProxyHandler(application);
             }
+            logger.info("MotrWebHandler - handleRequest po utworzeniu handlera");
 
             if (request.isPing()) {
                 handler.getApplicationHandler().getServiceLocator().getService(LambdaWarmUp.class).warmUp();
@@ -49,9 +57,13 @@ public class MotrWebHandler {
                 return null;
             }
 
+            logger.info("MotrWebHandler - handleRequest przed proxowaniem requestu");
+
             return handler.proxy(request, context);
 
         } finally {
+            logger.info("MotrWebHandler - handleRequest po proxowaniu requestu");
+
             ColdStartMarker.unmark();
         }
     }
