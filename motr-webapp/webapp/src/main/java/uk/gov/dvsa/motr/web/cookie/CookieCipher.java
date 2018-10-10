@@ -17,11 +17,11 @@ import java.util.function.Supplier;
 /**
  * Encrypts and decrypts CookieSession object using AES GCM cipher.
  */
-public class CookieCipher extends AesCipher {
+public class CookieCipher extends AesCipher implements CookieCipherInterface {
 
     private static final Logger logger = LoggerFactory.getLogger(CookieCipher.class);
 
-    public CookieCipher(Supplier<String> secretKey) {
+    public CookieCipher(String secretKey) {
         super(secretKey);
 
         logger.info("CookieCipher - konstruktor");

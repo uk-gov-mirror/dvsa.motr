@@ -35,7 +35,7 @@ public class MotrConfigFactory implements BaseFactory<Config> {
         Set<ConfigKey> secretVariables = new HashSet<>();
         secretVariables.add(GOV_NOTIFY_API_TOKEN);
         secretVariables.add(MOT_TEST_REMINDER_INFO_TOKEN);
-        secretVariables.add(COOKIE_CIPHER_KEY);
+//        secretVariables.add(COOKIE_CIPHER_KEY);
 
         return secretVariables;
     }
