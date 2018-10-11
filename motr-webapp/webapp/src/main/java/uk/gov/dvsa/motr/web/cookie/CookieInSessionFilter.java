@@ -82,13 +82,14 @@ public class CookieInSessionFilter implements ContainerResponseFilter, Container
     }
 
     private void storeSessionInCookie(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
-
+        logger.info("CookieInSessionFilter - storeSession");
         CookieSession cookieSession = new CookieSession();
         this.motrSession.getAttributes().forEach(cookieSession::setAttribute);
 
         responseContext.getHeaders().add("Set-Cookie",
                 getSecureHttpOnlyCookieHeader("session", toString(cookieSession)));
         this.motrSession.clear();
+        logger.info("CookieInSessionFilter - storeSession koniec");
     }
 
     private String getSecureHttpOnlyCookieHeader(String key, Object value) {
