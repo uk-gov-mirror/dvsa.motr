@@ -11,6 +11,7 @@ import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.runner.RunWith;
 
 import uk.gov.dvsa.motr.web.performance.warmup.PingAwareAwsProxyRequest;
+import uk.gov.dvsa.motr.web.test.TestMotrWebHandler;
 import uk.gov.dvsa.motr.web.test.aws.TestLambdaContext;
 import uk.gov.dvsa.motr.web.test.environment.TestEnvironmentVariables;
 
@@ -22,7 +23,7 @@ public class MotrWebHandlerNotFoundTest {
     @Rule
     public final EnvironmentVariables environmentVariables = new TestEnvironmentVariables();
 
-    private final MotrWebHandler handler = new MotrWebHandler();
+    private final MotrWebHandler handler = new TestMotrWebHandler();
 
     @DataProvider
     public static Object[][] notFoundResources() {

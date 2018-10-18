@@ -17,7 +17,7 @@ import uk.gov.dvsa.motr.web.system.MotrWebApplication;
  */
 public class MotrWebHandler {
 
-    private final JerseyLambdaContainerHandler<AwsProxyRequest, AwsProxyResponse> handler;
+    private static JerseyLambdaContainerHandler<AwsProxyRequest, AwsProxyResponse> handler;
 
     /**
      * Executes once per container instance
@@ -25,6 +25,7 @@ public class MotrWebHandler {
     public MotrWebHandler() {
 
         MotrWebApplication application = new MotrWebApplication();
+        configureApplication(application);
         handler = JerseyLambdaContainerHandler.getAwsProxyHandler(application);
     }
 
@@ -51,5 +52,9 @@ public class MotrWebHandler {
         } finally {
             ColdStartMarker.unmark();
         }
+    }
+
+    protected void configureApplication(MotrWebApplication application) {
+
     }
 }

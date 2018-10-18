@@ -76,7 +76,7 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
     }
 
     public static String gaTracingId() {
-        return lookupProperty("test.notify.ga.tracking.id");
+        return lookupProperty("test.notify.ga.tracing.id");
     }
 
     private static String lookupProperty(String property) {
