@@ -8,6 +8,8 @@ import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.web.eventlog.session.SessionMalformedEvent;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.Clock;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -16,13 +18,13 @@ import java.util.Date;
 import java.util.Map;
 
 import javax.inject.Inject;
-import javax.ws.rs.NotFoundException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.NewCookie;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
@@ -57,7 +59,12 @@ public class CookieInSessionFilter implements ContainerResponseFilter, Container
             getSessionFromCookie(requestContext);
         } catch (Exception e) {
             EventLogger.logErrorEvent(new SessionMalformedEvent(), e);
-            throw new NotFoundException();
+
+            try {
+                redirectToCookieErrorPageWithValidCookie(requestContext);
+            } catch (URISyntaxException | IOException exception) {
+                logger.debug("Could not redirect to /cookie-error on corrupted cookie: " + exception.toString());
+            }
         }
     }
 
@@ -65,6 +72,27 @@ public class CookieInSessionFilter implements ContainerResponseFilter, Container
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
 
         storeSessionInCookie(responseContext);
+    }
+
+    /**
+     * Creates a temporary, uncorrupted cookie to replace the corrupt one,
+     * then redirects to start page which will recreate the session cookie.
+     * @param requestContext
+     * @throws IOException
+     * @throws URISyntaxException
+     */
+    private void redirectToCookieErrorPageWithValidCookie(ContainerRequestContext requestContext) throws IOException, URISyntaxException {
+
+        this.motrSession.clear();
+        this.motrSession.setAttribute("dummy", "value");
+        this.motrSession.setShouldClearCookies(true);
+
+        CookieSession cookieSession = new CookieSession();
+        this.motrSession.getAttributes().forEach(cookieSession::setAttribute);
+        byte[] encryptedCookieSession = cookieCipher.encryptCookie(cookieSession);
+        Response response = Response.status(Response.Status.FOUND).location(new URI("cookie-error")).build();
+        response.getHeaders().add("Set-Cookie", getSecureHttpOnlyCookieHeader("session", encryptedCookieSession));
+        requestContext.abortWith(response);
     }
 
     private void getSessionFromCookie(ContainerRequestContext requestContext) throws IOException, ClassNotFoundException {
