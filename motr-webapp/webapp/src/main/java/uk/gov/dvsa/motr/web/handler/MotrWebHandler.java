@@ -10,7 +10,6 @@ import uk.gov.dvsa.motr.web.eventlog.PingEvent;
 import uk.gov.dvsa.motr.web.performance.ColdStartMarker;
 import uk.gov.dvsa.motr.web.performance.warmup.LambdaWarmUp;
 import uk.gov.dvsa.motr.web.performance.warmup.PingAwareAwsProxyRequest;
-import uk.gov.dvsa.motr.web.resource.ReviewResource;
 import uk.gov.dvsa.motr.web.system.MotrWebApplication;
 
 /**
@@ -19,7 +18,6 @@ import uk.gov.dvsa.motr.web.system.MotrWebApplication;
 public class MotrWebHandler {
 
     private static JerseyLambdaContainerHandler<AwsProxyRequest, AwsProxyResponse> handler;
-    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(MotrWebHandler.class);
 
     /**
      * Executes once per container instance
@@ -41,8 +39,6 @@ public class MotrWebHandler {
      */
     public AwsProxyResponse handleRequest(PingAwareAwsProxyRequest request, Context context) {
 
-        logger.error(request.getHeaders().toString());
-        
         try {
 
             if (request.isPing()) {
