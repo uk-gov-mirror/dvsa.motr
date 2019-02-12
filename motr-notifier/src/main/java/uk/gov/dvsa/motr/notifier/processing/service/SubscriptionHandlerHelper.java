@@ -1,5 +1,7 @@
 package uk.gov.dvsa.motr.notifier.processing.service;
 
+import uk.gov.dvsa.motr.notify.PreservationDateChecker;
+
 import java.time.LocalDate;
 
 /**
@@ -9,7 +11,7 @@ public class SubscriptionHandlerHelper {
 
     private static final int MONTHS_BEFORE_DELETION = 59;
     private static final int TWO_MONTHS_AHEAD_NOTIFICATION_TIME_DAYS = 60;
-    private static final int ONE_MONTH_AHEAD_NOTIFICATION_TIME_DAYS = 30;
+    private static final int ONE_MONTH_AHEAD_NOTIFICATION_TIME_MONTHS = 1;
     private static final int TWO_WEEKS_AHEAD_NOTIFICATION_TIME_DAYS = 14;
     private static final int ONE_DAY_AFTER_NOTIFICATION_TIME_DAYS = -1;
 
@@ -25,7 +27,20 @@ public class SubscriptionHandlerHelper {
 
     public static boolean oneMonthNotificationRequired(LocalDate requestDate, LocalDate vehicleDetailsMotExpiryDate) {
 
-        return requestDate.plusDays(ONE_MONTH_AHEAD_NOTIFICATION_TIME_DAYS).equals(vehicleDetailsMotExpiryDate);
+        if (PreservationDateChecker.dateIs29February(requestDate)) {
+            return isExpiryDateCorrectFor29February(requestDate, vehicleDetailsMotExpiryDate);
+        }
+
+        if (PreservationDateChecker.dateIs28FebruaryButNotLeapYear(requestDate)) {
+            return isExpiryDateCorrectFor28February(requestDate, vehicleDetailsMotExpiryDate);
+        }
+
+        if (PreservationDateChecker.expiryMonthIsLongerThanPreviousMonthButNotMarch(requestDate)) {
+            return isExpiryDateCorrectForMonthsLongerThanPreviousMonthsButNotMarch(requestDate, vehicleDetailsMotExpiryDate);
+        }
+
+        return PreservationDateChecker.isValidPreservationDate(requestDate)
+                && requestDate.plusMonths(ONE_MONTH_AHEAD_NOTIFICATION_TIME_MONTHS).equals(vehicleDetailsMotExpiryDate);
     }
 
     public static boolean twoWeekNotificationRequired(LocalDate requestDate, LocalDate vehicleDetailsMotExpiryDate) {
@@ -54,5 +69,28 @@ public class SubscriptionHandlerHelper {
 
         LocalDate deletionDate = vehicleMotExpiryDate.plusMonths(MONTHS_BEFORE_DELETION);
         return (requestDate.isAfter(deletionDate) || requestDate.isEqual(deletionDate));
+    }
+
+    private static boolean isExpiryDateCorrectFor29February(LocalDate requestDate, LocalDate vehicleDetailsMotExpiryDate) {
+        return (requestDate.plusMonths(1).equals(vehicleDetailsMotExpiryDate)
+                || requestDate.plusDays(31).equals(vehicleDetailsMotExpiryDate)
+                || requestDate.plusDays(30).equals(vehicleDetailsMotExpiryDate)
+            );
+    }
+
+    private static boolean isExpiryDateCorrectFor28February(LocalDate requestDate, LocalDate vehicleDetailsMotExpiryDate) {
+        return (requestDate.plusMonths(1).equals(vehicleDetailsMotExpiryDate)
+                || requestDate.plusDays(31).equals(vehicleDetailsMotExpiryDate)
+                || requestDate.plusDays(30).equals(vehicleDetailsMotExpiryDate)
+                || requestDate.plusDays(29).equals(vehicleDetailsMotExpiryDate)
+            );
+    }
+
+    private static boolean isExpiryDateCorrectForMonthsLongerThanPreviousMonthsButNotMarch(
+            LocalDate requestDate,
+            LocalDate vehicleDetailsMotExpiryDate) {
+        return (requestDate.plusMonths(1).equals(vehicleDetailsMotExpiryDate)
+                || requestDate.plusDays(31).equals(vehicleDetailsMotExpiryDate)
+            );
     }
 }

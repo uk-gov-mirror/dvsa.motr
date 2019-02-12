@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.dvsa.motr.eventlog.EventLogger;
+import uk.gov.dvsa.motr.notify.PreservationDateChecker;
 import uk.gov.dvsa.motr.subscriptionloader.event.ItemSuccess;
 import uk.gov.dvsa.motr.subscriptionloader.event.LoadingError;
 import uk.gov.dvsa.motr.subscriptionloader.event.LoadingSuccess;
@@ -20,8 +21,8 @@ import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -30,10 +31,13 @@ public class DefaultLoader implements Loader {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultLoader.class.getSimpleName());
 
-    private static final int ONE_MONTH_AHEAD_NOTIFICATION_TIME_DAYS = 30;
+    private static final int ONE_MONTH_AHEAD_NOTIFICATION_TIME_MONTH = 1;
     private static final int TWO_WEEKS_AHEAD_NOTIFICATION_TIME_DAYS = 14;
     private static final int ONE_DAY_AFTER_NOTIFICATION_TIME_DAYS = -1;
     private static final int TWO_MONTHS_AHEAD_NOTIFICATION_TIME_DAYS = 60;
+    private static final int ONE_MONTH_AHEAD_NOTIFICATION_TIME_29_DAYS = 29;
+    private static final int ONE_MONTH_AHEAD_NOTIFICATION_TIME_30_DAYS = 30;
+    private static final int ONE_MONTH_AHEAD_NOTIFICATION_TIME_31_DAYS = 31;
 
     /**
      * Time in milliseconds used define a threshold beyond which execution has timed out.
@@ -87,24 +91,35 @@ public class DefaultLoader implements Loader {
 
     private Iterator<Subscription> loadSubscriptions(LocalDate referenceDate) {
         LocalDate inTwoMonths = referenceDate.plusDays(TWO_MONTHS_AHEAD_NOTIFICATION_TIME_DAYS);
-        LocalDate inOneMonth = referenceDate.plusDays(ONE_MONTH_AHEAD_NOTIFICATION_TIME_DAYS);
+        LocalDate inOneMonth = referenceDate.plusMonths(ONE_MONTH_AHEAD_NOTIFICATION_TIME_MONTH);
         LocalDate inTwoWeeks = referenceDate.plusDays(TWO_WEEKS_AHEAD_NOTIFICATION_TIME_DAYS);
         LocalDate yesterday = referenceDate.plusDays(ONE_DAY_AFTER_NOTIFICATION_TIME_DAYS);
 
-        logger.info("Reference date: {}, +14 days is {}, +1 month (30 days) is {}, +2 months (60 days) is {}, -1 day is {}",
+        logger.info("Reference date: {}, +14 days is {}, +1 month is {}, +2 months (60 days) is {}, -1 day is {}",
                 referenceDate, inTwoWeeks, inOneMonth, inTwoMonths, yesterday);
 
-        List<SubscriptionCriteria> criteria = Arrays.asList(
-                new SubscriptionCriteria(inOneMonth, VehicleType.MOT),
-                new SubscriptionCriteria(inTwoWeeks, VehicleType.MOT),
-                new SubscriptionCriteria(yesterday, VehicleType.MOT),
-                new SubscriptionCriteria(inTwoMonths, VehicleType.HGV),
-                new SubscriptionCriteria(inOneMonth, VehicleType.HGV),
-                new SubscriptionCriteria(inTwoMonths, VehicleType.PSV),
-                new SubscriptionCriteria(inOneMonth, VehicleType.PSV),
-                new SubscriptionCriteria(inTwoMonths, VehicleType.TRAILER),
-                new SubscriptionCriteria(inOneMonth, VehicleType.TRAILER)
-        );
+        LinkedList<SubscriptionCriteria> criteria = new LinkedList<>();
+        criteria.add(new SubscriptionCriteria(inTwoWeeks, VehicleType.MOT));
+        criteria.add(new SubscriptionCriteria(yesterday, VehicleType.MOT));
+        criteria.add(new SubscriptionCriteria(inTwoMonths, VehicleType.HGV));
+        criteria.add(new SubscriptionCriteria(inTwoMonths, VehicleType.PSV));
+        criteria.add(new SubscriptionCriteria(inTwoMonths, VehicleType.TRAILER));
+
+        if (PreservationDateChecker.dateIs29February(referenceDate)) {
+            return producer.searchSubscriptions(getCriteria29February(referenceDate, criteria));
+        }
+
+        if (PreservationDateChecker.dateIs28FebruaryButNotLeapYear(referenceDate)) {
+            return producer.searchSubscriptions(getCriteria28FebruaryNotLeapYear(referenceDate, criteria));
+        }
+
+        if (PreservationDateChecker.expiryMonthIsLongerThanPreviousMonthButNotMarch(referenceDate)) {
+            return producer.searchSubscriptions(getCriteriaShortMonth(referenceDate, criteria));
+        }
+
+        if (PreservationDateChecker.isValidPreservationDate(referenceDate)) {
+            return producer.searchSubscriptions(getCriteriaWithOneMonthNotification(referenceDate, criteria));
+        }
 
         return producer.searchSubscriptions(criteria);
     }
@@ -195,5 +210,98 @@ public class DefaultLoader implements Loader {
             event.setDvlaId(subscription.getDvlaId());
         }
         EventLogger.logEvent(event);
+    }
+
+    private LinkedList<SubscriptionCriteria> getCriteriaWithOneMonthNotification(
+            LocalDate referenceDate,
+            LinkedList<SubscriptionCriteria> criteria) {
+
+        criteria = this.addOneMonthCriteria(referenceDate, criteria);
+
+        return criteria;
+    }
+
+    private LinkedList<SubscriptionCriteria> getCriteriaShortMonth(LocalDate referenceDate, LinkedList<SubscriptionCriteria> criteria) {
+
+        criteria = this.addOneMonthCriteria(referenceDate, criteria);
+        criteria = this.add31DayCriteria(referenceDate, criteria);
+
+        return criteria;
+    }
+
+    private LinkedList<SubscriptionCriteria> getCriteria29February(
+            LocalDate referenceDate,
+            LinkedList<SubscriptionCriteria> criteria) {
+
+        criteria = this.addOneMonthCriteria(referenceDate, criteria);
+        criteria = this.add31DayCriteria(referenceDate, criteria);
+        criteria = this.add30DayCriteria(referenceDate, criteria);
+
+        return criteria;
+
+    }
+
+    private LinkedList<SubscriptionCriteria> getCriteria28FebruaryNotLeapYear(
+            LocalDate referenceDate,
+            LinkedList<SubscriptionCriteria> criteria) {
+
+        criteria = this.addOneMonthCriteria(referenceDate, criteria);
+        criteria = this.add31DayCriteria(referenceDate, criteria);
+        criteria = this.add30DayCriteria(referenceDate, criteria);
+        criteria = this.add29DayCriteria(referenceDate, criteria);
+
+        return criteria;
+    }
+
+    private LinkedList<SubscriptionCriteria> add29DayCriteria(
+            LocalDate referenceDate,
+            LinkedList<SubscriptionCriteria> criteria) {
+        LocalDate in29Days = referenceDate.plusDays(ONE_MONTH_AHEAD_NOTIFICATION_TIME_29_DAYS);
+
+        criteria.add(new SubscriptionCriteria(in29Days, VehicleType.MOT));
+        criteria.add(new SubscriptionCriteria(in29Days, VehicleType.HGV));
+        criteria.add(new SubscriptionCriteria(in29Days, VehicleType.PSV));
+        criteria.add(new SubscriptionCriteria(in29Days, VehicleType.TRAILER));
+
+        return criteria;
+    }
+
+    private LinkedList<SubscriptionCriteria> add30DayCriteria(
+            LocalDate referenceDate,
+            LinkedList<SubscriptionCriteria> criteria) {
+        LocalDate in30Days = referenceDate.plusDays(ONE_MONTH_AHEAD_NOTIFICATION_TIME_30_DAYS);
+
+        criteria.add(new SubscriptionCriteria(in30Days, VehicleType.MOT));
+        criteria.add(new SubscriptionCriteria(in30Days, VehicleType.HGV));
+        criteria.add(new SubscriptionCriteria(in30Days, VehicleType.PSV));
+        criteria.add(new SubscriptionCriteria(in30Days, VehicleType.TRAILER));
+
+        return criteria;
+    }
+
+    private LinkedList<SubscriptionCriteria> add31DayCriteria(
+            LocalDate referenceDate,
+            LinkedList<SubscriptionCriteria> criteria) {
+        LocalDate in31Days = referenceDate.plusDays(ONE_MONTH_AHEAD_NOTIFICATION_TIME_31_DAYS);
+
+        criteria.add(new SubscriptionCriteria(in31Days, VehicleType.MOT));
+        criteria.add(new SubscriptionCriteria(in31Days, VehicleType.HGV));
+        criteria.add(new SubscriptionCriteria(in31Days, VehicleType.PSV));
+        criteria.add(new SubscriptionCriteria(in31Days, VehicleType.TRAILER));
+
+        return criteria;
+    }
+
+    private LinkedList<SubscriptionCriteria> addOneMonthCriteria(
+            LocalDate referenceDate,
+            LinkedList<SubscriptionCriteria> criteria) {
+        LocalDate inOneMonth = referenceDate.plusMonths(ONE_MONTH_AHEAD_NOTIFICATION_TIME_MONTH);
+
+        criteria.add(new SubscriptionCriteria(inOneMonth, VehicleType.MOT));
+        criteria.add(new SubscriptionCriteria(inOneMonth, VehicleType.HGV));
+        criteria.add(new SubscriptionCriteria(inOneMonth, VehicleType.PSV));
+        criteria.add(new SubscriptionCriteria(inOneMonth, VehicleType.TRAILER));
+
+        return criteria;
     }
 }

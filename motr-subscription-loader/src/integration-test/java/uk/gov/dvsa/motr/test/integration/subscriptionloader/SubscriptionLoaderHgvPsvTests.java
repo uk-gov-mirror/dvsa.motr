@@ -37,7 +37,7 @@ public class SubscriptionLoaderHgvPsvTests extends SubscriptionLoaderBase {
     public void runLoaderForOneMonthHgvReminderThenEnsureItemsAddedToQueue() throws Exception {
         subscriptionItem.setVehicleType(VehicleType.HGV);
         fixture.table(new SubscriptionTable().item(subscriptionItem)).run();
-        String testTime = subscriptionItem.getMotDueDate().minusDays(30) + "T12:00:00Z";
+        String testTime = subscriptionItem.getMotDueDate().minusMonths(1) + "T12:00:00Z";
 
         LoadReport loadReport = eventHandler.handle(buildRequest(testTime), buildContext());
 
