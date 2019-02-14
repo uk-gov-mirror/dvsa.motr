@@ -35,7 +35,7 @@ public class NotifyEmailService {
 
         SendEmailResponse response = notificationClient.sendEmail(notification.getTemplateId(), emailAddress,
                 notifyParameters, "");
-        LoggerFactory.getLogger("EventLogger").info(response.toString());
+        LoggerFactory.getLogger(NotifyEmailService.class).info(response.toString());
 
         logEvent(emailAddress, notification, vehicleDetails);
     }
