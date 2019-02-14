@@ -1,5 +1,7 @@
 package uk.gov.dvsa.motr.notifier.notify;
 
+import org.slf4j.LoggerFactory;
+
 import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.notifier.events.NotifyEvent;
 import uk.gov.dvsa.motr.notifier.processing.model.notification.SendableNotification;
@@ -10,6 +12,7 @@ import uk.gov.dvsa.motr.notify.NotifyTemplateEngineFailedEvent;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
+import uk.gov.service.notify.SendEmailResponse;
 
 import java.util.Map;
 
@@ -30,8 +33,9 @@ public class NotifyEmailService {
         Map<String, String> notifyParameters = getNotifyParameters(
                 notification.getNotificationPathSubject(), notification.getNotificationPathBody(), notification.getPersonalisation());
 
-        notificationClient.sendEmail(notification.getTemplateId(), emailAddress,
+        SendEmailResponse response = notificationClient.sendEmail(notification.getTemplateId(), emailAddress,
                 notifyParameters, "");
+        LoggerFactory.getLogger("EventLogger").info(response.toString());
 
         logEvent(emailAddress, notification, vehicleDetails);
     }
