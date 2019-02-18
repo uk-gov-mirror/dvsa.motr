@@ -32,6 +32,7 @@ public class NotifyEmailService {
         throws NotificationClientException {
 
         Logger logger = LoggerFactory.getLogger(NotifyEmailService.class);
+        logger.info("enter sendEmail");
 
         Map<String, String> notifyParameters = getNotifyParameters(
                 notification.getNotificationPathSubject(), notification.getNotificationPathBody(), notification.getPersonalisation());
