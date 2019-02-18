@@ -1,5 +1,8 @@
 package uk.gov.dvsa.motr.notifier.processing.unloader;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.notifier.events.HgvPsvDetailsRetrievalFailedEvent;
 import uk.gov.dvsa.motr.notifier.events.NotifyEvent;
@@ -20,6 +23,8 @@ import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClientException;
 import uk.gov.service.notify.NotificationClientException;
 
 public class ProcessSubscriptionTask implements Runnable {
+
+    private static final Logger logger = LoggerFactory.getLogger(ProcessSubscriptionTask.class);
 
     private SubscriptionQueueItem subscriptionQueueItemToProcess;
     private NotifierReport report;
@@ -44,6 +49,8 @@ public class ProcessSubscriptionTask implements Runnable {
         Long startedProcessingTime = System.currentTimeMillis();
 
         try {
+
+            logger.info("ProcessSubscriptionTask.run - about to process subscriptions");
 
             processSubscriptionService.processSubscription(subscriptionQueueItemToProcess);
 

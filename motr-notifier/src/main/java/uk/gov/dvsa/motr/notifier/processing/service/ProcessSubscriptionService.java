@@ -62,6 +62,8 @@ public class ProcessSubscriptionService {
 
         VehicleDetails vehicleDetails = getVehicleDetails(subscription);
 
+        logger.info("ProcessSubscriptionService processSubscription [1]");
+
         String vrm = subscription.getVrm();
         String email = subscription.getContactDetail().getValue();
         LocalDate subscriptionMotDueDate = subscription.getMotDueDate();
@@ -69,15 +71,21 @@ public class ProcessSubscriptionService {
         String subscriptionDvlaId = subscription.getDvlaId();
         LocalDate requestDate = subscription.getLoadedOnDate();
 
+        logger.info("ProcessSubscriptionService processSubscription [2]");
+
         LocalDate vehicleMotExpiryDate = vehicleDetails.getMotExpiryDate();
         String vehicleMotTestNumber = vehicleDetails.getMotTestNumber();
         String vehicleVrm = vehicleDetails.getRegNumber();
+
+        logger.info("ProcessSubscriptionService processSubscription [3]");
 
         if (subscriptionDeletionRequired(vehicleMotExpiryDate, requestDate)) {
             subscriptionRepository.deleteSubscription(vrm, email);
             EventLogger.logEvent(new DeleteSubscriptionSuccessfulEvent().setVrm(vrm).setMotExpiryDate(vehicleMotExpiryDate));
             return;
         }
+
+        logger.info("ProcessSubscriptionService processSubscription [4]");
 
         if (motDueDateUpdateRequired(subscriptionMotDueDate, vehicleMotExpiryDate)) {
             try {
@@ -96,12 +104,16 @@ public class ProcessSubscriptionService {
             }
         }
 
+        logger.info("ProcessSubscriptionService processSubscription [5]");
+
         SubscriptionQueueItem.ContactType contactType = subscription.getContactDetail().getContactType();
         if (contactType == SubscriptionQueueItem.ContactType.EMAIL) {
             sendEmailNotfication(subscription, requestDate, vehicleDetails);
         } else if (contactType == SubscriptionQueueItem.ContactType.MOBILE) {
             sendSmsNotification(subscription, vehicleDetails);
         }
+
+        logger.info("ProcessSubscriptionService processSubscription [6]");
 
         if (motTestNumberUpdateRequired(subscriptionMotTestNumber, vehicleMotTestNumber)) {
             subscriptionRepository.updateMotTestNumber(vrm, email, vehicleMotTestNumber);
@@ -113,6 +125,8 @@ public class ProcessSubscriptionService {
             }
         }
 
+        logger.info("ProcessSubscriptionService processSubscription [7]");
+
         if (vrmUpdateRequired(vrm, vehicleVrm)) {
             try {
                 subscriptionRepository.updateVrm(vrm, email, vehicleVrm);
@@ -121,10 +135,14 @@ public class ProcessSubscriptionService {
                 EventLogger.logErrorEvent(new UpdateVrmFailedEvent().setExistingVrm(vrm).setNewVrm(vehicleVrm), e);
             }
         }
+
+        logger.info("ProcessSubscriptionService processSubscription [8]");
     }
 
     private void sendEmailNotfication(SubscriptionQueueItem subscription, LocalDate requestDate, VehicleDetails vehicleDetails)
             throws NotificationClientException {
+
+        logger.info("sendEmailNotfication start");
 
         String email = subscription.getContactDetail().getValue();
 
@@ -132,8 +150,13 @@ public class ProcessSubscriptionService {
                 requestDate, subscription, vehicleDetails);
 
         if (notification.isPresent()) {
+            logger.info("notification present");
             notifyEmailService.sendEmail(email, notification.get(), vehicleDetails);
+        } else {
+            logger.info("notification not present");
         }
+
+        logger.info("sendEmailNotfication end");
     }
 
     private void sendSmsNotification(SubscriptionQueueItem subscription, VehicleDetails vehicleDetails)
