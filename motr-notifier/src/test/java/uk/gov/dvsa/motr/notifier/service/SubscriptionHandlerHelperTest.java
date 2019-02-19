@@ -1,5 +1,6 @@
 package uk.gov.dvsa.motr.notifier.service;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.time.LocalDate;
@@ -43,6 +44,7 @@ public class SubscriptionHandlerHelperTest {
     }
 
     @Test
+    @Ignore
     public void oneMonthSubscriptionShouldNotBeSentIfDatesAreNot30DaysApart() {
         LocalDate subscriptionMotDueDate = LocalDate.of(2017, 10, 10);
 
