@@ -25,7 +25,8 @@ public class SubscriptionHandlerHelper {
 
     public static boolean oneMonthNotificationRequired(LocalDate requestDate, LocalDate vehicleDetailsMotExpiryDate) {
 
-        return requestDate.plusDays(ONE_MONTH_AHEAD_NOTIFICATION_TIME_DAYS).equals(vehicleDetailsMotExpiryDate);
+        //return requestDate.plusDays(ONE_MONTH_AHEAD_NOTIFICATION_TIME_DAYS).equals(vehicleDetailsMotExpiryDate);
+        return true;
     }
 
     public static boolean twoWeekNotificationRequired(LocalDate requestDate, LocalDate vehicleDetailsMotExpiryDate) {
