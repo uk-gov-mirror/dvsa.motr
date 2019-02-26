@@ -35,21 +35,91 @@ public class SubscriptionHandlerHelperTest {
     }
 
     @Test
-    public void oneMonthSubscriptionShouldBeSentIfDatesAre30DaysApart() {
+    public void oneMonthSubscriptionShouldBeSentIfDatesAre1MonthApart() {
         LocalDate subscriptionMotDueDate = LocalDate.of(2017, 10, 10);
-        LocalDate vehicleDetailsMotExpiryDate = LocalDate.of(2017, 11, 9);
+        LocalDate vehicleDetailsMotExpiryDate = LocalDate.of(2017, 11, 10);
 
         assertTrue(oneMonthNotificationRequired(subscriptionMotDueDate, vehicleDetailsMotExpiryDate));
     }
 
     @Test
-    public void oneMonthSubscriptionShouldNotBeSentIfDatesAreNot30DaysApart() {
+    public void oneMonthSubscriptionShouldBeSentOnLastDayOfShortMonth() {
+        LocalDate subscriptionMotDueDate = LocalDate.of(2017, 4, 30);
+
+        LocalDate vehicleDetailsMotExpiryDate = LocalDate.of(2017, 5, 31);
+        assertTrue(oneMonthNotificationRequired(subscriptionMotDueDate, vehicleDetailsMotExpiryDate));
+    }
+
+    @Test
+    public void oneMonthSubscriptionShouldBeSentOnLastDayFebruaryForLastFourDaysInMarch() {
+        LocalDate subscriptionMotDueDate = LocalDate.of(2017, 2, 28);
+
+        LocalDate vehicleDetailsMotExpiryDate = LocalDate.of(2017, 3, 28);
+        assertTrue(oneMonthNotificationRequired(subscriptionMotDueDate, vehicleDetailsMotExpiryDate));
+
+        vehicleDetailsMotExpiryDate = LocalDate.of(2017, 3, 29);
+        assertTrue(oneMonthNotificationRequired(subscriptionMotDueDate, vehicleDetailsMotExpiryDate));
+
+        vehicleDetailsMotExpiryDate = LocalDate.of(2017, 3, 30);
+        assertTrue(oneMonthNotificationRequired(subscriptionMotDueDate, vehicleDetailsMotExpiryDate));
+
+        vehicleDetailsMotExpiryDate = LocalDate.of(2017, 3, 31);
+        assertTrue(oneMonthNotificationRequired(subscriptionMotDueDate, vehicleDetailsMotExpiryDate));
+    }
+
+    @Test
+    public void oneMonthSubscriptionShouldBeSentOnLastDayFebruaryForLastThreeDaysInMarchLeapYear() {
+        LocalDate subscriptionMotDueDate = LocalDate.of(2016, 2, 29);
+
+        LocalDate vehicleDetailsMotExpiryDate = LocalDate.of(2017, 3, 28);
+        assertFalse(oneMonthNotificationRequired(subscriptionMotDueDate, vehicleDetailsMotExpiryDate));
+
+        vehicleDetailsMotExpiryDate = LocalDate.of(2016, 3, 29);
+        assertTrue(oneMonthNotificationRequired(subscriptionMotDueDate, vehicleDetailsMotExpiryDate));
+
+        vehicleDetailsMotExpiryDate = LocalDate.of(2016, 3, 30);
+        assertTrue(oneMonthNotificationRequired(subscriptionMotDueDate, vehicleDetailsMotExpiryDate));
+
+        vehicleDetailsMotExpiryDate = LocalDate.of(2016, 3, 31);
+        assertTrue(oneMonthNotificationRequired(subscriptionMotDueDate, vehicleDetailsMotExpiryDate));
+    }
+
+    @Test
+    public void oneMonthSubscriptionShouldNotBeSentIfDatesAreNot1MonthApart() {
         LocalDate subscriptionMotDueDate = LocalDate.of(2017, 10, 10);
 
         LocalDate vehicleDetailsMotExpiryDate = LocalDate.of(2017, 11, 8);
         assertFalse(oneMonthNotificationRequired(subscriptionMotDueDate, vehicleDetailsMotExpiryDate));
 
-        vehicleDetailsMotExpiryDate = LocalDate.of(2017, 11, 10);
+        vehicleDetailsMotExpiryDate = LocalDate.of(2017, 11, 11);
+        assertFalse(oneMonthNotificationRequired(subscriptionMotDueDate, vehicleDetailsMotExpiryDate));
+    }
+
+    @Test
+    public void oneMonthSubscriptionShouldNotBeSentIfRequestDateIsNotAPreservationDate() {
+        LocalDate subscriptionMotDueDate = LocalDate.of(2017, 1, 29);
+
+        LocalDate vehicleDetailsMotExpiryDate = LocalDate.of(2017, 2, 28);
+        assertFalse(oneMonthNotificationRequired(subscriptionMotDueDate, vehicleDetailsMotExpiryDate));
+
+        subscriptionMotDueDate = LocalDate.of(2017, 1, 30);
+        assertFalse(oneMonthNotificationRequired(subscriptionMotDueDate, vehicleDetailsMotExpiryDate));
+
+        subscriptionMotDueDate = LocalDate.of(2017, 1, 31);
+        assertFalse(oneMonthNotificationRequired(subscriptionMotDueDate, vehicleDetailsMotExpiryDate));
+    }
+
+    @Test
+    public void oneMonthSubscriptionShouldNotBeNotSentOnJan30or31LeapYear() {
+        LocalDate subscriptionMotDueDate = LocalDate.of(2016, 1, 29);
+
+        LocalDate vehicleDetailsMotExpiryDate = LocalDate.of(2016, 2, 29);
+        assertTrue(oneMonthNotificationRequired(subscriptionMotDueDate, vehicleDetailsMotExpiryDate));
+
+        subscriptionMotDueDate = LocalDate.of(2016, 1, 31);
+        assertFalse(oneMonthNotificationRequired(subscriptionMotDueDate, vehicleDetailsMotExpiryDate));
+
+        subscriptionMotDueDate = LocalDate.of(2016, 1, 30);
         assertFalse(oneMonthNotificationRequired(subscriptionMotDueDate, vehicleDetailsMotExpiryDate));
     }
 
