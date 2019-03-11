@@ -4,15 +4,17 @@ It’s illegal to drive without a valid MOT - you can be fined up to £1000.
 
 Book a test now at an approved MOT test centre. Find out about getting your MOT at https://www.gov.uk/getting-an-mot
 
-# MOT test changed on 20 May 2018
 
-The MOT test changed on 20 May 2018. We have added new defect types, stricter rules for diesel car emissions, and some vehicles over 40 years old becoming exempt. Find out more at https://www.gov.uk/government/news/mot-changes-20-may-2018
+# Stop getting MOT reminders
+
+You can stop getting MOT reminders for this vehicle at ((unsubscribe_link))
+
+You may want to stop getting MOT reminders if you've sold this vehicle or if this vehicle is more than 40 years old and no longer needs an MOT. Find out more about vehicles that are exempt from MOT at https://www.gov.uk/historic-vehicles
+
 
 # Was this MOT reminder useful to you?
 
 Help us improve the MOT reminder service by telling us what you think at https://www.gov.uk/mot-survey
 
-DVSA (Driver and Vehicle Standards Agency)
 
-Unsubscribe from MOT reminders:
-((unsubscribe_link))
+DVSA (Driver and Vehicle Standards Agency)

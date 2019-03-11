@@ -2,19 +2,22 @@
 
 ((preservation_statement))
 
-# MOT test changed on 20 May 2018
-
-The MOT test changed on 20 May 2018. We have added new defect types, stricter rules for diesel car emissions, and some vehicles over 40 years old becoming exempt. Find out more at https://www.gov.uk/government/news/mot-changes-20-may-2018
 
 # Was this MOT reminder useful to you?
 
 Help us improve the MOT reminder service by telling us what you think at https://www.gov.uk/mot-survey
 
+
 # Check MOT history and outstanding safety recalls
 
 Check your vehicle’s MOT history and if it has outstanding manufacturer’s safety recalls at ((moth_url))
 
-DVSA (Driver and Vehicle Standards Agency)
 
-Unsubscribe from MOT reminders:
-((unsubscribe_link))
+# Stop getting MOT reminders
+
+You can stop getting MOT reminders for this vehicle at ((unsubscribe_link))
+
+You may want to stop getting MOT reminders if you've sold this vehicle or if this vehicle is more than 40 years old and no longer needs an MOT. Find out more about vehicles that are exempt from MOT at https://www.gov.uk/historic-vehicles
+
+
+DVSA (Driver and Vehicle Standards Agency)
