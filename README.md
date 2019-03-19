@@ -2,6 +2,9 @@
 
 Root project for the MOT Reminders service.
 
+### Integration with GOV Notify
+[Gov Notify integration details](docs/gov_notify_integration.md)
+
 ### Building
 To build all sub-projects:
 
