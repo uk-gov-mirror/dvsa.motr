@@ -50,7 +50,7 @@ allprojects {
         wiremockVersion = '2.12.0'
         systemRulesVersion = '1.16.0'
         commonsIoVersion = '2.5'
-        seleniumVersion = '2.53.1'
+        seleniumVersion = '3.141.59'
         orgTestingVersion = '6.10'
         uncommonsReportingVersion = '1.1.4'
         orgReflectionsVersion = '0.9.11'
