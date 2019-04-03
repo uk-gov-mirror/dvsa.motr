@@ -50,7 +50,7 @@ public class DriverFactory {
                 Logger.info("Javascript is enabled: " + String
                         .valueOf(capability.isJavascriptEnabled()));
                 capability.setCapability(FirefoxDriver.PROFILE, profile);
-                Firefox options = new FirefoxOptions();
+                FirefoxOptions options = new FirefoxOptions();
                 options.setProfile(profile);
                 driver = MotBrowserFactory.createMotDriver(new FirefoxDriver(options));
                 break;
