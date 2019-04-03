@@ -9,7 +9,7 @@ dependencies {
 
     compile "org.seleniumhq.selenium:selenium-java:${seleniumVersion}"
     compile "org.testng:testng:${orgTestingVersion}"
-    compile group: "commons-io", name: 'commons-io', version: '${apacheCommonsIOVersion}'
+    compile group: "commons-io", name: 'commons-io', version: "$apacheCommonsIOVersion"
     compile("org.uncommons:reportng:${uncommonsReportingVersion}") {
         exclude group: "org.testng", module: "testng"
     }
