@@ -54,6 +54,7 @@ allprojects {
         orgTestingVersion = '6.10'
         uncommonsReportingVersion = '1.1.4'
         orgReflectionsVersion = '0.9.11'
+        apacheCommonsIOVersion = '2.6'
     }
 }
 
