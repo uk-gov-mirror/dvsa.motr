@@ -5,14 +5,14 @@ import java.util.regex.Pattern;
 
 public class SmsConfirmationCodeValidator implements FieldValidator {
 
-    private static final Pattern CONF_CODE_VALIDATION_REGEX = Pattern.compile("\\d{6}");
+    private static final Pattern CONF_CODE_VALIDATION_REGEX = Pattern.compile("\\d{5}");
 
-    public static final String EMPTY_CONFIRMATION_CODE_MESSAGE = "Enter 6-digit code from text message<br/>" +
+    public static final String EMPTY_CONFIRMATION_CODE_MESSAGE = "Enter 5-digit code from text message<br/>" +
             "<br/>It can take a couple of minutes for the text to arrive.";
-    public static final String EMPTY_CONFIRMATION_CODE_MESSAGE_AT_FIELD = "Enter 6 digits from text message";
+    public static final String EMPTY_CONFIRMATION_CODE_MESSAGE_AT_FIELD = "Enter 5 digits from text message";
     public static final String INVALID_CONFIRMATION_CODE_MESSAGE = "Entered code is invalid<br/>" +
-            "<br/>Enter 6 digits you received in text message";
-    public static final String INVALID_CONFIRMATION_CODE_MESSAGE_AT_FIELD = "Enter 6 digits from text message";
+            "<br/>Enter 5 digits you received in text message";
+    public static final String INVALID_CONFIRMATION_CODE_MESSAGE_AT_FIELD = "Enter 5 digits from text message";
 
     public static final String CODE_INCORRECT_3_TIMES = "You can’t subscribe now. <br/>" +
             "Code was entered incorrectly 3 times. <br/>" +
