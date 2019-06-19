@@ -13,6 +13,7 @@ dependencies {
         exclude group: "org.testng", module: "testng"
     }
     compile "com.google.inject:guice:${guiceVersion}"
+    compile "commons-io:commons-io:${commonsIoVersion}"
 }
 
 task selenium(type: Test) {
