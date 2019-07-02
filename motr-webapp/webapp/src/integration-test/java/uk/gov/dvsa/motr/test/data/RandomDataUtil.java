@@ -70,6 +70,6 @@ public class RandomDataUtil {
 
     public static String confirmationCode() {
 
-        return random(6, false, true);
+        return random(5, false, true);
     }
 }

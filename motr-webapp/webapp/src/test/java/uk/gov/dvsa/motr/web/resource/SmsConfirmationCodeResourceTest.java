@@ -37,8 +37,8 @@ public class SmsConfirmationCodeResourceTest {
     private static final String CONFIRMATION_LINK = "CONFIRMATION_LINK";
     private static final String PHONE_NUMBER = "07801856718";
     private static final String CONFIRMATION_ID = "ABC123";
-    private static final String CONFIRMATION_CODE = "123456";
-    private static final String INVALID_CONFIRMATION_CODE = "654321";
+    private static final String CONFIRMATION_CODE = "12345";
+    private static final String INVALID_CONFIRMATION_CODE = "65432";
     private static final String VRM = "YN13NTX";
 
 

@@ -14,7 +14,7 @@
 
             <h1 class="heading heading-large heading--large">One more step</h1>
 
-            <p>We sent you a text message with a 6-digit activation code, which expires in 24h. Enter the code on this page to activate your reminder.</p>
+            <p>We sent you a text message with a 5-digit activation code, which expires in 24h. Enter the code on this page to activate your reminder.</p>
 
             <form method="POST" autocomplete="off" novalidate="" action="confirm-phone">
 
@@ -26,7 +26,7 @@
                         {{/showInLine}}
                     </label>
 
-                    <input type="text" id="confirmationCode" name="confirmationCode" class="form-control" maxlength="6" value="{{confirmationCode}}">
+                    <input type="text" id="confirmationCode" name="confirmationCode" class="form-control" maxlength="5" value="{{confirmationCode}}">
                 </div>
 
                 <div class="form-group">

@@ -1,8 +1,10 @@
 package uk.gov.dvsa.motr.config.webdriver;
 
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -49,7 +51,11 @@ public class DriverFactory {
                 Logger.info("Javascript is enabled: " + String
                         .valueOf(capability.isJavascriptEnabled()));
                 capability.setCapability(FirefoxDriver.PROFILE, profile);
-                driver = MotBrowserFactory.createMotDriver(new FirefoxDriver(profile));
+
+                FirefoxOptions options = new FirefoxOptions();
+                options.setProfile(profile);
+
+                driver = MotBrowserFactory.createMotDriver(new FirefoxDriver(options));
                 break;
             }
             case CHROME: {

@@ -26,7 +26,7 @@ public class SmsConfirmationCodeValidatorTest {
                 {"12"},
                 {"123"},
                 {"1234"},
-                {"12345"},
+                {"123456"},
                 {"1234567"},
                 {"a"},
                 {"abcdef"},
@@ -39,10 +39,10 @@ public class SmsConfirmationCodeValidatorTest {
     @DataProvider
     public static Object[][] validCodes() {
         return new Object[][]{
-                {"000000"},
-                {"123456"},
-                {"999999"},
-                {RandomStringUtils.randomNumeric(6)}
+                {"00000"},
+                {"12345"},
+                {"99999"},
+                {RandomStringUtils.randomNumeric(5)}
         };
     }
 
