@@ -11,7 +11,7 @@ class ReviewFlowUpdater {
     ) {
         if (visitingFromReviewPage) {
             modelMap.put("continue_button_text", "Save and return to review");
-            modelMap.put("back_button_text", "Cancel and return");
+            modelMap.put("back_button_text", "Back");
             modelMap.put("back_url", "review");
         } else if (visitingFromContactEntryPage) {
             modelMap.put("continue_button_text", "Continue");
