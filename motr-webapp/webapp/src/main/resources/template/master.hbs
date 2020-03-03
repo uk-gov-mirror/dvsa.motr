@@ -11,22 +11,24 @@
 
     <title>{{{pageTitle}}}</title>
 
-    {{#dataLayer}}
+    {{#shouldUseAnalytics}}
+        {{#dataLayer}}
+            <script>
+                dataLayer = [{{{dataLayer}}}];
+            </script>
+        {{/dataLayer}}
+        <!-- Google Tag Manager -->
         <script>
-            dataLayer = [{{{dataLayer}}}];
+            (function (w,d,s,l,i) {
+                w[l]=w[l]||[];w[l].push(
+                    {'gtm.start': new Date().getTime(),event:'gtm.js'}
+                );var f=d.getElementsByTagName(s)[0],
+                j=d.createElement(s),
+                dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','GTM-TVLB97T');
         </script>
-    {{/dataLayer}}
-    <!-- Google Tag Manager -->
-    <script>
-        (function (w,d,s,l,i) {
-            w[l]=w[l]||[];w[l].push(
-                {'gtm.start': new Date().getTime(),event:'gtm.js'}
-            );var f=d.getElementsByTagName(s)[0],
-            j=d.createElement(s),
-            dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-        })(window,document,'script','dataLayer','GTM-TVLB97T');
-    </script>
-    <!-- End Google Tag Manager -->
+        <!-- End Google Tag Manager -->
+    {{/shouldUseAnalytics}}
 
     <!--[if IE 8]>
     <script type="text/javascript">
@@ -57,21 +59,22 @@
     <link rel="manifest" href="{{{asset this '/misc/manifest-motr.json'}}}">
 
     <link href="{{asset this '/stylesheets/styles.css'}}" media="all" rel="stylesheet" type="text/css"/>
+
+    {{> partial/cookie-manager-config }}
 </head>
 
 <body class="motr ">
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TVLB97T" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<script>document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');</script>
+    {{#shouldUseAnalytics}}
+        <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TVLB97T" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    {{/shouldUseAnalytics}}
+    <script>document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');</script>
 
     <!-- skiplink -->
     <div id="skiplink-container">
       <div><a href="#content" class="skiplink">Skip to main content</a></div>
     </div>
 
-    <!-- cookie message -->
-    <div id="global-cookie-message">
-        <p>GOV.UK uses cookies to make the site simpler. <a href="{{{url this "/cookies"}}}">Find out more about cookies</a></p>
-    </div>
+    {{> partial/cookie-preferences-banner }}
 
     <!-- header -->
     <header id="global-header" class="with-proposition">
