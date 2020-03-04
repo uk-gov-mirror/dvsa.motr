@@ -17,6 +17,8 @@ public class MotrWebApplication extends ResourceConfig {
 
         packages("uk.gov.dvsa.motr.web");
 
+        property("jersey.config.server.wadl.disableWadl", "true");
+
         register(new ConfigBinder());
         register(new TemplateEngineBinder());
         register(new SystemVariableBinder());
