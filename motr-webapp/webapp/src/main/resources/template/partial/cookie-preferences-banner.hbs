@@ -1,0 +1,35 @@
+{{#userHasSetCookiePreferencesHelper}}
+{{else}}
+    <div class="govuk-visually-hidden theme__cookie-success-message-grey" id="accept-all-cookies-success">
+        <div class="govuk-width-container">
+            <div class="govuk-!-padding-top-5 govuk-!-padding-bottom-7">
+                <span class="govuk-body"  >You’ve accepted all cookies. You can <a href="{{{url this "/cookie-preferences"}}}">change your cookie settings</a> at any time.</span>
+
+                <span id="cookie-accept-all-success-banner-hide" class="govuk-body u-float-right"><a href="#">Hide</a></span>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        document.getElementById('cookie-accept-all-success-banner-hide').onclick = function(){
+            document.getElementById('accept-all-cookies-success').classList.add('govuk-visually-hidden');
+        };
+    </script>
+    <div class="theme__cookie-success-message-grey" id="cm_cookie_notification">
+        <div class="govuk-width-container">
+            <div class="govuk-grid-row ">
+                <div class=" govuk-grid-column-two-thirds govuk-!-margin-top-5">
+                    <div>
+                        <span class="govuk-heading-m">Tell us whether you accept cookies</span>
+                        <p class="govuk-body">We use <a class="govuk-link" href="{{{url this "/cookies"}}}">cookies to collect information</a> about how you use the MOT history service. We use this information to make the service work as well as possible.</p>
+                    </div>
+                    <div class="js-show govuk-grid-column-full govuk-grid-column-one-half-from-desktop">
+                        <button class="govuk-button" type="submit">Accept all cookies</button>
+                    </div>
+                    <div class="govuk-grid-column-full govuk-grid-column-one-half-from-desktop">
+                        <a role="button" class="govuk-button" href="{{{url this "/cookie-preferences"}}}">Set cookie preferences</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{{/userHasSetCookiePreferencesHelper}}

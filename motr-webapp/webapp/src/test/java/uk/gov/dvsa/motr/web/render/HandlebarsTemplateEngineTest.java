@@ -4,8 +4,11 @@ import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.DataProviderRunner;
 import com.tngtech.java.junit.dataprovider.UseDataProvider;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import uk.gov.dvsa.motr.web.cookie.UserCookiePreferences;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,6 +17,13 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(DataProviderRunner.class)
 public class HandlebarsTemplateEngineTest {
+
+    UserCookiePreferences userCookiePreferences = new UserCookiePreferences();
+
+    @Before
+    public void setup() {
+        this.userCookiePreferences.setShouldUseAnalytics(false);
+    }
 
     @DataProvider
     public static Object[][] baseUrl() {
@@ -33,7 +43,7 @@ public class HandlebarsTemplateEngineTest {
     public void assetHelperBuildsPathsCorrectly(String assetsPath, String path, String result) {
 
         HandlebarsTemplateEngine instance =
-                new HandlebarsTemplateEngine(assetsPath, "12345", "baseUrl", "releaseVersion");
+                new HandlebarsTemplateEngine(assetsPath, "12345", "baseUrl", "releaseVersion", this.userCookiePreferences);
 
         Map<String, String> context = new HashMap<>();
         context.put("path", path);
@@ -48,7 +58,7 @@ public class HandlebarsTemplateEngineTest {
     public void testEngineCorrectlyFillsContextKey() {
 
         HandlebarsTemplateEngine instance =
-                new HandlebarsTemplateEngine("/", "12345", "baseUrl", "releaseVersion");
+                new HandlebarsTemplateEngine("/", "12345", "baseUrl", "releaseVersion", this.userCookiePreferences);
 
         Map<String, String> context = new HashMap<>();
         context.put("key", "SomeValueOfTheKey");
@@ -63,7 +73,7 @@ public class HandlebarsTemplateEngineTest {
     public void urlHelperCorrectlyBuildsPathsCorrectly(String basePath, String path, String expectedOutput) {
 
         HandlebarsTemplateEngine instance =
-                new HandlebarsTemplateEngine("someassetPath", "12345", basePath, "releaseVersion");
+                new HandlebarsTemplateEngine("someassetPath", "12345", basePath, "releaseVersion", this.userCookiePreferences);
 
         Map<String, String> context = new HashMap<>();
         context.put("path", path);

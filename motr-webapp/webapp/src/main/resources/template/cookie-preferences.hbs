@@ -1,0 +1,96 @@
+{{#partial "content" }}
+
+    <h1 class="heading-xlarge">Cookies on the MOT reminder service</h1>
+
+    <div class="text">
+
+        <p>Cookies are files saved on your phone, tablet or computer when you visit a website.</p>
+        <p>We use cookies to store information about how you use the MOT reminder service, such as the pages you visit.</p>
+
+    </div>
+
+    <h2 class="heading-large">Cookie settings</h2>
+
+    <div class="text govuk-visually-hidden" id="cookie-preference-success">
+        <div class="success-message" aria-labelledby="success-title" role="alert" tabindex="-1">
+            <h2 class="success-title heading-medium">
+                Your cookie settings were saved
+            </h2>
+            <div >
+                <p>Government services may set additional cookies and, if so, will have their own cookie policy and banner.</p>
+            </div>
+            <a href="{{{url this "/"}}}">Go to homepage</a>
+        </div>
+    </div>
+
+    <div class="js-hidden text">
+       <p>We use Javascript to set most of our cookies. Unfortunately Javascript is not running on your browser, so you cannot change your settings. You can try:</p>
+       <ul class="list-bullet">
+           <li>reloading the page</li>
+           <li>turning on Javascript in your browser</li>
+       </ul>
+    </div>
+
+    <div class="js-show text">
+        <p>We use 2 types of cookie. You can choose which cookies you're happy for us to use.</p>
+
+        <form id="cookie-manager-form">
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset" aria-describedby="hint-ga">
+
+                    <legend class="govuk-fieldset__legend--m">Cookies that measure website use</legend>
+
+                    <div id="hint-ga" class="u-margin-top-10 u-margin-bottom-30">
+                        We use Google Analytics software to collect information about how you use the MOT reminder service.
+                        We do this to help make sure the site is meeting the needs of its users and to help us make improvements.
+                        <p class="u-margin-top-10 u-margin-bottom-30">Google Analytics stores information about:</p>
+                        <ul class="list-bullet">
+                            <li>the pages you visit on the MOT reminder service</li>
+                            <li>how long you spend on each page</li>
+                            <li>how you got to the site</li>
+                            <li>what you click on while you're visiting the site</li>
+                        </ul>
+                        <p class="u-margin-top-10 u-margin-bottom-30">Google doesn’t collect or store your personal
+                            information, such as your name or address, so this information can’t be used to identify
+                            who you are. We don’t allow Google to use or share our analytics data.</p>
+                    </div>
+
+                    <div class="govuk-radios govuk-radios--inline">
+                        <div class="govuk-radios__item">
+                            <input type="radio" name="analytics" id="radio-analytics-on" value="on" class="govuk-radios__input" >
+                            <label for="radio-analytics-on" class="govuk-label govuk-radios__label">
+                                <span>On</span>
+                            </label>
+                        </div>
+                        <div class="govuk-radios__item">
+                            <input type="radio" name="analytics" id="radio-analytics-off" value="off" class="govuk-radios__input" checked="checked">
+                            <label for="radio-analytics-off" class="govuk-label govuk-radios__label">
+                                <span>Off</span>
+                            </label>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+
+            <div>
+                <h2 class="heading-large">Strictly necessary cookies</h2>
+                <p>The MOT reminder service uses cookies for session management and security.</p>
+                <p>They always need to be on.</p>
+                <p>
+                    <a href="{{{url this "/cookies"}}}">Find out more about cookies on the MOT reminder service</a>
+                </p>
+            </div>
+
+            <button class="govuk-button" type="submit">Save changes</button>
+        </form>
+    </div>
+
+    <div class="text">
+        <h2 class="heading-large">Third-party and government services</h2>
+
+        <p>Most services we link to are run by different government departments, for example HM Revenue and Customs
+            (HMRC) or the Home Office.  We also use <a rel="external" href="https://www.smartsurvey.co.uk" target="_blank">SmartSurvey</a> to collect feedback comments.</p>
+        <p>These services may set additional cookies and, if so, will have their own cookies policy.</p>
+    </div>
+{{/partial}}
+{{> master pageTitle="Cookies – MOT reminders"}}
