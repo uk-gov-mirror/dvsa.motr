@@ -27,7 +27,7 @@ public class ByVrmResolver {
                     .primaryColour("Silver")
                     .vehicleType(MOT)
                     .manufactureYear("2006")
-                    .dueDate("2020-11-26")
+                    .dueDate(daysFromToday(60))
                     .testNumber("42343234");
         } else if (vrm.equals("HGV1MO")) {
             response.make("DAF")
@@ -64,7 +64,7 @@ public class ByVrmResolver {
                     .secondaryColour("Multi-colour")
                     .vehicleType(MOT)
                     .manufactureYear("2004")
-                    .dueDate("2020-12-01")
+                    .dueDate(daysFromToday(60))
                     .testNumber("42343234");
         } else if (vrm.contains("LOY-500")) {
             response.make("TOJEIRO BRISTOL 2.0L")
@@ -73,7 +73,7 @@ public class ByVrmResolver {
                     .secondaryColour("Multi-colour")
                     .vehicleType(MOT)
                     .manufactureYear("1999")
-                    .dueDate("2020-08-14")
+                    .dueDate(daysFromToday(60))
                     .testNumber("3243432");
         } else if (vrm.contains("OLD-EXPIRY-")) {
             response.make("testMake")
@@ -91,7 +91,7 @@ public class ByVrmResolver {
                     .secondaryColour("testDVLASecondaryColour")
                     .vehicleType(MOT)
                     .manufactureYear("1999")
-                    .dueDate("2020-03-09")
+                    .dueDate(daysFromToday(60))
                     .testNumber("12349876");
         } else if (vrm.contains("HGV-OLDEXPIRY")) {
             response.make("testMakeHGV")
@@ -136,7 +136,7 @@ public class ByVrmResolver {
                     .secondaryColour("testSecondaryColour")
                     .vehicleType(PSV)
                     .manufactureYear("1999")
-                    .dueDate("2020-01-04")
+                    .dueDate(daysFromToday(60))
                     .dvlaId("567623")
                     .testNumber("546431");
         } else if (vrm.contains("PSVMULTICOLOR")) {
