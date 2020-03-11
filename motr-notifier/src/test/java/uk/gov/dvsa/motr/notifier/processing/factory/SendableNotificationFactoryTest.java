@@ -179,6 +179,21 @@ public class SendableNotificationFactoryTest {
     }
 
     @Test
+    public void whenMotVehicleExpiryDateIsUpdatedAndIsInOneMonth_SmsNotificationIsCreated() {
+        LocalDate requestDate = LocalDate.of(2020, 2, 24);
+        LocalDate subscriptionVehicleExpiryDate = LocalDate.of(2019, 3, 24);
+        LocalDate vehicleExpiryDate = LocalDate.of(2020, 3, 24);
+        VehicleDetails vehicleDetails = vehicleDetailsStub(vehicleExpiryDate);
+
+        SendableNotification notification = notificationFactory.getSmsNotification(
+                subscriptionStub(subscriptionVehicleExpiryDate, requestDate, VehicleType.MOT), vehicleDetails).get();
+
+        Assert.assertEquals(MotOneMonthSmsNotification.class, notification.getClass());
+        Assert.assertEquals(SMS_ONE_MONTH_TEMPLATE_ID, notification.getTemplateId());
+        Assert.assertEquals("24/03/20", notification.getPersonalisation().get("mot_expiry_date"));
+    }
+
+    @Test
     public void whenMotVehicleExpiryDateIsInTwoWeeks_SmsNotificationIsCreated() {
         LocalDate requestDate = LocalDate.of(2018, 10, 10);
         LocalDate vehicleExpiryDate = LocalDate.of(2018, 10, 24);

@@ -3,6 +3,7 @@ package uk.gov.dvsa.motr.notifier.processing.model.notification.sms;
 import uk.gov.dvsa.motr.notifier.events.NotifyEvent;
 import uk.gov.dvsa.motr.notifier.events.OneDayAfterSmsReminderEvent;
 import uk.gov.dvsa.motr.notifier.processing.model.SubscriptionQueueItem;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 
 import java.util.HashMap;
 
@@ -13,9 +14,9 @@ public class MotOneDayAfterSmsNotification extends SendableSmsNotification {
     }
 
     @Override
-    public void personalise(SubscriptionQueueItem subscription) {
+    public void personalise(VehicleDetails vehicleDetails) {
         personalisation = new HashMap<>();
-        personalisation.put("vehicle_vrm", subscription.getVrm());
+        personalisation.put("vehicle_vrm", vehicleDetails.getRegNumber());
     }
 
     @Override

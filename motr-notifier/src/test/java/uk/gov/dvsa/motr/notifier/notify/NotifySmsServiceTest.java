@@ -12,6 +12,7 @@ import uk.gov.dvsa.motr.notifier.processing.model.notification.sms.MotTwoWeekSms
 import uk.gov.dvsa.motr.notifier.processing.model.notification.sms.SendableSmsNotification;
 import uk.gov.dvsa.motr.notify.NotifyTemplateEngine;
 import uk.gov.dvsa.motr.notify.NotifyTemplateEngineException;
+import uk.gov.dvsa.motr.vehicledetails.VehicleDetails;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
@@ -70,7 +71,7 @@ public class NotifySmsServiceTest {
         SendableSmsNotification notification = new MotOneMonthSmsNotification()
                 .setTemplateId(notificationTemplateIds.getOneMonthNotificationTemplateId());
 
-        notification.personalise(stubSubscriptionQueueItem());
+        notification.personalise(stubVehicleDetails());
 
         notifySmsService.sendSms(PHONE_NUMBER, notification);
 
@@ -94,7 +95,7 @@ public class NotifySmsServiceTest {
         SendableSmsNotification notification = new MotTwoWeekSmsNotification()
                 .setTemplateId(notificationTemplateIds.getTwoWeekNotificationTemplateId());
 
-        notification.personalise(stubSubscriptionQueueItem());
+        notification.personalise(stubVehicleDetails());
 
         notifySmsService.sendSms(PHONE_NUMBER, notification);
 
@@ -117,7 +118,7 @@ public class NotifySmsServiceTest {
         SendableSmsNotification notification = new MotOneDayAfterSmsNotification()
                 .setTemplateId(notificationTemplateIds.getOneDayAfterNotificationTemplateId());
 
-        notification.personalise(stubSubscriptionQueueItem());
+        notification.personalise(stubVehicleDetails());
 
         notifySmsService.sendSms(PHONE_NUMBER, notification);
 
@@ -141,7 +142,7 @@ public class NotifySmsServiceTest {
         SendableSmsNotification notification = new HgvPsvTwoMonthSmsNotification()
                 .setTemplateId(notificationTemplateIds.getTwoMonthHgvPsvNotificationTemplateId());
 
-        notification.personalise(stubSubscriptionQueueItem());
+        notification.personalise(stubVehicleDetails());
 
         notifySmsService.sendSms(PHONE_NUMBER, notification);
 
@@ -166,7 +167,7 @@ public class NotifySmsServiceTest {
         SendableSmsNotification notification = new HgvPsvOneMonthSmsNotification()
                 .setTemplateId(notificationTemplateIds.getOneMonthHgvPsvNotificationTemplateId());
 
-        notification.personalise(stubSubscriptionQueueItem());
+        notification.personalise(stubVehicleDetails());
 
         notifySmsService.sendSms(PHONE_NUMBER, notification);
 
@@ -206,5 +207,13 @@ public class NotifySmsServiceTest {
                 .setVrm(REG)
                 .setMotDueDate(EXPIRY_DATE);
         return subscription;
+    }
+
+    private VehicleDetails stubVehicleDetails() {
+        VehicleDetails vehicleDetails = new VehicleDetails();
+        vehicleDetails
+                .setRegNumber(REG)
+                .setMotExpiryDate(EXPIRY_DATE);
+        return vehicleDetails;
     }
 }
