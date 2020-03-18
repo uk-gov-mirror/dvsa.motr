@@ -68,7 +68,7 @@ public class SubscriptionDbItemQueueItemUnloaderTest extends SubscriptionDbItemQ
         subscriptionItem = new SubscriptionItem();
         subscriptionItem
             .setMotDueDate(DATE_NOT_MATCHING_VEHICLE_MOCK)
-            .setVrm("WDD2040022A65")
+            .setVrm("SUB-CHANGE")
             .setMotTestNumber("12345");
 
         SubscriptionDbItem changedSubscriptionDbItem = saveAndProcessSubscriptionItem(subscriptionItem);
