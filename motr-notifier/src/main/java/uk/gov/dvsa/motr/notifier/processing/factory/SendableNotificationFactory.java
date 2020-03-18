@@ -128,7 +128,7 @@ public class SendableNotificationFactory {
             }
         }
 
-        notification.ifPresent(n -> n.personalise(subscription));
+        notification.ifPresent(n -> n.personalise(vehicleDetails));
 
         return notification;
     }
