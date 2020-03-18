@@ -29,6 +29,14 @@ public class ByVrmResolver {
                     .manufactureYear("2006")
                     .dueDate(daysFromToday(60))
                     .testNumber("42343234");
+        } else if (vrm.equals("SUB-CHANGE")) {
+            response.make("MERCEDES-BENZ")
+                    .model("C220 ELEGANCE ED125 CDI BLU-CY")
+                    .primaryColour("Silver")
+                    .vehicleType(MOT)
+                    .manufactureYear("2006")
+                    .dueDate("2016-11-26")
+                    .testNumber("42343234");
         } else if (vrm.equals("HGV1MO")) {
             response.make("DAF")
                     .model("XF 105")
