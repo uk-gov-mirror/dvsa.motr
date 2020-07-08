@@ -11,8 +11,6 @@ import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.eventlog.subscription.NotifyClientFailedEvent;
-import uk.gov.dvsa.motr.web.formatting.DateFormatter;
-import uk.gov.dvsa.motr.web.formatting.DateFormatterForSmsDisplay;
 import uk.gov.dvsa.motr.web.formatting.MakeModelFormatter;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
@@ -121,14 +119,7 @@ public class NotifyService {
         Map<String, String> personalisation = new HashMap<>();
         personalisation.put("vehicle_details", MakeModelFormatter.getMakeModelDisplayStringFromVehicleDetails(
                 vehicleDetails, ", " + subscription.getVrm()));
-        personalisation.put("mot_expiry_date", DateFormatter.asDisplayDate(subscription.getMotDueDate()));
         personalisation.put("unsubscribe_link", urlHelper.unsubscribeLink(subscription.getUnsubscribeId()));
-
-        if (subscription.getMotIdentification().getDvlaId().isPresent()) {
-            personalisation.put("is_due_or_expires", "is due");
-        } else {
-            personalisation.put("is_due_or_expires", "expires");
-        }
 
         Map<String, String> notifyParams = getNotifyParameters(
                 modifyTemplatePathForVehicleType(SIGNED_UP_COMPLETE_EMAIL_SUBJECT, vehicleDetails.getVehicleType()),
@@ -177,7 +168,6 @@ public class NotifyService {
         String phoneNumber = subscription.getContactDetail().getValue();
         Map<String, String> personalisation = new HashMap<>();
         personalisation.put("vehicle_vrm", subscription.getVrm());
-        personalisation.put("mot_expiry_date", DateFormatterForSmsDisplay.asFormattedForSmsDate(subscription.getMotDueDate()));
         Map<String, String> notifyParams = getNotifyParameters(
                 modifyTemplatePathForVehicleType(SIGNED_UP_COMPLETE_SMS, vehicleDetails.getVehicleType()), personalisation);
 
