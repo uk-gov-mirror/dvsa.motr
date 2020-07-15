@@ -42,19 +42,22 @@ public class ProcessSubscriptionService {
     private NotifyEmailService notifyEmailService;
     private NotifySmsService notifySmsService;
     private SendableNotificationFactory notificationFactory;
+    private Boolean hgvPsvNotifications;
 
     public ProcessSubscriptionService(
             VehicleDetailsClient client,
             SubscriptionRepository repository,
             NotifyEmailService notifyEmailService,
             NotifySmsService notifySmsService,
-            SendableNotificationFactory notificationFactory) {
+            SendableNotificationFactory notificationFactory,
+            Boolean hgvPsvNotifications) {
 
         this.client = client;
         this.subscriptionRepository = repository;
         this.notifyEmailService = notifyEmailService;
         this.notifySmsService = notifySmsService;
         this.notificationFactory = notificationFactory;
+        this.hgvPsvNotifications = hgvPsvNotifications;
     }
 
     public void processSubscription(SubscriptionQueueItem subscription) throws NotificationClientException,
@@ -72,6 +75,8 @@ public class ProcessSubscriptionService {
         LocalDate vehicleMotExpiryDate = vehicleDetails.getMotExpiryDate();
         String vehicleMotTestNumber = vehicleDetails.getMotTestNumber();
         String vehicleVrm = vehicleDetails.getRegNumber();
+
+        VehicleType vehicleType = subscription.getVehicleType();
 
         if (subscriptionDeletionRequired(vehicleMotExpiryDate, requestDate)) {
             subscriptionRepository.deleteSubscription(vrm, email);
@@ -96,11 +101,15 @@ public class ProcessSubscriptionService {
             }
         }
 
-        SubscriptionQueueItem.ContactType contactType = subscription.getContactDetail().getContactType();
-        if (contactType == SubscriptionQueueItem.ContactType.EMAIL) {
-            sendEmailNotfication(subscription, requestDate, vehicleDetails);
-        } else if (contactType == SubscriptionQueueItem.ContactType.MOBILE) {
-            sendSmsNotification(subscription, vehicleDetails);
+        if (!this.hgvPsvNotifications && VehicleType.isCommercialVehicle(vehicleType)) {
+            logger.debug("HGV/PSV notifications not enabled {}", vrm);
+        } else {
+            SubscriptionQueueItem.ContactType contactType = subscription.getContactDetail().getContactType();
+            if (contactType == SubscriptionQueueItem.ContactType.EMAIL) {
+                sendEmailNotfication(subscription, requestDate, vehicleDetails);
+            } else if (contactType == SubscriptionQueueItem.ContactType.MOBILE) {
+                sendSmsNotification(subscription, vehicleDetails);
+            }
         }
 
         if (motTestNumberUpdateRequired(subscriptionMotTestNumber, vehicleMotTestNumber)) {

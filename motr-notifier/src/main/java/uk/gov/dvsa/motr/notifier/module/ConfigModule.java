@@ -48,6 +48,7 @@ import static org.apache.log4j.Level.toLevel;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.CHECKSUM_SALT;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.DB_TABLE_SUBSCRIPTION;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.GOV_NOTIFY_API_TOKEN;
+import static uk.gov.dvsa.motr.notifier.SystemVariable.HGV_PSV_NOTIFICATIONS;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.HGV_PSV_ONE_MONTH_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.HGV_PSV_TWO_MONTH_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.LOG_LEVEL;
@@ -166,7 +167,14 @@ public class ConfigModule extends AbstractModule {
             SendableNotificationFactory notificationFactory,
             Config config) {
 
-        return new ProcessSubscriptionService(client, repository, notifyEmailService, notifySmsService, notificationFactory);
+        return new ProcessSubscriptionService(
+                client,
+                repository,
+                notifyEmailService,
+                notifySmsService,
+                notificationFactory,
+                Boolean.parseBoolean(config.getValue(HGV_PSV_NOTIFICATIONS))
+        );
     }
 
     @Provides
@@ -217,6 +225,7 @@ public class ConfigModule extends AbstractModule {
 
         return new AwsKmsDecryptor(getRegion(fromName(config.getValue(REGION))));
     }
+
 
     private static Set<ConfigKey> secretVariables() {
 

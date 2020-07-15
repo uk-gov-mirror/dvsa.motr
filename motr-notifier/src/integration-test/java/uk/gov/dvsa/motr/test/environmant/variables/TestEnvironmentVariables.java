@@ -10,6 +10,7 @@ import static uk.gov.dvsa.motr.notifier.SystemVariable.CHECKSUM_SALT;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.DB_TABLE_SUBSCRIPTION;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.EU_GO_LIVE_DATE;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.GOV_NOTIFY_API_TOKEN;
+import static uk.gov.dvsa.motr.notifier.SystemVariable.HGV_PSV_NOTIFICATIONS;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.HGV_PSV_ONE_MONTH_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.HGV_PSV_TWO_MONTH_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.LOG_LEVEL;
@@ -70,6 +71,8 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
         set(WEB_BASE_URL, "");
         set(MOTH_DIRECT_URL_PREFIX, mothDirectUrlPrefix());
         set(CHECKSUM_SALT, checksumSalt());
+        set(HGV_PSV_NOTIFICATIONS, hgvPsvNotifications());
+
     }
 
     public static String motTestNumberApiEndpoint() {
@@ -207,6 +210,11 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
     public static String euGoLiveDate() {
 
         return lookupProperty("test.eu.go.live.date");
+    }
+
+    public static String hgvPsvNotifications() {
+
+        return lookupProperty("test.hgv.psv.notification");
     }
 
     private static String lookupProperty(String property) {

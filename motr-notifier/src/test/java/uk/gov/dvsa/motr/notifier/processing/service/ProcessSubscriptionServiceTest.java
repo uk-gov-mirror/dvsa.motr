@@ -26,7 +26,6 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -50,16 +49,18 @@ public class ProcessSubscriptionServiceTest {
     private static final String TEST_MODEL = "TEST-MODEL";
     private static final String DVLA_ID = "2131312";
     private static final String TEST_PHONE_NUMBER = "070000000000";
+    private static final Boolean hgvPsvNotifications = true;
 
     @Before
     public void setUp() {
         processSubscriptionService = new ProcessSubscriptionService(
-                vehicleDetailsClient, subscriptionRepository, notifyEmailService, notifySmsService, notificationFactory
+                vehicleDetailsClient, subscriptionRepository, notifyEmailService, notifySmsService, notificationFactory, hgvPsvNotifications
         );
     }
 
     @Test(expected = VehicleNotFoundException.class)
     public void whenVehicleNotFoundInTradeApiExceptionThrown() throws Exception {
+
         when(vehicleDetailsClient.fetchByMotTestNumber(any())).thenReturn(Optional.empty());
         processSubscriptionService.processSubscription(emailSubscriptionStub(LocalDate.now()));
     }
@@ -80,6 +81,48 @@ public class ProcessSubscriptionServiceTest {
         processSubscriptionService.processSubscription(subscriptionQueueItem);
 
         verify(subscriptionRepository).updateExpiryDate(TEST_VRM, "test@this-is-a-test-123", vehicleExpiryDate);
+    }
+
+    @Test
+    public void whenHgvVehicleAndNotificationsAreTurnedOffNoEmailReminderIsSent() throws Exception {
+
+        LocalDate testExpiryDate = LocalDate.of(2020, 7, 14);
+        LocalDate requestDate = LocalDate.of(2020, 5, 14);
+        SubscriptionQueueItem subscriptionQueueItem = emailSubscriptionStub(testExpiryDate)
+                .setLoadedOnDate(requestDate)
+                .setVehicleType(VehicleType.HGV)
+                .setMotTestNumber(MOT_TEST_NUMBER);
+        VehicleDetails vehicleDetails = vehicleDetailsStub(testExpiryDate);
+
+        when(vehicleDetailsClient.fetchHgvPsvByVrm(TEST_VRM)).thenReturn(Optional.of(vehicleDetails));
+
+        this.createServiceWithHgvNotificationsTurnedOff();
+        processSubscriptionService.processSubscription(subscriptionQueueItem);
+
+        verify(notifyEmailService, never()).sendEmail(
+                eq("test@this-is-a-test-123"), isA(SendableEmailNotification.class), eq(vehicleDetails)
+        );
+    }
+
+    @Test
+    public void whenHgvVehicleAndNotificationsAreTurnedOffNoSmsReminderIsSent() throws Exception {
+
+        LocalDate testExpiryDate = LocalDate.of(2020, 7, 14);
+        LocalDate requestDate = LocalDate.of(2020, 5, 14);
+        SubscriptionQueueItem subscriptionQueueItem = smsSubscriptionStub(testExpiryDate)
+                .setLoadedOnDate(requestDate)
+                .setVehicleType(VehicleType.HGV)
+                .setMotTestNumber(MOT_TEST_NUMBER);
+        VehicleDetails vehicleDetails = vehicleDetailsStub(testExpiryDate);
+
+        when(vehicleDetailsClient.fetchHgvPsvByVrm(TEST_VRM)).thenReturn(Optional.of(vehicleDetails));
+
+        this.createServiceWithHgvNotificationsTurnedOff();
+        processSubscriptionService.processSubscription(subscriptionQueueItem);
+
+        verify(notifySmsService, never()).sendSms(
+                eq(TEST_PHONE_NUMBER), isA(MotOneMonthSmsNotification.class)
+        );
     }
 
     @Test
@@ -127,6 +170,7 @@ public class ProcessSubscriptionServiceTest {
 
     @Test
     public void whenVehicleExpiryDateIsInTwoWeeksEmailReminderIsSent() throws Exception {
+
         LocalDate vehicleExpiryDate = LocalDate.of(2017, 10, 24);
         LocalDate requestDate = LocalDate.of(2017, 10, 10);
         SubscriptionQueueItem subscription = emailSubscriptionStub(vehicleExpiryDate)
@@ -245,6 +289,7 @@ public class ProcessSubscriptionServiceTest {
     @Test
     public void whenExpiryDateFromApiIsBeforeOneStoredInSubscriptionButWithinOneMonth_ThenRecordIsUpdatedAndEmailSent()
             throws Exception {
+
         LocalDate testExpiryDateInSubscription = LocalDate.of(2019, 10, 24);
         SubscriptionQueueItem subscription = emailSubscriptionStub(testExpiryDateInSubscription)
                 .setLoadedOnDate(LocalDate.of(2017, 9, 24))
@@ -474,6 +519,13 @@ public class ProcessSubscriptionServiceTest {
         verify(subscriptionRepository, never()).updateExpiryDate(any(), any(), any());
         verify(notifyEmailService).sendEmail(
                 eq("test@this-is-a-test-123"), isA(SendableEmailNotification.class), eq(vehicleDetails)
+        );
+    }
+
+    private void createServiceWithHgvNotificationsTurnedOff() {
+
+        processSubscriptionService = new ProcessSubscriptionService(
+                vehicleDetailsClient, subscriptionRepository, notifyEmailService, notifySmsService, notificationFactory, false
         );
     }
 
