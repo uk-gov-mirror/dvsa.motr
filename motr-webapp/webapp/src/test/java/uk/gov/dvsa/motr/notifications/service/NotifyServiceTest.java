@@ -13,6 +13,8 @@ import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.component.subscription.model.ContactDetail;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
+import uk.gov.dvsa.motr.web.formatting.DateFormatter;
+import uk.gov.dvsa.motr.web.formatting.DateFormatterForSmsDisplay;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 import uk.gov.service.notify.SendEmailResponse;
@@ -94,7 +96,7 @@ public class NotifyServiceTest {
     public void notifyCalledWithCorrectValues()
             throws NotificationClientException, VehicleDetailsClientException, NotifyTemplateEngineException {
 
-        Map<String, String> personalisation = stubPersonalisationMap(vehicleDetails, unsubscribeLink);
+        Map<String, String> personalisation = stubPersonalisationMap(vehicleDetails, motExpiryDate, unsubscribeLink);
 
         when(notificationClientMock.sendEmail(any(), any(), any(), any())).thenReturn(mock(SendEmailResponse.class));
         when(vehicleDetailsClientMock.fetchByVrm(VRM)).thenReturn(mockVehicleDetailsStub());
@@ -175,6 +177,7 @@ public class NotifyServiceTest {
 
         Map<String, String> personalisation = new HashMap<>();
         personalisation.put("vehicle_vrm", VRM);
+        personalisation.put("mot_expiry_date", DateFormatterForSmsDisplay.asFormattedForSmsDate(motExpiryDate));
 
         verify(notifyTemplateEngineMock, times(1)).getNotifyParameters(any(), eq(personalisation));
 
@@ -218,11 +221,13 @@ public class NotifyServiceTest {
         );
     }
 
-    private Map<String, String> stubPersonalisationMap(String vehicleDetails, String link) {
+    private Map<String, String> stubPersonalisationMap(String vehicleDetails, LocalDate expiryDate, String link) {
 
         Map<String, String> map = new HashMap<>();
         map.put("vehicle_details", vehicleDetails);
+        map.put("mot_expiry_date", DateFormatter.asDisplayDate(expiryDate));
         map.put("unsubscribe_link", link);
+        map.put("is_due_or_expires", "expires");
         return map;
     }
 
