@@ -35,6 +35,7 @@ public class SubscriptionLoaderHgvPsvTests extends SubscriptionLoaderBase {
 
     @Test
     public void runLoaderForOneMonthHgvReminderThenEnsureItemsAddedToQueue() throws Exception {
+        environmentVariables.set("HGV_PSV_SUBSCRIPTION_LOADER", "true");
         subscriptionItem.setVehicleType(VehicleType.HGV);
         fixture.table(new SubscriptionTable().item(subscriptionItem)).run();
         String testTime = subscriptionItem.getMotDueDate().minusMonths(1) + "T12:00:00Z";
@@ -47,6 +48,7 @@ public class SubscriptionLoaderHgvPsvTests extends SubscriptionLoaderBase {
 
     @Test
     public void runLoaderForTwoMonthsPsvReminderThenEnsureItemsAddedToQueue() throws Exception {
+        environmentVariables.set("HGV_PSV_SUBSCRIPTION_LOADER", "true");
         subscriptionItem.setVehicleType(VehicleType.PSV);
         fixture.table(new SubscriptionTable().item(subscriptionItem)).run();
         String testTime = subscriptionItem.getMotDueDate().minusDays(60) + "T12:00:00Z";
@@ -59,6 +61,7 @@ public class SubscriptionLoaderHgvPsvTests extends SubscriptionLoaderBase {
 
     @Test
     public void runLoaderForTwoMonthsTrailerReminderThenEnsureItemsAddedToQueue() throws Exception {
+        environmentVariables.set("HGV_PSV_SUBSCRIPTION_LOADER", "true");
         subscriptionItem.setVehicleType(VehicleType.TRAILER);
         subscriptionItem.setDvlaId(null);
         fixture.table(new SubscriptionTable().item(subscriptionItem)).run();

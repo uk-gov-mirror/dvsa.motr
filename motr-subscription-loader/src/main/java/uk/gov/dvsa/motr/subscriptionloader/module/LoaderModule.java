@@ -11,6 +11,7 @@ import uk.gov.dvsa.motr.subscriptionloader.processing.loader.Loader;
 import uk.gov.dvsa.motr.subscriptionloader.processing.loader.PurgingLoader;
 import uk.gov.dvsa.motr.subscriptionloader.processing.producer.SubscriptionProducer;
 
+import static uk.gov.dvsa.motr.subscriptionloader.SystemVariable.HGV_PSV_SUBSCRIPTION_LOADER;
 import static uk.gov.dvsa.motr.subscriptionloader.SystemVariable.POST_PURGE_DELAY;
 import static uk.gov.dvsa.motr.subscriptionloader.SystemVariable.QUEUE_URL;
 
@@ -32,7 +33,7 @@ public class LoaderModule extends AbstractModule {
     @Provides
     public Loader provideLoader(Config config, AmazonSQSAsync client, SubscriptionProducer producer, Dispatcher dispatcher) {
 
-        Loader loader = new DefaultLoader(producer, dispatcher);
+        Loader loader = new DefaultLoader(producer, dispatcher, Boolean.parseBoolean(config.getValue(HGV_PSV_SUBSCRIPTION_LOADER)));
 
         String queueUrl = config.getValue(QUEUE_URL);
         int postPurgeDelayMs = parseInt(config.getValue(POST_PURGE_DELAY));

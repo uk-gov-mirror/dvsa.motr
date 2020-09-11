@@ -1,6 +1,7 @@
 package uk.gov.dvsa.motr.test.integration.unloader;
 
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
@@ -14,7 +15,9 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.concurrent.ExecutionException;
 
+@Ignore("These tests rely on the subscription loader running against HGV/PSV vehicles, which is currently disabled (see BL-11356")
 public class SubscriptionDbItemQueueItemUnloaderCommercialVehiclesTest extends SubscriptionDbItemQueueItemUnloaderAbstractTest {
+
 
     @Rule
     public final EnvironmentVariables environmentVariables = new TestEnvironmentVariables();

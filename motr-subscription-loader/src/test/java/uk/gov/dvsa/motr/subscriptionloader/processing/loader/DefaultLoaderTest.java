@@ -49,7 +49,6 @@ public class DefaultLoaderTest {
     private static final LocalDate TEST_DATE_END_OF_MARCH = LocalDate.of(2017, 2, 28);
     private static final LocalDate TEST_DATE_SHORT_MONTH = LocalDate.of(2017, 4, 30);
 
-
     @Mock
     private SubscriptionProducer producer;
 
@@ -59,16 +58,19 @@ public class DefaultLoaderTest {
     @Mock
     private Context context;
 
-    @InjectMocks
-    private DefaultLoader loader;
-
     @Captor
     private ArgumentCaptor<List<SubscriptionCriteria>> criteriaCaptor;
+
+    private DefaultLoader loader;
+
+    private Boolean hgvPsvSubscriptionLoader = true;
+
 
     @Before
     public void setup() {
         initMocks(this);
         when(context.getRemainingTimeInMillis()).thenReturn(400000);
+        loader = new DefaultLoader(producer, dispatcher, hgvPsvSubscriptionLoader);
     }
 
     @Test
@@ -104,6 +106,24 @@ public class DefaultLoaderTest {
         assertThat(criteria, containsSubscriptionOneMonth(VehicleType.HGV, 1));
         assertThat(criteria, containsSubscriptionOneMonth(VehicleType.PSV, 1));
         assertThat(criteria, containsSubscriptionOneMonth(VehicleType.TRAILER, 1));
+    }
+
+    @Test
+    public void whenRunCalledWithLocalDate_AndHgvSubscriptionsTurnedOff_thenProducerCalledWithCorrectDateValuesOneMonth() throws Exception {
+        loader = new DefaultLoader(producer, dispatcher, false);
+        when(this.producer.searchSubscriptions(any()))
+                .thenReturn(Collections.emptyIterator());
+
+        loader.run(TEST_DATE_STANDARD_MONTH, context);
+
+        verify(producer, times(1))
+                .searchSubscriptions(criteriaCaptor.capture());
+        List<SubscriptionCriteria> criteria = criteriaCaptor.getValue();
+        assertEquals(3, criteria.size());
+        assertThat(criteria, containsSubscriptionOneMonth(VehicleType.MOT, 1));
+        assertThat(criteria, doesNotContainSubscriptionOneMonth(VehicleType.HGV, 1));
+        assertThat(criteria, doesNotContainSubscriptionOneMonth(VehicleType.PSV, 1));
+        assertThat(criteria, doesNotContainSubscriptionOneMonth(VehicleType.TRAILER, 1));
     }
 
     @Test
@@ -287,6 +307,28 @@ public class DefaultLoaderTest {
                         Objects.equals(criteria.getVehicleType(), vehicleType)
                                 && Objects.equals(criteria.getTestDueDate(), testDueDate)
                 );
+            }
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("list should contain subscription with ")
+                        .appendText("vehicleType = ").appendValue(vehicleType).appendText(", ")
+                        .appendText("testDueDate = ").appendValue(testDueDate).appendText(";");
+            }
+        };
+    }
+
+    private Matcher<List<SubscriptionCriteria>> doesNotContainSubscriptionOneMonth(
+            final VehicleType vehicleType,
+            final int inMonths) {
+        final LocalDate testDueDate = TEST_DATE_STANDARD_MONTH.plusMonths(inMonths);
+        return new TypeSafeMatcher<List<SubscriptionCriteria>>() {
+            @Override
+            protected boolean matchesSafely(List<SubscriptionCriteria> item) {
+                return !(item.stream().anyMatch(criteria ->
+                        Objects.equals(criteria.getVehicleType(), vehicleType)
+                                && Objects.equals(criteria.getTestDueDate(), testDueDate)
+                ));
             }
 
             @Override
