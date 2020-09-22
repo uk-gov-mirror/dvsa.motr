@@ -4,6 +4,9 @@ import org.junit.contrib.java.lang.system.EnvironmentVariables;
 
 import uk.gov.dvsa.motr.subscriptionloader.SystemVariable;
 
+import java.util.Optional;
+
+import static uk.gov.dvsa.motr.subscriptionloader.SystemVariable.HGV_PSV_SUBSCRIPTION_LOADER;
 import static uk.gov.dvsa.motr.subscriptionloader.SystemVariable.INFLIGHT_BATCHES;
 import static uk.gov.dvsa.motr.subscriptionloader.SystemVariable.LOG_LEVEL;
 import static uk.gov.dvsa.motr.subscriptionloader.SystemVariable.POST_PURGE_DELAY;
@@ -24,6 +27,20 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
         set(QUEUE_URL, sqsEndpoint());
         set(POST_PURGE_DELAY, "0");
         set(INFLIGHT_BATCHES, "1");
+        set(HGV_PSV_SUBSCRIPTION_LOADER, hgvPsvSubscriptionLoader());
+    }
+
+
+    public static String hgvPsvSubscriptionLoader() {
+
+        return lookupProperty("test.hgv.psv.subscription.loader");
+    }
+
+    private static String lookupProperty(String property) {
+
+        return Optional.ofNullable(System.getProperty(property)).orElseThrow(
+                () -> new RuntimeException("Property: " + property + " is not defined!")
+        );
     }
 
     private void set(SystemVariable var, String value) {

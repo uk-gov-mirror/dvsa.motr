@@ -46,12 +46,16 @@ public class DefaultLoader implements Loader {
 
     private SubscriptionProducer producer;
     private Dispatcher dispatcher;
+    private Boolean hgvPsvSubscriptionLoaderActive;
 
     @Inject
-    public DefaultLoader(SubscriptionProducer producer, Dispatcher dispatcher) {
-
+    public DefaultLoader(
+            SubscriptionProducer producer,
+            Dispatcher dispatcher,
+            Boolean hgvPsvSubscriptionLoaderActive) {
         this.producer = producer;
         this.dispatcher = dispatcher;
+        this.hgvPsvSubscriptionLoaderActive = hgvPsvSubscriptionLoaderActive;
     }
 
     public LoadReport run(LocalDate referenceDate, Context context) throws Exception {
@@ -101,9 +105,11 @@ public class DefaultLoader implements Loader {
         LinkedList<SubscriptionCriteria> criteria = new LinkedList<>();
         criteria.add(new SubscriptionCriteria(inTwoWeeks, VehicleType.MOT));
         criteria.add(new SubscriptionCriteria(yesterday, VehicleType.MOT));
-        criteria.add(new SubscriptionCriteria(inTwoMonths, VehicleType.HGV));
-        criteria.add(new SubscriptionCriteria(inTwoMonths, VehicleType.PSV));
-        criteria.add(new SubscriptionCriteria(inTwoMonths, VehicleType.TRAILER));
+        if (hgvPsvSubscriptionLoaderActive) {
+            criteria.add(new SubscriptionCriteria(inTwoMonths, VehicleType.HGV));
+            criteria.add(new SubscriptionCriteria(inTwoMonths, VehicleType.PSV));
+            criteria.add(new SubscriptionCriteria(inTwoMonths, VehicleType.TRAILER));
+        }
 
         if (PreservationDateChecker.dateIs29February(referenceDate)) {
             return producer.searchSubscriptions(getCriteria29February(referenceDate, criteria));
@@ -259,9 +265,11 @@ public class DefaultLoader implements Loader {
         LocalDate in29Days = referenceDate.plusDays(ONE_MONTH_AHEAD_NOTIFICATION_TIME_29_DAYS);
 
         criteria.add(new SubscriptionCriteria(in29Days, VehicleType.MOT));
-        criteria.add(new SubscriptionCriteria(in29Days, VehicleType.HGV));
-        criteria.add(new SubscriptionCriteria(in29Days, VehicleType.PSV));
-        criteria.add(new SubscriptionCriteria(in29Days, VehicleType.TRAILER));
+        if (hgvPsvSubscriptionLoaderActive) {
+            criteria.add(new SubscriptionCriteria(in29Days, VehicleType.HGV));
+            criteria.add(new SubscriptionCriteria(in29Days, VehicleType.PSV));
+            criteria.add(new SubscriptionCriteria(in29Days, VehicleType.TRAILER));
+        }
 
         return criteria;
     }
@@ -272,9 +280,11 @@ public class DefaultLoader implements Loader {
         LocalDate in30Days = referenceDate.plusDays(ONE_MONTH_AHEAD_NOTIFICATION_TIME_30_DAYS);
 
         criteria.add(new SubscriptionCriteria(in30Days, VehicleType.MOT));
-        criteria.add(new SubscriptionCriteria(in30Days, VehicleType.HGV));
-        criteria.add(new SubscriptionCriteria(in30Days, VehicleType.PSV));
-        criteria.add(new SubscriptionCriteria(in30Days, VehicleType.TRAILER));
+        if (hgvPsvSubscriptionLoaderActive) {
+            criteria.add(new SubscriptionCriteria(in30Days, VehicleType.HGV));
+            criteria.add(new SubscriptionCriteria(in30Days, VehicleType.PSV));
+            criteria.add(new SubscriptionCriteria(in30Days, VehicleType.TRAILER));
+        }
 
         return criteria;
     }
@@ -285,9 +295,11 @@ public class DefaultLoader implements Loader {
         LocalDate in31Days = referenceDate.plusDays(ONE_MONTH_AHEAD_NOTIFICATION_TIME_31_DAYS);
 
         criteria.add(new SubscriptionCriteria(in31Days, VehicleType.MOT));
-        criteria.add(new SubscriptionCriteria(in31Days, VehicleType.HGV));
-        criteria.add(new SubscriptionCriteria(in31Days, VehicleType.PSV));
-        criteria.add(new SubscriptionCriteria(in31Days, VehicleType.TRAILER));
+        if (hgvPsvSubscriptionLoaderActive) {
+            criteria.add(new SubscriptionCriteria(in31Days, VehicleType.HGV));
+            criteria.add(new SubscriptionCriteria(in31Days, VehicleType.PSV));
+            criteria.add(new SubscriptionCriteria(in31Days, VehicleType.TRAILER));
+        }
 
         return criteria;
     }
@@ -298,9 +310,11 @@ public class DefaultLoader implements Loader {
         LocalDate inOneMonth = referenceDate.plusMonths(ONE_MONTH_AHEAD_NOTIFICATION_TIME_MONTH);
 
         criteria.add(new SubscriptionCriteria(inOneMonth, VehicleType.MOT));
-        criteria.add(new SubscriptionCriteria(inOneMonth, VehicleType.HGV));
-        criteria.add(new SubscriptionCriteria(inOneMonth, VehicleType.PSV));
-        criteria.add(new SubscriptionCriteria(inOneMonth, VehicleType.TRAILER));
+        if (hgvPsvSubscriptionLoaderActive) {
+            criteria.add(new SubscriptionCriteria(inOneMonth, VehicleType.HGV));
+            criteria.add(new SubscriptionCriteria(inOneMonth, VehicleType.PSV));
+            criteria.add(new SubscriptionCriteria(inOneMonth, VehicleType.TRAILER));
+        }
 
         return criteria;
     }
