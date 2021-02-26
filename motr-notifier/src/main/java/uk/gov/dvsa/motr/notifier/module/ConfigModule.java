@@ -116,9 +116,9 @@ public class ConfigModule extends AbstractModule {
         BlockingExecutor executor =
                 new BlockingExecutor(Integer.parseInt(config.getValue(WORKER_COUNT)));
 
-        return new QueueUnloader(subscriptionsReceiver, queueItemRemover, executor,
-                processSubscriptionService, Integer.parseInt(config.getValue(REMAINING_TIME_THRESHOLD)) * 1000,
-                POST_PROCESSING_DELAY_MS);
+        return new QueueUnloader(subscriptionsReceiver, queueItemRemover,
+                processSubscriptionService, Integer.parseInt(config.getValue(REMAINING_TIME_THRESHOLD)) * 1000
+                );
     }
 
     @Provides
