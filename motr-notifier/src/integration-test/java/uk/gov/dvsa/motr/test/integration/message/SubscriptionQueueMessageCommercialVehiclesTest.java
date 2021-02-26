@@ -1,22 +1,19 @@
-package uk.gov.dvsa.motr.test.integration.unloader;
+package uk.gov.dvsa.motr.test.integration.message;
 
-import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 
+import uk.gov.dvsa.motr.notifier.component.subscription.persistence.SubscriptionDbItem;
 import uk.gov.dvsa.motr.test.environmant.variables.TestEnvironmentVariables;
 import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.model.SubscriptionItem;
 import uk.gov.dvsa.motr.vehicledetails.VehicleType;
-import uk.gov.service.notify.NotificationClientException;
 
-import java.io.IOException;
 import java.time.LocalDate;
-import java.util.concurrent.ExecutionException;
 
 @Ignore("These tests rely on the subscription loader running against HGV/PSV vehicles, which is currently disabled (see BL-11356")
-public class SubscriptionDbItemQueueItemUnloaderCommercialVehiclesTest extends SubscriptionDbItemQueueItemUnloaderAbstractTest {
+public class SubscriptionQueueMessageCommercialVehiclesTest extends SubscriptionQueueMessageAbstractTest {
 
 
     @Rule
@@ -26,7 +23,7 @@ public class SubscriptionDbItemQueueItemUnloaderCommercialVehiclesTest extends S
 
     @Test
     public void whenAnHgvSubscriptionIsInTheDb_TheLoaderLoadsIt_TheNotifierProcessIt()
-            throws IOException, InterruptedException, ExecutionException, NotificationClientException {
+            throws Exception {
         subscriptionItem = new SubscriptionItem()
                 .setVehicleType(VehicleType.HGV)
                 .setVrm("HGV-OLDEXPIRY")
@@ -37,7 +34,7 @@ public class SubscriptionDbItemQueueItemUnloaderCommercialVehiclesTest extends S
 
     @Test
     public void whenAnPsvSubscriptionIsInTheDb_TheLoaderLoadsIt_TheNotifierProcessIt()
-            throws IOException, InterruptedException, ExecutionException, NotificationClientException {
+            throws Exception {
         subscriptionItem = new SubscriptionItem()
                 .setVehicleType(VehicleType.HGV)
                 .setVrm("PSV-ONECOLOR")

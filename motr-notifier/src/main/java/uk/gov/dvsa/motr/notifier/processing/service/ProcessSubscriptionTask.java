@@ -1,4 +1,4 @@
-package uk.gov.dvsa.motr.notifier.processing.unloader;
+package uk.gov.dvsa.motr.notifier.processing.service;
 
 import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.notifier.events.HgvPsvDetailsRetrievalFailedEvent;
@@ -6,90 +6,67 @@ import uk.gov.dvsa.motr.notifier.events.NotifyEvent;
 import uk.gov.dvsa.motr.notifier.events.NotifyReminderFailedEvent;
 import uk.gov.dvsa.motr.notifier.events.SubscriptionProcessedEvent;
 import uk.gov.dvsa.motr.notifier.events.SubscriptionProcessingFailedEvent;
-import uk.gov.dvsa.motr.notifier.events.SubscriptionQueueItemRemovalFailedEvent;
 import uk.gov.dvsa.motr.notifier.events.SuccessfulSubscriptionProcessedEvent;
 import uk.gov.dvsa.motr.notifier.events.VehicleDetailsRetrievalFailedEvent;
 import uk.gov.dvsa.motr.notifier.events.VehicleNotFoundEvent;
 import uk.gov.dvsa.motr.notifier.processing.model.SubscriptionQueueItem;
-import uk.gov.dvsa.motr.notifier.processing.queue.QueueItemRemover;
-import uk.gov.dvsa.motr.notifier.processing.queue.RemoveSubscriptionFromQueueException;
 import uk.gov.dvsa.motr.notifier.processing.service.ProcessSubscriptionService;
 import uk.gov.dvsa.motr.notifier.processing.service.VehicleNotFoundException;
 import uk.gov.dvsa.motr.vehicledetails.HgvPsvDetailsClientException;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClientException;
 import uk.gov.service.notify.NotificationClientException;
 
-public class ProcessSubscriptionTask implements Runnable {
+public class ProcessSubscriptionTask {
 
     private SubscriptionQueueItem subscriptionQueueItemToProcess;
-    private NotifierReport report;
     private ProcessSubscriptionService processSubscriptionService;
-    private QueueItemRemover queueItemRemover;
 
-    public ProcessSubscriptionTask(
-            SubscriptionQueueItem subscriptionQueueItemToProcess,
-            NotifierReport report,
-            ProcessSubscriptionService processSubscriptionService,
-            QueueItemRemover queueItemRemover) {
+    public ProcessSubscriptionTask(ProcessSubscriptionService processSubscriptionService) {
 
-        this.subscriptionQueueItemToProcess = subscriptionQueueItemToProcess;
-        this.report = report;
         this.processSubscriptionService = processSubscriptionService;
-        this.queueItemRemover = queueItemRemover;
     }
 
-    @Override
-    public void run() {
+    public void run(SubscriptionQueueItem subscriptionQueueItemToProcess) throws Exception {
+
+        this.subscriptionQueueItemToProcess = subscriptionQueueItemToProcess;
 
         Long startedProcessingTime = System.currentTimeMillis();
 
         try {
-
             processSubscriptionService.processSubscription(subscriptionQueueItemToProcess);
-
-            queueItemRemover.removeProcessedQueueItem(subscriptionQueueItemToProcess);
 
             EventLogger.logEvent(new SuccessfulSubscriptionProcessedEvent()
                     .setMessageProcessTimeProcessed(System.currentTimeMillis() - startedProcessingTime)
                     .setMessageBody(subscriptionQueueItemToProcess.toString()));
-
-            report.incrementSuccessfullyProcessed();
-
-        } catch (RemoveSubscriptionFromQueueException e) {
-
-            SubscriptionProcessedEvent event = populateEvent(new SubscriptionQueueItemRemovalFailedEvent());
-            EventLogger.logErrorEvent(event, e);
-            report.incrementFailedToProcess();
-
         } catch (VehicleNotFoundException e) {
 
             SubscriptionProcessedEvent event = populateEvent(new VehicleNotFoundEvent());
             EventLogger.logErrorEvent(event, e);
-            report.incrementFailedToProcess();
+            throw e;
 
         } catch (VehicleDetailsClientException e) {
 
             SubscriptionProcessedEvent event = populateEvent(new VehicleDetailsRetrievalFailedEvent());
             EventLogger.logErrorEvent(event, e);
-            report.incrementFailedToProcess();
+            throw e;
 
         } catch (HgvPsvDetailsClientException e) {
 
             SubscriptionProcessedEvent event = populateEvent(new HgvPsvDetailsRetrievalFailedEvent());
             EventLogger.logErrorEvent(event, e);
-            report.incrementFailedToProcess();
+            throw e;
+
         } catch (NotificationClientException e) {
 
             NotifyEvent event = populateEvent(new NotifyReminderFailedEvent());
             EventLogger.logErrorEvent(event, e);
-            report.incrementFailedToProcess();
+            throw e;
 
         } catch (Exception e) {
             EventLogger.logErrorEvent(new SubscriptionProcessingFailedEvent()
                     .setMessageBody(subscriptionQueueItemToProcess.toString())
                     .setMessageProcessTimeProcessed(System.currentTimeMillis() - startedProcessingTime), e);
-
-            report.incrementFailedToProcess();
+            throw e;
         }
     }
 
