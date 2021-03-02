@@ -41,7 +41,7 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
 
     public TestEnvironmentVariables() {
 
-        set(LOG_LEVEL, "INFO");
+        set(LOG_LEVEL, "DEBUG");
         set(REGION, region());
         set(DB_TABLE_SUBSCRIPTION, subscriptionTableName());
         set(SUBSCRIPTIONS_QUEUE_URL, sqsEndpoint());

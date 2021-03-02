@@ -9,7 +9,7 @@ public class Logger {
 
     public static void info(String logText) {
 
-        String logInfo = ("INFO: [" + logText + "]");
+        String logInfo = ("DEBUG: [" + logText + "]");
         Reporter.log(logInfo, true);
     }
 
