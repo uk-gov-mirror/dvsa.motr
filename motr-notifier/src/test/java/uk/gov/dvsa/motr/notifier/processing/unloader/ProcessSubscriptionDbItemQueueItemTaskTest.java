@@ -51,6 +51,7 @@ public class ProcessSubscriptionDbItemQueueItemTaskTest {
 
         verify(processSubscriptionService, times(1)).processSubscription(subscriptionQueueItemToProcess);
         verify(queueItemRemover, times(1)).removeProcessedQueueItem(subscriptionQueueItemToProcess);
+        verify(report, times(1)).incrementSuccessfullyProcessed();
     }
 
     @Test
@@ -64,5 +65,6 @@ public class ProcessSubscriptionDbItemQueueItemTaskTest {
         verify(processSubscriptionService, times(1)).processSubscription(subscriptionQueueItemToProcess);
         verify(queueItemRemover, times(0)).removeProcessedQueueItem(subscriptionQueueItemToProcess);
         verify(report, times(0)).incrementSuccessfullyProcessed();
+        verify(report, times(1)).incrementFailedToProcess();
     }
 }

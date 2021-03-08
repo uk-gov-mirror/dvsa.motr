@@ -53,34 +53,49 @@ public class ProcessSubscriptionTask implements Runnable {
                     .setMessageProcessTimeProcessed(System.currentTimeMillis() - startedProcessingTime)
                     .setMessageBody(subscriptionQueueItemToProcess.toString()));
 
+            report.incrementSuccessfullyProcessed();
+
         } catch (RemoveSubscriptionFromQueueException e) {
 
             SubscriptionProcessedEvent event = populateEvent(new SubscriptionQueueItemRemovalFailedEvent());
             EventLogger.logErrorEvent(event, e);
+
+            report.incrementFailedToProcess();
 
         } catch (VehicleNotFoundException e) {
 
             SubscriptionProcessedEvent event = populateEvent(new VehicleNotFoundEvent());
             EventLogger.logErrorEvent(event, e);
 
+            report.incrementFailedToProcess();
+
         } catch (VehicleDetailsClientException e) {
 
             SubscriptionProcessedEvent event = populateEvent(new VehicleDetailsRetrievalFailedEvent());
             EventLogger.logErrorEvent(event, e);
 
+            report.incrementFailedToProcess();
+
         } catch (HgvPsvDetailsClientException e) {
 
             SubscriptionProcessedEvent event = populateEvent(new HgvPsvDetailsRetrievalFailedEvent());
             EventLogger.logErrorEvent(event, e);
+
+            report.incrementFailedToProcess();
+
         } catch (NotificationClientException e) {
 
             NotifyEvent event = populateEvent(new NotifyReminderFailedEvent());
             EventLogger.logErrorEvent(event, e);
 
+            report.incrementFailedToProcess();
+
         } catch (Exception e) {
             EventLogger.logErrorEvent(new SubscriptionProcessingFailedEvent()
                     .setMessageBody(subscriptionQueueItemToProcess.toString())
                     .setMessageProcessTimeProcessed(System.currentTimeMillis() - startedProcessingTime), e);
+
+            report.incrementFailedToProcess();
         }
     }
 
