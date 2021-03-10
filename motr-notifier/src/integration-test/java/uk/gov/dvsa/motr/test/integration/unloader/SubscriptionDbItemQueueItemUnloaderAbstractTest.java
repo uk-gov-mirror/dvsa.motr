@@ -14,20 +14,20 @@ import org.junit.Before;
 import uk.gov.dvsa.motr.notifier.component.subscription.persistence.DynamoDbSubscriptionRepository;
 import uk.gov.dvsa.motr.notifier.component.subscription.persistence.SubscriptionDbItem;
 import uk.gov.dvsa.motr.notifier.handler.EventHandler;
-import uk.gov.dvsa.motr.notifier.processing.unloader.NotifierReport;
+import uk.gov.dvsa.motr.notifier.processing.model.ContactDetail;
+import uk.gov.dvsa.motr.notifier.processing.model.SubscriptionQueueItem;
 import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.core.DynamoDbFixture;
 import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.model.SubscriptionItem;
 import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.model.SubscriptionTable;
 import uk.gov.dvsa.motr.test.integration.lambda.LoaderHelper;
 import uk.gov.dvsa.motr.test.integration.lambda.LoaderInvocationEvent;
-import uk.gov.service.notify.NotificationClientException;
 
-import java.io.IOException;
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
-
-import static org.junit.Assert.assertEquals;
 
 import static uk.gov.dvsa.motr.test.environmant.variables.TestEnvironmentVariables.region;
 import static uk.gov.dvsa.motr.test.environmant.variables.TestEnvironmentVariables.subscriptionTableName;
@@ -80,7 +80,35 @@ public abstract class SubscriptionDbItemQueueItemUnloaderAbstractTest {
 
         // Invoke the notifiers handle event with correct date to read items from the queue.
         //NotifierReport report = eventHandler.handle(new SQSEvent(), buildContext());
-        eventHandler.handle(new SQSEvent(), buildContext());
+        SubscriptionQueueItem subscriptionQueueItem = new SubscriptionQueueItem();
+
+        ContactDetail contactDetail = new ContactDetail(subscriptionItem.getEmail(), subscriptionItem.getContactType());
+        LocalDate date = LocalDate.parse(subscriptionItem.getMotDueDate().minusMonths(1).toString());
+
+        subscriptionQueueItem.setMotTestNumber(subscriptionItem.getMotTestNumber());
+        subscriptionQueueItem.setLoadedOnDate(date);
+        subscriptionQueueItem.setContactDetail(contactDetail);
+        subscriptionQueueItem.setDvlaId(subscriptionItem.getDvlaId());
+        subscriptionQueueItem.setId(subscriptionItem.getId());
+        subscriptionQueueItem.setVrm(subscriptionItem.getVrm());
+        subscriptionQueueItem.setVehicleType(subscriptionItem.getVehicleType());
+        subscriptionQueueItem.setMotDueDate(subscriptionItem.getMotDueDate());
+
+        ObjectMapper jsonMapper = new ObjectMapper();
+        SQSEvent.SQSMessage message = new SQSEvent.SQSMessage();
+
+        message.setBody(jsonMapper.writeValueAsString(subscriptionQueueItem));
+        HashMap<String, SQSEvent.MessageAttribute> attributeValueHashMap = new HashMap<>();
+        SQSEvent.MessageAttribute messageAttribute = new SQSEvent.MessageAttribute();
+        messageAttribute.setStringValue("test-correlation-id");
+        attributeValueHashMap.put("correlation-id", messageAttribute);
+        message.setMessageAttributes(attributeValueHashMap);
+        List<SQSEvent.SQSMessage> messageList = Arrays.asList(message);
+
+        SQSEvent event = new SQSEvent();
+        event.setRecords(messageList);
+        eventHandler.handle(event, buildContext());
+
         // @todo assert response code
         //assertEquals(1, report.getSuccessfullyProcessed());
 
