@@ -32,6 +32,7 @@ import uk.gov.dvsa.motr.notifier.processing.factory.SendableNotificationFactory;
 import uk.gov.dvsa.motr.notifier.processing.queue.QueueItemRemover;
 import uk.gov.dvsa.motr.notifier.processing.queue.SubscriptionsReceiver;
 import uk.gov.dvsa.motr.notifier.processing.service.ProcessSubscriptionService;
+import uk.gov.dvsa.motr.notifier.processing.unloader.ProcessSubscriptionTask;
 import uk.gov.dvsa.motr.notifier.processing.unloader.QueueUnloader;
 import uk.gov.dvsa.motr.notify.NotifyTemplateEngine;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
@@ -119,6 +120,14 @@ public class ConfigModule extends AbstractModule {
         return new QueueUnloader(subscriptionsReceiver, queueItemRemover,
                 processSubscriptionService, Integer.parseInt(config.getValue(REMAINING_TIME_THRESHOLD)) * 1000
                 );
+    }
+
+    @Provides
+    public ProcessSubscriptionTask provideProcessSubscriptionTask(
+            ProcessSubscriptionService processSubscriptionService
+    ) {
+
+        return new ProcessSubscriptionTask(processSubscriptionService);
     }
 
     @Provides

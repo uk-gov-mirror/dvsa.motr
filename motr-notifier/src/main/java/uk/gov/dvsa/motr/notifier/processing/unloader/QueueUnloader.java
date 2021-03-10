@@ -40,11 +40,8 @@ public class QueueUnloader {
             }
 
             (new ProcessSubscriptionTask(
-                subscriptionQueueItemFromQueue,
-                report,
-                processSubscriptionService,
-                queueItemRemover
-            )).run();
+                processSubscriptionService
+            )).run(subscriptionQueueItemFromQueue);
         }
 
         return report;

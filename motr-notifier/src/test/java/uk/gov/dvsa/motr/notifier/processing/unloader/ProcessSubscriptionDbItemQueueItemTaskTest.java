@@ -24,7 +24,6 @@ public class ProcessSubscriptionDbItemQueueItemTaskTest {
     private SubscriptionQueueItem subscriptionQueueItemToProcess;
     private NotifierReport report = mock(NotifierReport.class);
     private ProcessSubscriptionService processSubscriptionService = mock(ProcessSubscriptionService.class);
-    private QueueItemRemover queueItemRemover = mock(QueueItemRemover.class);
 
     private ProcessSubscriptionTask processSubscriptionTask;
 
@@ -37,20 +36,17 @@ public class ProcessSubscriptionDbItemQueueItemTaskTest {
                 .setMotTestNumber("test-mot-number-123")
                 .setContactDetail(new ContactDetail("test@test.com", SubscriptionQueueItem.ContactType.EMAIL));
 
-        processSubscriptionTask = new ProcessSubscriptionTask(
-                subscriptionQueueItemToProcess, report, processSubscriptionService, queueItemRemover);
+        processSubscriptionTask = new ProcessSubscriptionTask(processSubscriptionService);
     }
 
     @Test
     public void subscriptionIsProcessedAndThenRemoved() throws Exception {
 
         doNothing().when(processSubscriptionService).processSubscription(any());
-        doNothing().when(queueItemRemover).removeProcessedQueueItem(any());
 
-        processSubscriptionTask.run();
+        processSubscriptionTask.run(subscriptionQueueItemToProcess);
 
         verify(processSubscriptionService, times(1)).processSubscription(subscriptionQueueItemToProcess);
-        verify(queueItemRemover, times(1)).removeProcessedQueueItem(subscriptionQueueItemToProcess);
         verify(report, times(1)).incrementSuccessfullyProcessed();
     }
 
@@ -58,12 +54,10 @@ public class ProcessSubscriptionDbItemQueueItemTaskTest {
     public void whenSubscriptionFailsThenReportIncrementsFailedToProcess() throws Exception {
 
         doThrow(VehicleNotFoundException.class).when(processSubscriptionService).processSubscription(any());
-        doNothing().when(queueItemRemover).removeProcessedQueueItem(any());
 
-        processSubscriptionTask.run();
+        processSubscriptionTask.run(subscriptionQueueItemToProcess);
 
         verify(processSubscriptionService, times(1)).processSubscription(subscriptionQueueItemToProcess);
-        verify(queueItemRemover, times(0)).removeProcessedQueueItem(subscriptionQueueItemToProcess);
         verify(report, times(0)).incrementSuccessfullyProcessed();
         verify(report, times(1)).incrementFailedToProcess();
     }
