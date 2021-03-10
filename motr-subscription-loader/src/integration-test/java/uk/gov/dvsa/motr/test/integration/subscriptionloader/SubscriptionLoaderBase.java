@@ -21,7 +21,7 @@ import static uk.gov.dvsa.motr.test.integration.dynamodb.DynamoDbIntegrationHelp
 
 
 public abstract class SubscriptionLoaderBase {
-
+/* @todo: Change these tests to work with new event source mapping
     private ObjectMapper jsonMapper = new ObjectMapper();
 
     private SqsHelper queueHelper;
@@ -107,4 +107,6 @@ public abstract class SubscriptionLoaderBase {
         queueHelper.deleteMessageFromQueue(messages.get(0));
         return queuedSubscription;
     }
+
+ */
 }
