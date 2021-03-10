@@ -29,52 +29,17 @@ public class ProcessSubscriptionTask {
         this.processSubscriptionService = processSubscriptionService;
     }
 
-    public void run(SubscriptionQueueItem subscriptionQueueItemToProcess) {
+    public void run(SubscriptionQueueItem subscriptionQueueItemToProcess) throws Exception {
 
         this.subscriptionQueueItemToProcess = subscriptionQueueItemToProcess;
 
         Long startedProcessingTime = System.currentTimeMillis();
 
-        try {
+        processSubscriptionService.processSubscription(subscriptionQueueItemToProcess);
 
-            processSubscriptionService.processSubscription(subscriptionQueueItemToProcess);
-
-            EventLogger.logEvent(new SuccessfulSubscriptionProcessedEvent()
-                    .setMessageProcessTimeProcessed(System.currentTimeMillis() - startedProcessingTime)
-                    .setMessageBody(subscriptionQueueItemToProcess.toString()));
-
-        }/* catch (RemoveSubscriptionFromQueueException e) {
-
-            SubscriptionProcessedEvent event = populateEvent(new SubscriptionQueueItemRemovalFailedEvent());
-            EventLogger.logErrorEvent(event, e);
-
-            report.incrementFailedToProcess();
-
-        }*/ catch (VehicleNotFoundException e) {
-
-            SubscriptionProcessedEvent event = populateEvent(new VehicleNotFoundEvent());
-            EventLogger.logErrorEvent(event, e);
-
-        } catch (VehicleDetailsClientException e) {
-
-            SubscriptionProcessedEvent event = populateEvent(new VehicleDetailsRetrievalFailedEvent());
-            EventLogger.logErrorEvent(event, e);
-
-        } catch (HgvPsvDetailsClientException e) {
-
-            SubscriptionProcessedEvent event = populateEvent(new HgvPsvDetailsRetrievalFailedEvent());
-            EventLogger.logErrorEvent(event, e);
-
-        } catch (NotificationClientException e) {
-
-            NotifyEvent event = populateEvent(new NotifyReminderFailedEvent());
-            EventLogger.logErrorEvent(event, e);
-
-        } catch (Exception e) {
-            EventLogger.logErrorEvent(new SubscriptionProcessingFailedEvent()
-                    .setMessageBody(subscriptionQueueItemToProcess.toString())
-                    .setMessageProcessTimeProcessed(System.currentTimeMillis() - startedProcessingTime), e);
-        }
+        EventLogger.logEvent(new SuccessfulSubscriptionProcessedEvent()
+                .setMessageProcessTimeProcessed(System.currentTimeMillis() - startedProcessingTime)
+                .setMessageBody(subscriptionQueueItemToProcess.toString()));
     }
 
     private NotifyEvent populateEvent(NotifyEvent event) {

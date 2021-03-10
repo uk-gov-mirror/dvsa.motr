@@ -26,7 +26,7 @@ public class SubscriptionDbItemQueueItemUnloaderCommercialVehiclesTest extends S
 
     @Test
     public void whenAnHgvSubscriptionIsInTheDb_TheLoaderLoadsIt_TheNotifierProcessIt()
-            throws IOException, InterruptedException, ExecutionException, NotificationClientException {
+            throws Exception {
         subscriptionItem = new SubscriptionItem()
                 .setVehicleType(VehicleType.HGV)
                 .setVrm("HGV-OLDEXPIRY")
@@ -37,7 +37,7 @@ public class SubscriptionDbItemQueueItemUnloaderCommercialVehiclesTest extends S
 
     @Test
     public void whenAnPsvSubscriptionIsInTheDb_TheLoaderLoadsIt_TheNotifierProcessIt()
-            throws IOException, InterruptedException, ExecutionException, NotificationClientException {
+            throws Exception {
         subscriptionItem = new SubscriptionItem()
                 .setVehicleType(VehicleType.HGV)
                 .setVrm("PSV-ONECOLOR")

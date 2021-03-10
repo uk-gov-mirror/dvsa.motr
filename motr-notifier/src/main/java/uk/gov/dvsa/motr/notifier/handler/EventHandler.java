@@ -2,7 +2,6 @@ package uk.gov.dvsa.motr.notifier.handler;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.events.SQSEvent;
-import com.amazonaws.services.sqs.model.Message;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -13,9 +12,7 @@ import org.slf4j.LoggerFactory;
 import uk.gov.dvsa.motr.notifier.module.ConfigModule;
 import uk.gov.dvsa.motr.notifier.module.InvocationContextModule;
 import uk.gov.dvsa.motr.notifier.processing.model.SubscriptionQueueItem;
-import uk.gov.dvsa.motr.notifier.processing.unloader.NotifierReport;
 import uk.gov.dvsa.motr.notifier.processing.unloader.ProcessSubscriptionTask;
-import uk.gov.dvsa.motr.notifier.processing.unloader.QueueUnloader;
 
 import java.io.IOException;
 import java.util.List;
@@ -24,7 +21,7 @@ public class EventHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(EventHandler.class);
 
-    public void handle(final SQSEvent event, Context context)  {
+    public void handle(final SQSEvent event, Context context) throws Exception {
 
         logger.info("Event: {}, context: {}", event, context);
         Injector injector = Guice.createInjector(

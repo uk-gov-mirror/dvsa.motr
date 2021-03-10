@@ -69,7 +69,7 @@ public abstract class SubscriptionDbItemQueueItemUnloaderAbstractTest {
      * @param subscriptionItem The subscription item to save.
      */
     protected SubscriptionDbItem saveAndProcessSubscriptionItem(SubscriptionItem subscriptionItem)
-            throws IOException, InterruptedException, ExecutionException, NotificationClientException {
+            throws Exception {
 
         // Save the subscription to db.
         fixture.table(new SubscriptionTable().item(subscriptionItem)).run();

@@ -28,7 +28,7 @@ public class QueueUnloader {
         this.processSubscriptionService = processSubscriptionService;
     }
 
-    public NotifierReport run(Context context) {
+    public NotifierReport run(Context context) throws Exception {
 
         NotifierReport report = new NotifierReport();
         report.startProcessingTheMessages();

@@ -39,7 +39,7 @@ public class SubscriptionDbItemQueueItemUnloaderTest extends SubscriptionDbItemQ
 
     @Test
     public void whenAnEmailItemIsInTheDb_TheLoaderAddsToQueue_ThenTheNotifierSuccessfullyProcessesIt()
-            throws IOException, InterruptedException, ExecutionException, NotificationClientException {
+            throws Exception {
 
         subscriptionItem = new SubscriptionItem()
                 .setMotDueDate(MOCK_API_RANDOM_VEHICLE_DATE)
@@ -50,7 +50,7 @@ public class SubscriptionDbItemQueueItemUnloaderTest extends SubscriptionDbItemQ
 
     @Test
     public void whenAnSmsItemIsInTheDb_TheLoaderAddsToQueue_ThenTheNotifierSuccessfullyProcessesIt()
-            throws IOException, InterruptedException, ExecutionException, NotificationClientException {
+            throws Exception {
 
         subscriptionItem = new SubscriptionItem()
                 .setMotDueDate(MOCK_API_RANDOM_VEHICLE_DATE)
@@ -62,8 +62,7 @@ public class SubscriptionDbItemQueueItemUnloaderTest extends SubscriptionDbItemQ
     }
 
     @Test
-    public void whenProcessingASubscriptionWithAMismatchedMotDueDate_TheSubscriptionDateInTheDbIsUpdated() throws IOException,
-            InterruptedException, ExecutionException, NotificationClientException {
+    public void whenProcessingASubscriptionWithAMismatchedMotDueDate_TheSubscriptionDateInTheDbIsUpdated() throws Exception {
 
         subscriptionItem = new SubscriptionItem();
         subscriptionItem
@@ -78,8 +77,7 @@ public class SubscriptionDbItemQueueItemUnloaderTest extends SubscriptionDbItemQ
     }
 
     @Test
-    public void whenProcessingASubscriptionWithAMismatchedMotTestNumber_TheSubscriptionMotTestNumberInTheDbIsUpdated() throws IOException,
-            InterruptedException, ExecutionException, NotificationClientException {
+    public void whenProcessingASubscriptionWithAMismatchedMotTestNumber_TheSubscriptionMotTestNumberInTheDbIsUpdated() throws Exception {
 
         subscriptionItem = new SubscriptionItem();
         subscriptionItem
@@ -94,8 +92,7 @@ public class SubscriptionDbItemQueueItemUnloaderTest extends SubscriptionDbItemQ
     }
 
     @Test
-    public void whenProcessingASubscriptionWithAMismatchedVrm_TheSubscriptionVrmInTheDbIsUpdated() throws IOException,
-            InterruptedException, ExecutionException, NotificationClientException {
+    public void whenProcessingASubscriptionWithAMismatchedVrm_TheSubscriptionVrmInTheDbIsUpdated() throws Exception {
 
         subscriptionItem = new SubscriptionItem()
                 .setMotDueDate(MOCK_API_SPECIFIC_VEHICLE_DATE)
@@ -128,8 +125,7 @@ public class SubscriptionDbItemQueueItemUnloaderTest extends SubscriptionDbItemQ
     }
 
     @Test
-    public void whenProcessingASubscriptionWithDeletionRequired_TheSubscriptionInTheDbIsDeleted() throws IOException,
-            InterruptedException, ExecutionException, NotificationClientException {
+    public void whenProcessingASubscriptionWithDeletionRequired_TheSubscriptionInTheDbIsDeleted() throws Exception {
 
         subscriptionItem = new SubscriptionItem().setMotTestNumber("12345");
 
@@ -143,7 +139,7 @@ public class SubscriptionDbItemQueueItemUnloaderTest extends SubscriptionDbItemQ
 
     @Test
     public void whenProcessingASubscriptionWithADvlaId_whichHasNowGotATestNumber_thenTheSubscriptionIsSuccessfullyProcessed()
-            throws IOException, InterruptedException, ExecutionException, NotificationClientException {
+            throws Exception {
 
         subscriptionItem = new SubscriptionItem()
                 .setMotDueDate(MOCK_API_SPECIFIC_VEHICLE_DATE)
@@ -171,7 +167,7 @@ public class SubscriptionDbItemQueueItemUnloaderTest extends SubscriptionDbItemQ
 
     @Test
     public void whenProcessingASubscriptionWithADvlaId_whichHasUndergoneACherishedTransfer_thenTheSubscriptionIsSuccessfullyProcessed()
-            throws IOException, InterruptedException, ExecutionException, NotificationClientException {
+            throws Exception {
 
         subscriptionItem = new SubscriptionItem()
                 .setMotDueDate(MOCK_API_SPECIFIC_VEHICLE_DATE)
@@ -198,7 +194,7 @@ public class SubscriptionDbItemQueueItemUnloaderTest extends SubscriptionDbItemQ
 
     @Test
     public void whenProcessingASubscriptionWithADvlaId_whichHasGotANewExpiryDate_thenTheSubscriptionIsSuccessfullyProcessed()
-            throws IOException, InterruptedException, ExecutionException, NotificationClientException {
+            throws Exception {
 
         subscriptionItem = new SubscriptionItem()
                 .setMotDueDate(LocalDate.of(1991, 3, 9))

@@ -5,7 +5,6 @@ import org.junit.Test;
 
 import uk.gov.dvsa.motr.notifier.processing.model.ContactDetail;
 import uk.gov.dvsa.motr.notifier.processing.model.SubscriptionQueueItem;
-import uk.gov.dvsa.motr.notifier.processing.queue.QueueItemRemover;
 import uk.gov.dvsa.motr.notifier.processing.service.ProcessSubscriptionService;
 import uk.gov.dvsa.motr.notifier.processing.service.VehicleNotFoundException;
 
@@ -27,6 +26,8 @@ public class ProcessSubscriptionDbItemQueueItemTaskTest {
 
     private ProcessSubscriptionTask processSubscriptionTask;
 
+    // @todo Move tests to more relevant location (no longer associated with the unloader
+
     @Before
     public void setUp() {
 
@@ -47,18 +48,15 @@ public class ProcessSubscriptionDbItemQueueItemTaskTest {
         processSubscriptionTask.run(subscriptionQueueItemToProcess);
 
         verify(processSubscriptionService, times(1)).processSubscription(subscriptionQueueItemToProcess);
-        verify(report, times(1)).incrementSuccessfullyProcessed();
     }
 
-    @Test
-    public void whenSubscriptionFailsThenReportIncrementsFailedToProcess() throws Exception {
+    @Test(expected = Exception.class)
+    public void whenSubscriptionFailsThenExceptionIsThrown() throws Exception {
 
         doThrow(VehicleNotFoundException.class).when(processSubscriptionService).processSubscription(any());
 
         processSubscriptionTask.run(subscriptionQueueItemToProcess);
 
         verify(processSubscriptionService, times(1)).processSubscription(subscriptionQueueItemToProcess);
-        verify(report, times(0)).incrementSuccessfullyProcessed();
-        verify(report, times(1)).incrementFailedToProcess();
     }
 }
