@@ -114,7 +114,7 @@ public class MetricsPerfAspect {
         return response;
     }
 
-    @Before("execution(* uk.gov.dvsa.motr.notifier.processing.unloader.QueueUnloader.run(..))")
+    @Before("execution(* uk.gov.dvsa.motr.notifier.handler.EventHandler.handle(..))")
     public void beginMetrics() {
         vehicleDetailsFetchByMotTestNumber = METRIC_REGISTRY.timer("vehicleDetailsFetchByMotTestNumber");
         vehicleDetailsFetchByDvlaId = METRIC_REGISTRY.timer("vehicleDetailsFetchByDvlaId");
@@ -124,7 +124,7 @@ public class MetricsPerfAspect {
         processItemTimer = METRIC_REGISTRY.timer("process_single_item");
     }
 
-    @Around("execution(* uk.gov.dvsa.motr.notifier.processing.unloader.QueueUnloader.run(..))")
+    @Around("execution(* uk.gov.dvsa.motr.notifier.handler.EventHandler.handle(..))")
     public Object processMetricEvent(ProceedingJoinPoint joinPoint) throws Throwable {
 
         NotifierReport response;
