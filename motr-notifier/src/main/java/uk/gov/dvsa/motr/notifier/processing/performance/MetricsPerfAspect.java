@@ -127,16 +127,10 @@ public class MetricsPerfAspect {
     @Around("execution(* uk.gov.dvsa.motr.notifier.handler.EventHandler.handle(..))")
     public Object processMetricEvent(ProceedingJoinPoint joinPoint) throws Throwable {
 
-        NotifierReport response;
+        Object response;
 
         try {
-            response = (NotifierReport)joinPoint.proceed();
-            response.setVehicleDetailsTimerFetchByMotTestNumber(vehicleDetailsFetchByMotTestNumber);
-            response.setSendEmailTimer(sendEmailTimer);
-            response.setSendSmsTimer(sendSmsTimer);
-            response.setUpdateExpiryDateTimer(updateExpiryDateTimer);
-            response.setProcessItemTimer(processItemTimer);
-            response.setVehicleDetailsTimerFetchByDvlaId(vehicleDetailsFetchByDvlaId);
+            response = joinPoint.proceed();
         } finally {
             EventLogger.logEvent(new MetricEvent()
                     .setVehicleDetails99thPercentileFetchByMotTestNumber(vehicleDetailsFetchByMotTestNumber.getSnapshot()
