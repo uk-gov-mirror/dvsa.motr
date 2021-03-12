@@ -34,16 +34,16 @@ public class EventHandler {
         List<SQSEvent.SQSMessage> messages = event.getRecords();
 
         for (SQSEvent.SQSMessage message : messages) {
-            task.run(getSubscriptionFromMessage(message));
+            task.run(getSubscriptionFromMessage(message, context));
         }
     }
 
-    private SubscriptionQueueItem getSubscriptionFromMessage(SQSEvent.SQSMessage message) {
+    private SubscriptionQueueItem getSubscriptionFromMessage(SQSEvent.SQSMessage message, Context context) {
         try {
             ObjectMapper jsonMapper = new ObjectMapper();
             SubscriptionQueueItem subscriptionQueueItem = jsonMapper.readValue(message.getBody(), SubscriptionQueueItem.class);
             subscriptionQueueItem.setMessageReceiptHandle(message.getReceiptHandle())
-                    .setMessageCorrelationId(message.getMessageAttributes().get("correlation-id").getStringValue());
+                    .setMessageCorrelationId(context.getAwsRequestId());
             return subscriptionQueueItem;
         } catch (IOException e) {
             throw new RuntimeException(e);

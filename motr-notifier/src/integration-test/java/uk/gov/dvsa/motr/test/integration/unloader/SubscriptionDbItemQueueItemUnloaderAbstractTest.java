@@ -98,11 +98,6 @@ public abstract class SubscriptionDbItemQueueItemUnloaderAbstractTest {
         SQSEvent.SQSMessage message = new SQSEvent.SQSMessage();
 
         message.setBody(jsonMapper.writeValueAsString(subscriptionQueueItem));
-        HashMap<String, SQSEvent.MessageAttribute> attributeValueHashMap = new HashMap<>();
-        SQSEvent.MessageAttribute messageAttribute = new SQSEvent.MessageAttribute();
-        messageAttribute.setStringValue("test-correlation-id");
-        attributeValueHashMap.put("correlation-id", messageAttribute);
-        message.setMessageAttributes(attributeValueHashMap);
         List<SQSEvent.SQSMessage> messageList = Arrays.asList(message);
 
         SQSEvent event = new SQSEvent();
