@@ -22,7 +22,7 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
 
         assetsUrl("http://url");
         assetsHash("981347823940237907edfdfdfdf");
-        logLevel("DEBUG");
+        logLevel("INFO");
         baseUrl("http://url");
         motTestReminderInfoApiUri("some_uri");
         doWarmUp(false);

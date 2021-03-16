@@ -20,7 +20,7 @@ public class TestEnvironmentVariables extends EnvironmentVariables {
 
     public TestEnvironmentVariables() {
 
-        set(LOG_LEVEL, "DEBUG");
+        set(LOG_LEVEL, "INFO");
         set(REGION, region());
         set(DB_TABLE_SUBSCRIPTION, subscriptionTableName());
         set(DB_TABLE_CANCELLED_SUBSCRIPTION, cancelledSubscriptionTableName());
