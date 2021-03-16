@@ -9,12 +9,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class NotifierReport {
 
-    private AtomicInteger successfullyProcessed = new AtomicInteger(0);
-
-    private AtomicInteger failedToProcess = new AtomicInteger(0);
-
-    private AtomicLong allMessagesStartTime = new AtomicLong(0);
-
     private Timer vehicleDetailsTimerFetchByMotTestNumber;
 
     private Timer sendEmailTimer;
@@ -26,36 +20,6 @@ public class NotifierReport {
     private Timer processItemTimer;
 
     private Timer vehicleDetailsTimerFetchByDvlaId;
-
-    public void incrementSuccessfullyProcessed() {
-
-        successfullyProcessed.incrementAndGet();
-    }
-
-    public void incrementFailedToProcess() {
-
-        failedToProcess.incrementAndGet();
-    }
-
-    public int getFailedToProcess() {
-
-        return failedToProcess.get();
-    }
-
-    public int getSuccessfullyProcessed() {
-
-        return successfullyProcessed.get();
-    }
-
-    public void startProcessingTheMessages() {
-
-        allMessagesStartTime = new AtomicLong(System.currentTimeMillis());
-    }
-
-    public long getDurationToProcessTheMessages() {
-
-        return System.currentTimeMillis() - allMessagesStartTime.get();
-    }
 
     public MetricsTimerWrapper getVehicleDetailsTimerFetchByMotTestNumber() {
         return new MetricsTimerWrapper(vehicleDetailsTimerFetchByMotTestNumber);

@@ -49,22 +49,4 @@ public class EventHandler {
             throw new RuntimeException(e);
         }
     }
-
-    /*
-    @Override
-    public Void handleRequest(final SQSEvent event, final Context context) {
-
-        List<SQSMessage> messages = event.getRecords();
-        logger.debug("Received {} SQS message/s", messages.size());
-
-        for (SQSMessage message : messages) {
-            logger.info("Processing message with ID {}", message.getMessageId());
-            this.messagePayloadProcessor.processMessagePayload(message);
-        }
-
-        logger.debug("Processing of SQS message/s complete");
-
-        return null;
-    }
-     */
 }
