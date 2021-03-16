@@ -4,6 +4,7 @@ import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.log4j.Logger;
 import org.glassfish.jersey.apache.connector.ApacheClientProperties;
@@ -11,6 +12,7 @@ import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 import org.slf4j.LoggerFactory;
+
 import uk.gov.dvsa.motr.config.CachedConfig;
 import uk.gov.dvsa.motr.config.Config;
 import uk.gov.dvsa.motr.config.ConfigKey;
@@ -36,7 +38,9 @@ import java.util.Set;
 
 import static com.amazonaws.regions.Region.getRegion;
 import static com.amazonaws.regions.Regions.fromName;
+
 import static org.apache.log4j.Level.toLevel;
+
 import static uk.gov.dvsa.motr.notifier.SystemVariable.CHECKSUM_SALT;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.DB_TABLE_SUBSCRIPTION;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.GOV_NOTIFY_API_TOKEN;
