@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.After;
 import org.junit.Before;
-import static org.junit.Assert.assertEquals;
 
 import uk.gov.dvsa.motr.notifier.component.subscription.persistence.DynamoDbSubscriptionRepository;
 import uk.gov.dvsa.motr.notifier.component.subscription.persistence.SubscriptionDbItem;
@@ -28,6 +27,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import static org.junit.Assert.assertEquals;
 
 import static uk.gov.dvsa.motr.test.environmant.variables.TestEnvironmentVariables.region;
 import static uk.gov.dvsa.motr.test.environmant.variables.TestEnvironmentVariables.subscriptionTableName;
@@ -124,9 +125,7 @@ public abstract class SubscriptionQueueMessageAbstractTest {
         assertEquals(subscriptionItem.getId(), subscriptionDbItem.getId());
         assertEquals(subscriptionItem.getVrm(), subscriptionDbItem.getVrm());
         assertEquals(subscriptionItem.getEmail(), subscriptionDbItem.getEmail());
-        assertEquals(subscriptionItem.getDvlaId(), subscriptionDbItem.getDvlaId());
         assertEquals(subscriptionItem.getMotDueDate(), subscriptionDbItem.getMotDueDate());
-        assertEquals(subscriptionItem.getMotTestNumber(), subscriptionDbItem.getMotTestNumber());
         assertEquals(subscriptionItem.getVehicleType(), subscriptionDbItem.getVehicleType());
     }
 
