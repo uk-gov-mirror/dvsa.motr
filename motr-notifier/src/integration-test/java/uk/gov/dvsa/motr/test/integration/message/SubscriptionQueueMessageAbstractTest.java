@@ -1,4 +1,4 @@
-package uk.gov.dvsa.motr.test.integration.unloader;
+package uk.gov.dvsa.motr.test.integration.message;
 
 import com.amazonaws.services.lambda.runtime.ClientContext;
 import com.amazonaws.services.lambda.runtime.CognitoIdentity;
@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.After;
 import org.junit.Before;
+import static org.junit.Assert.assertEquals;
 
 import uk.gov.dvsa.motr.notifier.component.subscription.persistence.DynamoDbSubscriptionRepository;
 import uk.gov.dvsa.motr.notifier.component.subscription.persistence.SubscriptionDbItem;
@@ -24,7 +25,6 @@ import uk.gov.dvsa.motr.test.integration.lambda.LoaderInvocationEvent;
 
 import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -33,7 +33,7 @@ import static uk.gov.dvsa.motr.test.environmant.variables.TestEnvironmentVariabl
 import static uk.gov.dvsa.motr.test.environmant.variables.TestEnvironmentVariables.subscriptionTableName;
 import static uk.gov.dvsa.motr.test.integration.dynamodb.DynamoDbIntegrationHelper.dynamoDbClient;
 
-public abstract class SubscriptionDbItemQueueItemUnloaderAbstractTest {
+public abstract class SubscriptionQueueMessageAbstractTest {
 
     private ObjectMapper jsonMapper = new ObjectMapper();
     private LoaderHelper loaderHelper;
@@ -117,6 +117,17 @@ public abstract class SubscriptionDbItemQueueItemUnloaderAbstractTest {
         // Update vrm in subscriptionItem to match changeSubscriptionDbItem so cleanUp() will find it in the db.
         subscriptionItem.setVrm(changedSubscriptionDbItem.getVrm());
         return changedSubscriptionDbItem;
+    }
+
+    // Confirms that the data provided by the test is saved into a DB item successfully
+    protected void verifySavedSubscriptionItem(SubscriptionItem subscriptionItem, SubscriptionDbItem subscriptionDbItem) {
+        assertEquals(subscriptionItem.getId(), subscriptionDbItem.getId());
+        assertEquals(subscriptionItem.getVrm(), subscriptionDbItem.getVrm());
+        assertEquals(subscriptionItem.getEmail(), subscriptionDbItem.getEmail());
+        assertEquals(subscriptionItem.getDvlaId(), subscriptionDbItem.getDvlaId());
+        assertEquals(subscriptionItem.getMotDueDate(), subscriptionDbItem.getMotDueDate());
+        assertEquals(subscriptionItem.getMotTestNumber(), subscriptionDbItem.getMotTestNumber());
+        assertEquals(subscriptionItem.getVehicleType(), subscriptionDbItem.getVehicleType());
     }
 
     protected Context buildContext() {

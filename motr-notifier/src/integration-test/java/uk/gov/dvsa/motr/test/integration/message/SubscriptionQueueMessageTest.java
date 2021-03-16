@@ -1,4 +1,4 @@
-package uk.gov.dvsa.motr.test.integration.unloader;
+package uk.gov.dvsa.motr.test.integration.message;
 
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Item;
@@ -14,11 +14,8 @@ import uk.gov.dvsa.motr.notifier.processing.model.SubscriptionQueueItem;
 import uk.gov.dvsa.motr.test.environmant.variables.TestEnvironmentVariables;
 import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.model.SubscriptionItem;
 import uk.gov.dvsa.motr.vehicledetails.VehicleType;
-import uk.gov.service.notify.NotificationClientException;
 
-import java.io.IOException;
 import java.time.LocalDate;
-import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -27,7 +24,7 @@ import static org.junit.Assert.assertNull;
 import static uk.gov.dvsa.motr.test.environmant.variables.TestEnvironmentVariables.subscriptionTableName;
 import static uk.gov.dvsa.motr.test.integration.dynamodb.DynamoDbIntegrationHelper.dynamoDbClient;
 
-public class SubscriptionDbItemQueueItemUnloaderTest extends SubscriptionDbItemQueueItemUnloaderAbstractTest {
+public class SubscriptionQueueMessageTest extends SubscriptionQueueMessageAbstractTest {
 
     @Rule
     public final EnvironmentVariables environmentVariables = new TestEnvironmentVariables();
@@ -45,7 +42,8 @@ public class SubscriptionDbItemQueueItemUnloaderTest extends SubscriptionDbItemQ
                 .setMotDueDate(MOCK_API_RANDOM_VEHICLE_DATE)
                 .setRandomMotTestNumber();
 
-        saveAndProcessSubscriptionItem(subscriptionItem);
+        SubscriptionDbItem savedItem = saveAndProcessSubscriptionItem(subscriptionItem);
+        verifySavedSubscriptionItem(subscriptionItem, savedItem);
     }
 
     @Test
@@ -58,7 +56,8 @@ public class SubscriptionDbItemQueueItemUnloaderTest extends SubscriptionDbItemQ
                 .setContactType(SubscriptionQueueItem.ContactType.MOBILE)
                 .setRandomMotTestNumber();
 
-        saveAndProcessSubscriptionItem(subscriptionItem);
+        SubscriptionDbItem savedItem = saveAndProcessSubscriptionItem(subscriptionItem);
+        verifySavedSubscriptionItem(subscriptionItem, savedItem);
     }
 
     @Test
@@ -74,6 +73,7 @@ public class SubscriptionDbItemQueueItemUnloaderTest extends SubscriptionDbItemQ
 
         // Assert that the db subscription date now is equal to the mock api date.
         assertEquals(MOCK_API_SPECIFIC_VEHICLE_DATE, changedSubscriptionDbItem.getMotDueDate());
+        verifySavedSubscriptionItem(subscriptionItem, changedSubscriptionDbItem);
     }
 
     @Test
@@ -89,6 +89,7 @@ public class SubscriptionDbItemQueueItemUnloaderTest extends SubscriptionDbItemQ
 
         // Assert that the db motTestNumber now is equal to the mock api motTestNumber.
         assertEquals("2321321", changedSubscriptionDbItem.getMotTestNumber());
+        verifySavedSubscriptionItem(subscriptionItem, changedSubscriptionDbItem);
     }
 
     @Test
