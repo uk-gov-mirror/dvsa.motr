@@ -17,6 +17,8 @@ public class SubscriptionHandlerHelper {
 
     public static boolean motDueDateUpdateRequired(LocalDate subscriptionMotDueDate, LocalDate vehicleDetailsMotExpiryDate) {
 
+        System.out.println("Subscription Due Date: " + subscriptionMotDueDate.toString());
+        System.out.println("Vehicle Details Expiry Date: " + vehicleDetailsMotExpiryDate.toString());
         return !subscriptionMotDueDate.equals(vehicleDetailsMotExpiryDate);
     }
 
