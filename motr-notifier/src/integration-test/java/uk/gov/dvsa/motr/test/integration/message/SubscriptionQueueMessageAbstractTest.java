@@ -56,7 +56,7 @@ public abstract class SubscriptionQueueMessageAbstractTest {
     @After
     public void cleanUp() {
 
-        // fixture.removeItem(subscriptionItem);
+        fixture.removeItem(subscriptionItem);
     }
 
     protected String buildLoaderRequest(String testTime) throws JsonProcessingException {
