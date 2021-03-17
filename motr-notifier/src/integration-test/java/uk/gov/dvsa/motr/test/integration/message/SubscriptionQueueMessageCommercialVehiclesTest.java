@@ -30,7 +30,6 @@ public class SubscriptionQueueMessageCommercialVehiclesTest extends Subscription
                 .setMotDueDate(VEHICLE_TEST_EXPIRY_DATE);
 
         SubscriptionDbItem savedItem = saveAndProcessSubscriptionItem(subscriptionItem);
-        verifySavedSubscriptionItem(subscriptionItem, savedItem);
     }
 
     @Test
@@ -44,6 +43,5 @@ public class SubscriptionQueueMessageCommercialVehiclesTest extends Subscription
         saveAndProcessSubscriptionItem(subscriptionItem);
 
         SubscriptionDbItem savedItem = saveAndProcessSubscriptionItem(subscriptionItem);
-        verifySavedSubscriptionItem(subscriptionItem, savedItem);
     }
 }

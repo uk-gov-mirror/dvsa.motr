@@ -43,7 +43,6 @@ public class SubscriptionQueueMessageTest extends SubscriptionQueueMessageAbstra
                 .setRandomMotTestNumber();
 
         SubscriptionDbItem savedItem = saveAndProcessSubscriptionItem(subscriptionItem);
-        verifySavedSubscriptionItem(subscriptionItem, savedItem);
     }
 
     @Test
@@ -57,7 +56,6 @@ public class SubscriptionQueueMessageTest extends SubscriptionQueueMessageAbstra
                 .setRandomMotTestNumber();
 
         SubscriptionDbItem savedItem = saveAndProcessSubscriptionItem(subscriptionItem);
-        verifySavedSubscriptionItem(subscriptionItem, savedItem);
     }
 
     @Test
@@ -73,7 +71,6 @@ public class SubscriptionQueueMessageTest extends SubscriptionQueueMessageAbstra
 
         // Assert that the db subscription date now is equal to the mock api date.
         assertEquals(MOCK_API_SPECIFIC_VEHICLE_DATE, changedSubscriptionDbItem.getMotDueDate());
-        verifySavedSubscriptionItem(subscriptionItem, changedSubscriptionDbItem);
     }
 
     @Test
@@ -89,7 +86,6 @@ public class SubscriptionQueueMessageTest extends SubscriptionQueueMessageAbstra
 
         // Assert that the db motTestNumber now is equal to the mock api motTestNumber.
         assertEquals("2321321", changedSubscriptionDbItem.getMotTestNumber());
-        verifySavedSubscriptionItem(subscriptionItem, changedSubscriptionDbItem);
     }
 
     @Test

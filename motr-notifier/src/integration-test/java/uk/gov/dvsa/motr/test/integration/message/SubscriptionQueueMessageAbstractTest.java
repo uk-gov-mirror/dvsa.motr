@@ -142,13 +142,4 @@ public abstract class SubscriptionQueueMessageAbstractTest {
         subscriptionItem.setVrm(changedSubscriptionDbItem.getVrm());
         return changedSubscriptionDbItem;
     }
-
-    // Confirms that the data provided by the test is saved into a DB item successfully
-    protected void verifySavedSubscriptionItem(SubscriptionItem subscriptionItem, SubscriptionDbItem subscriptionDbItem) {
-        assertEquals(subscriptionItem.getId(), subscriptionDbItem.getId());
-        assertEquals(subscriptionItem.getVrm(), subscriptionDbItem.getVrm());
-        assertEquals(subscriptionItem.getEmail(), subscriptionDbItem.getEmail());
-        assertEquals(subscriptionItem.getMotDueDate(), subscriptionDbItem.getMotDueDate());
-        assertEquals(subscriptionItem.getVehicleType(), subscriptionDbItem.getVehicleType());
-    }
 }
