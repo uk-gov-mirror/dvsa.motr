@@ -129,7 +129,11 @@ public abstract class SubscriptionQueueMessageAbstractTest {
         String testTime = subscriptionItem.getMotDueDate().minusMonths(1) + "T12:00:00Z";
         loaderHelper.invokeLoader(buildLoaderRequest(testTime));
 
+        // Allow SQS to process the loaded items.
         waitForSqsProcessing();
+
+        // Wait for DynamoDB to get it's act together.
+        Thread.sleep(10000);
 
         Optional<SubscriptionDbItem> subscriptionContainer = repo.findById(subscriptionItem.getId());
         if (!subscriptionContainer.isPresent()) {
