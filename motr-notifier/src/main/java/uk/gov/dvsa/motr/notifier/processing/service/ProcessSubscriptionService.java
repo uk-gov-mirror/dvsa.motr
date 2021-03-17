@@ -166,22 +166,22 @@ public class ProcessSubscriptionService {
         final String vrm = subscriptionQueueItem.getVrm();
         final VehicleType vehicleType = subscriptionQueueItem.getVehicleType();
 
-        logger.debug("Subscription dvlaId is {}, mot test number is {} and vrm is {}", dvlaId, motTestNumber, vrm);
+        logger.info("Subscription dvlaId is {}, mot test number is {} and vrm is {}", dvlaId, motTestNumber, vrm);
 
         if (vehicleType == VehicleType.MOT && motTestNumber != null) {
-            logger.trace("going to fetch by mot test number");
+            logger.info("going to fetch by mot test number");
 
             return client.fetchByMotTestNumber(motTestNumber).orElseThrow(() -> {
-                logger.debug("no vehicle found for mot_test_number {}", motTestNumber);
+                logger.info("no vehicle found for mot_test_number {}", motTestNumber);
                 return new VehicleNotFoundException("no vehicle found for mot_test_number: " + motTestNumber);
             });
         }
 
         if (VehicleType.isCommercialVehicle(vehicleType) && vrm != null) {
-            logger.trace("going to fetch HGV/PSV/trailer data by vrm");
+            logger.info("going to fetch HGV/PSV/trailer data by vrm");
 
             VehicleDetails vehicleDetails = client.fetchHgvPsvByVrm(vrm).orElseThrow(() -> {
-                logger.debug("no HGV/PSV/trailer vehicle found for vrm {}", vrm);
+                logger.info("no HGV/PSV/trailer vehicle found for vrm {}", vrm);
                 return new VehicleNotFoundException("no HGV/PSV vehicle found for vrm " + vrm);
             });
             EventLogger.logEvent(new HgvPsvDetailsRetrievalSuccessfulEvent());
@@ -189,15 +189,15 @@ public class ProcessSubscriptionService {
         }
 
         if (dvlaId != null) {
-            logger.trace("going to fetch by dvla id");
+            logger.info("going to fetch by dvla id");
 
             return client.fetchByDvlaId(dvlaId).orElseThrow(() -> {
-                logger.debug("no vehicle found for dvla id {}", dvlaId);
+                logger.info("no vehicle found for dvla id {}", dvlaId);
                 return new VehicleNotFoundException("no vehicle found for dvlaid: " + dvlaId);
             });
         }
 
-        logger.debug("no attribute to search for subscription {}", subscriptionQueueItem);
+        logger.info("no attribute to search for subscription {}", subscriptionQueueItem);
         throw new VehicleNotFoundException("no data to search for subscription " + subscriptionQueueItem.getId());
     }
 }
