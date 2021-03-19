@@ -16,8 +16,6 @@ import uk.gov.dvsa.motr.notifier.SystemVariable;
 import uk.gov.dvsa.motr.notifier.component.subscription.persistence.DynamoDbSubscriptionRepository;
 import uk.gov.dvsa.motr.notifier.component.subscription.persistence.SubscriptionDbItem;
 import uk.gov.dvsa.motr.notifier.handler.EventHandler;
-import uk.gov.dvsa.motr.notifier.processing.model.ContactDetail;
-import uk.gov.dvsa.motr.notifier.processing.model.SubscriptionQueueItem;
 import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.core.DynamoDbFixture;
 import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.model.SubscriptionItem;
 import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.model.SubscriptionTable;
@@ -35,6 +33,10 @@ import static uk.gov.dvsa.motr.test.environmant.variables.TestEnvironmentVariabl
 import static uk.gov.dvsa.motr.test.integration.dynamodb.DynamoDbIntegrationHelper.dynamoDbClient;
 
 public abstract class SubscriptionQueueMessageAbstractTest {
+
+    private static final long MAXIMUM_QUEUE_TRIES = 10;
+    private static final long SECONDS_BETWEEN_QUEUE_RETRIES = 5;
+    private static final long SECONDS_TO_WAIT_FOR_LAMBDA_EXECUTION = 5;
 
     private ObjectMapper jsonMapper = new ObjectMapper();
     private LoaderHelper loaderHelper;
@@ -69,15 +71,13 @@ public abstract class SubscriptionQueueMessageAbstractTest {
         int tries = 0;
 
         while (hasMessagesInQueue()) {
-            if (tries > 5) {
-                System.out.println("Reach maximum attempts of waiting for the SQS to finish.");
-                // Maybe throw an exception here to prevent the rest of the tests from processing.
-                // Something is wrong.
+            if (tries >= MAXIMUM_QUEUE_TRIES) {
+                System.out.println("Reached maximum attempts of waiting for the SQS to finish.");
                 break;
             }
 
-            System.out.println("Messages still in queue. Waiting 5 seconds...");
-            Thread.sleep(5000);
+            System.out.println("Messages still to be processed in the queue. Waiting...");
+            Thread.sleep(SECONDS_BETWEEN_QUEUE_RETRIES * 1000);
 
             ++tries;
         }
@@ -105,12 +105,12 @@ public abstract class SubscriptionQueueMessageAbstractTest {
         boolean hasMessages = !getQueueAttributesResult.getAttributes()
                 .get(QueueAttributeName.ApproximateNumberOfMessages.toString()).equals("0");
 
+        System.out.println("Messages ready for processing: " + getQueueAttributesResult.getAttributes()
+                .get(QueueAttributeName.ApproximateNumberOfMessages.toString()));
         System.out.println("Delayed messages: " + getQueueAttributesResult.getAttributes()
                 .get(QueueAttributeName.ApproximateNumberOfMessagesDelayed.toString()));
         System.out.println("Not visible messages: " + getQueueAttributesResult.getAttributes()
                 .get(QueueAttributeName.ApproximateNumberOfMessagesNotVisible.toString()));
-        System.out.println("Total messages: " + getQueueAttributesResult.getAttributes()
-                .get(QueueAttributeName.ApproximateNumberOfMessages.toString()));
 
         return hasDelayedMessages || hasNotVisibleMessages || hasMessages;
     }
@@ -133,7 +133,7 @@ public abstract class SubscriptionQueueMessageAbstractTest {
         waitForSqsProcessing();
 
         // Wait for DynamoDB to get it's act together.
-        Thread.sleep(10000);
+        Thread.sleep(SECONDS_TO_WAIT_FOR_LAMBDA_EXECUTION * 1000);
 
         Optional<SubscriptionDbItem> subscriptionContainer = repo.findById(subscriptionItem.getId());
         if (!subscriptionContainer.isPresent()) {
