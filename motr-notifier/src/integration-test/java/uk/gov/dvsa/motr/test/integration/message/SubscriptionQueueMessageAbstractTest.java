@@ -34,6 +34,7 @@ import static uk.gov.dvsa.motr.test.integration.dynamodb.DynamoDbIntegrationHelp
 
 public abstract class SubscriptionQueueMessageAbstractTest {
 
+    private static final long INITIAL_SQS_WARMUP_WAIT = 10;
     private static final long MAXIMUM_QUEUE_TRIES = 10;
     private static final long SECONDS_BETWEEN_QUEUE_RETRIES = 5;
     private static final long SECONDS_TO_WAIT_FOR_LAMBDA_EXECUTION = 10;
@@ -68,6 +69,8 @@ public abstract class SubscriptionQueueMessageAbstractTest {
     }
 
     protected void waitForSqsProcessing() throws Exception {
+        Thread.sleep(INITIAL_SQS_WARMUP_WAIT * 1000);
+
         int tries = 0;
 
         while (hasMessagesInQueue()) {
