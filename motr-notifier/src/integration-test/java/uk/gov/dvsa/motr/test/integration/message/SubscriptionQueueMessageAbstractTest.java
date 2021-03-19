@@ -36,7 +36,7 @@ public abstract class SubscriptionQueueMessageAbstractTest {
 
     private static final long MAXIMUM_QUEUE_TRIES = 10;
     private static final long SECONDS_BETWEEN_QUEUE_RETRIES = 5;
-    private static final long SECONDS_TO_WAIT_FOR_LAMBDA_EXECUTION = 5;
+    private static final long SECONDS_TO_WAIT_FOR_LAMBDA_EXECUTION = 10;
 
     private ObjectMapper jsonMapper = new ObjectMapper();
     private LoaderHelper loaderHelper;
