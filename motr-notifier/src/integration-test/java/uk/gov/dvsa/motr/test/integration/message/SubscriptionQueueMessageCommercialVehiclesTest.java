@@ -29,7 +29,7 @@ public class SubscriptionQueueMessageCommercialVehiclesTest extends Subscription
                 .setVrm("HGV-OLDEXPIRY")
                 .setMotDueDate(VEHICLE_TEST_EXPIRY_DATE);
 
-        SubscriptionDbItem savedItem = saveAndProcessSubscriptionItem(subscriptionItem);
+        saveAndProcessSubscriptionItem(subscriptionItem);
     }
 
     @Test
@@ -41,7 +41,5 @@ public class SubscriptionQueueMessageCommercialVehiclesTest extends Subscription
                 .setMotDueDate(VEHICLE_TEST_EXPIRY_DATE);
 
         saveAndProcessSubscriptionItem(subscriptionItem);
-
-        SubscriptionDbItem savedItem = saveAndProcessSubscriptionItem(subscriptionItem);
     }
 }

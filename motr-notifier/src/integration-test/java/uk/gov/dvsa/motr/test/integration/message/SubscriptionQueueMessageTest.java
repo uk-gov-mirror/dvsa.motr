@@ -42,7 +42,7 @@ public class SubscriptionQueueMessageTest extends SubscriptionQueueMessageAbstra
                 .setMotDueDate(MOCK_API_RANDOM_VEHICLE_DATE)
                 .setRandomMotTestNumber();
 
-        SubscriptionDbItem savedItem = saveAndProcessSubscriptionItem(subscriptionItem);
+        saveAndProcessSubscriptionItem(subscriptionItem);
     }
 
     @Test
@@ -55,7 +55,7 @@ public class SubscriptionQueueMessageTest extends SubscriptionQueueMessageAbstra
                 .setContactType(SubscriptionQueueItem.ContactType.MOBILE)
                 .setRandomMotTestNumber();
 
-        SubscriptionDbItem savedItem = saveAndProcessSubscriptionItem(subscriptionItem);
+        saveAndProcessSubscriptionItem(subscriptionItem);
     }
 
     @Test

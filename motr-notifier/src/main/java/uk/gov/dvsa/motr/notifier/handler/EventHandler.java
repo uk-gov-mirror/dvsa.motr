@@ -38,15 +38,11 @@ public class EventHandler {
         }
     }
 
-    private SubscriptionQueueItem getSubscriptionFromMessage(SQSEvent.SQSMessage message, Context context) {
-        try {
-            ObjectMapper jsonMapper = new ObjectMapper();
-            SubscriptionQueueItem subscriptionQueueItem = jsonMapper.readValue(message.getBody(), SubscriptionQueueItem.class);
-            subscriptionQueueItem.setMessageReceiptHandle(message.getReceiptHandle())
-                    .setMessageCorrelationId(context.getAwsRequestId());
-            return subscriptionQueueItem;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    private SubscriptionQueueItem getSubscriptionFromMessage(SQSEvent.SQSMessage message, Context context) throws IOException {
+        ObjectMapper jsonMapper = new ObjectMapper();
+        SubscriptionQueueItem subscriptionQueueItem = jsonMapper.readValue(message.getBody(), SubscriptionQueueItem.class);
+        subscriptionQueueItem.setMessageReceiptHandle(message.getReceiptHandle())
+                .setMessageCorrelationId(context.getAwsRequestId());
+        return subscriptionQueueItem;
     }
 }
