@@ -28,7 +28,7 @@ import uk.gov.dvsa.motr.notifier.notify.NotifyEmailService;
 import uk.gov.dvsa.motr.notifier.notify.NotifySmsService;
 import uk.gov.dvsa.motr.notifier.processing.factory.SendableNotificationFactory;
 import uk.gov.dvsa.motr.notifier.processing.service.ProcessSubscriptionService;
-import uk.gov.dvsa.motr.notifier.processing.unloader.ProcessSubscriptionTask;
+import uk.gov.dvsa.motr.notifier.processing.service.ProcessSubscriptionTask;
 import uk.gov.dvsa.motr.notify.NotifyTemplateEngine;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
 import uk.gov.service.notify.NotificationClient;

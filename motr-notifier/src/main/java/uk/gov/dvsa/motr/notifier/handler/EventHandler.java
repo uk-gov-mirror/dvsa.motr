@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import uk.gov.dvsa.motr.notifier.module.ConfigModule;
 import uk.gov.dvsa.motr.notifier.module.InvocationContextModule;
 import uk.gov.dvsa.motr.notifier.processing.model.SubscriptionQueueItem;
-import uk.gov.dvsa.motr.notifier.processing.unloader.ProcessSubscriptionTask;
+import uk.gov.dvsa.motr.notifier.processing.service.ProcessSubscriptionTask;
 
 import java.io.IOException;
 import java.util.List;

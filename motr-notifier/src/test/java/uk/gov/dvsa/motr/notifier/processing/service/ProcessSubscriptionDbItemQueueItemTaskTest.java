@@ -1,12 +1,10 @@
-package uk.gov.dvsa.motr.notifier.processing.unloader;
+package uk.gov.dvsa.motr.notifier.processing.service;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import uk.gov.dvsa.motr.notifier.processing.model.ContactDetail;
 import uk.gov.dvsa.motr.notifier.processing.model.SubscriptionQueueItem;
-import uk.gov.dvsa.motr.notifier.processing.service.ProcessSubscriptionService;
-import uk.gov.dvsa.motr.notifier.processing.service.VehicleNotFoundException;
 
 import java.time.LocalDate;
 
@@ -21,12 +19,9 @@ public class ProcessSubscriptionDbItemQueueItemTaskTest {
 
     private static LocalDate requestDate = LocalDate.of(2017, 10, 10);
     private SubscriptionQueueItem subscriptionQueueItemToProcess;
-    private NotifierReport report = mock(NotifierReport.class);
     private ProcessSubscriptionService processSubscriptionService = mock(ProcessSubscriptionService.class);
 
     private ProcessSubscriptionTask processSubscriptionTask;
-
-    // @todo Move tests to more relevant location (no longer associated with the unloader
 
     @Before
     public void setUp() {

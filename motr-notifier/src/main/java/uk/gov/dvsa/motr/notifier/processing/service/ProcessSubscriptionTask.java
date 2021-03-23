@@ -1,4 +1,4 @@
-package uk.gov.dvsa.motr.notifier.processing.unloader;
+package uk.gov.dvsa.motr.notifier.processing.service;
 
 import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.notifier.events.HgvPsvDetailsRetrievalFailedEvent;

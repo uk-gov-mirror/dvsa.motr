@@ -10,7 +10,6 @@ import org.aspectj.lang.annotation.Before;
 
 import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.notifier.events.MetricEvent;
-import uk.gov.dvsa.motr.notifier.processing.unloader.NotifierReport;
 
 @Aspect
 public class MetricsPerfAspect {
