@@ -5,10 +5,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import uk.gov.dvsa.motr.serialisation.LocalDateDeserialiser;
-import uk.gov.dvsa.motr.serialisation.LocalDateSerialiser;
 import uk.gov.dvsa.motr.vehicledetails.VehicleType;
 
 import java.time.LocalDate;
@@ -36,7 +34,6 @@ public class SubscriptionQueueItem {
     private String id;
 
     @JsonProperty("motDueDate")
-    @JsonSerialize(using = LocalDateSerialiser.class)
     @JsonDeserialize(using = LocalDateDeserialiser.class)
     private LocalDate motDueDate;
 
@@ -55,7 +52,6 @@ public class SubscriptionQueueItem {
     private String dvlaId;
 
     @JsonProperty("loadedOnDate")
-    @JsonSerialize(using = LocalDateSerialiser.class)
     @JsonDeserialize(using = LocalDateDeserialiser.class)
     private LocalDate loadedOnDate;
 
