@@ -2,7 +2,7 @@
 <!--[if lte IE 8 ]><html class="lte-ie8" lang="en"><![endif]-->
 <!--[if IE 9 ]><html class="ie9" lang="en"><![endif]-->
 <!--[if (gt IE 9)|!(IE)]><!--><html class="" lang="en"><!--<![endif]-->
-  <head>
+<head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
@@ -21,10 +21,10 @@
         <script>
             (function (w,d,s,l,i) {
                 w[l]=w[l]||[];w[l].push(
-                    {'gtm.start': new Date().getTime(),event:'gtm.js'}
+                        {'gtm.start': new Date().getTime(),event:'gtm.js'}
                 );var f=d.getElementsByTagName(s)[0],
-                j=d.createElement(s),
-                dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+                        j=d.createElement(s),
+                        dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
             })(window,document,'script','dataLayer','GTM-TVLB97T');
         </script>
         <!-- End Google Tag Manager -->
@@ -64,104 +64,104 @@
 </head>
 
 <body class="motr ">
-    {{#shouldUseAnalytics}}
-        <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TVLB97T" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-    {{/shouldUseAnalytics}}
-    <script>document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');</script>
+{{#shouldUseAnalytics}}
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TVLB97T" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+{{/shouldUseAnalytics}}
+<script>document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');</script>
 
-    <!-- skiplink -->
-    <div id="skiplink-container">
-      <div><a href="#content" class="skiplink">Skip to main content</a></div>
+<!-- skiplink -->
+<div id="skiplink-container">
+    <div><a href="#content" class="skiplink">Skip to main content</a></div>
+</div>
+
+{{> partial/cookie-preferences-banner }}
+
+<!-- header -->
+<header id="global-header" class="with-proposition">
+    <div class="header-wrapper">
+        <div class="header-global">
+            <div class="header-logo">
+                <a href="https://www.gov.uk" title="Go to the GOV.UK homepage" id="logo" class="content">
+                    <img src="{{{asset this 'images/gov.uk_logotype_crown_invert_trans.png?0.22.1'}}}" width="36" height="32" alt="GOV UK Crown">
+                    GOV.UK
+                </a>
+            </div>
+        </div>
+
+        <div class="header-proposition">
+            <div class="content">
+                <nav id="proposition-menu">
+                    <a href="https://www.gov.uk/mot-reminder" id="proposition-name">Get an annual MOT reminder</a>
+                </nav>
+            </div>
+        </div>
+
+    </div>
+</header>
+<!-- header bar -->
+<div id="global-header-bar"></div>
+
+<!-- main content -->
+<main id="content">
+
+    <div class="phase-banner">
+        <p>
+            <strong class="phase-tag">BETA</strong>
+            <span>This is a new service – your <a href="{{#if smartSurveyFeedback}}{{smartSurveyFeedback}}{{else}}http://www.smartsurvey.co.uk/s/MKVXI/{{/if}}" target="_blank">feedback</a> will help us to improve it.</span>
+        </p>
     </div>
 
-    {{> partial/cookie-preferences-banner }}
+    {{#block "content"}}
 
-    <!-- header -->
-    <header id="global-header" class="with-proposition">
-        <div class="header-wrapper">
-            <div class="header-global">
-                <div class="header-logo">
-                    <a href="https://www.gov.uk" title="Go to the GOV.UK homepage" id="logo" class="content">
-                        <img src="{{{asset this 'images/gov.uk_logotype_crown_invert_trans.png?0.22.1'}}}" width="36" height="32" alt="GOV UK Crown">
-                        GOV.UK
-                    </a>
-                </div>
-            </div>
+    {{/block}}
 
-            <div class="header-proposition">
-                <div class="content">
-                    <nav id="proposition-menu">
-                        <a href="https://www.gov.uk/mot-reminder" id="proposition-name">Get an annual MOT reminder</a>
-                    </nav>
-                </div>
-            </div>
+</main>
+<!-- / #content -->
 
-        </div>
-    </header>
-    <!-- header bar -->
-    <div id="global-header-bar"></div>
-
-    <!-- main content -->
-        <main id="content">
-
-            <div class="phase-banner">
-                <p>
-                    <strong class="phase-tag">BETA</strong>
-                    <span>This is a new service – your <a href="{{#if smartSurveyFeedback}}{{smartSurveyFeedback}}{{else}}http://www.smartsurvey.co.uk/s/MKVXI/{{/if}}" target="_blank">feedback</a> will help us to improve it.</span>
-                </p>
-            </div>
-
-            {{#block "content"}}
-
-            {{/block}}
-
-        </main>
-    <!-- / #content -->
-
-    <!-- footer -->
-        <footer class="group js-footer" id="footer">
-            <div class="footer-wrapper">
-                <div class="footer-meta">
-                    <div class="footer-meta-inner">
-                        <h2 class="visuallyhidden">Support links</h2>
+<!-- footer -->
+<footer class="group js-footer" id="footer">
+    <div class="footer-wrapper">
+        <div class="footer-meta">
+            <div class="footer-meta-inner">
+                <h2 class="visuallyhidden">Support links</h2>
+                <ul>
+                    <li><a href="{{{url this "/cookies"}}}" id="cookiesLink">Cookies</a></li>
+                    <li><a href="{{{url this "/terms-and-conditions"}}}" id="terms-and-conditions-link">Terms and conditions</a></li>
+                    <li><a href="https://www.gov.uk/dvsa/privacy" target="_blank" id="privacy-notice-link">Privacy notice</a></li>
+                    <li><a href="{{{url this "/accessibility-statement"}}}" id="accessibility-statement-link">Accessibility statement</a></li>
+                    <li>
                         <ul>
-                            <li><a href="{{{url this "/cookies"}}}" id="cookiesLink">Cookies</a></li>
-                            <li><a href="{{{url this "/terms-and-conditions"}}}" id="terms-and-conditions-link">Terms and conditions</a></li>
-                            <li><a href="https://www.gov.uk/dvsa/privacy" target="_blank" id="privacy-notice-link">Privacy notice</a></li>
-                            <li><a href="{{{url this "/accessibility-statement"}}}" id="accessibility-statement-link">Accessibility Statement</a></li>
-                            <li>
-                                <ul>
-                                    <li><a href="https://mattersoftesting.blog.gov.uk/mot-testing-service-status/">Service Status</a></li>
-                                    <li>Built by the <a href="https://www.gov.uk/government/organisations/driver-and-vehicle-standards-agency">Driver &amp;
-                                        Vehicle Standards Agency</a></li>
-                                </ul>
-                            </li>
-                            <li class="visuallyhidden" tabindex="-1">Release {{{release-version}}}</li>
+                            <li><a href="https://mattersoftesting.blog.gov.uk/mot-testing-service-status/">Service status</a></li>
+                            <li>Built by the <a href="https://www.gov.uk/government/organisations/driver-and-vehicle-standards-agency">Driver &amp;
+                                Vehicle Standards Agency</a></li>
                         </ul>
-                        <div class="open-government-licence">
-                            <p class="logo"><a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" rel="license">Open
-                                Government Licence</a></p>
-                            <p>All content is available under the <a
-                                    href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" rel="license">Open Government
-                                Licence v3.0</a>, except where otherwise stated</p>
-                        </div>
-                    </div>
-
-                    <div class="copyright">
-                        <a href="https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/copyright-and-re-use/crown-copyright/">&copy; Crown copyright</a>
-                    </div>
+                    </li>
+                    <li class="visuallyhidden" tabindex="-1">Release {{{release-version}}}</li>
+                </ul>
+                <div class="open-government-licence">
+                    <p class="logo"><a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" rel="license">Open
+                        Government Licence</a></p>
+                    <p>All content is available under the <a
+                            href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" rel="license">Open Government
+                        Licence v3.0</a>, except where otherwise stated</p>
                 </div>
             </div>
-        </footer>
 
-    <div id="global-app-error" class="app-error hidden"></div>
+            <div class="copyright">
+                <a href="https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/copyright-and-re-use/crown-copyright/">&copy; Crown copyright</a>
+            </div>
+        </div>
+    </div>
+</footer>
 
-    <div class="hidden">{{{requestId this}}}</div>
+<div id="global-app-error" class="app-error hidden"></div>
 
-    
-    <!--[if (gte IE 9) | (!IE)]><!-->
-    <script type="text/javascript" src="{{{asset this '/javascripts/vendor.bundle.js'}}}"></script>
-    <script type="text/javascript" src="{{{asset this '/javascripts/dvsa.bundle.js'}}}"></script>
-    <!--<![endif]-->
-  </body>
+<div class="hidden">{{{requestId this}}}</div>
+
+
+<!--[if (gte IE 9) | (!IE)]><!-->
+<script type="text/javascript" src="{{{asset this '/javascripts/vendor.bundle.js'}}}"></script>
+<script type="text/javascript" src="{{{asset this '/javascripts/dvsa.bundle.js'}}}"></script>
+<!--<![endif]-->
+</body>
 </html>
