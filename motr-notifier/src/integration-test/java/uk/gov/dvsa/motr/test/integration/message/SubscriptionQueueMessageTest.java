@@ -217,4 +217,18 @@ public class SubscriptionQueueMessageTest extends SubscriptionQueueMessageAbstra
         assertNull("mot_test_number is not null, when it is meant to be", savedItem.getString("mot_test_number"));
         assertNotNull("dvla_id is null even though it is meant to be kept", savedItem.getString("dvla_id"));
     }
+
+
+
+    @Test
+    public void whenASubscriptionIsInTheDbButNotTradeApi_TheLoaderLoadsIt_TheNotifierProcessIt()
+            throws Exception {
+
+        subscriptionItem = new SubscriptionItem()
+                .setMotDueDate(MOCK_API_RANDOM_VEHICLE_DATE)
+                .setRandomMotTestNumber()
+                .setVrm("ERROR-OH-NO");
+
+        saveAndProcessSubscriptionItem(subscriptionItem);
+    }
 }
