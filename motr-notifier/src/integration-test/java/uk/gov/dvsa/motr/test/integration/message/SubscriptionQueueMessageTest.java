@@ -226,7 +226,7 @@ public class SubscriptionQueueMessageTest extends SubscriptionQueueMessageAbstra
 
         subscriptionItem = new SubscriptionItem()
                 .setMotDueDate(MOCK_API_RANDOM_VEHICLE_DATE)
-                .setRandomMotTestNumber()
+                .setMotTestNumber("ERROR123456789")
                 .setVrm("ERROR-OH-NO");
 
         saveAndProcessSubscriptionItem(subscriptionItem);
