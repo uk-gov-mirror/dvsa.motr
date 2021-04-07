@@ -42,4 +42,15 @@ public class SubscriptionQueueMessageCommercialVehiclesTest extends Subscription
 
         saveAndProcessSubscriptionItem(subscriptionItem);
     }
+
+    @Test
+    public void whenAnPsvSubscriptionIsInTheDbButNotTradeApi_TheLoaderLoadsIt_TheNotifierProcessIt()
+            throws Exception {
+        subscriptionItem = new SubscriptionItem()
+                .setVehicleType(VehicleType.HGV)
+                .setVrm("ERROR-PSV")
+                .setMotDueDate(VEHICLE_TEST_EXPIRY_DATE);
+
+        saveAndProcessSubscriptionItem(subscriptionItem);
+    }
 }
