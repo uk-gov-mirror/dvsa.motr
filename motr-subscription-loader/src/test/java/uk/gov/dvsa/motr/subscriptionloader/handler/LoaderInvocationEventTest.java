@@ -37,6 +37,6 @@ public class LoaderInvocationEventTest {
 
         LoaderInvocationEvent event = new LoaderInvocationEvent();
 
-        assertTrue(event.isPurge());
+        assertFalse(event.isPurge());
     }
 }

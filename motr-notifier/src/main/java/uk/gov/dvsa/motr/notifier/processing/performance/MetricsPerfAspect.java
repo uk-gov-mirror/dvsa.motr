@@ -10,7 +10,6 @@ import org.aspectj.lang.annotation.Before;
 
 import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.notifier.events.MetricEvent;
-import uk.gov.dvsa.motr.notifier.processing.unloader.NotifierReport;
 
 @Aspect
 public class MetricsPerfAspect {
@@ -114,7 +113,7 @@ public class MetricsPerfAspect {
         return response;
     }
 
-    @Before("execution(* uk.gov.dvsa.motr.notifier.processing.unloader.QueueUnloader.run(..))")
+    @Before("execution(* uk.gov.dvsa.motr.notifier.handler.EventHandler.handle(..))")
     public void beginMetrics() {
         vehicleDetailsFetchByMotTestNumber = METRIC_REGISTRY.timer("vehicleDetailsFetchByMotTestNumber");
         vehicleDetailsFetchByDvlaId = METRIC_REGISTRY.timer("vehicleDetailsFetchByDvlaId");
@@ -124,19 +123,13 @@ public class MetricsPerfAspect {
         processItemTimer = METRIC_REGISTRY.timer("process_single_item");
     }
 
-    @Around("execution(* uk.gov.dvsa.motr.notifier.processing.unloader.QueueUnloader.run(..))")
+    @Around("execution(* uk.gov.dvsa.motr.notifier.handler.EventHandler.handle(..))")
     public Object processMetricEvent(ProceedingJoinPoint joinPoint) throws Throwable {
 
-        NotifierReport response;
+        Object response;
 
         try {
-            response = (NotifierReport)joinPoint.proceed();
-            response.setVehicleDetailsTimerFetchByMotTestNumber(vehicleDetailsFetchByMotTestNumber);
-            response.setSendEmailTimer(sendEmailTimer);
-            response.setSendSmsTimer(sendSmsTimer);
-            response.setUpdateExpiryDateTimer(updateExpiryDateTimer);
-            response.setProcessItemTimer(processItemTimer);
-            response.setVehicleDetailsTimerFetchByDvlaId(vehicleDetailsFetchByDvlaId);
+            response = joinPoint.proceed();
         } finally {
             EventLogger.logEvent(new MetricEvent()
                     .setVehicleDetails99thPercentileFetchByMotTestNumber(vehicleDetailsFetchByMotTestNumber.getSnapshot()

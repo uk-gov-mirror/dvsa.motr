@@ -2,7 +2,6 @@ package uk.gov.dvsa.motr.notifier.module;
 
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
-import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 
@@ -21,7 +20,6 @@ import uk.gov.dvsa.motr.config.EncryptionAwareConfig;
 import uk.gov.dvsa.motr.config.EnvironmentVariableConfig;
 import uk.gov.dvsa.motr.encryption.AwsKmsDecryptor;
 import uk.gov.dvsa.motr.encryption.Decryptor;
-import uk.gov.dvsa.motr.executor.BlockingExecutor;
 import uk.gov.dvsa.motr.notifier.SystemVariable;
 import uk.gov.dvsa.motr.notifier.component.subscription.persistence.DynamoDbSubscriptionRepository;
 import uk.gov.dvsa.motr.notifier.component.subscription.persistence.SubscriptionRepository;
@@ -29,10 +27,8 @@ import uk.gov.dvsa.motr.notifier.notify.NotificationTemplateIds;
 import uk.gov.dvsa.motr.notifier.notify.NotifyEmailService;
 import uk.gov.dvsa.motr.notifier.notify.NotifySmsService;
 import uk.gov.dvsa.motr.notifier.processing.factory.SendableNotificationFactory;
-import uk.gov.dvsa.motr.notifier.processing.queue.QueueItemRemover;
-import uk.gov.dvsa.motr.notifier.processing.queue.SubscriptionsReceiver;
 import uk.gov.dvsa.motr.notifier.processing.service.ProcessSubscriptionService;
-import uk.gov.dvsa.motr.notifier.processing.unloader.QueueUnloader;
+import uk.gov.dvsa.motr.notifier.processing.service.ProcessSubscriptionTask;
 import uk.gov.dvsa.motr.notify.NotifyTemplateEngine;
 import uk.gov.dvsa.motr.vehicledetails.VehicleDetailsClient;
 import uk.gov.service.notify.NotificationClient;
@@ -52,8 +48,6 @@ import static uk.gov.dvsa.motr.notifier.SystemVariable.HGV_PSV_NOTIFICATIONS;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.HGV_PSV_ONE_MONTH_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.HGV_PSV_TWO_MONTH_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.LOG_LEVEL;
-import static uk.gov.dvsa.motr.notifier.SystemVariable.MESSAGE_RECEIVE_TIMEOUT;
-import static uk.gov.dvsa.motr.notifier.SystemVariable.MESSAGE_VISIBILITY_TIMEOUT;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MOTH_DIRECT_URL_PREFIX;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_API_DVLA_ID_URI;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_API_HGV_PSV_URI;
@@ -62,13 +56,11 @@ import static uk.gov.dvsa.motr.notifier.SystemVariable.MOT_TEST_REMINDER_INFO_TO
 import static uk.gov.dvsa.motr.notifier.SystemVariable.ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID_POST_EU;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.ONE_MONTH_NOTIFICATION_TEMPLATE_ID_POST_EU;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.REGION;
-import static uk.gov.dvsa.motr.notifier.SystemVariable.REMAINING_TIME_THRESHOLD;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.SMS_HGV_PSV_ONE_MONTH_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.SMS_HGV_PSV_TWO_MONTH_NOTIFICATION_TEMPLATE_ID;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.SMS_ONE_DAY_AFTER_NOTIFICATION_TEMPLATE_ID_POST_EU;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.SMS_ONE_MONTH_NOTIFICATION_TEMPLATE_ID_POST_EU;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.SMS_TWO_WEEK_NOTIFICATION_TEMPLATE_ID_POST_EU;
-import static uk.gov.dvsa.motr.notifier.SystemVariable.SUBSCRIPTIONS_QUEUE_URL;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.TWO_WEEK_NOTIFICATION_TEMPLATE_ID_POST_EU;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.VEHICLE_API_CLIENT_TIMEOUT;
 import static uk.gov.dvsa.motr.notifier.SystemVariable.WEB_BASE_URL;
@@ -106,37 +98,11 @@ public class ConfigModule extends AbstractModule {
     }
 
     @Provides
-    public QueueUnloader provideUnloader(
-            SubscriptionsReceiver subscriptionsReceiver,
-            QueueItemRemover queueItemRemover,
-            ProcessSubscriptionService processSubscriptionService,
-            Config config) {
+    public ProcessSubscriptionTask provideProcessSubscriptionTask(
+            ProcessSubscriptionService processSubscriptionService
+    ) {
 
-        logger.info("Worker count is {}", Integer.parseInt(config.getValue(WORKER_COUNT)));
-        BlockingExecutor executor =
-                new BlockingExecutor(Integer.parseInt(config.getValue(WORKER_COUNT)));
-
-        return new QueueUnloader(subscriptionsReceiver, queueItemRemover, executor,
-                processSubscriptionService, Integer.parseInt(config.getValue(REMAINING_TIME_THRESHOLD)) * 1000,
-                POST_PROCESSING_DELAY_MS);
-    }
-
-    @Provides
-    public SubscriptionsReceiver provideSubscriptionReceiver(Config config) {
-
-        ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(config.getValue(SUBSCRIPTIONS_QUEUE_URL));
-        receiveMessageRequest.setWaitTimeSeconds(Integer.parseInt(config.getValue(MESSAGE_RECEIVE_TIMEOUT)));
-        receiveMessageRequest.setMaxNumberOfMessages(MAX_NUMBER_OF_MESSAGES);
-        receiveMessageRequest.setVisibilityTimeout(Integer.parseInt(config.getValue(MESSAGE_VISIBILITY_TIMEOUT)));
-        receiveMessageRequest.withMessageAttributeNames("correlation-id");
-
-        return new SubscriptionsReceiver(sqsClient, receiveMessageRequest);
-    }
-
-    @Provides
-    public QueueItemRemover provideSubscriptionRemover(Config config) {
-
-        return new QueueItemRemover(sqsClient ,config.getValue(SUBSCRIPTIONS_QUEUE_URL));
+        return new ProcessSubscriptionTask(processSubscriptionService);
     }
 
     @Provides

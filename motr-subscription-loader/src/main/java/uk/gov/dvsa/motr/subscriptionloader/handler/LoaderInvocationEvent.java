@@ -26,7 +26,7 @@ public class LoaderInvocationEvent {
      * That may come handy when it is necessary to run Lambda manually without affecting existing queue.
      * It also makes testing easier.
      */
-    private boolean isPurge = true;
+    private boolean isPurge = false;
 
     public String getTime() {
 
