@@ -1,9 +1,5 @@
 ^#You’ve signed up for annual test (MOT) reminders
 
-Reminders for lorries, buses and large trailers are currently suspended.
-
-You will receive reminders for ((vehicle_details)) when the service restarts.
-
 You'll get a reminder every year until you unsubscribe.
 
 # The annual test changed on 20 May 2018
