@@ -1,1 +1,1 @@
-MOT reminder: You've signed up. Give us feedback at https://www.gov.uk/mot-survey To unsubscribe reply STOP ((vehicle_vrm))
+MOT reminder: You've signed up. The annual test for ((vehicle_vrm)) is due ((mot_expiry_date)). The MOT test changed on 20/05/18, find out more at https://www.gov.uk/government/publications/hgv-inspection-manual Give us feedback at https://www.gov.uk/mot-survey To unsubscribe reply STOP ((vehicle_vrm))
